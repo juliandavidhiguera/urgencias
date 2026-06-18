@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URG CLÍNICO — Cheatsheet + Escalas</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2128;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --red: #f85149;
+  --red-bg: #3d1515;
+  --amber: #d29922;
+  --amber-bg: #2d2008;
+  --blue: #58a6ff;
+  --blue-bg: #0d1f3c;
+  --green: #3fb950;
+  --green-bg: #0d2818;
+  --purple: #bc8cff;
+  --mono: 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+.header p { font-size: 12px; color: var(--text2); }
+
+.nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 57px;
+  z-index: 99;
+}
+
+.nav-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.nav-btn:hover, .nav-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+
+.main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin: 24px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; margin-bottom: 8px; }
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+
+.card-title { font-size: 13px; font-weight: 500; }
+
+.card-body { padding: 12px 14px; }
+
+.code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.8;
+  white-space: pre;
+  color: var(--text);
+}
+
+.key { color: #79c0ff; }
+.val { color: #3fb950; }
+.alert { color: var(--red); font-weight: 600; }
+.note { color: var(--amber); }
+
+.btn-row { display: flex; gap: 6px; margin-top: 10px; }
+
+.btn {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.btn:hover { background: var(--border); color: var(--text); }
+.btn-copy:active { background: var(--green-bg); color: var(--green); }
+
+/* SCALES */
+.scales-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; }
+
+.scale-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.scale-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scale-title { font-size: 13px; font-weight: 600; }
+.scale-subtitle { font-size: 11px; color: var(--text2); }
+
+.scale-body { padding: 12px 14px; }
+
+.scale-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bg3);
+  gap: 8px;
+}
+.scale-item:last-child { border-bottom: none; }
+
+.scale-label { font-size: 12px; color: var(--text); flex: 1; }
+.scale-pts { font-size: 11px; color: var(--text2); white-space: nowrap; }
+
+.scale-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scale-input input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--blue); cursor: pointer; }
+.scale-input select {
+  font-size: 11px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-family: var(--sans);
+}
+
+.score-display {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-num { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+.score-risk { font-size: 12px; font-weight: 500; }
+.score-detail { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.risk-low { color: var(--green); }
+.risk-mid { color: var(--amber); }
+.risk-high { color: var(--red); }
+
+.reset-btn {
+  margin-top: 8px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+.tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.hidden { display: none; }
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.toast.show { opacity: 1; }
+
+.sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+@media (max-width: 600px) {
+  .grid, .scales-grid { grid-template-columns: 1fr; }
+  .nav { top: 57px; }
+}
+
+@media print {
+  .nav, .header .btn, .btn-row, .reset-btn { display: none; }
+  body { background: white; color: black; }
+  .card, .scale-card { border: 1px solid #ccc; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>⚡ URG CLÍNICO — Cheatsheet + Escalas</h1>
+    <p>Dr. Higuera · Clínica Barcelona · Uso clínico interno</p>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showTab('cheatsheets')">📋 Cheatsheets</button>
+  <button class="nav-btn" onclick="showTab('escalas')">📊 Escalas</button>
+</div>
+
+<div class="main">
+
+<!-- TAB CHEATSHEETS -->
+<div id="tab-cheatsheets" class="tab-content active">
+
+<div class="section-title">🔴 Síndrome crítico / Shock</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">Sepsis / Shock séptico</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c1"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> fiebre + hipotensión + foco _
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Analítica:</span> Lac _ · PCR _ · PCT _ · Cr _ · Bil _
+          Leucos _ · Plaquetas _ · TP _
+<span class="key">Hemocultivos:</span> S·N (extraídos antes ATB: S·N)
+<span class="key">Foco:</span> pulmonar/urinario/abdominal/catéter/_
+<span class="key">Fluidoterapia previa:</span> _ ml cristaloide
+<span class="key">AP:</span> inmunosupresión S·N · DM S·N · neoplasia S·N
+<span class="alert">⚠ Hora inicio síntomas: _h · qSOFA: calcular</span>
+<span class="note">→ Escalas: qSOFA · SOFA · SAPS II</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c1')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">SCA — Síndrome coronario agudo</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c2"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> dolor torácico _ min evolución
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · FR _
+<span class="key">ECG:</span> ritmo _ · BRIHH nuevo S·N
+       elevación ST en _ · cambios ST-T en _
+<span class="key">Analítica:</span> TnI/TnT _ (h0) · _ (h1/h3) · CK _ · Cr _
+<span class="key">Irradiación:</span> brazo izq/mandíbula/espalda/_
+<span class="key">Diaforesis:</span> S·N · Cortejo vegetativo: S·N
+<span class="key">Antiagregación previa:</span> AAS/clopidogrel/_
+<span class="key">AP:</span> cardiopatía previa S·N · HTA · DM · dislipemia
+<span class="key">Última dosis anticoagulante:</span> _h
+<span class="alert">⚠ Tiempo puerta-balón objetivo: &lt;90 min</span>
+<span class="note">→ Escalas: HEART · GRACE · TIMI</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c2')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">TEP — Tromboembolismo pulmonar</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c3"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> disnea aguda ± dolor pleurítico ± síncope
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _%
+<span class="key">ECG:</span> S1Q3T3 S·N · BRDHH S·N · taquicardia S·N
+<span class="key">Analítica:</span> DD _ · TnI _ · BNP/NT-proBNP _
+          pO₂ _ · pCO₂ _ · pH _
+<span class="key">Eco:</span> disfunción VD S·N · McConnell S·N
+<span class="key">FR:</span> inmovilización _ días · cirugía reciente S·N
+      neoplasia activa S·N · anticonceptivos S·N
+      TVP previa S·N · embarazo S·N
+<span class="key">AngioTC:</span> realizado S·N · resultado _
+<span class="alert">⚠ Estabilidad HD: estable·inestable</span>
+<span class="note">→ Escalas: Wells TEP · Geneva revisado · PESI</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c3')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">Ictus / AIT — Código Ictus</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c4"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> déficit neurológico focal agudo
+<span class="key">Hora último bien conocido:</span> __:__h
+<span class="key">Hora llegada urgencias:</span> __:__h
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Glucemia _
+<span class="key">NIHSS:</span> _ puntos
+<span class="key">Déficit:</span> hemiparesia D·I · afasia S·N
+          hemianopsia S·N · disartria S·N · ataxia S·N
+<span class="key">TC urgente:</span> hemorragia S·N · ASPECTS _
+<span class="key">Analítica:</span> Hb _ · Plaquetas _ · INR _ · TTPa _
+<span class="key">FA conocida:</span> S·N · anticoagulado S·N (fármaco _)
+<span class="key">AP:</span> HTA · DM · ictus previo S·N · cardiopatía S·N
+<span class="alert">⚠ Trombolisis: &lt;4.5h · Trombectomía: &lt;24h</span>
+<span class="note">→ Escalas: NIHSS · ABCD2 (AIT) · CHA₂DS₂-VASc</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c4')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">Shock — Diferencial</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c5"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> hipotensión · TAS &lt;90 mmHg
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Piel:</span> fría/caliente · sudoración S·N · livideces S·N
+<span class="key">PVY:</span> elevada/normal/baja
+<span class="key">Ruidos cardiacos:</span> normales/soplo/alejados
+<span class="key">Analítica:</span> Lac _ · Hb _ · Troponina _ · DD _
+          PCT _ · Cr _ · pH _ · HCO₃ _
+<span class="key">Eco POCUS:</span> FE _ · derrame pericárdico S·N
+              colapso VD S·N · IVC _
+<span class="key">Contexto:</span> fiebre S·N · hemorragia S·N · alergia S·N
+<span class="alert">⚠ Tipo probable: distributivo/cardiogénico/hipovolémico/obstructivo</span>
+<span class="note">→ Escalas: SOFA · qSOFA · MAP objetivo &gt;65 mmHg</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c5')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="section-title">🟡 Respiratorio / Cardiológico</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">IC descompensada</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c6"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> disnea aguda/subaguda · ortopnea S·N · DPN S·N
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% AA/GN
+<span class="key">Exploración:</span> crepitantes bil/unil/no
+              edemas MMII +/++/+++ · PVY elevada S·N
+              S3 S·N · hepatomegalia S·N
+<span class="key">Analítica:</span> BNP/NT-proBNP _ · TnI _ · Cr _ · Na _
+          K _ · Hb _ · urea _
+<span class="key">Rx tórax:</span> cardiomegalia S·N · redistribución S·N
+             líneas B Kerley S·N · derrame pleural S·N
+<span class="key">Eco:</span> FE _% · FEr/FEm/FEp · disfunción VD S·N
+<span class="key">Diurético habitual:</span> furosemida _ mg/día oral
+<span class="key">AP:</span> IC conocida S·N · FA · HTA · cardiopatía isq.
+<span class="note">→ Escalas: NYHA · AHA/ACC estadio · MAGGIC</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c6')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Neumonía / IRA</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c7"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> fiebre + tos + disnea _ días evolución
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Exploración:</span> crepitantes en _ · consolidación S·N
+              disminución MV en _ · derrame pleural S·N
+<span class="key">Analítica:</span> Leucos _ · PCR _ · PCT _ · Cr _
+          Hb _ · Na _ · pH _ · pO₂ _
+<span class="key">Rx/TC:</span> consolidación _ · bilateral S·N · derrame S·N
+<span class="key">Antígenos:</span> Legionella S·N · Neumococo S·N
+<span class="key">Esputo:</span> mucopurulento S·N · hemoptoico S·N
+<span class="key">ATB previo:</span> S·N (cuál _ · _ días)
+<span class="key">AP:</span> EPOC/asma S·N · inmunosupresión S·N · neoplasia S·N
+<span class="note">→ Escalas: CURB-65 · PSI/PORT · A-DROP</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c7')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">FA de novo / descompensada</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c8"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> palpitaciones/disnea/síncope · inicio _ h
+<span class="key">Vitales:</span> FC _ irreg · TA _/_ · SpO₂ _%
+<span class="key">ECG:</span> FA · RV _ lpm · preexcitación S·N
+       isquemia asociada S·N
+<span class="key">Analítica:</span> TSH _ · K _ · Mg _ · Cr _
+          TnI _ · BNP _
+<span class="key">FA previa:</span> S·N · tipo: parox/persist/permanente
+<span class="key">Anticoagulado:</span> S·N · fármaco _ · última dosis _h
+<span class="key">CHA₂DS₂-VASc:</span> _ (calcular)
+<span class="key">HAS-BLED:</span> _ (calcular)
+<span class="key">Objetivo:</span> control ritmo·frecuencia
+<span class="key">AP:</span> valvulopatía S·N · cardiopatía estructural S·N · HTA
+<span class="note">→ Escalas: CHA₂DS₂-VASc · HAS-BLED · EHRA</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c8')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">EPOC agudizado</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c9"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> disnea + cambio en esputo _ días
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Exploración:</span> sibilancias S·N · roncus S·N
+              uso musculatura accesoria S·N · cianosis S·N
+<span class="key">Gasometría:</span> pH _ · pO₂ _ · pCO₂ _ · HCO₃ _
+<span class="key">Analítica:</span> PCR _ · PCT _ · Hb _ · Hto _
+<span class="key">Rx:</span> hiperinsuflación S·N · infiltrado S·N · neumotórax S·N
+<span class="key">FEV1 basal:</span> _% · GOLD estadio _
+<span class="key">Esputo:</span> color: claro/amarillo/verde/marrón
+<span class="key">ATB indicado:</span> S·N (criterios Anthonisen: _/3)
+<span class="key">VMNI previa:</span> S·N · domiciliaria S·N
+<span class="note">→ Escalas: DECAF · BAP-65 · GOLD</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c9')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="section-title">🟡 Neurológico / Metabólico</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Síndrome confusional agudo (delirium)</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c10"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> alteración aguda comportamiento/consciencia
+<span class="key">Inicio:</span> hiperagudo/agudo · fluctuante S·N
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _ · Glucemia _
+<span class="key">CAM:</span> positivo S·N (inicio agudo + inatención + fluctuación)
+<span class="key">Glasgow:</span> _ /15 · hipoactivo/hiperactivo/mixto
+<span class="key">Analítica:</span> Na _ · K _ · Cr _ · Glucosa _ · Ca _
+          PCR _ · Hb _ · Leucos _ · TSH _ · NH₃ _
+<span class="key">Orina:</span> sedimento _ · retención urinaria S·N
+<span class="key">Fármacos recientes:</span> BDZ/opioides/anticolinérgicos S·N
+<span class="key">Estreñimiento/fecaloma:</span> S·N
+<span class="key">Situación basal:</span> independiente/dep.parcial/dep.total
+<span class="key">Demencia previa:</span> S·N · tipo _
+<span class="alert">⚠ Descartar: ITU · retención · fecaloma · fármaco · hipoglucemia</span>
+<span class="note">→ Escalas: CAM · DOS · 4AT · Nu-DESC</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c10')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">AKI — Fracaso renal agudo</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c11"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> deterioro función renal · oliguria S·N
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Diuresis:</span> _ ml/h · anuria S·N · sonda S·N
+<span class="key">Analítica:</span> Cr actual _ · Cr basal _ · ratio Cr/Cr_basal _
+          BUN _ · K _ · Na _ · HCO₃ _ · pH _
+          Lac _ · Albumina _
+<span class="key">Orina:</span> Na urinario _ · Cr urinaria _ · FENa _
+          cilindros granulosos S·N · proteinuria _
+<span class="key">Eco renal:</span> hidronefrosis S·N · tamaño renal _
+<span class="key">KDIGO stage:</span> 1(x1.5-1.9) / 2(x2-2.9) / 3(x3 o &gt;4) 
+<span class="key">Causa:</span> prerrenal/intrínseca/obstructiva
+<span class="key">Nefrotóxicos:</span> AINEs/contraste/aminoglucósidos/_ · suspendidos S·N
+<span class="key">AP:</span> IRC previa estadio _ · HTA · DM · mieloma
+<span class="note">→ Escalas: KDIGO · AKIN · RIFLE</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c11')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Cetoacidosis diabética / HHS</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c12"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> náuseas/vómitos/poliuria/dolor abdominal
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Glasgow:</span> _ /15 · respiración Kussmaul S·N
+<span class="key">Analítica:</span> Glucosa _ · pH _ · HCO₃ _
+          Cetonas plasma _ · Cetonuria _
+          Na _ (Na corregido _) · K _ · Cr _
+          Osm _ · Gap aniónico _
+          Lac _ · PCR _
+<span class="key">Orina:</span> glucosuria S·N · cetonuria _+
+<span class="key">Tipo DM:</span> DM1/DM2 · debut S·N
+<span class="key">Insulina habitual:</span> _ · última dosis _h
+<span class="key">Factor precipitante:</span> infección/omisión insulina/nuevo diagnóstico/_
+<span class="alert">⚠ CAD: pH&lt;7.3 + HCO₃&lt;15 + cetonemia&gt;3 / HHS: Osm&gt;320 + glucosa&gt;600</span>
+<span class="note">→ Escalas: criterios gravedad CAD · Bicarbonato gap</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c12')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="section-title">🟡 Digestivo / Geriátrico</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Hemorragia digestiva alta</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c13"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> hematemesis/melenas · _ episodios en _h
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · TAS ortostática _
+<span class="key">Aspecto:</span> hematemesis roja/posos café · melenas S·N
+<span class="key">Analítica:</span> Hb _ · Hto _ · Plaquetas _ · INR _
+          Cr _ · Urea _ · grupo ABO + Rh _
+<span class="key">Glasgow-Blatchford:</span> calcular
+<span class="key">Rockall pre-endoscopia:</span> calcular
+<span class="key">AINEs/ASS:</span> S·N · anticoagulantes S·N
+<span class="key">Alcohol:</span> S·N · hepatopatía S·N · varices conocidas S·N
+<span class="key">H.pylori:</span> conocido S·N · tratado S·N
+<span class="key">AP:</span> úlcera previa S·N · cirrosis S·N
+<span class="alert">⚠ Inestabilidad HD: reponer antes de endoscopia urgente</span>
+<span class="note">→ Escalas: Glasgow-Blatchford · Rockall · AIMS65</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c13')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Pancreatitis aguda</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c14"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> dolor epigástrico/mesogástrico irradiado a espalda
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Exploración:</span> defensa S·N · signo Grey Turner S·N · Cullen S·N
+<span class="key">Analítica:</span> Amilasa _ (x3 VN=_) · Lipasa _
+          PCR _ (a las 48h: _) · Leucos _ · Hb _
+          Cr _ · BUN _ · Ca _ · glucosa _
+          TGO _ · TGP _ · FA _ · Bil _
+          Hto _ · LDH _
+<span class="key">Eco:</span> colelitiasis S·N · dilatación VB S·N · necrosis S·N
+<span class="key">Etiología:</span> biliar/alcohol/hipertrigliceridemia/idiopática/_
+<span class="key">TG:</span> _ (si hipertrigliceridemia)
+<span class="key">Fluidoterapia:</span> _ ml/h pautados
+<span class="alert">⚠ Ranson &gt;3 o APACHE II &gt;8 → grave → UCI</span>
+<span class="note">→ Escalas: Ranson · BISAP · APACHE II · Atlanta revisada</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c14')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-red">Crítico</span>
+    <span class="card-title">Meningitis / Encefalitis</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c15"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> fiebre + cefalea + rigidez nucal ± alteración consciencia
+<span class="key">Tríada clásica:</span> fiebre S·N + rigidez S·N + alt.consciencia S·N
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Glasgow:</span> _ /15 · Kernig S·N · Brudzinski S·N
+<span class="key">Petequias/purpura:</span> S·N · localización _
+<span class="key">Analítica:</span> PCR _ · PCT _ · Leucos _ · Hb _
+          Coagulación: TP _ · TTPa _ · Fib _
+<span class="key">LCR (si no CI):</span> aspecto _ · células _ · PMN _
+                  proteínas _ · glucosa _ · glucemia _
+                  Gram _ · cultivo pendiente
+<span class="key">TC craneal:</span> previo a PL S·N · resultado _
+<span class="key">Inmunosupresión:</span> S·N · VIH S·N · corticoides S·N
+<span class="alert">⚠ ATB INMEDIATO si sospecha — no demorar por PL</span>
+<span class="note">→ Escalas: Glasgow · Bacterial Meningitis Score</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c15')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-blue">Hospitalario</span>
+    <span class="card-title">Caída en anciano frágil</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c16"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Mecanismo:</span> espontánea/tropiezo/sincope/mecánica
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Tª _ · Glucemia _
+<span class="key">Consciencia en caída:</span> presente/ausente · duración _
+<span class="key">Exploración:</span> deformidad _ · dolor a palpación _
+              TCE S·N · heridas _
+<span class="key">Rx:</span> fractura en _ · tipo _
+<span class="key">Analítica:</span> Hb _ · Cr _ · Na _ · K _ · Ca _
+          INR _ (si anticoagulado) · TSH _
+<span class="key">Medicación revisada:</span> BDZ S·N · antihipertensivos S·N
+                       diuréticos S·N · STOPP aplicable S·N
+<span class="key">Situación basal:</span> Barthel basal _ /100 · Lawton _ /8
+<span class="key">Caídas previas 12m:</span> _ (número)
+<span class="key">Demencia:</span> S·N · GDS _ · MMSE _
+<span class="key">Vive:</span> solo/acompañado · residencia S·N
+<span class="note">→ Escalas: Barthel · Morse · STRATIFY · Downton</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c16')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Intoxicación / Sobredosis</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c17"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> ingesta/exposición a _
+<span class="key">Hora exposición:</span> __:__h · cantidad estimada _
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _ · Pupilas _
+<span class="key">Glasgow:</span> _ /15 · agitación S·N · convulsiones S·N
+<span class="key">Tóxico:</span> fármaco/alcohol/droga/cáustico/CO/_
+<span class="key">Vía:</span> oral/inhalada/IV/transdérmica
+<span class="key">Analítica:</span> paracetamol _ · etanol _ · Na _ · K _
+          pH _ · Lac _ · CO-Hb _ · metHb _
+          osmolalidad _ · gap osmolar _
+<span class="key">ECG:</span> QTc _ · QRS _ · alteraciones _
+<span class="key">Intencionalidad:</span> accidental/voluntaria · psiquiátrico previo S·N
+<span class="key">Vómitos inducidos:</span> S·N · carbón activado S·N
+<span class="alert">⚠ Contactar toxicología: 91 562 04 20 (España)</span>
+<span class="note">→ Escalas: PSS (Poisoning Severity Score) · Glasgow</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c17')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-amber">Urgente</span>
+    <span class="card-title">Crisis hipertensiva</span>
+  </div>
+  <div class="card-body">
+    <div class="code" id="c18"><span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> cefalea/síntomas neurológicos/disnea + TA elevada
+<span class="key">Vitales:</span> TA _ (brazo D) / _ (brazo I) · FC _ · SpO₂ _% · Tª _
+<span class="key">Fondo de ojo:</span> papiledema S·N · hemorragias S·N · exudados S·N
+<span class="key">Neurológico:</span> GCS _ · déficit focal S·N · cefalea thunderclap S·N
+<span class="key">Cardiaco:</span> disnea S·N · dolor torácico S·N · S3 S·N
+<span class="key">Renal:</span> Cr _ · proteinuria _ · hematuria S·N
+<span class="key">Analítica:</span> Cr _ · Na _ · K _ · TnI _ · BNP _
+          Hb _ · esquistocitos S·N (MAT)
+<span class="key">ECG:</span> HVI S·N · isquemia S·N
+<span class="key">Tratamiento habitual:</span> _ · cumplimiento S·N
+<span class="key">Causa secundaria:</span> feocromocitoma/ESR/eclampsia/drogas S·N
+<span class="alert">⚠ Urgencia hipertensiva vs Emergencia (daño órgano diana)</span>
+<span class="note">→ Diferencial: emergencia (descenso &lt;25% en 1h) vs urgencia (oral 24-48h)</span></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyCard('c18')">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+</div>
+</div><!-- end tab-cheatsheets -->
+
+
+<!-- TAB ESCALAS -->
+<div id="tab-escalas" class="tab-content">
+
+<div class="section-title">Escalas de gravedad — calculadoras interactivas</div>
+<div class="scales-grid">
+
+<!-- qSOFA -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">qSOFA</div>
+      <div class="scale-subtitle">Sepsis — screening rápido (≥2 = alto riesgo)</div>
+    </div>
+    <span class="badge badge-red">Sepsis</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">FR ≥22 rpm</span>
+      <div class="scale-input"><input type="checkbox" id="qsofa1" onchange="calcQSOFA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Alteración estado mental (GCS &lt;15)</span>
+      <div class="scale-input"><input type="checkbox" id="qsofa2" onchange="calcQSOFA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">TAS ≤100 mmHg</span>
+      <div class="scale-input"><input type="checkbox" id="qsofa3" onchange="calcQSOFA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="score-display" id="qsofa-result">
+      <div><div class="score-num" id="qsofa-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="qsofa-risk">Sin criterios</div><div class="score-detail" id="qsofa-detail">Riesgo bajo</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetScale('qsofa',['qsofa1','qsofa2','qsofa3'],calcQSOFA)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- CURB-65 -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">CURB-65</div>
+      <div class="scale-subtitle">Neumonía — gravedad e ingreso</div>
+    </div>
+    <span class="badge badge-amber">Neumonía</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">C — Confusión (nueva, orientación alterada)</span>
+      <div class="scale-input"><input type="checkbox" id="curb1" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">U — Urea &gt;7 mmol/L (BUN &gt;20 mg/dL)</span>
+      <div class="scale-input"><input type="checkbox" id="curb2" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">R — FR ≥30 rpm</span>
+      <div class="scale-input"><input type="checkbox" id="curb3" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">B — TAS &lt;90 mmHg o TAD ≤60 mmHg</span>
+      <div class="scale-input"><input type="checkbox" id="curb4" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">65 — Edad ≥65 años</span>
+      <div class="scale-input"><input type="checkbox" id="curb5" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="score-display">
+      <div><div class="score-num" id="curb-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="curb-risk">0–1</div><div class="score-detail" id="curb-detail">Ambulatorio</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetScale('curb',['curb1','curb2','curb3','curb4','curb5'],calcCURB)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- Wells TEP -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">Wells — TEP</div>
+      <div class="scale-subtitle">Probabilidad pre-test de tromboembolismo</div>
+    </div>
+    <span class="badge badge-red">TEP</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">Signos/síntomas de TVP</span>
+      <div class="scale-input"><input type="checkbox" id="wells1" onchange="calcWells()"><span class="scale-pts">+3</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">TEP más probable que diagnóstico alternativo</span>
+      <div class="scale-input"><input type="checkbox" id="wells2" onchange="calcWells()"><span class="scale-pts">+3</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">FC &gt;100 lpm</span>
+      <div class="scale-input"><input type="checkbox" id="wells3" onchange="calcWells()"><span class="scale-pts">+1.5</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Inmovilización ≥3 días o cirugía en &lt;4 semanas</span>
+      <div class="scale-input"><input type="checkbox" id="wells4" onchange="calcWells()"><span class="scale-pts">+1.5</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">TEP o TVP previos</span>
+      <div class="scale-input"><input type="checkbox" id="wells5" onchange="calcWells()"><span class="scale-pts">+1.5</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Hemoptisis</span>
+      <div class="scale-input"><input type="checkbox" id="wells6" onchange="calcWells()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Neoplasia activa (tratamiento en &lt;6 meses)</span>
+      <div class="scale-input"><input type="checkbox" id="wells7" onchange="calcWells()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="score-display">
+      <div><div class="score-num" id="wells-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="wells-risk">Bajo</div><div class="score-detail" id="wells-detail">&lt;2 pts: DD si &lt;500 descarta</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetScale('wells',['wells1','wells2','wells3','wells4','wells5','wells6','wells7'],calcWells)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- CHA2DS2-VASc -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">CHA₂DS₂-VASc</div>
+      <div class="scale-subtitle">FA — Riesgo tromboembólico</div>
+    </div>
+    <span class="badge badge-blue">FA</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">C — IC congestiva / FE deprimida</span>
+      <div class="scale-input"><input type="checkbox" id="cha1" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">H — Hipertensión arterial</span>
+      <div class="scale-input"><input type="checkbox" id="cha2" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">A₂ — Edad ≥75 años</span>
+      <div class="scale-input"><input type="checkbox" id="cha3" onchange="calcCHA()"><span class="scale-pts">+2</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">D — Diabetes mellitus</span>
+      <div class="scale-input"><input type="checkbox" id="cha4" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">S₂ — Ictus/AIT/tromboembolismo previo</span>
+      <div class="scale-input"><input type="checkbox" id="cha5" onchange="calcCHA()"><span class="scale-pts">+2</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">V — Enfermedad vascular (IAM, EAP, placa aórtica)</span>
+      <div class="scale-input"><input type="checkbox" id="cha6" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">A — Edad 65–74 años</span>
+      <div class="scale-input"><input type="checkbox" id="cha7" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Sc — Sexo femenino</span>
+      <div class="scale-input"><input type="checkbox" id="cha8" onchange="calcCHA()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="score-display">
+      <div><div class="score-num" id="cha-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="cha-risk">Sin indicación</div><div class="score-detail" id="cha-detail">ACO no recomendado</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetScale('cha',['cha1','cha2','cha3','cha4','cha5','cha6','cha7','cha8'],calcCHA)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- HEART Score -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">HEART Score</div>
+      <div class="scale-subtitle">SCA — Estratificación dolor torácico</div>
+    </div>
+    <span class="badge badge-red">SCA</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">H — Historia (muy sospechosa)</span>
+      <div class="scale-input">
+        <select id="heart1" onchange="calcHEART()">
+          <option value="0">Poco sospechosa (0)</option>
+          <option value="1">Moderada (1)</option>
+          <option value="2">Muy sospechosa (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">E — ECG</span>
+      <div class="scale-input">
+        <select id="heart2" onchange="calcHEART()">
+          <option value="0">Normal (0)</option>
+          <option value="1">BRI/HVI/repolarización (1)</option>
+          <option value="2">Desviación ST nueva (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">A — Edad</span>
+      <div class="scale-input">
+        <select id="heart3" onchange="calcHEART()">
+          <option value="0">&lt;45 años (0)</option>
+          <option value="1">45–65 años (1)</option>
+          <option value="2">&gt;65 años (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">R — Factores de riesgo CV</span>
+      <div class="scale-input">
+        <select id="heart4" onchange="calcHEART()">
+          <option value="0">Sin FR conocidos (0)</option>
+          <option value="1">1–2 FR o historia aterosclerosis (1)</option>
+          <option value="2">≥3 FR o enfermedad aterosclerótica (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">T — Troponina</span>
+      <div class="scale-input">
+        <select id="heart5" onchange="calcHEART()">
+          <option value="0">≤LSN (0)</option>
+          <option value="1">1–3x LSN (1)</option>
+          <option value="2">&gt;3x LSN (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="score-display">
+      <div><div class="score-num" id="heart-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="heart-risk">Bajo</div><div class="score-detail" id="heart-detail">0–3: Alta domiciliaria segura</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetSelectScale('heart',['heart1','heart2','heart3','heart4','heart5'],calcHEART)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- Glasgow-Blatchford HDA -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">Glasgow-Blatchford</div>
+      <div class="scale-subtitle">HDA — Necesidad de intervención</div>
+    </div>
+    <span class="badge badge-amber">HDA</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item">
+      <span class="scale-label">Urea sérica (mmol/L)</span>
+      <div class="scale-input">
+        <select id="gbs1" onchange="calcGBS()">
+          <option value="0">&lt;6.5 (0)</option>
+          <option value="2">6.5–7.9 (2)</option>
+          <option value="3">8.0–9.9 (3)</option>
+          <option value="4">10.0–24.9 (4)</option>
+          <option value="6">≥25 (6)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Hemoglobina — Hombre (g/dL)</span>
+      <div class="scale-input">
+        <select id="gbs2" onchange="calcGBS()">
+          <option value="0">≥13 (0)</option>
+          <option value="1">12–12.9 (1)</option>
+          <option value="3">10–11.9 (3)</option>
+          <option value="6">&lt;10 (6)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">Hemoglobina — Mujer (g/dL)</span>
+      <div class="scale-input">
+        <select id="gbs3" onchange="calcGBS()">
+          <option value="0">≥12 (0)</option>
+          <option value="1">10–11.9 (1)</option>
+          <option value="6">&lt;10 (6)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">TAS sistólica (mmHg)</span>
+      <div class="scale-input">
+        <select id="gbs4" onchange="calcGBS()">
+          <option value="0">≥110 (0)</option>
+          <option value="1">100–109 (1)</option>
+          <option value="2">90–99 (2)</option>
+          <option value="3">&lt;90 (3)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item"><span class="scale-label">FC ≥100 lpm</span><div class="scale-input"><input type="checkbox" id="gbs5" onchange="calcGBS()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">Presentación con melenas</span><div class="scale-input"><input type="checkbox" id="gbs6" onchange="calcGBS()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">Síncope</span><div class="scale-input"><input type="checkbox" id="gbs7" onchange="calcGBS()"><span class="scale-pts">+2</span></div></div>
+    <div class="scale-item"><span class="scale-label">Hepatopatía conocida</span><div class="scale-input"><input type="checkbox" id="gbs8" onchange="calcGBS()"><span class="scale-pts">+2</span></div></div>
+    <div class="scale-item"><span class="scale-label">IC congestiva</span><div class="scale-input"><input type="checkbox" id="gbs9" onchange="calcGBS()"><span class="scale-pts">+2</span></div></div>
+    <div class="score-display">
+      <div><div class="score-num" id="gbs-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="gbs-risk">Bajo</div><div class="score-detail" id="gbs-detail">0: Alta domiciliaria posible</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetSelectScale('gbs',['gbs1','gbs2','gbs3','gbs4'],calcGBS,['gbs5','gbs6','gbs7','gbs8','gbs9'])">↺ Reset</button>
+  </div>
+</div>
+
+<!-- BISAP Pancreatitis -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">BISAP</div>
+      <div class="scale-subtitle">Pancreatitis aguda — mortalidad</div>
+    </div>
+    <span class="badge badge-amber">Pancreatitis</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item"><span class="scale-label">B — BUN &gt;25 mg/dL</span><div class="scale-input"><input type="checkbox" id="bisap1" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">I — Alteración estado mental (desorientación)</span><div class="scale-input"><input type="checkbox" id="bisap2" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">S — SIRS (≥2 criterios)</span><div class="scale-input"><input type="checkbox" id="bisap3" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">A — Edad &gt;60 años</span><div class="scale-input"><input type="checkbox" id="bisap4" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">P — Derrame pleural en imagen</span><div class="scale-input"><input type="checkbox" id="bisap5" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="score-display">
+      <div><div class="score-num" id="bisap-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="bisap-risk">Leve</div><div class="score-detail" id="bisap-detail">Mortalidad &lt;1%</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetScale('bisap',['bisap1','bisap2','bisap3','bisap4','bisap5'],calcBISAP)">↺ Reset</button>
+  </div>
+</div>
+
+<!-- ABCD2 AIT -->
+<div class="scale-card">
+  <div class="scale-header">
+    <div>
+      <div class="scale-title">ABCD2</div>
+      <div class="scale-subtitle">AIT — Riesgo de ictus a 2 días</div>
+    </div>
+    <span class="badge badge-red">AIT/Ictus</span>
+  </div>
+  <div class="scale-body">
+    <div class="scale-item"><span class="scale-label">A — Edad ≥60 años</span><div class="scale-input"><input type="checkbox" id="abcd1" onchange="calcABCD()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item">
+      <span class="scale-label">B — TAS ≥140 o TAD ≥90 mmHg</span>
+      <div class="scale-input"><input type="checkbox" id="abcd2" onchange="calcABCD()"><span class="scale-pts">+1</span></div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">C — Clínica: hemiparesia unilateral</span>
+      <div class="scale-input">
+        <select id="abcd3" onchange="calcABCD()">
+          <option value="0">Sin déficit motor (0)</option>
+          <option value="1">Alteración habla sin déficit motor (1)</option>
+          <option value="2">Hemiparesia unilateral (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item">
+      <span class="scale-label">D — Duración síntomas</span>
+      <div class="scale-input">
+        <select id="abcd4" onchange="calcABCD()">
+          <option value="0">&lt;10 minutos (0)</option>
+          <option value="1">10–59 minutos (1)</option>
+          <option value="2">≥60 minutos (2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="scale-item"><span class="scale-label">D2 — Diabetes mellitus</span><div class="scale-input"><input type="checkbox" id="abcd5" onchange="calcABCD()"><span class="scale-pts">+1</span></div></div>
+    <div class="score-display">
+      <div><div class="score-num" id="abcd-num">0</div><div class="score-detail">puntos</div></div>
+      <div style="text-align:right"><div class="score-risk" id="abcd-risk">Bajo</div><div class="score-detail" id="abcd-detail">Riesgo ictus 2d: ~1%</div></div>
+    </div>
+    <button class="reset-btn" onclick="resetSelectScale('abcd',['abcd3','abcd4'],calcABCD,['abcd1','abcd2','abcd5'])">↺ Reset</button>
+  </div>
+</div>
+
+</div>
+</div><!-- end tab-escalas -->
+
+</div><!-- main -->
+
+<div class="toast" id="toast">✓ Copiado al portapapeles</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function copyCard(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast());
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// qSOFA
+function calcQSOFA() {
+  const s = ['qsofa1','qsofa2','qsofa3'].filter(id => document.getElementById(id).checked).length;
+  document.getElementById('qsofa-num').textContent = s;
+  const r = document.getElementById('qsofa-risk');
+  const d = document.getElementById('qsofa-detail');
+  if (s === 0) { r.className='score-risk risk-low'; r.textContent='Sin criterios'; d.textContent='Riesgo bajo'; }
+  else if (s === 1) { r.className='score-risk risk-mid'; r.textContent='1 criterio'; d.textContent='Vigilancia — reevaluar'; }
+  else { r.className='score-risk risk-high'; r.textContent='≥2 criterios'; d.textContent='ALTO RIESGO SEPSIS — activar protocolo'; }
+}
+
+// CURB-65
+function calcCURB() {
+  const s = ['curb1','curb2','curb3','curb4','curb5'].filter(id => document.getElementById(id).checked).length;
+  document.getElementById('curb-num').textContent = s;
+  const r = document.getElementById('curb-risk');
+  const d = document.getElementById('curb-detail');
+  if (s<=1) { r.className='score-risk risk-low'; r.textContent='0–1 pts'; d.textContent='Ambulatorio (mortalidad ~2%)'; }
+  else if (s===2) { r.className='score-risk risk-mid'; r.textContent='2 pts'; d.textContent='Ingreso planta (mortalidad ~9%)'; }
+  else { r.className='score-risk risk-high'; r.textContent=s+' pts'; d.textContent='Ingreso UCI valorar (mortalidad '+[,'','',9,17,57][s]+'%)'; }
+}
+
+// Wells TEP
+function calcWells() {
+  const vals = {wells1:3,wells2:3,wells3:1.5,wells4:1.5,wells5:1.5,wells6:1,wells7:1};
+  let s = 0;
+  Object.entries(vals).forEach(([id,v]) => { if(document.getElementById(id).checked) s+=v; });
+  document.getElementById('wells-num').textContent = s;
+  const r = document.getElementById('wells-risk');
+  const d = document.getElementById('wells-detail');
+  if (s<2) { r.className='score-risk risk-low'; r.textContent='Probabilidad baja'; d.textContent='DD &lt;500 descarta TEP'; }
+  else if (s<=6) { r.className='score-risk risk-mid'; r.textContent='Probabilidad moderada'; d.textContent='DD + AngioTC si DD+'; }
+  else { r.className='score-risk risk-high'; r.textContent='Probabilidad alta'; d.textContent='AngioTC directo sin DD previo'; }
+}
+
+// CHA2DS2-VASc
+function calcCHA() {
+  const vals = {cha1:1,cha2:1,cha3:2,cha4:1,cha5:2,cha6:1,cha7:1,cha8:1};
+  let s = 0;
+  Object.entries(vals).forEach(([id,v]) => { if(document.getElementById(id).checked) s+=v; });
+  document.getElementById('cha-num').textContent = s;
+  const r = document.getElementById('cha-risk');
+  const d = document.getElementById('cha-detail');
+  if (s===0) { r.className='score-risk risk-low'; r.textContent='Sin indicación'; d.textContent='ACO no recomendado'; }
+  else if (s===1) { r.className='score-risk risk-mid'; r.textContent='Riesgo bajo-mod.'; d.textContent='ACO individualizar (hombre) · Considerar (mujer)'; }
+  else { r.className='score-risk risk-high'; r.textContent='ACO indicado'; d.textContent='Riesgo ~'+[0,1.3,2.2,3.2,4,6.7,9.8,9.6,12.5,15.2][Math.min(s,9)]+'%/año'; }
+}
+
+// HEART
+function calcHEART() {
+  const s = ['heart1','heart2','heart3','heart4','heart5'].reduce((a,id) => a + parseInt(document.getElementById(id).value), 0);
+  document.getElementById('heart-num').textContent = s;
+  const r = document.getElementById('heart-risk');
+  const d = document.getElementById('heart-detail');
+  if (s<=3) { r.className='score-risk risk-low'; r.textContent='Riesgo bajo'; d.textContent='Alta segura — MACE &lt;2%'; }
+  else if (s<=6) { r.className='score-risk risk-mid'; r.textContent='Riesgo moderado'; d.textContent='Ingreso — MACE 12–17%'; }
+  else { r.className='score-risk risk-high'; r.textContent='Riesgo alto'; d.textContent='Revascularización urgente — MACE &gt;50%'; }
+}
+
+// Glasgow-Blatchford
+function calcGBS() {
+  const selects = ['gbs1','gbs2','gbs3','gbs4'];
+  const checks = ['gbs5','gbs6','gbs7','gbs8','gbs9'];
+  const checkVals = [1,1,2,2,2];
+  let s = selects.reduce((a,id) => a + parseInt(document.getElementById(id).value), 0);
+  checks.forEach((id,i) => { if(document.getElementById(id).checked) s+=checkVals[i]; });
+  document.getElementById('gbs-num').textContent = s;
+  const r = document.getElementById('gbs-risk');
+  const d = document.getElementById('gbs-detail');
+  if (s===0) { r.className='score-risk risk-low'; r.textContent='Riesgo muy bajo'; d.textContent='Alta domiciliaria posible'; }
+  else if (s<=5) { r.className='score-risk risk-mid'; r.textContent='Riesgo moderado'; d.textContent='Ingreso — probable endoscopia'; }
+  else { r.className='score-risk risk-high'; r.textContent='Riesgo alto'; d.textContent='Endoscopia urgente — '+s+'pts'; }
+}
+
+// BISAP
+function calcBISAP() {
+  const s = ['bisap1','bisap2','bisap3','bisap4','bisap5'].filter(id => document.getElementById(id).checked).length;
+  document.getElementById('bisap-num').textContent = s;
+  const r = document.getElementById('bisap-risk');
+  const d = document.getElementById('bisap-detail');
+  if (s<=1) { r.className='score-risk risk-low'; r.textContent='Leve'; d.textContent='Mortalidad &lt;1%'; }
+  else if (s===2) { r.className='score-risk risk-mid'; r.textContent='Moderado'; d.textContent='Mortalidad ~2% — monitorizar'; }
+  else { r.className='score-risk risk-high'; r.textContent='Grave'; d.textContent='Mortalidad '+(s===3?'5':s===4?'13':'22')+'% — UCI valorar'; }
+}
+
+// ABCD2
+function calcABCD() {
+  const checks = {abcd1:1, abcd2:1, abcd5:1};
+  const selects = {abcd3:0, abcd4:0};
+  let s = 0;
+  Object.entries(checks).forEach(([id,v]) => { if(document.getElementById(id).checked) s+=v; });
+  Object.keys(selects).forEach(id => { s += parseInt(document.getElementById(id).value); });
+  document.getElementById('abcd-num').textContent = s;
+  const r = document.getElementById('abcd-risk');
+  const d = document.getElementById('abcd-detail');
+  if (s<=3) { r.className='score-risk risk-low'; r.textContent='Riesgo bajo'; d.textContent='Riesgo ictus 2d: ~1%'; }
+  else if (s<=5) { r.className='score-risk risk-mid'; r.textContent='Riesgo moderado'; d.textContent='Riesgo ictus 2d: ~4%'; }
+  else { r.className='score-risk risk-high'; r.textContent='Riesgo alto'; d.textContent='Riesgo ictus 2d: ~8% — hospitalizar'; }
+}
+
+function resetScale(prefix, ids, calcFn) {
+  ids.forEach(id => { document.getElementById(id).checked = false; });
+  calcFn();
+}
+function resetSelectScale(prefix, selectIds, calcFn, checkIds=[]) {
+  selectIds.forEach(id => { document.getElementById(id).value = '0'; });
+  checkIds.forEach(id => { document.getElementById(id).checked = false; });
+  calcFn();
+}
+</script>
+</body>
+</html>
