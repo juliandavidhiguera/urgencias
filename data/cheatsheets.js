@@ -424,5 +424,221 @@ window.CHEATSHEETS = [
 <span class="key">Causa secundaria:</span> feocromocitoma/ESR/eclampsia/drogas S·N
 <span class="alert">⚠ Urgencia hipertensiva vs Emergencia (daño órgano diana)</span>
 <span class="note">→ Diferencial: emergencia (descenso <25% en 1h) vs urgencia (oral 24-48h)</span>`
+  },
+  {
+    id: 'c19',
+    title: 'Anafilaxia',
+    badge: 'red',
+    badgeLabel: 'Crítico',
+    section: 'Síndrome crítico / Shock',
+    sectionIcon: '🔴',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo/Peso:</span> <span class="val">_a / M·F / _kg</span>
+<span class="key">Motivo:</span> reacción anafiláctica aguda
+<span class="key">Alérgeno sospechoso:</span> fármaco/alimento/picadura/contraste/_
+<span class="key">Tiempo exposición-síntomas:</span> _ min
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _%
+<span class="key">Piel:</span> urticaria S·N · angioedema S·N · prurito S·N
+<span class="key">Respiratorio:</span> estridor S·N · sibilancias S·N · disnea S·N
+<span class="key">Cardiovascular:</span> hipotensión S·N · síncope S·N · taquicardia S·N
+<span class="key">Digestivo:</span> náuseas/vómitos S·N · dolor abdominal S·N · diarrea S·N
+<span class="key">Adrenalina IM:</span> 0.01 mg/kg (máx 0.5 mg) · dosis 1 __:__h
+<span class="key">Dosis repetidas:</span> cada 5-15 min · nº dosis _
+<span class="key">Fluidoterapia:</span> cristaloide _ ml en bolo
+<span class="key">Coadyuvantes:</span> corticoide IV S·N · antiH1 S·N · antiH2 S·N
+<span class="key">Broncoespasmo refractario:</span> salbutamol nebulizado S·N
+<span class="key">Triptasa sérica:</span> basal (0-3h) _ · diferida (24h) _
+<span class="key">AP:</span> alergias conocidas _ · asma S·N · mastocitosis S·N
+<span class="alert">⚠ ADRENALINA IM 0.5mg INMEDIATA cara anterolateral muslo</span>
+<span class="note">→ Observación mínima 6-12h por riesgo de reacción bifásica</span>`
+  },
+  {
+    id: 'c20',
+    title: 'Politrauma / ATLS (ABCDE)',
+    badge: 'red',
+    badgeLabel: 'Crítico',
+    section: 'Síndrome crítico / Shock',
+    sectionIcon: '🔴',
+    html: `<span class="key">/URG ATLS</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Mecanismo lesional:</span> AT/precipitación/agresión/arma/_
+<span class="key">Hora del accidente:</span> __:__h
+<span class="key">A — Vía aérea + control cervical:</span> permeable S·N · collarín S·N
+                          cuerpo extraño S·N · estridor S·N
+<span class="key">B — Ventilación:</span> FR _ · SpO₂ _% · simetría S·N
+              neumotórax S·N · hemotórax S·N · enfisema subcutáneo S·N
+<span class="key">C — Circulación:</span> FC _ · TA _/_ · relleno capilar _ seg
+              hemorragia externa S·N · localización _
+              fluidoterapia _ ml · transfusión S·N (concentrados _)
+<span class="key">D — Neurológico:</span> Glasgow _ /15 · pupilas _
+              lateralización S·N · glucemia _
+<span class="key">E — Exposición:</span> Tª _ · lesiones asociadas _
+              medidas prevención hipotermia S·N
+<span class="key">FAST eco:</span> líquido libre S·N (Morrison/esplenorrenal/pelvis/pericardio)
+<span class="key">Analítica:</span> Hb _ · Lac _ · pruebas cruzadas S·N
+          coagulación: TP _ · TTPa _ · Fib _
+<span class="key">TC body:</span> realizado S·N · hallazgos _
+<span class="alert">⚠ Ácido tranexámico 1g IV en <3h si sospecha hemorragia</span>
+<span class="note">→ Escalas: GCS · FAST · RTS</span>`
+  },
+  {
+    id: 'c21',
+    title: 'Arritmias',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Respiratorio / Cardiológico',
+    sectionIcon: '🟠',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> palpitaciones/síncope/disnea · inicio _ h
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · FR _
+<span class="key">Tipo arritmia:</span> TSV/TV/FA/flutter/bradicardia/BAV/_
+<span class="key">QRS:</span> estrecho (<120ms)/ancho (≥120ms) · duración _ ms
+<span class="key">Ritmo:</span> regular/irregular
+<span class="key">Estabilidad hemodinámica:</span> estable/inestable
+<span class="key">Signos inestabilidad:</span> hipotensión S·N · dolor torácico S·N
+                       disminución consciencia S·N · signos IC S·N
+<span class="key">ECG:</span> descripción _ · eje _ · QTc _
+<span class="key">Analítica:</span> K _ · Mg _ · Ca _ · TSH _ · TnI _
+<span class="key">Antiarrítmicos previos:</span> _ · última dosis _h
+<span class="key">Maniobras vagales:</span> S·N · adenosina S·N (dosis _ mg)
+<span class="key">AP:</span> cardiopatía estructural S·N · arritmia previa S·N
+<span class="alert">⚠ Inestable → cardioversión sincronizada inmediata</span>
+<span class="note">→ Escalas: CHA₂DS₂-VASc (si FA) · EHRA</span>`
+  },
+  {
+    id: 'c22',
+    title: 'Crisis asmática',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Respiratorio / Cardiológico',
+    sectionIcon: '🟠',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> disnea + sibilancias · inicio _ h
+<span class="key">Gravedad:</span> leve/moderada/grave/parada inminente
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _%
+<span class="key">PEF:</span> _ L/min (_% del teórico/mejor personal)
+<span class="key">Habla entrecortada:</span> S·N
+<span class="key">Musculatura accesoria:</span> S·N · tiraje S·N
+<span class="key">Auscultación:</span> sibilancias difusas S·N · hipoventilación S·N
+<span class="key">GSA (si grave):</span> pH _ · pO₂ _ · pCO₂ _
+<span class="key">Salbutamol nebulizado:</span> 2.5-5 mg c/20min x3 · dosis dadas _
+<span class="key">Ipratropio:</span> 0.5 mg nebulizado · asociado S·N
+<span class="key">Corticoide sistémico:</span> prednisona _ mg VO/metilprednisolona _ mg IV
+<span class="key">MgSO4 (si refractaria):</span> 2g IV en 20min · S·N
+<span class="key">Desencadenante:</span> infección/alérgeno/AINEs/ejercicio/_
+<span class="key">AP:</span> ingresos previos S·N · UCI previa S·N · tto de base _
+<span class="alert">⚠ Silencio auscultatorio = GRAVEDAD EXTREMA</span>
+<span class="note">→ Escalas: mMRC · PEF post-broncodilatador</span>`
+  },
+  {
+    id: 'c23',
+    title: 'Dolor abdominal agudo',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Digestivo / Geriátrico',
+    sectionIcon: '🟠',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> dolor abdominal · inicio _ h
+<span class="key">Localización:</span> HD/HI/FID/FII/epigastrio/mesogastrio/difuso
+<span class="key">Irradiación:</span> espalda/hombro/región lumbar/_
+<span class="key">Inicio:</span> brusco/gradual · carácter: cólico/continuo/punzante
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Síntomas asociados:</span> vómitos S·N · fiebre S·N · diarrea S·N · hematoquecia S·N
+<span class="key">Exploración:</span> defensa S·N · peritonismo S·N
+              Blumberg S·N · Murphy S·N · McBurney S·N · Rovsing S·N
+<span class="key">Última regla (mujeres):</span> _ · β-hCG S·N (resultado _)
+<span class="key">Analítica:</span> Leucos _ · PCR _ · Lac _ · amilasa/lipasa _
+          Bil _ · TGO/TGP _ · Cr _ · orina _
+<span class="key">Eco/TC abdominal:</span> realizado S·N · hallazgos _
+<span class="key">AP:</span> cirugía abdominal previa S·N · litiasis biliar S·N
+<span class="alert">⚠ Defensa generalizada + lactato elevado → cirugía urgente</span>
+<span class="note">→ Diferencial: apendicitis · colecistitis · diverticulitis · obstrucción · isquemia mesentérica · rotura AAA</span>`
+  },
+  {
+    id: 'c24',
+    title: 'Convulsiones / Status epiléptico',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Neurológico / Metabólico',
+    sectionIcon: '🟠',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> crisis convulsiva · testigos S·N
+<span class="key">Tipo:</span> focal/generalizada/desconocida
+<span class="key">Duración:</span> _ min · primera crisis S·N
+<span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _ · Glucemia _
+<span class="key">Recuperación postcrítica:</span> S·N · tiempo _ min
+<span class="key">Mordedura lingual:</span> S·N · incontinencia S·N
+<span class="key">Glasgow:</span> _ /15 · focalidad neurológica S·N
+<span class="key">Tratamiento 1ª línea (BZD):</span> diazepam/midazolam _ mg __:__h
+<span class="key">Tratamiento 2ª línea:</span> levetiracetam/valproato/fenitoína _ mg __:__h
+<span class="key">Tratamiento 3ª línea:</span> UCI · anestesia S·N
+<span class="key">Analítica:</span> glucemia _ · Na _ · Ca _ · Mg _
+          tóxicos en orina S·N · niveles antiepiléptico _
+<span class="key">TC craneal:</span> realizado S·N · hallazgos _
+<span class="key">EEG (si status):</span> S·N · hallazgos _
+<span class="key">AP:</span> epilepsia conocida S·N · cumplimiento tto S·N · alcohol/tóxicos S·N
+<span class="alert">⚠ >5 min = Status epiléptico → iniciar BZD inmediato</span>
+<span class="note">→ Escalas: GCS · NIHSS (si focalidad)</span>`
+  },
+  {
+    id: 'c25',
+    title: 'TCE — Traumatismo craneoencefálico',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Neurológico / Metabólico',
+    sectionIcon: '🟠',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Mecanismo:</span> caída/AT/agresión/deportivo/_
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · FR _
+<span class="key">GCS inicial:</span> _ /15 · GCS actual _ /15 (hora __:__h)
+<span class="key">Pupilas:</span> isocóricas/anisocoria · reactivas S·N
+<span class="key">Focalidad neurológica:</span> S·N · descripción _
+<span class="key">Pérdida de consciencia:</span> S·N · duración _ min
+<span class="key">Amnesia postraumática:</span> S·N · duración _ min
+<span class="key">Vómitos:</span> nº episodios _ · cefalea S·N intensidad _/10
+<span class="key">Signos fractura base cráneo:</span> hemotímpano S·N · ojos mapache S·N
+                            otorrea/rinorrea LCR S·N · signo Battle S·N
+<span class="key">Anticoagulación/antiagregación:</span> S·N · fármaco _ · última dosis _h
+<span class="key">Criterios TC (Canadian CT Head Rule):</span>
+   GCS <15 a 2h S·N · fractura abierta/deprimida sospechada S·N
+   >2 vómitos S·N · >65 años S·N · amnesia >30min S·N
+   mecanismo peligroso S·N
+<span class="key">TC craneal:</span> realizado S·N · hallazgos _
+<span class="alert">⚠ GCS ≤8 → proteger vía aérea + TC inmediato</span>
+<span class="note">→ Escalas: GCS · Canadian CT Head Rule</span>`
+  },
+  {
+    id: 'c26',
+    title: 'TVP — Trombosis venosa profunda',
+    badge: 'amber',
+    badgeLabel: 'Urgente',
+    section: 'Vascular',
+    sectionIcon: '🟣',
+    html: `<span class="key">/URG</span>
+<span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
+<span class="key">Motivo:</span> dolor/hinchazón extremidad · inicio _ días
+<span class="key">Extremidad afectada:</span> MID/MII · localización _
+<span class="key">Vitales:</span> FC _ · TA _/_ · SpO₂ _% · Tª _
+<span class="key">Edema:</span> S·N · fóvea S·N · unilateral S·N
+<span class="key">Dolor a la palpación trayecto venoso:</span> S·N
+<span class="key">Empastamiento gemelar:</span> S·N
+<span class="key">Diferencia de perímetro (>3cm):</span> S·N · medida _ cm
+<span class="key">Eritema/calor local:</span> S·N · Homans S·N
+<span class="key">Factores de riesgo:</span> inmovilización S·N · cirugía reciente S·N
+                    neoplasia activa S·N · ACO/THS S·N
+                    viaje prolongado S·N · TVP/TEP previo S·N
+<span class="key">Wells TVP score:</span> _ (calcular) · probabilidad baja/media/alta
+<span class="key">D-dímero:</span> _
+<span class="key">Eco-Doppler:</span> realizado S·N · trombo S·N · localización _
+<span class="key">Tratamiento HBPM:</span> _ (fármaco/dosis mg o UI) · peso _ kg
+<span class="key">Medias de compresión:</span> S·N
+<span class="key">Síntomas respiratorios:</span> disnea S·N · dolor torácico S·N
+<span class="alert">⚠ Descartar TEP concomitante si disnea/dolor torácico</span>
+<span class="note">→ Escalas: Wells TVP · D-dímero</span>`
   }
 ];
