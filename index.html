@@ -857,7 +857,16 @@ function calcScale(id) {
     }
     return el.checked ? it.p : 0;
   });
-  const s = sc.agg === 'max' ? Math.max.apply(null, pts) : pts.reduce((a, b) => a + b, 0);
+  let s;
+  if (sc.calcCustom) {
+    const rawVals = sc.items.map((it, i) => {
+      const el = document.getElementById(id + '_' + i);
+      return parseFloat(el.value) || 0;
+    });
+    s = sc.calcCustom(rawVals);
+  } else {
+    s = sc.agg === 'max' ? Math.max.apply(null, pts) : pts.reduce((a, b) => a + b, 0);
+  }
   const [cls, risk, det] = sc.interp(s);
   document.getElementById(id + '-num').textContent = s;
   const r = document.getElementById(id + '-risk');

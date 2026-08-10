@@ -259,6 +259,107 @@ window.SCALES = [
   {t:'chk', l:'Proteínas en LCR ≥80 mg/dL', p:1},
   {t:'chk', l:'Neutrófilos en LCR ≥1.000/µL', p:1},
   {t:'chk', l:'Convulsión al inicio del cuadro', p:1}],
-  interp:function(s){return s===0?['low','0 puntos','Riesgo muy bajo de meningitis bacteriana (VPN ~99,9%). NO aplicable si aspecto séptico, púrpura, ATB previo, inmunosupresión o neurocirugía']:['high',s+' puntos','No descarta meningitis bacteriana — antibioterapia empírica inmediata']}}
+  interp:function(s){return s===0?['low','0 puntos','Riesgo muy bajo de meningitis bacteriana (VPN ~99,9%). NO aplicable si aspecto séptico, púrpura, ATB previo, inmunosupresión o neurocirugía']:['high',s+' puntos','No descarta meningitis bacteriana — antibioterapia empírica inmediata']}},
+
+// ── 9 escalas nuevas ──────────────────────────────────────────────
+
+{id:'news2', title:'NEWS2', sub:'Alerta temprana — respuesta clínica (0–20)', badge:'red', tag:'Triaje', max:20, items:[
+  {t:'sel', l:'Frecuencia respiratoria (rpm)', o:[['12–20 (0)',0],['9–11 (1)',1],['21–24 (2)',2],['≤8 (3)',3],['≥25 (3)',3]]},
+  {t:'sel', l:'SpO₂ — Escala 1 (%)', o:[['≥96 (0)',0],['94–95 (1)',1],['92–93 (2)',2],['≤91 (3)',3]]},
+  {t:'sel', l:'Aire o O₂ suplementario', o:[['Aire ambiente (0)',0],['O₂ suplementario (2)',2]]},
+  {t:'sel', l:'TAS (mmHg)', o:[['111–219 (0)',0],['101–110 (1)',1],['91–100 (2)',2],['≤90 (3)',3],['≥220 (3)',3]]},
+  {t:'sel', l:'Frecuencia cardiaca (lpm)', o:[['51–90 (0)',0],['41–50 (1)',1],['91–110 (1)',1],['111–130 (2)',2],['≤40 (3)',3],['≥131 (3)',3]]},
+  {t:'sel', l:'Nivel de conciencia (ACVPU)', o:[['Alerta (0)',0],['Confusión nueva / Voz / Dolor / No responde (3)',3]]},
+  {t:'sel', l:'Temperatura (°C)', o:[['36,1–38,0 (0)',0],['35,1–36,0 (1)',1],['38,1–39,0 (1)',1],['≥39,1 (2)',2],['≤35,0 (3)',3]]}],
+  interp:function(s){return s<=4?['low',s+' puntos','Riesgo bajo — monitorización rutinaria']:s<=6?['mid',s+' puntos','Respuesta urgente — valoración clínica inmediata']:['high',s+' puntos','Respuesta emergencia — equipo de respuesta rápida']}},
+
+{id:'apache2', title:'APACHE II', sub:'Gravedad en UCI — mortalidad estimada (0–71)', badge:'amber', tag:'UCI', max:71, items:[
+  {t:'sel', l:'Temperatura rectal (°C)', o:[['36–38,4 (0)',0],['38,5–38,9 (1)',1],['34–35,9 (1)',1],['32–33,9 (2)',2],['39–40,9 (3)',3],['30–31,9 (3)',3],['≥41 (4)',4],['≤29,9 (4)',4]]},
+  {t:'sel', l:'PAM — presión arterial media (mmHg)', o:[['70–109 (0)',0],['110–129 (2)',2],['50–69 (2)',2],['130–159 (3)',3],['≥160 (4)',4],['≤49 (4)',4]]},
+  {t:'sel', l:'Frecuencia cardiaca (lpm)', o:[['70–109 (0)',0],['110–139 (2)',2],['55–69 (2)',2],['140–179 (3)',3],['40–54 (3)',3],['≥180 (4)',4],['≤39 (4)',4]]},
+  {t:'sel', l:'Frecuencia respiratoria (rpm)', o:[['12–24 (0)',0],['25–34 (1)',1],['10–11 (1)',1],['6–9 (2)',2],['35–49 (3)',3],['≥50 (4)',4],['≤5 (4)',4]]},
+  {t:'sel', l:'Oxigenación', o:[['Normal: PaO₂ >70 o A-aDO₂ <200 (0)',0],['PaO₂ 61–70 (1)',1],['A-aDO₂ 200–349 (2)',2],['PaO₂ 55–60 o A-aDO₂ 350–499 (3)',3],['PaO₂ <55 o A-aDO₂ ≥500 (4)',4]]},
+  {t:'sel', l:'pH arterial', o:[['7,33–7,49 (0)',0],['7,50–7,59 (1)',1],['7,25–7,32 (2)',2],['7,60–7,69 (3)',3],['7,15–7,24 (3)',3],['≥7,70 (4)',4],['<7,15 (4)',4]]},
+  {t:'sel', l:'Sodio sérico (mEq/L)', o:[['130–149 (0)',0],['150–154 (1)',1],['120–129 (2)',2],['155–159 (2)',2],['160–179 (3)',3],['111–119 (3)',3],['≥180 (4)',4],['≤110 (4)',4]]},
+  {t:'sel', l:'Potasio sérico (mEq/L)', o:[['3,5–5,4 (0)',0],['5,5–5,9 (1)',1],['3,0–3,4 (1)',1],['2,5–2,9 (2)',2],['6,0–6,9 (3)',3],['≥7,0 (4)',4],['<2,5 (4)',4]]},
+  {t:'sel', l:'Creatinina sérica (mg/dL)', o:[['0,6–1,4 (0)',0],['<0,6 (2)',2],['1,5–1,9 (2)',2],['2,0–3,4 (3)',3],['≥3,5 (4)',4],['≥3,5 + FRA (8)',8]]},
+  {t:'sel', l:'Hematocrito (%)', o:[['30–45,9 (0)',0],['46–49,9 (1)',1],['50–59,9 (2)',2],['20–29,9 (2)',2],['≥60 (4)',4],['<20 (4)',4]]},
+  {t:'sel', l:'Leucocitos (×10³/µL)', o:[['3–14,9 (0)',0],['15–19,9 (1)',1],['20–39,9 (2)',2],['1–2,9 (2)',2],['≥40 (4)',4],['<1 (4)',4]]},
+  {t:'sel', l:'Glasgow (15 − GCS)', o:[['GCS 15 (0 pts)',0],['GCS 13–14 (2 pts)',2],['GCS 10–12 (5 pts)',5],['GCS 7–9 (8 pts)',8],['GCS 4–6 (11 pts)',11],['GCS 3 (12 pts)',12]]},
+  {t:'sel', l:'Edad', o:[['<45 años (0)',0],['45–54 años (2)',2],['55–64 años (3)',3],['65–74 años (5)',5],['≥75 años (6)',6]]},
+  {t:'sel', l:'Enfermedad crónica grave', o:[['No (0)',0],['Postquirúrgico electivo (2)',2],['Postquirúrgico urgente o ingreso médico (5)',5]]}],
+  interp:function(s){return s<=4?['low',s+' puntos','Mortalidad estimada ~4%']:s<=9?['low',s+' puntos','Mortalidad estimada ~8%']:s<=14?['mid',s+' puntos','Mortalidad estimada ~15%']:s<=19?['mid',s+' puntos','Mortalidad estimada ~25%']:s<=24?['high',s+' puntos','Mortalidad estimada ~40%']:s<=29?['high',s+' puntos','Mortalidad estimada ~55%']:s<=34?['high',s+' puntos','Mortalidad estimada ~75%']:['high',s+' puntos','Mortalidad estimada >85%']}},
+
+{id:'saps2', title:'SAPS II', sub:'Gravedad en UCI — mortalidad estimada', badge:'amber', tag:'UCI', max:163, items:[
+  {t:'sel', l:'Edad', o:[['<40 años (0)',0],['40–59 años (7)',7],['60–69 años (12)',12],['70–74 años (15)',15],['75–79 años (16)',16],['≥80 años (18)',18]]},
+  {t:'sel', l:'Frecuencia cardiaca (lpm)', o:[['70–119 (0)',0],['40–69 (2)',2],['120–159 (4)',4],['≥160 (7)',7],['<40 (11)',11]]},
+  {t:'sel', l:'TAS sistólica (mmHg)', o:[['100–199 (0)',0],['≥200 (2)',2],['70–99 (5)',5],['<70 (13)',13]]},
+  {t:'sel', l:'Temperatura (°C)', o:[['<39 (0)',0],['≥39 (3)',3]]},
+  {t:'sel', l:'Glasgow (menor valor)', o:[['14–15 (0)',0],['11–13 (5)',5],['9–10 (7)',7],['6–8 (13)',13],['3–5 (26)',26]]},
+  {t:'sel', l:'PaO₂/FiO₂ (solo si VM o CPAP)', o:[['Sin VM/CPAP (0)',0],['≥200 (6)',6],['100–199 (9)',9],['<100 (11)',11]]},
+  {t:'sel', l:'Diuresis (L/24 h)', o:[['≥1,0 (0)',0],['0,5–0,999 (4)',4],['<0,5 (11)',11]]},
+  {t:'sel', l:'BUN (mg/dL)', o:[['<28 (0)',0],['28–83 (6)',6],['≥84 (10)',10]]},
+  {t:'sel', l:'Sodio (mEq/L)', o:[['125–144 (0)',0],['≥145 (1)',1],['<125 (5)',5]]},
+  {t:'sel', l:'Potasio (mEq/L)', o:[['3,0–4,9 (0)',0],['<3,0 (3)',3],['≥5,0 (3)',3]]},
+  {t:'sel', l:'Bicarbonato (mEq/L)', o:[['≥20 (0)',0],['15–19 (3)',3],['<15 (6)',6]]},
+  {t:'sel', l:'Bilirrubina (mg/dL)', o:[['<4,0 (0)',0],['4,0–5,9 (4)',4],['≥6,0 (9)',9]]},
+  {t:'sel', l:'Leucocitos (×10³/µL)', o:[['1,0–19,9 (0)',0],['≥20 (3)',3],['<1,0 (12)',12]]},
+  {t:'sel', l:'Enfermedad crónica', o:[['Ninguna (0)',0],['Neoplasia metastásica (9)',9],['Neoplasia hematológica (10)',10],['SIDA (17)',17]]},
+  {t:'sel', l:'Tipo de ingreso', o:[['Quirúrgico programado (0)',0],['Médico (6)',6],['Quirúrgico urgente (8)',8]]}],
+  interp:function(s){return s<29?['low',s+' puntos','Mortalidad estimada <10%']:s<40?['mid',s+' puntos','Mortalidad estimada ~10–25%']:s<52?['mid',s+' puntos','Mortalidad estimada ~25–50%']:s<64?['high',s+' puntos','Mortalidad estimada ~50–75%']:['high',s+' puntos','Mortalidad estimada >75%']}},
+
+{id:'meld', title:'MELD', sub:'Hepatopatía terminal — priorización trasplante', badge:'amber', tag:'Digestivo', max:40, agg:'custom', items:[
+  {t:'num', l:'Bilirrubina total', u:'mg/dL', f:function(v){return 0}},
+  {t:'num', l:'Creatinina sérica', u:'mg/dL', f:function(v){return 0}},
+  {t:'num', l:'INR', u:'', f:function(v){return 0}}],
+  calcCustom:function(vals){var bil=Math.max(1,vals[0]||1);var cr=Math.min(4,Math.max(1,vals[1]||1));var inr=Math.max(1,vals[2]||1);return Math.round(10*(0.957*Math.log(cr)+0.378*Math.log(bil)+1.12*Math.log(inr)+0.643))},
+  interp:function(s){return s<10?['low',s+' puntos','Mortalidad 3 meses ~2% — seguimiento ambulatorio']:s<20?['mid',s+' puntos','Mortalidad 3 meses ~6% — seguimiento estrecho']:s<30?['high',s+' puntos','Mortalidad 3 meses ~20% — evaluar trasplante']:['high',s+' puntos','Mortalidad 3 meses ~50–70% — priorizar trasplante hepático']}},
+
+{id:'childpugh', title:'Child-Pugh', sub:'Cirrosis — clasificación funcional (A–B–C)', badge:'amber', tag:'Digestivo', max:15, items:[
+  {t:'sel', l:'Bilirrubina total (mg/dL)', o:[['<2 (1)',1],['2–3 (2)',2],['>3 (3)',3]]},
+  {t:'sel', l:'Albúmina (g/dL)', o:[['>3,5 (1)',1],['2,8–3,5 (2)',2],['<2,8 (3)',3]]},
+  {t:'sel', l:'INR / Tiempo de protrombina', o:[['<1,7 / TP >50% (1)',1],['1,7–2,3 / TP 30–50% (2)',2],['>2,3 / TP <30% (3)',3]]},
+  {t:'sel', l:'Ascitis', o:[['Ausente (1)',1],['Leve / controlada con diuréticos (2)',2],['Moderada-grave / refractaria (3)',3]]},
+  {t:'sel', l:'Encefalopatía hepática', o:[['Ausente (1)',1],['Grado I–II (2)',2],['Grado III–IV (3)',3]]}],
+  interp:function(s){return s<=6?['low','Clase A ('+s+' pts)','Buen pronóstico — supervivencia 1 año ~100%']:s<=9?['mid','Clase B ('+s+' pts)','Pronóstico intermedio — supervivencia 1 año ~80%']:['high','Clase C ('+s+' pts)','Mal pronóstico — supervivencia 1 año ~45% — valorar trasplante']}},
+
+{id:'camicu', title:'CAM-ICU', sub:'Delirium en UCI — cribado diagnóstico', badge:'amber', tag:'UCI', max:1, agg:'custom', items:[
+  {t:'sel', l:'1. Inicio agudo o curso fluctuante', o:[['No (0)',0],['Sí — cambio agudo del estado mental o fluctuación 24 h (1)',1]]},
+  {t:'sel', l:'2. Inatención (RASS/letras)', o:[['No (0)',0],['Sí — dificultad para mantener la atención (1)',1]]},
+  {t:'sel', l:'3. Nivel de conciencia alterado', o:[['RASS 0 — alerta y calmado (0)',0],['RASS ≠ 0 — alterado (1)',1]]},
+  {t:'sel', l:'4. Pensamiento desorganizado', o:[['No (0)',0],['Sí — respuestas incoherentes o desordenadas (1)',1]]}],
+  calcCustom:function(vals){return(vals[0]>0&&vals[1]>0&&(vals[2]>0||vals[3]>0))?1:0},
+  interp:function(s){return s===0?['low','Negativo','Delirium no presente — reevaluar si cambio clínico']:['high','POSITIVO','Delirium presente — buscar causa: fármacos, infección, metabólico, retención, dolor']}},
+
+{id:'psi', title:'PSI/PORT', sub:'Neumonía — mortalidad y decisión de ingreso', badge:'amber', tag:'Respiratorio', max:395, items:[
+  {t:'num', l:'Edad (años = puntos directos)', u:'años', f:function(v){return v}},
+  {t:'sel', l:'Sexo', o:[['Hombre (0)',0],['Mujer (−10)',-10]]},
+  {t:'chk', l:'Residencia de ancianos', p:10},
+  {t:'chk', l:'Neoplasia', p:30},
+  {t:'chk', l:'Hepatopatía', p:20},
+  {t:'chk', l:'ICC', p:10},
+  {t:'chk', l:'Enfermedad cerebrovascular', p:10},
+  {t:'chk', l:'Enfermedad renal', p:10},
+  {t:'chk', l:'Alteración del nivel de conciencia', p:20},
+  {t:'chk', l:'FR ≥30 rpm', p:20},
+  {t:'chk', l:'TAS <90 mmHg', p:20},
+  {t:'chk', l:'Temperatura <35 °C o ≥40 °C', p:15},
+  {t:'chk', l:'FC ≥125 lpm', p:10},
+  {t:'chk', l:'pH <7,35', p:30},
+  {t:'chk', l:'BUN ≥30 mg/dL (urea ≥11 mmol/L)', p:20},
+  {t:'chk', l:'Na <130 mEq/L', p:20},
+  {t:'chk', l:'Glucosa ≥250 mg/dL', p:10},
+  {t:'chk', l:'Hematocrito <30%', p:10},
+  {t:'chk', l:'PaO₂ <60 mmHg o SpO₂ <90%', p:10},
+  {t:'chk', l:'Derrame pleural', p:10}],
+  interp:function(s){return s<=50?['low','Clase I','Mortalidad 0,1–0,4% — tratamiento ambulatorio']:s<=70?['low','Clase II','Mortalidad 0,6–0,7% — tratamiento ambulatorio']:s<=90?['mid','Clase III','Mortalidad 0,9–2,8% — observación breve']:s<=130?['high','Clase IV','Mortalidad 8–9% — ingreso hospitalario']:['high','Clase V','Mortalidad 27–31% — ingreso / UCI']}},
+
+{id:'rass', title:'RASS', sub:'Sedación y agitación en UCI (−5 a +4)', badge:'blue', tag:'UCI', max:4, items:[
+  {t:'sel', l:'Nivel de sedación/agitación', o:[['0 Alerta y calmado',0],['-1 Somnoliento (apertura ocular >10 s al hablar)',-1],['-2 Sedación ligera (apertura ocular <10 s)',-2],['-3 Sedación moderada (movimiento sin apertura ocular)',-3],['-4 Sedación profunda (movimiento al estímulo físico)',-4],['-5 No despertable',-5],['+1 Inquieto (ansioso)',1],['+2 Agitado (movimientos sin propósito)',2],['+3 Muy agitado (tira de tubos/catéteres)',3],['+4 Combativo (peligro para el personal)',4]]}],
+  interp:function(s){return s<=-3?['high','RASS '+s,'Sedación profunda — valorar reducción de sedantes / despertar diario']:s<=-1?['mid','RASS '+s,'Sedación ligera — objetivo habitual en VM']:s===0?['low','RASS 0','Alerta y calmado — estado óptimo']:s<=2?['mid','RASS +'+s,'Agitación — evaluar causa: dolor, delirium, ansiedad']:['high','RASS +'+s,'Agitación peligrosa — contención + sedación urgente']}},
+
+{id:'mmrc', title:'mMRC', sub:'Disnea — grado funcional (0–4)', badge:'blue', tag:'Respiratorio', max:4, items:[
+  {t:'sel', l:'Grado de disnea', o:[['0 — Solo con ejercicio intenso (0)',0],['1 — Al caminar deprisa o subir cuesta ligera (1)',1],['2 — Camina más lento que personas de su edad (2)',2],['3 — Para tras ~100 m o pocos min en llano (3)',3],['4 — Disnea al vestirse / no sale de casa (4)',4]]}],
+  interp:function(s){return s<=1?['low','Grado '+s,'Limitación leve — actividad física normal']:s===2?['mid','Grado 2','Limitación moderada — valorar rehabilitación pulmonar']:['high','Grado '+s,'Limitación grave — rehabilitación + optimizar tratamiento broncodilatador']}}
 
 ];
