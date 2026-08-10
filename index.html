@@ -290,6 +290,32 @@ body {
 }
 .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
+/* PROTOCOLS */
+.protocol-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.protocol-step {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--bg3);
+  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.protocol-step:last-child { border-bottom: none; }
+.step-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+.step-decision { background: var(--amber-bg); font-weight: 500; }
+.step-info { background: var(--blue-bg); font-size: 11px; }
+
 .tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
 .tab {
   padding: 10px 18px;
@@ -564,6 +590,7 @@ body {
 
 <script src="data/cheatsheets.js"></script>
 <script src="data/scales.js"></script>
+<script src="data/protocols.js"></script>
 <script>
 function renderCheatsheets() {
   var container = document.getElementById('tab-cheatsheets');
@@ -902,9 +929,30 @@ function copyScaleResult(id) {
   });
 }
 
+function renderProtocols() {
+  const container = document.getElementById('tab-protocolos');
+  container.innerHTML = '<div class="section-title">🔀 Protocolos de actuación</div>' +
+    PROTOCOLS.map(p =>
+      '<div class="protocol-card">' +
+        '<div class="scale-header"><div>' +
+          '<div class="scale-title">' + p.title + '</div>' +
+          '<div class="scale-subtitle">' + p.sub + '</div>' +
+        '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span></div>' +
+        '<div class="scale-body">' +
+          p.steps.map((s, i) => {
+            const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (i + 1);
+            const cls = s.type === 'decision' ? ' step-decision' : s.type === 'info' ? ' step-info' : '';
+            return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
+          }).join('') +
+        '</div>' +
+      '</div>'
+    ).join('');
+}
+
 /* El <script> se carga al final del <body>: ejecución directa. */
 renderCheatsheets();
 renderScales();
+renderProtocols();
 calcSCA();
 </script>
 </body>
