@@ -10,6 +10,7 @@
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#161b22" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
@@ -1021,6 +1022,10 @@ renderScales();
 renderProtocols();
 renderDrugs();
 calcSCA();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
