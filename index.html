@@ -290,6 +290,20 @@ body {
 }
 .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
+/* DRUGS */
+.drug-weight-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+}
+.drug-weight-bar label { font-size: 12px; color: var(--text2); }
+.drug-alerts .scale-pts { color: var(--red); }
+
 /* PROTOCOLS */
 .protocol-card {
   background: var(--bg2);
@@ -591,6 +605,7 @@ body {
 <script src="data/cheatsheets.js"></script>
 <script src="data/scales.js"></script>
 <script src="data/protocols.js"></script>
+<script src="data/drugs.js"></script>
 <script>
 function renderCheatsheets() {
   var container = document.getElementById('tab-cheatsheets');
@@ -949,10 +964,62 @@ function renderProtocols() {
     ).join('');
 }
 
+function _drugId(name) {
+  return 'drug-' + name.replace(/[^a-zA-Z0-9]/g, '');
+}
+
+function renderDrugs() {
+  const container = document.getElementById('tab-farmacos');
+  container.innerHTML =
+    '<div class="section-title">💉 Fármacos — calculadora por peso</div>' +
+    '<div class="drug-weight-bar">' +
+      '<label for="farmacos-peso">Peso del paciente</label>' +
+      '<input type="number" class="num-in" id="farmacos-peso" value="70" min="20" max="250" step="1" oninput="recalcDrugs(this.value)">' +
+      '<span class="scale-pts">kg</span>' +
+    '</div>' +
+    '<div class="scales-grid">' +
+    DRUGS.map(g => g.drugs.map(d => {
+      const id = _drugId(d.name);
+      return '<div class="scale-card drug-card">' +
+        '<div class="scale-header"><div>' +
+          '<div class="scale-title">' + d.name + '</div>' +
+          '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
+        '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span></div>' +
+        '<div class="scale-body">' +
+          '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
+          (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
+          (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
+          (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
+        '</div></div>';
+    }).join('')).join('') +
+    '</div>';
+  recalcDrugs(document.getElementById('farmacos-peso').value);
+}
+
+function recalcDrugs(peso) {
+  let p = parseFloat(peso);
+  if (isNaN(p)) p = 70;
+  if (p < 20) p = 20;
+  if (p > 250) p = 250;
+  DRUGS.forEach(g => g.drugs.forEach(d => {
+    const id = _drugId(d.name);
+    if (d.doseCalc) {
+      const r = d.doseCalc(p);
+      const el = document.getElementById(id + '-calc');
+      if (el) el.textContent = (r.min === r.max ? r.min : r.min + '–' + r.max) + ' ' + r.unit + ' (a ' + p + ' kg)';
+    }
+    if (d.extra) {
+      const el = document.getElementById(id + '-extra');
+      if (el) el.textContent = d.extra(p);
+    }
+  }));
+}
+
 /* El <script> se carga al final del <body>: ejecución directa. */
 renderCheatsheets();
 renderScales();
 renderProtocols();
+renderDrugs();
 calcSCA();
 </script>
 </body>
