@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>URG CLÍNICO — Cheatsheet + Escalas</title>
+<meta name="description" content="URG CLÍNICO — Herramienta de consulta rápida para urgencias: cheatsheets, escalas interactivas, protocolos y fármacos.">
+<meta property="og:title" content="URG CLÍNICO — Cheatsheet + Escalas">
+<meta property="og:description" content="Consulta rápida para urgencias: escalas interactivas, protocolos, fármacos y cheatsheets clínicos.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161b22" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <style>
 :root {
   --bg: #f8f9fa;
@@ -441,8 +450,8 @@ body {
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="showTab('cheatsheets')">📋 Cheatsheets</button>
-  <button class="nav-btn" onclick="showTab('escalas')">📊 Escalas</button>
+  <button class="nav-btn active" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
+  <button class="nav-btn" onclick="showTab('escalas', this)">📊 Escalas</button>
 </div>
 
 <div class="main">
@@ -500,7 +509,7 @@ body {
 <span class="key">AAS en los 7 días previos:</span> S·N
 <span class="key">Antiagregación/ACO previa:</span> _ · última dosis _ h
 <span class="key">Episodios anginosos en 24 h:</span> _
-<span class="alert">⚠ Puerta-balón &lt;90 min · GRACE &gt;140 → invasiva &lt;24 h</span>
+<span class="alert">⚠ Puerta-balón <90 min · GRACE >140 → invasiva <24 h</span>
 <span class="note">→ Escalas: GRACE · TIMI · CRUSADE · HEART (pestaña Escalas → Box SCA)</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c2')">📋 Copiar</button>
@@ -553,7 +562,7 @@ body {
 <span class="key">Analítica:</span> Hb _ · Plaquetas _ · INR _ · TTPa _
 <span class="key">FA conocida:</span> S·N · anticoagulado S·N (fármaco _)
 <span class="key">AP:</span> HTA · DM · ictus previo S·N · cardiopatía S·N
-<span class="alert">⚠ Trombolisis: &lt;4.5h · Trombectomía: &lt;24h</span>
+<span class="alert">⚠ Trombolisis: <4.5h · Trombectomía: <24h</span>
 <span class="note">→ Escalas: NIHSS · ABCD2 (AIT) · CHA₂DS₂-VASc</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c4')">📋 Copiar</button>
@@ -569,7 +578,7 @@ body {
   <div class="card-body">
     <div class="code" id="c5"><span class="key">/URG</span>
 <span class="key">Edad/Sexo:</span> <span class="val">_a / M·F</span>
-<span class="key">Motivo:</span> hipotensión · TAS &lt;90 mmHg
+<span class="key">Motivo:</span> hipotensión · TAS <90 mmHg
 <span class="key">Vitales:</span> FC _ · FR _ · TA _/_ · SpO₂ _% · Tª _
 <span class="key">Piel:</span> fría/caliente · sudoración S·N · livideces S·N
 <span class="key">PVY:</span> elevada/normal/baja
@@ -580,7 +589,7 @@ body {
               colapso VD S·N · IVC _
 <span class="key">Contexto:</span> fiebre S·N · hemorragia S·N · alergia S·N
 <span class="alert">⚠ Tipo probable: distributivo/cardiogénico/hipovolémico/obstructivo</span>
-<span class="note">→ Escalas: SOFA · qSOFA · MAP objetivo &gt;65 mmHg</span></div>
+<span class="note">→ Escalas: SOFA · qSOFA · MAP objetivo >65 mmHg</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c5')">📋 Copiar</button>
     </div>
@@ -748,7 +757,7 @@ body {
 <span class="key">Orina:</span> Na urinario _ · Cr urinaria _ · FENa _
           cilindros granulosos S·N · proteinuria _
 <span class="key">Eco renal:</span> hidronefrosis S·N · tamaño renal _
-<span class="key">KDIGO stage:</span> 1(x1.5-1.9) / 2(x2-2.9) / 3(x3 o &gt;4) 
+<span class="key">KDIGO stage:</span> 1(x1.5-1.9) / 2(x2-2.9) / 3(x3 o >4) 
 <span class="key">Causa:</span> prerrenal/intrínseca/obstructiva
 <span class="key">Nefrotóxicos:</span> AINEs/contraste/aminoglucósidos/_ · suspendidos S·N
 <span class="key">AP:</span> IRC previa estadio _ · HTA · DM · mieloma
@@ -779,7 +788,7 @@ body {
 <span class="key">Tipo DM:</span> DM1/DM2 · debut S·N
 <span class="key">Insulina habitual:</span> _ · última dosis _h
 <span class="key">Factor precipitante:</span> infección/omisión insulina/nuevo diagnóstico/_
-<span class="alert">⚠ CAD: pH&lt;7.3 + HCO₃&lt;15 + cetonemia&gt;3 / HHS: Osm&gt;320 + glucosa&gt;600</span>
+<span class="alert">⚠ CAD: pH<7.3 + HCO₃<15 + cetonemia>3 / HHS: Osm>320 + glucosa>600</span>
 <span class="note">→ Escalas: criterios gravedad CAD · Bicarbonato gap</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c12')">📋 Copiar</button>
@@ -839,7 +848,7 @@ body {
 <span class="key">Etiología:</span> biliar/alcohol/hipertrigliceridemia/idiopática/_
 <span class="key">TG:</span> _ (si hipertrigliceridemia)
 <span class="key">Fluidoterapia:</span> _ ml/h pautados
-<span class="alert">⚠ Ranson &gt;3 o APACHE II &gt;8 → grave → UCI</span>
+<span class="alert">⚠ Ranson >3 o APACHE II >8 → grave → UCI</span>
 <span class="note">→ Escalas: Ranson · BISAP · APACHE II · Atlanta revisada</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c14')">📋 Copiar</button>
@@ -952,7 +961,7 @@ body {
 <span class="key">Tratamiento habitual:</span> _ · cumplimiento S·N
 <span class="key">Causa secundaria:</span> feocromocitoma/ESR/eclampsia/drogas S·N
 <span class="alert">⚠ Urgencia hipertensiva vs Emergencia (daño órgano diana)</span>
-<span class="note">→ Diferencial: emergencia (descenso &lt;25% en 1h) vs urgencia (oral 24-48h)</span></div>
+<span class="note">→ Diferencial: emergencia (descenso <25% en 1h) vs urgencia (oral 24-48h)</span></div>
     <div class="btn-row">
       <button class="btn btn-copy" onclick="copyCard('c18')">📋 Copiar</button>
     </div>
@@ -1065,7 +1074,7 @@ body {
       <div class="scale-input"><input type="checkbox" id="qsofa1" onchange="calcQSOFA()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">Alteración estado mental (GCS &lt;15)</span>
+      <span class="scale-label">Alteración estado mental (GCS <15)</span>
       <div class="scale-input"><input type="checkbox" id="qsofa2" onchange="calcQSOFA()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
@@ -1095,7 +1104,7 @@ body {
       <div class="scale-input"><input type="checkbox" id="curb1" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">U — Urea &gt;7 mmol/L (BUN &gt;20 mg/dL)</span>
+      <span class="scale-label">U — Urea >7 mmol/L (BUN >20 mg/dL)</span>
       <div class="scale-input"><input type="checkbox" id="curb2" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
@@ -1103,7 +1112,7 @@ body {
       <div class="scale-input"><input type="checkbox" id="curb3" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">B — TAS &lt;90 mmHg o TAD ≤60 mmHg</span>
+      <span class="scale-label">B — TAS <90 mmHg o TAD ≤60 mmHg</span>
       <div class="scale-input"><input type="checkbox" id="curb4" onchange="calcCURB()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
@@ -1137,11 +1146,11 @@ body {
       <div class="scale-input"><input type="checkbox" id="wells2" onchange="calcWells()"><span class="scale-pts">+3</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">FC &gt;100 lpm</span>
+      <span class="scale-label">FC >100 lpm</span>
       <div class="scale-input"><input type="checkbox" id="wells3" onchange="calcWells()"><span class="scale-pts">+1.5</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">Inmovilización ≥3 días o cirugía en &lt;4 semanas</span>
+      <span class="scale-label">Inmovilización ≥3 días o cirugía en <4 semanas</span>
       <div class="scale-input"><input type="checkbox" id="wells4" onchange="calcWells()"><span class="scale-pts">+1.5</span></div>
     </div>
     <div class="scale-item">
@@ -1153,12 +1162,12 @@ body {
       <div class="scale-input"><input type="checkbox" id="wells6" onchange="calcWells()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="scale-item">
-      <span class="scale-label">Neoplasia activa (tratamiento en &lt;6 meses)</span>
+      <span class="scale-label">Neoplasia activa (tratamiento en <6 meses)</span>
       <div class="scale-input"><input type="checkbox" id="wells7" onchange="calcWells()"><span class="scale-pts">+1</span></div>
     </div>
     <div class="score-display">
       <div><div class="score-num" id="wells-num">0</div><div class="score-detail">puntos</div></div>
-      <div style="text-align:right"><div class="score-risk" id="wells-risk">Bajo</div><div class="score-detail" id="wells-detail">&lt;2 pts: DD si &lt;500 descarta</div></div>
+      <div style="text-align:right"><div class="score-risk" id="wells-risk">Bajo</div><div class="score-detail" id="wells-detail"><2 pts: DD si <500 descarta</div></div>
     </div>
     <button class="reset-btn" onclick="resetScale('wells',['wells1','wells2','wells3','wells4','wells5','wells6','wells7'],calcWells)">↺ Reset</button>
   </div>
@@ -1248,9 +1257,9 @@ body {
       <span class="scale-label">A — Edad</span>
       <div class="scale-input">
         <select id="heart3" onchange="calcHEART()">
-          <option value="0">&lt;45 años (0)</option>
+          <option value="0"><45 años (0)</option>
           <option value="1">45–65 años (1)</option>
-          <option value="2">&gt;65 años (2)</option>
+          <option value="2">>65 años (2)</option>
         </select>
       </div>
     </div>
@@ -1270,7 +1279,7 @@ body {
         <select id="heart5" onchange="calcHEART()">
           <option value="0">≤LSN (0)</option>
           <option value="1">1–3x LSN (1)</option>
-          <option value="2">&gt;3x LSN (2)</option>
+          <option value="2">>3x LSN (2)</option>
         </select>
       </div>
     </div>
@@ -1296,7 +1305,7 @@ body {
       <span class="scale-label">Urea sérica (mmol/L)</span>
       <div class="scale-input">
         <select id="gbs1" onchange="calcGBS()">
-          <option value="0">&lt;6.5 (0)</option>
+          <option value="0"><6.5 (0)</option>
           <option value="2">6.5–7.9 (2)</option>
           <option value="3">8.0–9.9 (3)</option>
           <option value="4">10.0–24.9 (4)</option>
@@ -1311,7 +1320,7 @@ body {
           <option value="0">≥13 (0)</option>
           <option value="1">12–12.9 (1)</option>
           <option value="3">10–11.9 (3)</option>
-          <option value="6">&lt;10 (6)</option>
+          <option value="6"><10 (6)</option>
         </select>
       </div>
     </div>
@@ -1321,7 +1330,7 @@ body {
         <select id="gbs3" onchange="calcGBS()">
           <option value="0">≥12 (0)</option>
           <option value="1">10–11.9 (1)</option>
-          <option value="6">&lt;10 (6)</option>
+          <option value="6"><10 (6)</option>
         </select>
       </div>
     </div>
@@ -1332,7 +1341,7 @@ body {
           <option value="0">≥110 (0)</option>
           <option value="1">100–109 (1)</option>
           <option value="2">90–99 (2)</option>
-          <option value="3">&lt;90 (3)</option>
+          <option value="3"><90 (3)</option>
         </select>
       </div>
     </div>
@@ -1359,14 +1368,14 @@ body {
     <span class="badge badge-amber">Pancreatitis</span>
   </div>
   <div class="scale-body">
-    <div class="scale-item"><span class="scale-label">B — BUN &gt;25 mg/dL</span><div class="scale-input"><input type="checkbox" id="bisap1" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">B — BUN >25 mg/dL</span><div class="scale-input"><input type="checkbox" id="bisap1" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
     <div class="scale-item"><span class="scale-label">I — Alteración estado mental (desorientación)</span><div class="scale-input"><input type="checkbox" id="bisap2" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
     <div class="scale-item"><span class="scale-label">S — SIRS (≥2 criterios)</span><div class="scale-input"><input type="checkbox" id="bisap3" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
-    <div class="scale-item"><span class="scale-label">A — Edad &gt;60 años</span><div class="scale-input"><input type="checkbox" id="bisap4" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
+    <div class="scale-item"><span class="scale-label">A — Edad >60 años</span><div class="scale-input"><input type="checkbox" id="bisap4" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
     <div class="scale-item"><span class="scale-label">P — Derrame pleural en imagen</span><div class="scale-input"><input type="checkbox" id="bisap5" onchange="calcBISAP()"><span class="scale-pts">+1</span></div></div>
     <div class="score-display">
       <div><div class="score-num" id="bisap-num">0</div><div class="score-detail">puntos</div></div>
-      <div style="text-align:right"><div class="score-risk" id="bisap-risk">Leve</div><div class="score-detail" id="bisap-detail">Mortalidad &lt;1%</div></div>
+      <div style="text-align:right"><div class="score-risk" id="bisap-risk">Leve</div><div class="score-detail" id="bisap-detail">Mortalidad <1%</div></div>
     </div>
     <button class="reset-btn" onclick="resetScale('bisap',['bisap1','bisap2','bisap3','bisap4','bisap5'],calcBISAP)">↺ Reset</button>
   </div>
@@ -1401,7 +1410,7 @@ body {
       <span class="scale-label">D — Duración síntomas</span>
       <div class="scale-input">
         <select id="abcd4" onchange="calcABCD()">
-          <option value="0">&lt;10 minutos (0)</option>
+          <option value="0"><10 minutos (0)</option>
           <option value="1">10–59 minutos (1)</option>
           <option value="2">≥60 minutos (2)</option>
         </select>
@@ -1449,11 +1458,11 @@ function toggleTheme() {
   document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
 })();
 
-function showTab(name) {
+function showTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
 }
 
 function copyCard(id) {
@@ -1498,7 +1507,7 @@ function calcWells() {
   document.getElementById('wells-num').textContent = s;
   const r = document.getElementById('wells-risk');
   const d = document.getElementById('wells-detail');
-  if (s<2) { r.className='score-risk risk-low'; r.textContent='Probabilidad baja'; d.textContent='DD &lt;500 descarta TEP'; }
+  if (s<2) { r.className='score-risk risk-low'; r.textContent='Probabilidad baja'; d.textContent='DD <500 descarta TEP'; }
   else if (s<=6) { r.className='score-risk risk-mid'; r.textContent='Probabilidad moderada'; d.textContent='DD + AngioTC si DD+'; }
   else { r.className='score-risk risk-high'; r.textContent='Probabilidad alta'; d.textContent='AngioTC directo sin DD previo'; }
 }
@@ -1522,9 +1531,9 @@ function calcHEART() {
   document.getElementById('heart-num').textContent = s;
   const r = document.getElementById('heart-risk');
   const d = document.getElementById('heart-detail');
-  if (s<=3) { r.className='score-risk risk-low'; r.textContent='Riesgo bajo'; d.textContent='Alta segura — MACE &lt;2%'; }
+  if (s<=3) { r.className='score-risk risk-low'; r.textContent='Riesgo bajo'; d.textContent='Alta segura — MACE <2%'; }
   else if (s<=6) { r.className='score-risk risk-mid'; r.textContent='Riesgo moderado'; d.textContent='Ingreso — MACE 12–17%'; }
-  else { r.className='score-risk risk-high'; r.textContent='Riesgo alto'; d.textContent='Revascularización urgente — MACE &gt;50%'; }
+  else { r.className='score-risk risk-high'; r.textContent='Riesgo alto'; d.textContent='Revascularización urgente — MACE >50%'; }
 }
 
 // Glasgow-Blatchford
@@ -1548,7 +1557,7 @@ function calcBISAP() {
   document.getElementById('bisap-num').textContent = s;
   const r = document.getElementById('bisap-risk');
   const d = document.getElementById('bisap-detail');
-  if (s<=1) { r.className='score-risk risk-low'; r.textContent='Leve'; d.textContent='Mortalidad &lt;1%'; }
+  if (s<=1) { r.className='score-risk risk-low'; r.textContent='Leve'; d.textContent='Mortalidad <1%'; }
   else if (s===2) { r.className='score-risk risk-mid'; r.textContent='Moderado'; d.textContent='Mortalidad ~2% — monitorizar'; }
   else { r.className='score-risk risk-high'; r.textContent='Grave'; d.textContent='Mortalidad '+(s===3?'5':s===4?'13':'22')+'% — UCI valorar'; }
 }
@@ -1733,24 +1742,24 @@ ${t('sca-aux')}`;
 const EXTRA_SCALES = [
 
 {id:'hasbled', title:'HAS-BLED', sub:'FA — riesgo hemorrágico bajo anticoagulación', badge:'blue', tag:'FA', items:[
-  {t:'chk', l:'H — HTA no controlada (TAS &gt;160 mmHg)', p:1},
-  {t:'chk', l:'A — Función renal alterada (diálisis, trasplante, Cr &gt;2,26 mg/dL)', p:1},
-  {t:'chk', l:'A — Función hepática alterada (cirrosis, Bil &gt;2×, transaminasas &gt;3×)', p:1},
+  {t:'chk', l:'H — HTA no controlada (TAS >160 mmHg)', p:1},
+  {t:'chk', l:'A — Función renal alterada (diálisis, trasplante, Cr >2,26 mg/dL)', p:1},
+  {t:'chk', l:'A — Función hepática alterada (cirrosis, Bil >2×, transaminasas >3×)', p:1},
   {t:'chk', l:'S — Ictus previo', p:1},
   {t:'chk', l:'B — Sangrado previo o predisposición (anemia)', p:1},
-  {t:'chk', l:'L — INR lábil (TRT &lt;60%)', p:1},
-  {t:'chk', l:'E — Edad &gt;65 años', p:1},
+  {t:'chk', l:'L — INR lábil (TRT <60%)', p:1},
+  {t:'chk', l:'E — Edad >65 años', p:1},
   {t:'chk', l:'D — Fármacos (AINE, antiagregantes)', p:1},
   {t:'chk', l:'D — Alcohol ≥8 UBE/semana', p:1}],
   interp:s => s<=2 ? ['low','Riesgo bajo','Sangrado mayor ~1%/año'] : ['high','Riesgo alto','≥3: corregir factores modificables — NO contraindica ACO']},
 
 {id:'spesi', title:'sPESI', sub:'TEP — mortalidad a 30 días (simplificado)', badge:'red', tag:'TEP', items:[
-  {t:'chk', l:'Edad &gt;80 años', p:1},
+  {t:'chk', l:'Edad >80 años', p:1},
   {t:'chk', l:'Cáncer activo', p:1},
   {t:'chk', l:'Insuficiencia cardiaca o enfermedad pulmonar crónica', p:1},
   {t:'chk', l:'FC ≥110 lpm', p:1},
-  {t:'chk', l:'TAS &lt;100 mmHg', p:1},
-  {t:'chk', l:'SpO₂ &lt;90%', p:1}],
+  {t:'chk', l:'TAS <100 mmHg', p:1},
+  {t:'chk', l:'SpO₂ <90%', p:1}],
   interp:s => s===0 ? ['low','Bajo riesgo','Mortalidad 30 d ~1% — valorar alta precoz (criterios Hestia)']
                     : ['high','Alto riesgo','Mortalidad 30 d ~10% — ingreso + troponina y función VD']},
 
@@ -1761,11 +1770,11 @@ const EXTRA_SCALES = [
   {t:'chk', l:'Insuficiencia cardiaca', p:10},
   {t:'chk', l:'Enfermedad pulmonar crónica', p:10},
   {t:'chk', l:'FC ≥110 lpm', p:20},
-  {t:'chk', l:'TAS &lt;100 mmHg', p:30},
+  {t:'chk', l:'TAS <100 mmHg', p:30},
   {t:'chk', l:'FR ≥30 rpm', p:20},
-  {t:'chk', l:'Temperatura &lt;36 °C', p:20},
+  {t:'chk', l:'Temperatura <36 °C', p:20},
   {t:'chk', l:'Alteración del estado mental', p:60},
-  {t:'chk', l:'SpO₂ &lt;90%', p:20}],
+  {t:'chk', l:'SpO₂ <90%', p:20}],
   interp:s => s<=65 ? ['low','Clase I','Muy bajo riesgo — mortalidad 0–1,6%']
             : s<=85 ? ['low','Clase II','Bajo riesgo — 1,7–3,5%']
             : s<=105 ? ['mid','Clase III','Riesgo intermedio — 3,2–7,1%']
@@ -1773,13 +1782,13 @@ const EXTRA_SCALES = [
                      : ['high','Clase V','Muy alto riesgo — 10,0–24,5%']},
 
 {id:'geneva', title:'Ginebra revisado', sub:'TEP — probabilidad clínica pre-test', badge:'red', tag:'TEP', items:[
-  {t:'chk', l:'Edad &gt;65 años', p:1},
+  {t:'chk', l:'Edad >65 años', p:1},
   {t:'chk', l:'TVP o TEP previos', p:3},
-  {t:'chk', l:'Cirugía o fractura &lt;1 mes', p:2},
+  {t:'chk', l:'Cirugía o fractura <1 mes', p:2},
   {t:'chk', l:'Neoplasia activa (sólida o hematológica)', p:2},
   {t:'chk', l:'Dolor unilateral en extremidad inferior', p:3},
   {t:'chk', l:'Hemoptisis', p:2},
-  {t:'sel', l:'Frecuencia cardiaca', o:[['&lt;75 lpm (0)',0],['75–94 lpm (3)',3],['≥95 lpm (5)',5]]},
+  {t:'sel', l:'Frecuencia cardiaca', o:[['<75 lpm (0)',0],['75–94 lpm (3)',3],['≥95 lpm (5)',5]]},
   {t:'chk', l:'Dolor a la palpación venosa profunda + edema unilateral', p:4}],
   interp:s => s<=3 ? ['low','Probabilidad baja','DD de alta sensibilidad (ajustado a edad) descarta']
             : s<=10 ? ['mid','Probabilidad intermedia','DD; si positivo → angioTC']
@@ -1792,10 +1801,10 @@ const EXTRA_SCALES = [
   {t:'sel', l:'2 — Mirada conjugada', o:[['Normal (0)',0],['Paresia parcial (1)',1],['Desviación forzada (2)',2]]},
   {t:'sel', l:'3 — Campos visuales', o:[['Normal (0)',0],['Hemianopsia parcial (1)',1],['Hemianopsia completa (2)',2],['Ceguera bilateral (3)',3]]},
   {t:'sel', l:'4 — Paresia facial', o:[['Normal (0)',0],['Asimetría leve (1)',1],['Parálisis parcial inferior (2)',2],['Parálisis completa (3)',3]]},
-  {t:'sel', l:'5a — Motor brazo izquierdo', o:[['No claudica 10 s (0)',0],['Claudica &lt;10 s (1)',1],['Vence gravedad parcialmente (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
-  {t:'sel', l:'5b — Motor brazo derecho', o:[['No claudica 10 s (0)',0],['Claudica &lt;10 s (1)',1],['Vence gravedad parcialmente (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
-  {t:'sel', l:'6a — Motor pierna izquierda', o:[['No claudica 5 s (0)',0],['Claudica &lt;5 s (1)',1],['Esfuerzo contra gravedad (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
-  {t:'sel', l:'6b — Motor pierna derecha', o:[['No claudica 5 s (0)',0],['Claudica &lt;5 s (1)',1],['Esfuerzo contra gravedad (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
+  {t:'sel', l:'5a — Motor brazo izquierdo', o:[['No claudica 10 s (0)',0],['Claudica <10 s (1)',1],['Vence gravedad parcialmente (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
+  {t:'sel', l:'5b — Motor brazo derecho', o:[['No claudica 10 s (0)',0],['Claudica <10 s (1)',1],['Vence gravedad parcialmente (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
+  {t:'sel', l:'6a — Motor pierna izquierda', o:[['No claudica 5 s (0)',0],['Claudica <5 s (1)',1],['Esfuerzo contra gravedad (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
+  {t:'sel', l:'6b — Motor pierna derecha', o:[['No claudica 5 s (0)',0],['Claudica <5 s (1)',1],['Esfuerzo contra gravedad (2)',2],['No vence gravedad (3)',3],['Ningún movimiento (4)',4]]},
   {t:'sel', l:'7 — Ataxia de miembros', o:[['Ausente (0)',0],['Presente en 1 extremidad (1)',1],['Presente en 2 extremidades (2)',2]]},
   {t:'sel', l:'8 — Sensibilidad', o:[['Normal (0)',0],['Hipoestesia leve-moderada (1)',1],['Anestesia grave o bilateral (2)',2]]},
   {t:'sel', l:'9 — Lenguaje', o:[['Normal (0)',0],['Afasia leve-moderada (1)',1],['Afasia grave (2)',2],['Mutismo / afasia global (3)',3]]},
@@ -1808,12 +1817,12 @@ const EXTRA_SCALES = [
                     : ['high','Ictus grave','Alta probabilidad de oclusión de gran vaso — trombectomía']},
 
 {id:'sofa', title:'SOFA', sub:'Disfunción orgánica (0–24) · Δ≥2 = sepsis', badge:'red', tag:'Sepsis', items:[
-  {t:'sel', l:'Respiratorio — PaO₂/FiO₂', o:[['≥400 (0)',0],['&lt;400 (1)',1],['&lt;300 (2)',2],['&lt;200 con soporte ventilatorio (3)',3],['&lt;100 con soporte ventilatorio (4)',4]]},
-  {t:'sel', l:'Coagulación — plaquetas ×10³/µL', o:[['≥150 (0)',0],['&lt;150 (1)',1],['&lt;100 (2)',2],['&lt;50 (3)',3],['&lt;20 (4)',4]]},
-  {t:'sel', l:'Hepático — bilirrubina mg/dL', o:[['&lt;1,2 (0)',0],['1,2–1,9 (1)',1],['2,0–5,9 (2)',2],['6,0–11,9 (3)',3],['&gt;12 (4)',4]]},
-  {t:'sel', l:'Cardiovascular', o:[['PAM ≥70 mmHg (0)',0],['PAM &lt;70 mmHg (1)',1],['Dopamina ≤5 o dobutamina cualquier dosis (2)',2],['Dopamina &gt;5 o NA/ADR ≤0,1 µg/kg/min (3)',3],['Dopamina &gt;15 o NA/ADR &gt;0,1 µg/kg/min (4)',4]]},
-  {t:'sel', l:'SNC — Glasgow', o:[['15 (0)',0],['13–14 (1)',1],['10–12 (2)',2],['6–9 (3)',3],['&lt;6 (4)',4]]},
-  {t:'sel', l:'Renal — creatinina mg/dL o diuresis', o:[['&lt;1,2 (0)',0],['1,2–1,9 (1)',1],['2,0–3,4 (2)',2],['3,5–4,9 o &lt;500 mL/d (3)',3],['&gt;5,0 o &lt;200 mL/d (4)',4]]}],
+  {t:'sel', l:'Respiratorio — PaO₂/FiO₂', o:[['≥400 (0)',0],['<400 (1)',1],['<300 (2)',2],['<200 con soporte ventilatorio (3)',3],['<100 con soporte ventilatorio (4)',4]]},
+  {t:'sel', l:'Coagulación — plaquetas ×10³/µL', o:[['≥150 (0)',0],['<150 (1)',1],['<100 (2)',2],['<50 (3)',3],['<20 (4)',4]]},
+  {t:'sel', l:'Hepático — bilirrubina mg/dL', o:[['<1,2 (0)',0],['1,2–1,9 (1)',1],['2,0–5,9 (2)',2],['6,0–11,9 (3)',3],['>12 (4)',4]]},
+  {t:'sel', l:'Cardiovascular', o:[['PAM ≥70 mmHg (0)',0],['PAM <70 mmHg (1)',1],['Dopamina ≤5 o dobutamina cualquier dosis (2)',2],['Dopamina >5 o NA/ADR ≤0,1 µg/kg/min (3)',3],['Dopamina >15 o NA/ADR >0,1 µg/kg/min (4)',4]]},
+  {t:'sel', l:'SNC — Glasgow', o:[['15 (0)',0],['13–14 (1)',1],['10–12 (2)',2],['6–9 (3)',3],['<6 (4)',4]]},
+  {t:'sel', l:'Renal — creatinina mg/dL o diuresis', o:[['<1,2 (0)',0],['1,2–1,9 (1)',1],['2,0–3,4 (2)',2],['3,5–4,9 o <500 mL/d (3)',3],['>5,0 o <200 mL/d (4)',4]]}],
   interp:s => s<=6 ? ['low',s+' puntos','Mortalidad <10%']
             : s<=9 ? ['mid',s+' puntos','Mortalidad 15–20%']
             : s<=12 ? ['high',s+' puntos','Mortalidad 40–50%']
@@ -1829,7 +1838,7 @@ const EXTRA_SCALES = [
 
 {id:'kdigo', title:'KDIGO — AKI', sub:'Fracaso renal agudo (estadio = criterio más alto)', badge:'amber', tag:'AKI', agg:'max', items:[
   {t:'sel', l:'Criterio creatinina', o:[['Sin criterio (0)',0],['×1,5–1,9 basal o ↑≥0,3 mg/dL en 48 h (1)',1],['×2,0–2,9 basal (2)',2],['×3 basal, Cr ≥4 mg/dL o inicio de TRS (3)',3]]},
-  {t:'sel', l:'Criterio diuresis', o:[['Sin criterio (0)',0],['&lt;0,5 mL/kg/h durante 6–12 h (1)',1],['&lt;0,5 mL/kg/h ≥12 h (2)',2],['&lt;0,3 mL/kg/h ≥24 h o anuria ≥12 h (3)',3]]}],
+  {t:'sel', l:'Criterio diuresis', o:[['Sin criterio (0)',0],['<0,5 mL/kg/h durante 6–12 h (1)',1],['<0,5 mL/kg/h ≥12 h (2)',2],['<0,3 mL/kg/h ≥24 h o anuria ≥12 h (3)',3]]}],
   interp:s => s===0 ? ['low','Sin AKI','No cumple criterios KDIGO']
             : s===1 ? ['mid','Estadio 1','Retirar nefrotóxicos · optimizar volemia · control Cr/diuresis']
             : s===2 ? ['high','Estadio 2','Revisar dosis por FG · descartar obstrucción (eco) · valorar nefrología']
@@ -1837,9 +1846,9 @@ const EXTRA_SCALES = [
 
 {id:'decaf', title:'DECAF', sub:'EPOC agudizado — mortalidad intrahospitalaria', badge:'amber', tag:'EPOC', items:[
   {t:'sel', l:'eMRCD — disnea basal estable', o:[['Grados 1–4 (0)',0],['5a: no sale de casa, autónomo para lavado/vestido (1)',1],['5b: no sale de casa, dependiente para lavado/vestido (2)',2]]},
-  {t:'chk', l:'Eosinófilos &lt;0,05 ×10⁹/L', p:1},
+  {t:'chk', l:'Eosinófilos <0,05 ×10⁹/L', p:1},
   {t:'chk', l:'Consolidación en radiografía de tórax', p:1},
-  {t:'chk', l:'pH &lt;7,30', p:1},
+  {t:'chk', l:'pH <7,30', p:1},
   {t:'chk', l:'Fibrilación auricular en ECG', p:1}],
   interp:s => s<=1 ? ['low',s+' puntos','Mortalidad 0–1,5% — valorar hospitalización a domicilio']
             : s===2 ? ['mid','2 puntos','Mortalidad ~5% — ingreso convencional']
@@ -1848,42 +1857,42 @@ const EXTRA_SCALES = [
 {id:'at4', title:'4AT', sub:'Delirium — cribado rápido (≥4 = posible delirium)', badge:'amber', tag:'Delirium', items:[
   {t:'sel', l:'Alerta (somnolencia o agitación marcada)', o:[['Normal (0)',0],['Alterada (4)',4]]},
   {t:'sel', l:'AMT4 — edad, fecha nacimiento, lugar, año', o:[['Sin errores (0)',0],['1 error (1)',1],['≥2 errores o no evaluable (2)',2]]},
-  {t:'sel', l:'Atención — meses del año en orden inverso', o:[['≥7 meses correctos (0)',0],['&lt;7 o rechaza (1)',1],['No evaluable por enfermedad/somnolencia (2)',2]]},
+  {t:'sel', l:'Atención — meses del año en orden inverso', o:[['≥7 meses correctos (0)',0],['<7 o rechaza (1)',1],['No evaluable por enfermedad/somnolencia (2)',2]]},
   {t:'sel', l:'Cambio agudo o curso fluctuante (2 semanas)', o:[['No (0)',0],['Sí (4)',4]]}],
   interp:s => s===0 ? ['low','0 puntos','Delirium y deterioro cognitivo improbables']
             : s<=3 ? ['mid',s+' puntos','Posible deterioro cognitivo — delirium no descartado']
                    : ['high',s+' puntos','Posible delirium ± deterioro cognitivo — buscar causa: ITU, retención, fecaloma, fármacos, hipoglucemia']},
 
 {id:'rockall', title:'Rockall pre-endoscópico', sub:'HDA — riesgo previo a endoscopia (0–7)', badge:'amber', tag:'HDA', items:[
-  {t:'sel', l:'Edad', o:[['&lt;60 años (0)',0],['60–79 años (1)',1],['≥80 años (2)',2]]},
-  {t:'sel', l:'Shock', o:[['Sin shock: TAS ≥100, FC &lt;100 (0)',0],['Taquicardia: TAS ≥100, FC ≥100 (1)',1],['Hipotensión: TAS &lt;100 (2)',2]]},
+  {t:'sel', l:'Edad', o:[['<60 años (0)',0],['60–79 años (1)',1],['≥80 años (2)',2]]},
+  {t:'sel', l:'Shock', o:[['Sin shock: TAS ≥100, FC <100 (0)',0],['Taquicardia: TAS ≥100, FC ≥100 (1)',1],['Hipotensión: TAS <100 (2)',2]]},
   {t:'sel', l:'Comorbilidad', o:[['Ninguna mayor (0)',0],['Cardiopatía isquémica, IC u otra mayor (2)',2],['IRC, hepatopatía, neoplasia diseminada (3)',3]]}],
   interp:s => s===0 ? ['low','0 puntos','Riesgo muy bajo — valorar alta precoz']
-            : s<=2 ? ['mid',s+' puntos','Riesgo intermedio — endoscopia &lt;24 h']
+            : s<=2 ? ['mid',s+' puntos','Riesgo intermedio — endoscopia <24 h']
                    : ['high',s+' puntos','Alto riesgo — endoscopia urgente + ingreso']},
 
 {id:'aims65', title:'AIMS65', sub:'HDA — mortalidad intrahospitalaria', badge:'amber', tag:'HDA', items:[
-  {t:'chk', l:'A — Albúmina &lt;3,0 g/dL', p:1},
-  {t:'chk', l:'I — INR &gt;1,5', p:1},
+  {t:'chk', l:'A — Albúmina <3,0 g/dL', p:1},
+  {t:'chk', l:'I — INR >1,5', p:1},
   {t:'chk', l:'M — Alteración del estado mental', p:1},
   {t:'chk', l:'S — TAS ≤90 mmHg', p:1},
-  {t:'chk', l:'65 — Edad &gt;65 años', p:1}],
+  {t:'chk', l:'65 — Edad >65 años', p:1}],
   interp:s => s<=1 ? ['low',s+' puntos','Mortalidad 1–3%']
             : s===2 ? ['mid','2 puntos','Mortalidad ~6%']
                     : ['high',s+' puntos','Mortalidad 15–25% — UCI valorar']},
 
 {id:'ranson', title:'Ranson (no biliar)', sub:'Pancreatitis — ingreso + 48 h (≥3 = grave)', badge:'amber', tag:'Pancreatitis', items:[
-  {t:'chk', l:'Ingreso — Edad &gt;55 años', p:1},
-  {t:'chk', l:'Ingreso — Leucocitos &gt;16.000/µL', p:1},
-  {t:'chk', l:'Ingreso — Glucosa &gt;200 mg/dL', p:1},
-  {t:'chk', l:'Ingreso — LDH &gt;350 UI/L', p:1},
-  {t:'chk', l:'Ingreso — AST &gt;250 UI/L', p:1},
-  {t:'chk', l:'48 h — Descenso del hematocrito &gt;10%', p:1},
-  {t:'chk', l:'48 h — Aumento del BUN &gt;5 mg/dL', p:1},
-  {t:'chk', l:'48 h — Calcio &lt;8 mg/dL', p:1},
-  {t:'chk', l:'48 h — PaO₂ &lt;60 mmHg', p:1},
-  {t:'chk', l:'48 h — Déficit de bases &gt;4 mEq/L', p:1},
-  {t:'chk', l:'48 h — Secuestro de líquidos &gt;6 L', p:1}],
+  {t:'chk', l:'Ingreso — Edad >55 años', p:1},
+  {t:'chk', l:'Ingreso — Leucocitos >16.000/µL', p:1},
+  {t:'chk', l:'Ingreso — Glucosa >200 mg/dL', p:1},
+  {t:'chk', l:'Ingreso — LDH >350 UI/L', p:1},
+  {t:'chk', l:'Ingreso — AST >250 UI/L', p:1},
+  {t:'chk', l:'48 h — Descenso del hematocrito >10%', p:1},
+  {t:'chk', l:'48 h — Aumento del BUN >5 mg/dL', p:1},
+  {t:'chk', l:'48 h — Calcio <8 mg/dL', p:1},
+  {t:'chk', l:'48 h — PaO₂ <60 mmHg', p:1},
+  {t:'chk', l:'48 h — Déficit de bases >4 mEq/L', p:1},
+  {t:'chk', l:'48 h — Secuestro de líquidos >6 L', p:1}],
   interp:s => s<=2 ? ['low',s+' criterios','Mortalidad ~1% — pancreatitis leve']
             : s<=4 ? ['mid',s+' criterios','Mortalidad ~15% — monitorización estrecha']
             : s<=6 ? ['high',s+' criterios','Mortalidad ~40% — UCI']
@@ -1937,7 +1946,7 @@ const EXTRA_SCALES = [
   {t:'chk', l:'Aumento de la purulencia del esputo', p:1}],
   interp:s => s===3 ? ['high','Tipo I','Antibiótico indicado']
             : s===2 ? ['mid','Tipo II','Antibiótico indicado si incluye purulencia']
-            : s===1 ? ['low','Tipo III','Antibiótico solo si criterio menor asociado (fiebre, infección VRS &lt;5 d, ↑FC/FR &gt;20%)']
+            : s===1 ? ['low','Tipo III','Antibiótico solo si criterio menor asociado (fiebre, infección VRS <5 d, ↑FC/FR >20%)']
                     : ['low','Sin criterios','Antibiótico no indicado']},
 
 {id:'ehra', title:'EHRA', sub:'FA — clase funcional sintomática', badge:'blue', tag:'FA', items:[
