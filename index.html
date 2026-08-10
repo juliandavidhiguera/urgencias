@@ -483,6 +483,18 @@ body {
   border-radius: 50%;
   line-height: 1;
 }
+
+.fav-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+}
+.fav-btn.fav-active { color: var(--amber); }
+.fav-btn:hover { color: var(--amber); }
 </style>
 </head>
 <body>
@@ -608,8 +620,40 @@ body {
 <script src="data/protocols.js"></script>
 <script src="data/drugs.js"></script>
 <script>
+/* ==================================================================
+   FAVORITOS Y RECIENTES — localStorage
+   ================================================================== */
+function getFavs() {
+  try { return JSON.parse(localStorage.getItem('urg-favs') || '{}'); } catch { return {}; }
+}
+
+function toggleFav(type, id) {
+  const favs = getFavs();
+  const key = type + ':' + id;
+  if (favs[key]) delete favs[key];
+  else favs[key] = Date.now();
+  localStorage.setItem('urg-favs', JSON.stringify(favs));
+  if (type === 'cheatsheet') renderCheatsheets();
+  else if (type === 'scale') renderScales();
+  else if (type === 'protocol') renderProtocols();
+  else renderDrugs();
+}
+
+function getRecent() {
+  try { return JSON.parse(localStorage.getItem('urg-recent') || '[]'); } catch { return []; }
+}
+
+function trackRecent(id) {
+  let recent = getRecent();
+  recent = recent.filter(r => r !== id);
+  recent.unshift(id);
+  recent = recent.slice(0, 5);
+  localStorage.setItem('urg-recent', JSON.stringify(recent));
+}
+
 function renderCheatsheets() {
   var container = document.getElementById('tab-cheatsheets');
+  var favs = getFavs();
   var sections = {};
   CHEATSHEETS.forEach(function(ch) {
     if (!sections[ch.section]) sections[ch.section] = { icon: ch.sectionIcon, items: [] };
@@ -617,12 +661,17 @@ function renderCheatsheets() {
   });
   container.innerHTML = Object.entries(sections).map(function(entry) {
     var name = entry[0], sec = entry[1];
+    var items = sec.items.slice().sort(function(a, b) {
+      return (favs['cheatsheet:' + b.id] || 0) - (favs['cheatsheet:' + a.id] || 0);
+    });
     return '<div class="section-title">' + sec.icon + ' ' + name + '</div>' +
-      '<div class="grid">' + sec.items.map(function(ch) {
+      '<div class="grid">' + items.map(function(ch) {
         return '<div class="card">' +
           '<div class="card-header">' +
             '<span class="badge badge-' + ch.badge + '">' + ch.badgeLabel + '</span>' +
             '<span class="card-title">' + ch.title + '</span>' +
+            '<button class="fav-btn' + (favs['cheatsheet:' + ch.id] ? ' fav-active' : '') +
+              '" onclick="event.stopPropagation();toggleFav(\'cheatsheet\',\'' + ch.id + '\')" aria-label="Favorito">★</button>' +
           '</div>' +
           '<div class="card-body">' +
             '<div class="code" id="' + ch.id + '">' + ch.html + '</div>' +
@@ -853,49 +902,75 @@ ${t('sca-aux')}`;
   navigator.clipboard.writeText(txt).then(showToast);
 }
 
-function _scaleCtrl(sc, it, i) {
-  const id = sc.id + '_' + i;
+function _scaleCtrl(sc, it, i, pfx) {
+  pfx = pfx || '';
+  const id = pfx + sc.id + '_' + i;
   if (it.t === 'sel') {
-    return '<select id="' + id + '" onchange="calcScale(\'' + sc.id + '\')">' +
+    return '<select id="' + id + '" onchange="onScaleChange(\'' + sc.id + '\',\'' + pfx + '\')">' +
       it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>';
   }
   if (it.t === 'num') {
-    return '<input type="number" class="num-in" id="' + id + '" oninput="calcScale(\'' + sc.id + '\')" placeholder="' + (it.u || '') + '"><span class="scale-pts" id="' + id + '-p">+0</span>';
+    return '<input type="number" class="num-in" id="' + id + '" oninput="onScaleChange(\'' + sc.id + '\',\'' + pfx + '\')" placeholder="' + (it.u || '') + '"><span class="scale-pts" id="' + id + '-p">+0</span>';
   }
-  return '<input type="checkbox" id="' + id + '" onchange="calcScale(\'' + sc.id + '\')"><span class="scale-pts">+' + it.p + '</span>';
+  return '<input type="checkbox" id="' + id + '" onchange="onScaleChange(\'' + sc.id + '\',\'' + pfx + '\')"><span class="scale-pts">+' + it.p + '</span>';
 }
 
-function renderScales() {
-  document.getElementById('all-scales').innerHTML = SCALES.map(sc =>
-    '<div class="scale-card">' +
+function renderOneScale(sc, favs, pfx) {
+  pfx = pfx || '';
+  const uid = pfx + sc.id;
+  return '<div class="scale-card">' +
       '<div class="scale-header"><div>' +
         '<div class="scale-title">' + sc.title + '</div>' +
         '<div class="scale-subtitle">' + sc.sub + '</div>' +
-      '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span></div>' +
+      '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span>' +
+      '<button class="fav-btn' + (favs['scale:' + sc.id] ? ' fav-active' : '') +
+        '" onclick="event.stopPropagation();toggleFav(\'scale\',\'' + sc.id + '\')" aria-label="Favorito">★</button>' +
+      '</div>' +
       '<div class="scale-body">' +
         sc.items.map((it, i) =>
           '<div class="scale-item"><span class="scale-label">' + it.l + '</span>' +
-          '<div class="scale-input">' + _scaleCtrl(sc, it, i) + '</div></div>').join('') +
+          '<div class="scale-input">' + _scaleCtrl(sc, it, i, pfx) + '</div></div>').join('') +
         '<div class="score-display">' +
-          '<div><div class="score-num" id="' + sc.id + '-num">0</div><div class="score-detail">puntos</div></div>' +
-          '<div style="text-align:right"><div class="score-risk" id="' + sc.id + '-risk">—</div>' +
-          '<div class="score-detail" id="' + sc.id + '-detail">—</div></div>' +
+          '<div><div class="score-num" id="' + uid + '-num">0</div><div class="score-detail">puntos</div></div>' +
+          '<div style="text-align:right"><div class="score-risk" id="' + uid + '-risk">—</div>' +
+          '<div class="score-detail" id="' + uid + '-detail">—</div></div>' +
         '</div>' +
-        '<button class="reset-btn" onclick="resetGeneric(\'' + sc.id + '\')">↺ Reset</button>' +
-        '<button class="btn btn-copy" onclick="copyScaleResult(\'' + sc.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
-      '</div></div>').join('');
+        '<button class="reset-btn" onclick="resetGeneric(\'' + sc.id + '\',\'' + pfx + '\')">↺ Reset</button>' +
+        '<button class="btn btn-copy" onclick="copyScaleResult(\'' + sc.id + '\',\'' + pfx + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
+      '</div></div>';
+}
+
+function renderScales() {
+  const favs = getFavs();
+  const recent = getRecent();
+  const recentScales = recent.map(rid => SCALES.find(x => x.id === rid)).filter(Boolean);
+  const recentHtml = recentScales.length ?
+    '<div class="section-title">🕐 Usadas recientemente</div><div class="scales-grid">' +
+    recentScales.map(sc => renderOneScale(sc, favs, 'recent-')).join('') + '</div>' : '';
+  const sortedScales = SCALES.slice().sort((a, b) => (favs['scale:' + b.id] || 0) - (favs['scale:' + a.id] || 0));
+  document.getElementById('all-scales').innerHTML = recentHtml +
+    sortedScales.map(sc => renderOneScale(sc, favs)).join('');
+  recentScales.forEach(sc => calcScale(sc.id, 'recent-'));
   SCALES.forEach(sc => calcScale(sc.id));
 }
 
-function calcScale(id) {
+/* Wrapper used by scale input handlers: registers real usage in "recientes" then recalculates. */
+function onScaleChange(id, pfx) {
+  trackRecent(id);
+  calcScale(id, pfx);
+}
+
+function calcScale(id, pfx) {
+  pfx = pfx || '';
+  const uid = pfx + id;
   const sc = SCALES.find(x => x.id === id);
   const pts = sc.items.map((it, i) => {
-    const el = document.getElementById(id + '_' + i);
+    const el = document.getElementById(uid + '_' + i);
     if (it.t === 'sel') return parseFloat(el.value);
     if (it.t === 'num') {
       const v = parseFloat(el.value);
       const p = isNaN(v) ? 0 : it.f(v);
-      document.getElementById(id + '_' + i + '-p').textContent = '+' + p;
+      document.getElementById(uid + '_' + i + '-p').textContent = '+' + p;
       return p;
     }
     return el.checked ? it.p : 0;
@@ -903,7 +978,7 @@ function calcScale(id) {
   let s;
   if (sc.calcCustom) {
     const rawVals = sc.items.map((it, i) => {
-      const el = document.getElementById(id + '_' + i);
+      const el = document.getElementById(uid + '_' + i);
       return parseFloat(el.value) || 0;
     });
     s = sc.calcCustom(rawVals);
@@ -911,29 +986,33 @@ function calcScale(id) {
     s = sc.agg === 'max' ? Math.max.apply(null, pts) : pts.reduce((a, b) => a + b, 0);
   }
   const [cls, risk, det] = sc.interp(s);
-  document.getElementById(id + '-num').textContent = s;
-  const r = document.getElementById(id + '-risk');
+  document.getElementById(uid + '-num').textContent = s;
+  const r = document.getElementById(uid + '-risk');
   r.className = 'score-risk risk-' + cls;
   r.innerHTML = risk;
-  document.getElementById(id + '-detail').innerHTML = det;
+  document.getElementById(uid + '-detail').innerHTML = det;
 }
 
-function resetGeneric(id) {
+function resetGeneric(id, pfx) {
+  pfx = pfx || '';
+  const uid = pfx + id;
   const sc = SCALES.find(x => x.id === id);
   sc.items.forEach((it, i) => {
-    const el = document.getElementById(id + '_' + i);
+    const el = document.getElementById(uid + '_' + i);
     if (it.t === 'sel') el.selectedIndex = 0;
     else if (it.t === 'num') el.value = '';
     else el.checked = false;
   });
-  calcScale(id);
+  calcScale(id, pfx);
 }
 
-function copyScaleResult(id) {
+function copyScaleResult(id, pfx) {
+  pfx = pfx || '';
+  const uid = pfx + id;
   const sc = SCALES.find(x => x.id === id);
-  const num = document.getElementById(id + '-num').textContent;
-  const risk = document.getElementById(id + '-risk').textContent;
-  const detail = document.getElementById(id + '-detail').textContent;
+  const num = document.getElementById(uid + '-num').textContent;
+  const risk = document.getElementById(uid + '-risk').textContent;
+  const detail = document.getElementById(uid + '-detail').textContent;
   const score = sc.max ? num + '/' + sc.max : num;
   const txt = sc.title + ': ' + score + ' — ' + risk + '\n' + detail;
   navigator.clipboard.writeText(txt).then(() => {
@@ -947,13 +1026,18 @@ function copyScaleResult(id) {
 
 function renderProtocols() {
   const container = document.getElementById('tab-protocolos');
+  const favs = getFavs();
+  const sorted = PROTOCOLS.slice().sort((a, b) => (favs['protocol:' + b.id] || 0) - (favs['protocol:' + a.id] || 0));
   container.innerHTML = '<div class="section-title">🔀 Protocolos de actuación</div>' +
-    PROTOCOLS.map(p =>
+    sorted.map(p =>
       '<div class="protocol-card">' +
         '<div class="scale-header"><div>' +
           '<div class="scale-title">' + p.title + '</div>' +
           '<div class="scale-subtitle">' + p.sub + '</div>' +
-        '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span></div>' +
+        '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span>' +
+        '<button class="fav-btn' + (favs['protocol:' + p.id] ? ' fav-active' : '') +
+          '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito">★</button>' +
+        '</div>' +
         '<div class="scale-body">' +
           p.steps.map((s, i) => {
             const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (i + 1);
@@ -971,28 +1055,42 @@ function _drugId(name) {
 
 function renderDrugs() {
   const container = document.getElementById('tab-farmacos');
+  const favs = getFavs();
+  const pesoEl = document.getElementById('farmacos-peso');
+  const currentPeso = pesoEl ? pesoEl.value : '70';
   container.innerHTML =
     '<div class="section-title">💉 Fármacos — calculadora por peso</div>' +
     '<div class="drug-weight-bar">' +
       '<label for="farmacos-peso">Peso del paciente</label>' +
-      '<input type="number" class="num-in" id="farmacos-peso" value="70" min="20" max="250" step="1" oninput="recalcDrugs(this.value)">' +
+      '<input type="number" class="num-in" id="farmacos-peso" value="' + currentPeso + '" min="20" max="250" step="1" oninput="recalcDrugs(this.value)">' +
       '<span class="scale-pts">kg</span>' +
     '</div>' +
     '<div class="scales-grid">' +
-    DRUGS.map(g => g.drugs.map(d => {
-      const id = _drugId(d.name);
-      return '<div class="scale-card drug-card">' +
-        '<div class="scale-header"><div>' +
-          '<div class="scale-title">' + d.name + '</div>' +
-          '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
-        '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span></div>' +
-        '<div class="scale-body">' +
-          '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
-          (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
-          (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
-          (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
-        '</div></div>';
-    }).join('')).join('') +
+    DRUGS.map(g => {
+      const drugsSorted = g.drugs.slice().sort((a, b) => {
+        const fa = favs['drug:' + a.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
+        const fb = favs['drug:' + b.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
+        return fb - fa;
+      });
+      return drugsSorted.map(d => {
+        const id = _drugId(d.name);
+        const favId = d.name.replace(/[^a-zA-Z0-9]/g, '');
+        return '<div class="scale-card drug-card">' +
+          '<div class="scale-header"><div>' +
+            '<div class="scale-title">' + d.name + '</div>' +
+            '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
+          '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span>' +
+          '<button class="fav-btn' + (favs['drug:' + favId] ? ' fav-active' : '') +
+            '" onclick="event.stopPropagation();toggleFav(\'drug\',\'' + favId + '\')" aria-label="Favorito">★</button>' +
+          '</div>' +
+          '<div class="scale-body">' +
+            '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
+            (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
+            (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
+            (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
+          '</div></div>';
+      }).join('');
+    }).join('') +
     '</div>';
   recalcDrugs(document.getElementById('farmacos-peso').value);
 }
