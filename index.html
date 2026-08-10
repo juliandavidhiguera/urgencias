@@ -795,6 +795,7 @@ function renderScales() {
           '<div class="score-detail" id="' + sc.id + '-detail">—</div></div>' +
         '</div>' +
         '<button class="reset-btn" onclick="resetGeneric(\'' + sc.id + '\')">↺ Reset</button>' +
+        '<button class="btn btn-copy" onclick="copyScaleResult(\'' + sc.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
       '</div></div>').join('');
   SCALES.forEach(sc => calcScale(sc.id));
 }
@@ -830,6 +831,22 @@ function resetGeneric(id) {
     else el.checked = false;
   });
   calcScale(id);
+}
+
+function copyScaleResult(id) {
+  const sc = SCALES.find(x => x.id === id);
+  const num = document.getElementById(id + '-num').textContent;
+  const risk = document.getElementById(id + '-risk').textContent;
+  const detail = document.getElementById(id + '-detail').textContent;
+  const score = sc.max ? num + '/' + sc.max : num;
+  const txt = sc.title + ': ' + score + ' — ' + risk + '\n' + detail;
+  navigator.clipboard.writeText(txt).then(() => {
+    // Brief visual feedback
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
 }
 
 /* El <script> se carga al final del <body>: ejecución directa. */
