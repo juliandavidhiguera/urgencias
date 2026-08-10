@@ -115,13 +115,15 @@ body {
 
 .nav-btn {
   font-size: 11px;
-  padding: 4px 10px;
+  padding: 8px 14px;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--bg3);
   color: var(--text2);
   cursor: pointer;
   font-family: var(--sans);
+  min-height: 44px;
+  min-width: 44px;
 }
 .nav-btn:hover, .nav-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
 
@@ -195,13 +197,15 @@ body {
 
 .btn {
   font-size: 11px;
-  padding: 5px 12px;
+  padding: 8px 14px;
   border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--bg3);
   color: var(--text2);
   cursor: pointer;
   font-family: var(--sans);
+  min-height: 44px;
+  min-width: 44px;
 }
 .btn:hover { background: var(--border); color: var(--text); }
 .btn-copy:active { background: var(--green-bg); color: var(--green); }
@@ -248,15 +252,16 @@ body {
   gap: 6px;
 }
 
-.scale-input input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--blue); cursor: pointer; }
+.scale-input input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--blue); cursor: pointer; }
 .scale-input select {
-  font-size: 11px;
+  font-size: 13px;
   background: var(--bg3);
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 4px;
   padding: 2px 4px;
   font-family: var(--sans);
+  min-height: 36px;
 }
 
 .score-display {
@@ -281,13 +286,15 @@ body {
 .reset-btn {
   margin-top: 8px;
   font-size: 11px;
-  padding: 4px 10px;
+  padding: 8px 14px;
   border-radius: 4px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text2);
   cursor: pointer;
   font-family: var(--sans);
+  min-height: 44px;
+  min-width: 44px;
 }
 .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
@@ -369,13 +376,31 @@ body {
 
 @media (max-width: 600px) {
   .grid, .scales-grid { grid-template-columns: 1fr; }
-  .nav { top: 57px; }
+  .nav { top: auto; position: static; flex-wrap: wrap; }
+  .header { flex-wrap: wrap; }
+  .header h1 { font-size: 14px; }
+  .fields { grid-template-columns: repeat(2, 1fr); }
+  .chk-grid { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .grid, .scales-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media print {
-  .nav, .header .btn, .btn-row, .reset-btn { display: none; }
-  body { background: white; color: black; }
-  .card, .scale-card { border: 1px solid #ccc; break-inside: avoid; }
+  .nav, .header .btn, .btn-row, .reset-btn, .filter-wrap, .theme-toggle,
+  .scale-input, input, select, button { display: none; }
+  body { background: white; color: black; font-size: 12px; }
+  .card, .scale-card, .protocol-card, .drug-card {
+    border: 1px solid #ccc;
+    break-inside: avoid;
+    margin-bottom: 8px;
+  }
+  .header { position: static; background: white; border-bottom: 2px solid black; }
+  .tab-content { display: block !important; }
+  .score-display { border: 1px solid #999; }
+  .badge { border: 1px solid currentColor; }
 }
 
 /* ===== DATA BOX SCA (GRACE · TIMI · CRUSADE) ===== */
@@ -425,6 +450,7 @@ body {
   font-size: 13px;
   font-family: var(--mono);
   width: 100%;
+  min-height: 40px;
 }
 .field input:focus, .field select:focus { outline: none; border-color: var(--blue); }
 .field input.missing { border-color: var(--amber); }
