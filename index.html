@@ -124,6 +124,11 @@ body {
 }
 .nav-btn:hover, .nav-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
 
+.nav .filter-input {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
 .main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 
 .section-title {
@@ -452,6 +457,9 @@ body {
 <div class="nav">
   <button class="nav-btn active" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
   <button class="nav-btn" onclick="showTab('escalas', this)">📊 Escalas</button>
+  <button class="nav-btn" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
+  <button class="nav-btn" onclick="showTab('farmacos', this)">💊 Fármacos</button>
+  <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
 </div>
 
 <div class="main">
@@ -546,6 +554,10 @@ body {
 <div class="scales-grid" id="all-scales"></div>
 </div><!-- end tab-escalas -->
 
+<div id="tab-protocolos" class="tab-content"></div>
+
+<div id="tab-farmacos" class="tab-content"></div>
+
 </div><!-- main -->
 
 <div class="toast" id="toast">✓ Copiado al portapapeles</div>
@@ -605,6 +617,38 @@ function showTab(name, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+}
+
+function globalSearch(q) {
+  const t = q.trim().toLowerCase();
+  if (!t) {
+    // Restore normal tab state
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.style.display = '';
+      tab.querySelectorAll('.card, .scale-card, .protocol-card, .drug-card').forEach(c => c.style.display = '');
+    });
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    const activeBtn = document.querySelector('.nav-btn.active');
+    const activeName = activeBtn ? activeBtn.textContent.toLowerCase() : 'cheatsheets';
+    const tabId = activeName.includes('cheatsheet') ? 'tab-cheatsheets'
+               : activeName.includes('escala') ? 'tab-escalas'
+               : activeName.includes('protocolo') ? 'tab-protocolos'
+               : 'tab-farmacos';
+    document.getElementById(tabId).classList.add('active');
+    return;
+  }
+  // Show ALL tabs and filter within each
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+    tab.style.display = 'block';
+    let hasVisible = false;
+    tab.querySelectorAll('.card, .scale-card, .protocol-card, .drug-card').forEach(card => {
+      const match = card.textContent.toLowerCase().includes(t);
+      card.style.display = match ? '' : 'none';
+      if (match) hasVisible = true;
+    });
+    tab.style.display = hasVisible ? 'block' : 'none';
+  });
 }
 
 function copyCard(id) {
