@@ -6,6 +6,48 @@
 <title>URG CLÍNICO — Cheatsheet + Escalas</title>
 <style>
 :root {
+  --bg: #f8f9fa;
+  --bg2: #ffffff;
+  --bg3: #f0f2f5;
+  --border: #e2e5e9;
+  --text: #1f2328;
+  --text2: #656d76;
+  --red: #cf222e;
+  --red-bg: #ffebe9;
+  --amber: #9a6700;
+  --amber-bg: #fff8c5;
+  --blue: #0969da;
+  --blue-bg: #ddf4ff;
+  --green: #1a7f37;
+  --green-bg: #dafbe1;
+  --purple: #8250df;
+  --key-color: #0550ae;
+  --mono: 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --red: #f85149;
+    --red-bg: #3d1515;
+    --amber: #d29922;
+    --amber-bg: #2d2008;
+    --blue: #58a6ff;
+    --blue-bg: #0d1f3c;
+    --green: #3fb950;
+    --green-bg: #0d2818;
+    --purple: #bc8cff;
+    --key-color: #79c0ff;
+  }
+}
+
+[data-theme="dark"] {
   --bg: #0d1117;
   --bg2: #161b22;
   --bg3: #1c2128;
@@ -21,8 +63,7 @@
   --green: #3fb950;
   --green-bg: #0d2818;
   --purple: #bc8cff;
-  --mono: 'Courier New', monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --key-color: #79c0ff;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,8 +171,8 @@ body {
   color: var(--text);
 }
 
-.key { color: #79c0ff; }
-.val { color: #3fb950; }
+.key { color: var(--key-color); }
+.val { color: var(--green); }
 .alert { color: var(--red); font-weight: 600; }
 .note { color: var(--amber); }
 
@@ -379,6 +420,14 @@ body {
   font-family: var(--sans);
 }
 .filter-input:focus { outline: none; border-color: var(--blue); }
+
+.theme-toggle {
+  margin-left: auto;
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 50%;
+  line-height: 1;
+}
 </style>
 </head>
 <body>
@@ -388,6 +437,7 @@ body {
     <h1>⚡ URG CLÍNICO — Cheatsheet + Escalas</h1>
     <p>Dr. Higuera · Clínica Barcelona · Uso clínico interno</p>
   </div>
+  <button class="btn theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
 </div>
 
 <div class="nav">
@@ -1377,6 +1427,28 @@ body {
 <div class="toast" id="toast">✓ Copiado al portapapeles</div>
 
 <script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let next;
+  if (!current) next = prefersDark ? 'light' : 'dark';
+  else if (current === 'dark') next = 'light';
+  else next = 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('urg-theme', next);
+  document.getElementById('theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('urg-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+  const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+})();
+
 function showTab(name) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
