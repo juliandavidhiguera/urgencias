@@ -9,17 +9,18 @@ window.PROTOCOLS = [
   {type:'action', text:'Retirar el desencadenante si es posible (fármaco IV, picadura). NO retrasar la adrenalina por esto'},
   {type:'action', text:'ADRENALINA IM 0,5 mg (0,5 mL de solución 1 mg/mL = 1:1000) en cara anterolateral del muslo (vasto lateral), lo antes posible.\nAlternativa ponderal equivalente: 0,01 mg/kg IM, máximo 0,5 mg'},
   {type:'info', text:'IM en muslo, NO subcutánea ni en deltoides. Autoinyector en adultos: 0,5 mg (ERC First Aid 2025)'},
+  {type:'info', text:'CUIDADO CON LA AMPOLLA: 1 mg/mL (1:1000) es la de uso IM. 0,1 mg/mL (1:10.000) es la de uso IV/IO. Administrar por vía IV la ampolla de 1 mg/mL es una causa clásica de sobredosis grave'},
   {type:'action', text:'Posición: decúbito supino con piernas elevadas. Si disnea, semiincorporado. Si embarazo, decúbito lateral izquierdo.\nNO sentar ni levantar bruscamente'},
   {type:'action', text:'Oxígeno a alto flujo + acceso IV de grueso calibre + monitorización continua'},
   {type:'decision', text:'¿Persisten los síntomas a los 5 minutos?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'REPETIR adrenalina IM 0,5 mg. Se puede repetir cada 5 min según respuesta'},
   {type:'action', branch:'yes', text:'Fluidoterapia: cristaloide 500–1000 mL IV rápido si hipotensión; repetir según respuesta'},
-  {type:'action', branch:'yes', text:'Refractaria tras ≥2 dosis IM: valorar adrenalina IV en perfusión con monitorización y personal experto. NO bolo IV a menos que haya parada'},
+  {type:'action', branch:'yes', text:'Refractaria tras ≥2 dosis IM, con monitorización completa y personal experto: PERFUSIÓN IV de adrenalina 0,1 µg/kg/min, titulando a efecto (ERC 2025).\nPreparación práctica: 1 mg en 250 mL de SSF o SG5% = 4 µg/mL.\nNO dar bolo IV fuera de la parada: se asocia a más sobredosis y más eventos cardiovasculares que la vía IM'},
   {type:'action', branch:'no', text:'Mantener monitorización: riesgo de reacción bifásica'},
   {type:'info', text:'Broncoespasmo asociado: salbutamol nebulizado como adyuvante, nunca en sustitución de la adrenalina'},
   {type:'info', text:'Corticoide y antihistamínico son de segunda línea: no salvan la vida ni sustituyen a la adrenalina'},
   {type:'info', text:'Observación antes del alta según gravedad y respuesta. Alta con autoinyector, plan escrito y derivación a alergología'}],
-  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568'},
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568 · Actualizacion de evidencia en anafilaxia: Dodd 2021 · PMID 33895231 · Preparacion de la perfusion IV: LoVerde 2017 · PMID 28800865'},
 
 {id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', steps:[
   {type:'action', text:'ECG de 12 derivaciones. Descartar preexcitación (QRS ancho, delta): contraindica frenar el nodo AV'},
@@ -86,7 +87,7 @@ window.PROTOCOLS = [
   {type:'action', text:'Confirmar hiperkalemia con ECG y descartar pseudohiperpotasemia (hemólisis de la muestra, torniquete prolongado)'},
   {type:'decision', text:'¿Cambios ECG (T picudas, QRS ancho, aplanamiento de onda P) o K⁺ >6.5 mmol/L?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Estabilización de membrana — elegir UNA sal según el acceso venoso. Son fármacos distintos: aportan calcio elemental equivalente (~270 mg, ~13,6 mEq) pero NO son intercambiables mL a mL.\n• GLUCONATO cálcico 10%: 30 mL IV en 5–10 min. De elección con vía PERIFÉRICA, es menos flebotóxico.\n• CLORURO cálcico 10%: 10 mL IV en 2–5 min. Preferible con vía CENTRAL o en parada, aporta más Ca²⁺ por mL, pero es vesicante y causa necrosis si extravasa.\nReevaluar ECG y repetir a los 5 min si persisten los cambios'},
-  {type:'action', text:'Redistribución: insulina rápida 10 UI + glucosa 50% 25 g IV en 15–30 min (vigilar glucemia capilar)'},
+  {type:'action', text:'Redistribución: insulina rápida (regular/soluble) 10 UI IV + glucosa 25 g IV, en 15–30 min.\nForma preferida por ERC: glucosa 10% 250 mL (=25 g). Alternativa habitual en urgencias: glucosa 50% 50 mL (=25 g), más flebítica.\nSI LA GLUCEMIA BASAL ES <126 mg/dL (<7 mmol/L): añadir glucosa 10% a 50 mL/h durante 5 h para prevenir la hipoglucemia tardía'},
   {type:'action', text:'Redistribución: salbutamol nebulizado 10–20 mg (dosis alta, nebulizado continuo si es posible)'},
   {type:'action', text:'Eliminación: ciclosilicato de sodio y zirconio (SZC) 10 g VO precoz, en paralelo al resto (ERC 2025). Furosemida IV si diuresis conservada. Las resinas clásicas (Kayexalate/resincalcio) son de inicio lento y eficacia aguda limitada'},
   {type:'action', text:'Bicarbonato sódico IV si acidosis metabólica asociada'},
@@ -94,22 +95,24 @@ window.PROTOCOLS = [
   {type:'action', branch:'yes', text:'Activar hemodiálisis urgente'},
   {type:'info', text:'Calcio y bicarbonato PRECIPITAN: no mezclarlos en la misma línea ni en Y. Líneas separadas o lavado abundante entre ambos'},
   {type:'info', text:'El 10% de cloruro cálcico no aporta el mismo calcio elemental en todos los países y fabricantes. Ante la duda, prescribir en mmol o mEq de Ca²⁺, no en mL'},
+  {type:'info', text:'Tras la insulina, la hipoglucemia tardía es la complicación más frecuente: vigilar glucemia hasta 6 h, cada 30–60 min mientras pase la perfusión de glucosa. Mayor riesgo si ERC avanzada o diálisis, no diabético, bajo peso o anciano'},
+  {type:'info', text:'K⁺ de control a la 1–2 h (efecto máximo de la insulina a los 30–60 min) y de nuevo a las 4–6 h: el efecto es transitorio y puede haber rebote si no se ha eliminado potasio'},
   {type:'info', text:'Monitorización ECG continua y controles de K⁺ seriados cada 1–2 h hasta normalización; la gravedad clínica depende tanto del valor de K⁺ como de la velocidad de instauración y los cambios ECG'}
 ],
-  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822'
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822 · Insulina-glucosa e hipoglucemia: Jessen 2025 · PMID 39761907 · Ibarra 2024 · PMID 39111100'
 },
 
 {id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', steps:[
   {type:'decision', text:'¿Criterios de activación? (>10 CH en 24h, >4 CH en 1h, o hemorragia activa con inestabilidad hemodinámica)', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar protocolo de transfusión masiva: avisar al banco de sangre y al equipo quirúrgico/radiología intervencionista'},
   {type:'action', text:'Solicitar hemoderivados en ratio 1:1:1 (concentrados de hematíes : plasma fresco congelado : plaquetas)'},
-  {type:'action', text:'Ácido tranexámico 1 g IV en 10 min (idealmente en las primeras 3 h del sangrado), seguido de 1 g IV en infusión durante 8 h'},
+  {type:'action', text:'Ácido tranexámico: 1 g IV en 10 min (=100 mg/min; diluir en 100 mL de SSF), seguido de 1 g IV en 8 h (=125 mg/h).\nDENTRO DE LAS PRIMERAS 3 h desde la lesión, cuanto antes mejor. Pasadas las 3 h NO iniciarlo: se asocia a MÁS muerte por sangrado (RR 1,44; IC95% 1,12–1,84).\nNo administrar en bolo rápido: produce hipotensión'},
   {type:'action', text:'Control de daños precoz: hemostasia quirúrgica o radiología intervencionista'},
   {type:'action', text:'Monitorizar gasometría, coagulación (incluido fibrinógeno) y calcio iónico cada 30–60 min'},
   {type:'info', text:'Objetivos de reanimación: Hb >7 g/dL, fibrinógeno >1.5 g/L, plaquetas >50.000/µL, pH >7.2, Tª >35°C, Ca²⁺ iónico >1.1 mmol/L'},
   {type:'info', text:'Evitar sobrecarga de cristaloides — priorizar hemoderivados como fluido de reanimación; en trauma, valorar hipotensión permisiva hasta control del sangrado'}
 ],
-  src:'European guideline on major bleeding and coagulopathy following trauma, 6th ed · PMID 36859355 · NAEMSP/ACEP/ACS-COT TXA 2025 · PMID 40842057'
+  src:'European guideline on major bleeding and coagulopathy following trauma, 6th ed · PMID 36859355 · NAEMSP/ACEP/ACS-COT TXA 2025 · PMID 40842057 · Ventana de 3 h, subanalisis de CRASH-2 · PMID 21439633'
 },
 
 {id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', steps:[
