@@ -85,16 +85,18 @@ window.PROTOCOLS = [
 {id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', steps:[
   {type:'action', text:'Confirmar hiperkalemia con ECG y descartar pseudohiperpotasemia (hemólisis de la muestra, torniquete prolongado)'},
   {type:'decision', text:'¿Cambios ECG (T picudas, QRS ancho, aplanamiento de onda P) o K⁺ >6.5 mmol/L?', yes:'Sí', no:'No'},
-  {type:'action', branch:'yes', text:'Estabilización de membrana: gluconato cálcico 10% 30 mL IV en 2–3 min (ERC 2025). Equivale a cloruro cálcico 10% 10 mL, alternativa valida. Repetir a los 5–10 min si persisten los cambios en el ECG'},
+  {type:'action', branch:'yes', text:'Estabilización de membrana — elegir UNA sal según el acceso venoso. Son fármacos distintos: aportan calcio elemental equivalente (~270 mg, ~13,6 mEq) pero NO son intercambiables mL a mL.\n• GLUCONATO cálcico 10%: 30 mL IV en 5–10 min. De elección con vía PERIFÉRICA, es menos flebotóxico.\n• CLORURO cálcico 10%: 10 mL IV en 2–5 min. Preferible con vía CENTRAL o en parada, aporta más Ca²⁺ por mL, pero es vesicante y causa necrosis si extravasa.\nReevaluar ECG y repetir a los 5 min si persisten los cambios'},
   {type:'action', text:'Redistribución: insulina rápida 10 UI + glucosa 50% 25 g IV en 15–30 min (vigilar glucemia capilar)'},
   {type:'action', text:'Redistribución: salbutamol nebulizado 10–20 mg (dosis alta, nebulizado continuo si es posible)'},
   {type:'action', text:'Eliminación: ciclosilicato de sodio y zirconio (SZC) 10 g VO precoz, en paralelo al resto (ERC 2025). Furosemida IV si diuresis conservada. Las resinas clásicas (Kayexalate/resincalcio) son de inicio lento y eficacia aguda limitada'},
   {type:'action', text:'Bicarbonato sódico IV si acidosis metabólica asociada'},
   {type:'decision', text:'¿K⁺ >6.5 refractario al tratamiento, anuria o insuficiencia renal grave?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar hemodiálisis urgente'},
+  {type:'info', text:'Calcio y bicarbonato PRECIPITAN: no mezclarlos en la misma línea ni en Y. Líneas separadas o lavado abundante entre ambos'},
+  {type:'info', text:'El 10% de cloruro cálcico no aporta el mismo calcio elemental en todos los países y fabricantes. Ante la duda, prescribir en mmol o mEq de Ca²⁺, no en mL'},
   {type:'info', text:'Monitorización ECG continua y controles de K⁺ seriados cada 1–2 h hasta normalización; la gravedad clínica depende tanto del valor de K⁺ como de la velocidad de instauración y los cambios ECG'}
 ],
-  src:'ERC 2025 Special Circumstances · PMID 41117569 · ILCOR 2025 ALS CoSTR · PMID 41122842 · KDIGO 2019 · PMID 31706619'
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822'
 },
 
 {id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', steps:[
