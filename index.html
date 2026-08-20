@@ -1117,6 +1117,7 @@ function renderDrugs() {
             (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
             (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
             (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
+            (d.src ? '<div class="scale-src">Fuente: ' + d.src + '</div>' : '') +
           '</div></div>';
       }).join('');
     }).join('') +
