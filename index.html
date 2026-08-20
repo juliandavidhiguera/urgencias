@@ -230,6 +230,7 @@ body {
 
 .scale-title { font-size: 13px; font-weight: 600; }
 .scale-subtitle { font-size: 11px; color: var(--text2); }
+.scale-src { font-size: 10px; color: var(--text2); margin-top: 10px; opacity: .75; }
 
 .scale-body { padding: 12px 14px; }
 
@@ -963,6 +964,7 @@ function renderOneScale(sc, favs, pfx) {
         '</div>' +
         '<button class="reset-btn" onclick="resetGeneric(\'' + sc.id + '\',\'' + pfx + '\')">↺ Reset</button>' +
         '<button class="btn btn-copy" onclick="copyScaleResult(\'' + sc.id + '\',\'' + pfx + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
+        (sc.src ? '<div class="scale-src">Fuente: ' + sc.src + '</div>' : '') +
       '</div></div>';
 }
 

@@ -31,7 +31,7 @@ window.SCALES = [
   {t:'chk', l:'Neoplasia activa (tratamiento en <6 meses)', p:1}],
   interp:function(s){return s<2?['low','Probabilidad baja','DD <500 descarta TEP']:s<=6?['mid','Probabilidad moderada','DD + AngioTC si DD+']:['high','Probabilidad alta','AngioTC directo sin DD previo']}},
 
-{id:'chadsvasc', title:'CHA₂DS₂-VASc', sub:'FA — Riesgo tromboembólico', badge:'blue', tag:'FA', max:9, items:[
+{id:'chadsvasc', title:'CHA₂DS₂-VASc', sub:'FA — Riesgo tromboembólico · ACC/AHA 2023 (incluye sexo femenino)', badge:'blue', tag:'FA', max:9, items:[
   {t:'chk', l:'C — IC congestiva / FE deprimida', p:1},
   {t:'chk', l:'H — Hipertensión arterial', p:1},
   {t:'chk', l:'A₂ — Edad ≥75 años', p:2},
@@ -40,7 +40,21 @@ window.SCALES = [
   {t:'chk', l:'V — Enfermedad vascular (IAM, EAP, placa aórtica)', p:1},
   {t:'chk', l:'A — Edad 65–74 años', p:1},
   {t:'chk', l:'Sc — Sexo femenino', p:1}],
-  interp:function(s){return s===0?['low','Sin indicación','ACO no recomendado']:s===1?['mid','Riesgo bajo-mod.','ACO individualizar (hombre) · Considerar (mujer)']:['high','ACO indicado','Riesgo ~'+[0,1.3,2.2,3.2,4,6.7,9.8,9.6,12.5,15.2][Math.min(s,9)]+'%/año']}},
+  interp:function(s){return s===0?['low','Sin indicación','ACO no recomendado']:s===1?['mid','Riesgo bajo-mod.','ACO individualizar (hombre) · Considerar (mujer)']:['high','ACO indicado','Riesgo ~'+[0,1.3,2.2,3.2,4,6.7,9.8,9.6,12.5,15.2][Math.min(s,9)]+'%/año']},
+  src:'ACC/AHA/ACCP/HRS 2023 · PMID 38043043'
+},
+
+{id:'chadsva', title:'CHA₂DS₂-VA', sub:'FA — Riesgo tromboembólico · ESC 2024 (sin sexo femenino)', badge:'blue', tag:'FA', max:8, items:[
+  {t:'chk', l:'C — IC crónica (síntomas cualquier FEVI, o FEVI ≤40% asintomática)', p:1},
+  {t:'chk', l:'H — Hipertensión (>140/90 en ≥2 ocasiones o en tratamiento)', p:1},
+  {t:'chk', l:'A₂ — Edad ≥75 años', p:2},
+  {t:'chk', l:'D — Diabetes mellitus (tipo 1 o 2, o en tratamiento)', p:1},
+  {t:'chk', l:'S₂ — Ictus/AIT/tromboembolismo arterial previo', p:2},
+  {t:'chk', l:'V — Enfermedad vascular (IAM, angina, revascularización, EAP)', p:1},
+  {t:'chk', l:'A — Edad 65–74 años', p:1}],
+  interp:function(s){return s===0?['low','0 pts','ACO no indicada a largo plazo']:s===1?['mid','1 pt','ACO debe considerarse — decisión compartida']:['high',s+' pts','ACO RECOMENDADA (preferentemente DOAC)']},
+  src:'ESC 2024 · PMID 39210723'
+},
 
 {id:'heart', title:'HEART Score', sub:'SCA — Estratificación dolor torácico', badge:'red', tag:'SCA', max:10, items:[
   {t:'sel', l:'H — Historia (muy sospechosa)', o:[['Poco sospechosa (0)',0],['Moderada (1)',1],['Muy sospechosa (2)',2]]},
