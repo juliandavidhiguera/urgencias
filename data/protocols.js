@@ -5,6 +5,37 @@
    ================================================================== */
 window.PROTOCOLS = [
 
+{id:'anafilaxia', title:'Anafilaxia', sub:'Adrenalina IM inmediata — ERC 2025', badge:'red', tag:'Crítico', steps:[
+  {type:'action', text:'Retirar el desencadenante si es posible (fármaco IV, picadura). NO retrasar la adrenalina por esto'},
+  {type:'action', text:'ADRENALINA IM 0,5 mg (0,5 mL de solución 1 mg/mL = 1:1000) en cara anterolateral del muslo (vasto lateral), lo antes posible.\nAlternativa ponderal equivalente: 0,01 mg/kg IM, máximo 0,5 mg'},
+  {type:'info', text:'IM en muslo, NO subcutánea ni en deltoides. Autoinyector en adultos: 0,5 mg (ERC First Aid 2025)'},
+  {type:'action', text:'Posición: decúbito supino con piernas elevadas. Si disnea, semiincorporado. Si embarazo, decúbito lateral izquierdo.\nNO sentar ni levantar bruscamente'},
+  {type:'action', text:'Oxígeno a alto flujo + acceso IV de grueso calibre + monitorización continua'},
+  {type:'decision', text:'¿Persisten los síntomas a los 5 minutos?', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'REPETIR adrenalina IM 0,5 mg. Se puede repetir cada 5 min según respuesta'},
+  {type:'action', branch:'yes', text:'Fluidoterapia: cristaloide 500–1000 mL IV rápido si hipotensión; repetir según respuesta'},
+  {type:'action', branch:'yes', text:'Refractaria tras ≥2 dosis IM: valorar adrenalina IV en perfusión con monitorización y personal experto. NO bolo IV a menos que haya parada'},
+  {type:'action', branch:'no', text:'Mantener monitorización: riesgo de reacción bifásica'},
+  {type:'info', text:'Broncoespasmo asociado: salbutamol nebulizado como adyuvante, nunca en sustitución de la adrenalina'},
+  {type:'info', text:'Corticoide y antihistamínico son de segunda línea: no salvan la vida ni sustituyen a la adrenalina'},
+  {type:'info', text:'Observación antes del alta según gravedad y respuesta. Alta con autoinyector, plan escrito y derivación a alergología'}],
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568'},
+
+{id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', steps:[
+  {type:'action', text:'ECG de 12 derivaciones. Descartar preexcitación (QRS ancho, delta): contraindica frenar el nodo AV'},
+  {type:'decision', text:'¿Inestabilidad hemodinámica ATRIBUIBLE a la FA? (shock, hipotensión mantenida, edema agudo de pulmón, isquemia en curso)', yes:'Inestable', no:'Estable'},
+  {type:'action', branch:'yes', text:'CARDIOVERSIÓN ELÉCTRICA SINCRONIZADA inmediata. No retrasar por la duración de la FA ni por completar anticoagulación'},
+  {type:'action', branch:'yes', text:'Anticoagular en cuanto sea factible, tras la cardioversión'},
+  {type:'action', branch:'no', text:'CONTROL DE FRECUENCIA + buscar y tratar desencadenante (sepsis, anemia, hipoxemia, iones, TEP, hipertiroidismo, alcohol)'},
+  {type:'info', text:'Estrategia "wait-and-see": en FA <36 h estable, la cardioversión diferida fue NO INFERIOR a la precoz para ritmo sinusal a 4 semanas (91% vs 94%). El 69% revirtió solo en ≤48 h — RACE 7 ACWAS'},
+  {type:'action', branch:'no', text:'FEVI conservada (>40%): betabloqueante o diltiazem/verapamilo IV, titulado'},
+  {type:'action', branch:'no', text:'Hipotensión límite o IC descompensada: EVITAR diltiazem/verapamilo. Usar amiodarona IV o digoxina IV (ajustar digoxina por función renal)'},
+  {type:'info', text:'Objetivo inicial: aliviar síntomas. El control leniente (FC <110 lpm en reposo) es aceptable de entrada'},
+  {type:'info', text:'VENTANA DE SEGURIDAD ESC 2024: bajó de 48 h a 24 h. Con FA >24 h o de inicio incierto SIN anticoagulación previa eficaz, NO cardiovertir a ciegas: ETE o 3 semanas de anticoagulación antes'},
+  {type:'action', text:'Anticoagulación a largo plazo por CHA₂DS₂-VA (ESC 2024): ≥2 recomendada, =1 considerar. Mantener ≥4 semanas tras cardioversión en todos'},
+  {type:'info', text:'La duración referida por el paciente puede ser falsa si hubo FA asintomática previa. Prudencia en ancianos y cardiopatía estructural'}],
+  src:'ESC 2024 · PMID 39210723 · RACE 7 ACWAS NEJM 2019 · PMID 30883054 · AHA ALS 2025 · PMID 41122884'},
+
 {id:'rcp', title:'RCP / SVA', sub:'Soporte vital avanzado adulto — ritmo desfibrilable vs no desfibrilable', badge:'red', tag:'Crítico', steps:[
   {type:'action', text:'Confirmar PCR: inconsciente, no respira con normalidad (o gasping), sin pulso central palpable (máx. 10 seg)'},
   {type:'action', text:'Iniciar RCP básica de calidad: 30 compresiones : 2 ventilaciones, conectar monitor/desfibrilador en cuanto esté disponible'},

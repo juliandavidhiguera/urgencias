@@ -178,11 +178,11 @@ window.CHEATSHEETS = [
           TnI _ · BNP _
 <span class="key">FA previa:</span> S·N · tipo: parox/persist/permanente
 <span class="key">Anticoagulado:</span> S·N · fármaco _ · última dosis _h
-<span class="key">CHA₂DS₂-VASc:</span> _ (calcular)
+<span class="key">CHA₂DS₂-VA:</span> _ (ESC 2024, sin sexo) · VASc: _ (ACC/AHA)
 <span class="key">HAS-BLED:</span> _ (calcular)
 <span class="key">Objetivo:</span> control ritmo·frecuencia
 <span class="key">AP:</span> valvulopatía S·N · cardiopatía estructural S·N · HTA
-<span class="note">→ Escalas: CHA₂DS₂-VASc · HAS-BLED · EHRA</span>`
+<span class="note">→ Escalas: CHA₂DS₂-VA · CHA₂DS₂-VASc · HAS-BLED · EHRA</span>`
   },
   {
     id: 'c9',

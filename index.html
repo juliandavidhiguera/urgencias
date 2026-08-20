@@ -1072,6 +1072,7 @@ function renderProtocols() {
             const cls = s.type === 'decision' ? ' step-decision' : s.type === 'info' ? ' step-info' : '';
             return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
           }).join('') +
+          (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
         '</div>' +
       '</div>'
     ).join('');
