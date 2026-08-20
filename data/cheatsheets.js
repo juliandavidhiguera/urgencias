@@ -22,6 +22,7 @@ window.CHEATSHEETS = [
   },
   {
     id: 'c2',
+    src: 'ESC 2023 Sindromes Coronarios Agudos · PMID 37622654',
     title: 'SCA — Síndrome coronario agudo',
     badge: 'red',
     badgeLabel: 'Crítico',
@@ -44,7 +45,8 @@ window.CHEATSHEETS = [
 <span class="key">AAS en los 7 días previos:</span> S·N
 <span class="key">Antiagregación/ACO previa:</span> _ · última dosis _ h
 <span class="key">Episodios anginosos en 24 h:</span> _
-<span class="alert">⚠ Puerta-balón <90 min · GRACE >140 → invasiva <24 h</span>
+<span class="alert">⚠ ECG diagnóstico → paso de guía <120 min (decide ICP 1ª vs fibrinólisis)
+  Puerta-guía <60 min en centro con ICP · GRACE >140 → invasiva <24 h</span>
 <span class="note">→ Escalas: GRACE · TIMI · CRUSADE · HEART (pestaña Escalas → Box SCA)</span>`
   },
   {
@@ -71,6 +73,7 @@ window.CHEATSHEETS = [
   },
   {
     id: 'c4',
+    src: 'NIHSS · PMID 2749846 · ABCD2 · PMID 17258668',
     title: 'Ictus / AIT — Código Ictus',
     badge: 'red',
     badgeLabel: 'Crítico',
@@ -90,7 +93,7 @@ window.CHEATSHEETS = [
 <span class="key">FA conocida:</span> S·N · anticoagulado S·N (fármaco _)
 <span class="key">AP:</span> HTA · DM · ictus previo S·N · cardiopatía S·N
 <span class="alert">⚠ Trombolisis: <4.5h · Trombectomía: <24h</span>
-<span class="note">→ Escalas: NIHSS · ABCD2 (AIT) · CHA₂DS₂-VASc</span>`
+<span class="note">→ Escalas: NIHSS · ABCD2 (AIT) · CHA₂DS₂-VA · CHA₂DS₂-VASc</span>`
   },
   {
     id: 'c5',
@@ -163,6 +166,7 @@ window.CHEATSHEETS = [
   },
   {
     id: 'c8',
+    src: 'ESC 2024 fibrilacion auricular · PMID 39210723',
     title: 'FA de novo / descompensada',
     badge: 'amber',
     badgeLabel: 'Urgente',
@@ -427,6 +431,7 @@ window.CHEATSHEETS = [
   },
   {
     id: 'c19',
+    src: 'ERC 2025 Special Circumstances · PMID 41117569',
     title: 'Anafilaxia',
     badge: 'red',
     badgeLabel: 'Crítico',
@@ -442,8 +447,9 @@ window.CHEATSHEETS = [
 <span class="key">Respiratorio:</span> estridor S·N · sibilancias S·N · disnea S·N
 <span class="key">Cardiovascular:</span> hipotensión S·N · síncope S·N · taquicardia S·N
 <span class="key">Digestivo:</span> náuseas/vómitos S·N · dolor abdominal S·N · diarrea S·N
-<span class="key">Adrenalina IM:</span> 0.01 mg/kg (máx 0.5 mg) · dosis 1 __:__h
-<span class="key">Dosis repetidas:</span> cada 5-15 min · nº dosis _
+<span class="key">Adrenalina IM:</span> 0.5 mg = 0.5 mL de 1 mg/mL (1:1000)
+                 equivale a 0.01 mg/kg (máx 0.5 mg) · dosis 1 __:__h
+<span class="key">Dosis repetidas:</span> cada 5 min (ERC 2025) · nº dosis _
 <span class="key">Fluidoterapia:</span> cristaloide _ ml en bolo
 <span class="key">Coadyuvantes:</span> corticoide IV S·N · antiH1 S·N · antiH2 S·N
 <span class="key">Broncoespasmo refractario:</span> salbutamol nebulizado S·N

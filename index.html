@@ -703,6 +703,8 @@ function renderCheatsheets() {
           '<div class="card-body">' +
             '<div class="code" id="' + ch.id + '">' + ch.html + '</div>' +
             '<div class="btn-row"><button class="btn btn-copy" onclick="copyCard(\'' + ch.id + '\')">📋 Copiar</button></div>' +
+            // Fuera del div que copia el boton: la fuente no debe colarse en la nota clinica.
+            (ch.src ? '<div class="scale-src">Fuente: ' + ch.src + '</div>' : '') +
           '</div>' +
         '</div>';
       }).join('') + '</div>';
