@@ -48,9 +48,11 @@ window.PROTOCOLS = [
   {type:'action', branch:'no', text:'RCP continua 2 min entre análisis de ritmo — no desfibrilar'},
   {type:'info', text:'Buscar y tratar causas reversibles: 4H (Hipoxia, Hipovolemia, Hipo/Hiperpotasemia-metabólico, Hipotermia) + 4T (Neumotórax a Tensión, Taponamiento cardíaco, Tóxicos, Trombosis pulmonar/coronaria)'},
   {type:'info', text:'Capnografía (EtCO₂) continua para valorar calidad de RCP y detectar ROSC precoz; ecografía a pie de cama si disponible sin interrumpir compresiones'}
-]},
+],
+  src:'ERC 2025 Adult ALS · PMID 41117572 · AHA ALS 2025 · PMID 41122884'
+},
 
-{id:'via-aerea-dificil', title:'Vía aérea difícil', sub:'Algoritmo DAS — Plan A → B → C → D', badge:'red', tag:'Crítico', steps:[
+{id:'via-aerea-dificil', title:'Vía aérea difícil', sub:'Algoritmo DAS 2025 — Plan A → B → C → D', badge:'red', tag:'Crítico', steps:[
   {type:'action', text:'Preoxigenar con FiO₂ 100%, optimizar posición (olfateo/rampa) y preparación del material antes del primer intento'},
   {type:'action', text:'Plan A: laringoscopia directa o videolaringoscopia — máximo 3 intentos + 1 intento adicional por el operador más experto (4 en total)'},
   {type:'decision', text:'¿Intubación exitosa?', yes:'Sí', no:'No'},
@@ -62,7 +64,9 @@ window.PROTOCOLS = [
   {type:'decision', text:'¿Situación "no intubación, no oxigenación" (NINO)?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Plan D: cricotiroidotomía de emergencia (técnica quirúrgica o con kit) — no demorar'},
   {type:'info', text:'Declarar en voz alta la situación de vía aérea difícil desde el primer fallo y pedir ayuda precoz (anestesia/ORL); tener siempre un plan B preparado antes de iniciar'}
-]},
+],
+  src:'Difficult Airway Society 2025 · PMID 41203471'
+},
 
 {id:'sri', title:'Secuencia rápida de intubación (SRI)', sub:'Preparación, preoxigenación, inducción y relajación', badge:'red', tag:'Crítico', steps:[
   {type:'action', text:'Preparación: checklist de equipo (succión, oxígeno, vía aérea con tubos y plan B, fármacos, monitor) — confirmar plan B/C definidos'},
@@ -73,21 +77,25 @@ window.PROTOCOLS = [
   {type:'action', text:'Relajante neuromuscular: succinilcolina 1–1.5 mg/kg (inicio rápido) o rocuronio 1–1.2 mg/kg si contraindicación a succinilcolina'},
   {type:'action', text:'Intubación orotraqueal tras relajación completa (≈45–60 seg)'},
   {type:'action', text:'Confirmación: capnografía continua (EtCO₂), auscultación bilateral, fijación del tubo'},
-  {type:'info', text:'La presión cricoidea no se recomienda de rutina; tener siempre preparados el plan B (dispositivo supraglótico) y el plan C (cricotiroidotomía) antes de inducir'}
-]},
+  {type:'info', text:'Presión cricoidea: no de rutina. DAS 2025 la reserva para riesgo de aspiración particularmente alto, y obliga a RETIRARLA si dificulta la laringoscopia, la intubación o la colocación de un supraglótico. Tener siempre preparados el plan B (dispositivo supraglótico) y el plan C (cricotiroidotomía) antes de inducir'}
+],
+  src:'DAS/ICS intubacion en paciente critico 2017 · PMID 29406182 · DAS 2025 · PMID 41203471'
+},
 
 {id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', steps:[
   {type:'action', text:'Confirmar hiperkalemia con ECG y descartar pseudohiperpotasemia (hemólisis de la muestra, torniquete prolongado)'},
   {type:'decision', text:'¿Cambios ECG (T picudas, QRS ancho, aplanamiento de onda P) o K⁺ >6.5 mmol/L?', yes:'Sí', no:'No'},
-  {type:'action', branch:'yes', text:'Estabilización de membrana: gluconato cálcico 10% 10 ml IV en 2–3 min; repetir a los 5–10 min si persisten cambios ECG'},
+  {type:'action', branch:'yes', text:'Estabilización de membrana: gluconato cálcico 10% 30 mL IV en 2–3 min (ERC 2025). Equivale a cloruro cálcico 10% 10 mL, alternativa valida. Repetir a los 5–10 min si persisten los cambios en el ECG'},
   {type:'action', text:'Redistribución: insulina rápida 10 UI + glucosa 50% 25 g IV en 15–30 min (vigilar glucemia capilar)'},
   {type:'action', text:'Redistribución: salbutamol nebulizado 10–20 mg (dosis alta, nebulizado continuo si es posible)'},
-  {type:'action', text:'Eliminación: furosemida IV si diuresis conservada; resinas de intercambio (Kayexalate/resincalcio) si la función renal lo permite'},
+  {type:'action', text:'Eliminación: ciclosilicato de sodio y zirconio (SZC) 10 g VO precoz, en paralelo al resto (ERC 2025). Furosemida IV si diuresis conservada. Las resinas clásicas (Kayexalate/resincalcio) son de inicio lento y eficacia aguda limitada'},
   {type:'action', text:'Bicarbonato sódico IV si acidosis metabólica asociada'},
   {type:'decision', text:'¿K⁺ >6.5 refractario al tratamiento, anuria o insuficiencia renal grave?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar hemodiálisis urgente'},
   {type:'info', text:'Monitorización ECG continua y controles de K⁺ seriados cada 1–2 h hasta normalización; la gravedad clínica depende tanto del valor de K⁺ como de la velocidad de instauración y los cambios ECG'}
-]},
+],
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ILCOR 2025 ALS CoSTR · PMID 41122842 · KDIGO 2019 · PMID 31706619'
+},
 
 {id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', steps:[
   {type:'decision', text:'¿Criterios de activación? (>10 CH en 24h, >4 CH en 1h, o hemorragia activa con inestabilidad hemodinámica)', yes:'Sí', no:'No'},
@@ -98,7 +106,9 @@ window.PROTOCOLS = [
   {type:'action', text:'Monitorizar gasometría, coagulación (incluido fibrinógeno) y calcio iónico cada 30–60 min'},
   {type:'info', text:'Objetivos de reanimación: Hb >7 g/dL, fibrinógeno >1.5 g/L, plaquetas >50.000/µL, pH >7.2, Tª >35°C, Ca²⁺ iónico >1.1 mmol/L'},
   {type:'info', text:'Evitar sobrecarga de cristaloides — priorizar hemoderivados como fluido de reanimación; en trauma, valorar hipotensión permisiva hasta control del sangrado'}
-]},
+],
+  src:'European guideline on major bleeding and coagulopathy following trauma, 6th ed · PMID 36859355 · NAEMSP/ACEP/ACS-COT TXA 2025 · PMID 40842057'
+},
 
 {id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', steps:[
   {type:'action', text:'ECG de 12 derivaciones en menos de 10 minutos desde la llegada'},
@@ -110,6 +120,8 @@ window.PROTOCOLS = [
   {type:'action', branch:'yes', text:'Ingreso, antiagregación/anticoagulación según riesgo, coronariografía según estratificación (urgente/precoz/diferida)'},
   {type:'action', branch:'no', text:'Valorar diagnósticos alternativos: TEP (Wells + dímero D), disección aórtica (angioTC si sospecha), pericarditis (ECG difuso, roce pericárdico), neumotórax (auscultación, Rx/eco)'},
   {type:'info', text:'Alta con seguimiento ambulatorio si SCA descartado, troponinas negativas seriadas y estratificación de bajo riesgo'}
-]}
+],
+  src:'ESC 2023 Acute Coronary Syndromes · PMID 37622654 · ACC/AHA/ACEP 2025 · PMID 40013746'
+}
 
 ];
