@@ -1,0 +1,7 @@
+# Cache local de wrangler. Se regenera solo, y ademas se corrompe: en la sesion
+# del 2026-08-21 hubo que borrar .wrangler/tmp para desatascar un build que
+# fallaba con "Could not resolve middleware-loader.entry.ts".
+.wrangler/
+
+# Directorio de trabajo de gstack, local de cada maquina.
+.gstack/
