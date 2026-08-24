@@ -313,6 +313,142 @@ body {
 .drug-weight-bar label { font-size: 12px; color: var(--text2); }
 .drug-alerts .scale-pts { color: var(--red); }
 
+/* PERFUSION IV — texto más grande y oscuro para mejor lectura, y estados de rango */
+#tab-perfusiones .field label { font-size: 11px; color: var(--text); font-weight: 600; }
+#tab-perfusiones .field input, #tab-perfusiones .field select { font-size: 14px; }
+#tab-perfusiones .tile-name { font-size: 11px; color: var(--text); font-weight: 700; }
+#tab-perfusiones .tile-detail { font-size: 12px; color: var(--text); }
+#tab-perfusiones .tile-aux { font-size: 12.5px; color: var(--text); }
+#tab-perfusiones .scale-label { font-size: 13px; color: var(--text); }
+#tab-perfusiones .scale-pts { font-size: 12.5px; color: var(--text); font-weight: 500; }
+#tab-perfusiones .scale-subtitle { font-size: 12px; color: var(--text); }
+.inf-range-ok { font-weight: 600; color: var(--green); }
+.inf-range-bad { font-weight: 700; color: var(--red); }
+.inf-warning-banner {
+  margin: 0 14px 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--red-bg);
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 700;
+}
+.btn:disabled, .btn-copy:disabled { opacity: .4; cursor: not-allowed; }
+
+/* FICHA TÉCNICA — modal de medicamento */
+.ficha-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.ficha-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-width: 720px;
+  width: 100%;
+  margin-top: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+.ficha-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  border-radius: 10px 10px 0 0;
+}
+.ficha-name { font-size: 19px; font-weight: 700; color: var(--text); }
+.ficha-subtitulo { font-size: 12.5px; color: var(--text2); margin-top: 2px; font-style: italic; }
+.ficha-close {
+  border: none;
+  background: var(--bg3);
+  color: var(--text2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ficha-close:hover { background: var(--border); color: var(--text); }
+.ficha-body { padding: 4px 20px 20px; }
+.ficha-alerta {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-weight: 700;
+  font-size: 13.5px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.ficha-section { padding: 12px 0; border-bottom: 1px solid var(--bg3); }
+.ficha-section:last-child { border-bottom: none; }
+.ficha-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text2);
+  margin-bottom: 5px;
+}
+.ficha-section-text { font-size: 13.5px; color: var(--text); line-height: 1.55; white-space: pre-line; }
+.ficha-section.ficha-riesgo {
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 6px 0;
+}
+.ficha-section.ficha-riesgo .ficha-section-title { color: var(--red); }
+.ficha-section.ficha-riesgo .ficha-section-text { color: var(--red); font-weight: 500; }
+.ficha-section.ficha-adverso {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 6px 0;
+}
+.ficha-section.ficha-adverso .ficha-section-title { color: var(--amber); }
+.ficha-section.ficha-nota {
+  background: var(--blue-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 6px 0;
+}
+.ficha-section.ficha-nota .ficha-section-title { color: var(--blue); }
+.ficha-src { font-size: 11px; color: var(--text2); margin-top: 8px; }
+.ficha-src a { color: var(--blue); }
+.ficha-list-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+.ficha-list-btn:hover { background: var(--bg3); border-color: var(--blue); }
+.ficha-list-btn .badge { margin-left: 8px; }
+
 /* PROTOCOLS */
 .protocol-card {
   background: var(--bg2);
@@ -321,6 +457,20 @@ body {
   overflow: hidden;
   margin-bottom: 12px;
 }
+.protocol-card > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.protocol-card > summary::-webkit-details-marker { display: none; }
+.protocol-card > summary::after {
+  content: '▾';
+  color: var(--text2);
+  font-size: 12px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.protocol-card[open] > summary::after { content: '▴'; }
+.protocol-card > summary:hover { background: var(--bg3); }
 .protocol-step {
   padding: 8px 14px;
   border-bottom: 1px solid var(--bg3);
@@ -539,6 +689,9 @@ body {
   <button class="nav-btn" onclick="showTab('escalas', this)">📊 Escalas</button>
   <button class="nav-btn" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
   <button class="nav-btn" onclick="showTab('farmacos', this)">💊 Fármacos</button>
+  <button class="nav-btn" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
+  <button class="nav-btn" onclick="showTab('fichas', this)">📋 Fichas</button>
+  <button class="nav-btn" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
 </div>
 
@@ -638,7 +791,98 @@ body {
 
 <div id="tab-farmacos" class="tab-content"></div>
 
+<!-- TAB PERFUSIONES -->
+<div id="tab-perfusiones" class="tab-content">
+
+<div class="section-title">💧 Perfusión IV — dilución + dosis/peso → mL/h</div>
+
+<div class="databox">
+  <div class="databox-header">
+    <div>
+      <div class="scale-title">Calculadora de perfusión IV</div>
+      <div class="scale-subtitle">Peso, cantidad diluida y dosis prescrita → concentración y mL/h</div>
+    </div>
+    <span class="badge badge-blue">BIC</span>
+  </div>
+
+  <div class="subhead">Paciente y fármaco</div>
+  <div class="fields">
+    <div class="field"><label>Peso (kg)</label><input type="number" id="inf-peso" min="1" max="300" value="70" oninput="updateInfusionPeso()"></div>
+    <div class="field"><label>Medicamento</label><select id="inf-farmaco" onchange="selectInfusionDrug()"></select></div>
+    <div class="field"><label>Nombre (si "Otro")</label><input type="text" id="inf-nombre" placeholder="p.ej. Labetalol" oninput="calcInfusion()"></div>
+    <div class="field"><label>Cantidad fármaco (mg o UI)</label><input type="number" id="inf-mg" step="0.001" min="0" oninput="calcInfusion()"></div>
+    <div class="field"><label>Volumen dilución (mL)</label><input type="number" id="inf-vol" step="1" min="1" oninput="calcInfusion()"></div>
+    <div class="field"><label>Dosis prescrita</label><input type="number" id="inf-dosis" step="0.001" min="0" oninput="calcInfusion()"></div>
+    <div class="field"><label>Unidad de dosis</label>
+      <select id="inf-unidad" onchange="calcInfusion()">
+        <option value="mcg/kg/min">mcg/kg/min</option>
+        <option value="mcg/kg/h">mcg/kg/h</option>
+        <option value="mg/kg/h">mg/kg/h</option>
+        <option value="mg/kg/min">mg/kg/min</option>
+        <option value="UI/kg/h">UI/kg/h</option>
+        <option value="UI/min">UI/min (dosis fija)</option>
+        <option value="mg/h">mg/h (dosis fija)</option>
+        <option value="mg/min">mg/min (dosis fija)</option>
+        <option value="mcg/min">mcg/min (dosis fija)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile">
+      <div class="tile-name">Concentración de la dilución</div>
+      <div class="tile-num" id="inf-conc">—</div>
+      <div class="tile-detail">mg (o UI) / mL</div>
+    </div>
+    <div class="tile">
+      <div class="tile-name">Resultado — velocidad de infusión</div>
+      <div class="tile-num" id="inf-result">—</div>
+      <div class="tile-risk">mL/h</div>
+      <div class="tile-detail" id="inf-result-name">—</div>
+    </div>
+  </div>
+
+  <div class="inf-warning-banner" id="inf-warning" style="display:none"></div>
+
+  <div class="tile-aux" id="inf-range"><strong>Rango terapéutico:</strong> —</div>
+  <div class="tile-aux" id="inf-alert" style="color:var(--red)"></div>
+
+  <div class="btn-row" style="padding: 0 14px 14px;">
+    <button class="btn btn-copy" id="inf-copy-btn" onclick="copyInfusion()">📋 Copiar resultado</button>
+    <button class="btn" id="inf-ficha-btn" onclick="openInfusionFicha()" disabled>📄 Ver ficha del medicamento</button>
+    <button class="reset-btn" style="margin-top:0" onclick="resetInfusion()">↺ Reset</button>
+  </div>
+</div>
+
+<div class="section-title">Referencia — dilución habitual y mL/h según el peso indicado arriba</div>
+<div class="scales-grid" id="infusion-ref-grid"></div>
+
+</div><!-- end tab-perfusiones -->
+
+<!-- TAB FICHAS -->
+<div id="tab-fichas" class="tab-content">
+<div class="section-title">📋 Fichas técnicas de medicamentos</div>
+<div class="fields" style="padding:0 0 14px">
+  <div class="field" style="grid-column: 1 / -1; max-width:320px">
+    <label>Buscar medicamento</label>
+    <input type="search" id="fichas-buscar" placeholder="p.ej. adrenalina…" oninput="renderFichaList(this.value)">
+  </div>
+</div>
+<div id="fichas-list"></div>
+</div><!-- end tab-fichas -->
+
+<!-- TAB BIBLIOGRAFÍA -->
+<div id="tab-bibliografia" class="tab-content">
+<div class="section-title">📚 Bibliografía — verificación clínica de las fichas (Vera + Perplexity)</div>
+<div class="tile-aux" style="margin-bottom:12px">Registro de la última verificación por lote. Al pedir una actualización, revisar primero las <strong>guías base</strong> de cada lote: si ya existe una versión más reciente, focalizar la nueva consulta solo en lo que cambió esa guía.</div>
+<div id="bibliografia-list"></div>
+</div><!-- end tab-bibliografia -->
+
 </div><!-- main -->
+
+<div class="ficha-overlay" id="ficha-overlay" style="display:none" onclick="if(event.target===this) closeFicha()">
+  <div class="ficha-modal" id="ficha-modal"></div>
+</div>
 
 <div class="toast" id="toast">✓ Copiado al portapapeles</div>
 
@@ -646,6 +890,9 @@ body {
 <script src="data/scales.js"></script>
 <script src="data/protocols.js"></script>
 <script src="data/drugs.js"></script>
+<script src="data/infusions.js"></script>
+<script src="data/fichas.js"></script>
+<script src="data/bibliografia.js"></script>
 <script>
 /* ==================================================================
    FAVORITOS Y RECIENTES — localStorage
@@ -754,6 +1001,9 @@ function globalSearch(q) {
     const tabId = activeName.includes('cheatsheet') ? 'tab-cheatsheets'
                : activeName.includes('escala') ? 'tab-escalas'
                : activeName.includes('protocolo') ? 'tab-protocolos'
+               : activeName.includes('perfusión') ? 'tab-perfusiones'
+               : activeName.includes('bibliografía') ? 'tab-bibliografia'
+               : activeName.includes('ficha') ? 'tab-fichas'
                : 'tab-farmacos';
     document.getElementById(tabId).classList.add('active');
     return;
@@ -1057,17 +1307,21 @@ function copyScaleResult(id, pfx) {
 function renderProtocols() {
   const container = document.getElementById('tab-protocolos');
   const favs = getFavs();
-  const sorted = PROTOCOLS.slice().sort((a, b) => (favs['protocol:' + b.id] || 0) - (favs['protocol:' + a.id] || 0));
-  container.innerHTML = '<div class="section-title">🔀 Protocolos de actuación</div>' +
+  const sorted = PROTOCOLS.slice().sort((a, b) => {
+    const fa = favs['protocol:' + a.id] || 0, fb = favs['protocol:' + b.id] || 0;
+    if (fa !== fb) return fb - fa;
+    return (a.rank || 99) - (b.rank || 99);
+  });
+  container.innerHTML = '<div class="section-title">🔀 Protocolos de actuación — códigos de activación primero, luego por relevancia clínica</div>' +
     sorted.map(p =>
-      '<div class="protocol-card">' +
-        '<div class="scale-header"><div>' +
-          '<div class="scale-title">' + p.title + '</div>' +
+      '<details class="protocol-card">' +
+        '<summary class="scale-header"><div>' +
+          '<div class="scale-title">' + (p.codigo ? '🚨 ' : '') + p.title + '</div>' +
           '<div class="scale-subtitle">' + p.sub + '</div>' +
         '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span>' +
         '<button class="fav-btn' + (favs['protocol:' + p.id] ? ' fav-active' : '') +
           '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito">★</button>' +
-        '</div>' +
+        '</summary>' +
         '<div class="scale-body">' +
           p.steps.map((s, i) => {
             const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (i + 1);
@@ -1075,8 +1329,9 @@ function renderProtocols() {
             return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
           }).join('') +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
+          (p.folleto ? '<div class="btn-row" style="padding:10px 0 0"><button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button></div>' : '') +
         '</div>' +
-      '</div>'
+      '</details>'
     ).join('');
 }
 
@@ -1146,12 +1401,283 @@ function recalcDrugs(peso) {
   }));
 }
 
+/* ==================================================================
+   PERFUSIÓN IV — dilución + dosis/peso -> mL/h
+   ================================================================== */
+function _fmt(n, dec) {
+  const s = n.toFixed(dec);
+  return s.indexOf('.') === -1 ? s : s.replace(/0+$/, '').replace(/\.$/, '');
+}
+
+function _infuMgPerHour(dosis, unit, peso) {
+  switch (unit) {
+    case 'mcg/kg/min': return dosis * peso * 60 / 1000;
+    case 'mcg/kg/h':   return dosis * peso / 1000;
+    case 'mg/kg/h':    return dosis * peso;
+    case 'mg/kg/min':  return dosis * peso * 60;
+    case 'UI/kg/h':    return dosis * peso;
+    case 'UI/min':     return dosis * 60;
+    case 'mg/h':       return dosis;
+    case 'mg/min':     return dosis * 60;
+    case 'mcg/min':    return dosis * 60 / 1000;
+    default: return null;
+  }
+}
+
+function _infuMLH(dosis, unit, peso, conc) {
+  if (dosis == null || conc == null || conc <= 0) return null;
+  const needsPeso = unit.indexOf('/kg/') !== -1;
+  if (needsPeso && (peso == null || peso <= 0)) return null;
+  const mgh = _infuMgPerHour(dosis, unit, peso);
+  return mgh == null ? null : mgh / conc;
+}
+
+function renderInfusionSelect() {
+  const sel = document.getElementById('inf-farmaco');
+  sel.innerHTML = INFUSIONS.map(d => '<option value="' + d.name + '">' + d.name + '</option>').join('') +
+    '<option value="_otro">Otro / no listado (manual)</option>';
+}
+
+function selectInfusionDrug() {
+  const name = document.getElementById('inf-farmaco').value;
+  const rangeEl = document.getElementById('inf-range');
+  const alertEl = document.getElementById('inf-alert');
+  const fichaBtn = document.getElementById('inf-ficha-btn');
+  const d = INFUSIONS.find(x => x.name === name);
+  if (!d) {
+    document.getElementById('inf-mg').value = '';
+    document.getElementById('inf-vol').value = '';
+    document.getElementById('inf-dosis').value = '';
+    rangeEl.innerHTML = 'Introduce manualmente cantidad, volumen, dosis y unidad. Sin rango terapéutico definido: no se valida automáticamente';
+    alertEl.textContent = '';
+    fichaBtn.disabled = true;
+  } else {
+    document.getElementById('inf-mg').value = d.mg;
+    document.getElementById('inf-vol').value = d.vol;
+    document.getElementById('inf-dosis').value = d.doseMin;
+    document.getElementById('inf-unidad').value = d.unit;
+    rangeEl.innerHTML = '<strong>Rango terapéutico:</strong> ' + d.doseMin +
+      (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') +
+      ' ' + d.unit + ' · Diluyente: ' + d.diluyente;
+    alertEl.textContent = d.notas || '';
+    fichaBtn.disabled = !d.ficha;
+  }
+  calcInfusion();
+}
+
+function calcInfusion() {
+  const peso = _n('inf-peso');
+  const mg = _n('inf-mg');
+  const vol = _n('inf-vol');
+  const dosis = _n('inf-dosis');
+  const unit = document.getElementById('inf-unidad').value;
+  const sel = document.getElementById('inf-farmaco').value;
+  const nombre = sel === '_otro' ? (document.getElementById('inf-nombre').value || 'Medicamento') : sel;
+  const d = INFUSIONS.find(x => x.name === sel);
+  const u = (d && d.unitLabel) || 'mg';
+
+  const conc = (mg != null && vol != null && vol > 0) ? mg / vol : null;
+  const mlh = _infuMLH(dosis, unit, peso, conc);
+
+  document.getElementById('inf-conc').textContent = conc != null ? _fmt(conc, 3) : '—';
+  document.getElementById('inf-result').textContent = mlh != null ? _fmt(mlh, 2) : '—';
+  document.getElementById('inf-result-name').textContent = nombre + (conc != null ? ' — ' + _fmt(conc, 3) + ' ' + u + '/mL' : '');
+
+  const warnEl = document.getElementById('inf-warning');
+  const copyBtn = document.getElementById('inf-copy-btn');
+  const outOfRange = d && dosis != null && (dosis < d.doseMin || (d.doseMax != null && dosis > d.doseMax));
+  if (outOfRange) {
+    warnEl.style.display = '';
+    warnEl.textContent = '⚠ DOSIS FUERA DEL RANGO TERAPÉUTICO (' + d.doseMin +
+      (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') +
+      ' ' + d.unit + ') — revisar antes de administrar. No se puede copiar el resultado';
+    copyBtn.disabled = true;
+  } else {
+    warnEl.style.display = 'none';
+    warnEl.textContent = '';
+    copyBtn.disabled = false;
+  }
+}
+
+function openInfusionFicha() {
+  const sel = document.getElementById('inf-farmaco').value;
+  const d = INFUSIONS.find(x => x.name === sel);
+  if (d && d.ficha) showFicha(d.ficha);
+}
+
+function updateInfusionPeso() {
+  calcInfusion();
+  renderInfusionGrid();
+}
+
+function renderInfusionGrid() {
+  const peso = _n('inf-peso') || 70;
+  const grid = document.getElementById('infusion-ref-grid');
+  grid.innerHTML = INFUSIONS.map(d => {
+    const conc = d.mg / d.vol;
+    const u = d.unitLabel || 'mg';
+    const mlhMin = _infuMLH(d.doseMin, d.unit, peso, conc);
+    const mlhMax = d.doseMax != null ? _infuMLH(d.doseMax, d.unit, peso, conc) : null;
+    const mlhTxt = mlhMin == null ? '—' :
+      (mlhMax == null || mlhMax === mlhMin ? _fmt(mlhMin, 2) : _fmt(mlhMin, 2) + '–' + _fmt(mlhMax, 2));
+    return '<div class="scale-card">' +
+      '<div class="scale-header"><div>' +
+        '<div class="scale-title">' + d.name + '</div>' +
+        '<div class="scale-subtitle">' + d.group + '</div>' +
+      '</div><span class="badge badge-' + d.badge + '">' + d.unit + '</span>' +
+      '</div>' +
+      '<div class="scale-body">' +
+        '<div class="scale-item"><span class="scale-label">Dilución de referencia</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(conc, 3) + ' ' + u + '/mL)</span></div>' +
+        '<div class="scale-item"><span class="scale-label">Rango terapéutico</span><span class="scale-pts">' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</span></div>' +
+        '<div class="scale-item"><span class="scale-label">Infusión a ' + peso + ' kg</span><span class="scale-pts">' + mlhTxt + ' mL/h</span></div>' +
+        '<div class="scale-item"><span class="scale-label">Diluyente</span><span class="scale-pts">' + d.diluyente + '</span></div>' +
+        (d.notas ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Notas</span><span class="scale-pts">' + d.notas + '</span></div>' : '') +
+        (d.ficha ? '<div class="btn-row" style="padding:8px 0 0"><button class="btn" onclick="showFicha(\'' + d.ficha + '\')">📄 Ver ficha</button></div>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function copyInfusion() {
+  if (document.getElementById('inf-copy-btn').disabled) return;
+  const sel = document.getElementById('inf-farmaco').value;
+  const nombre = sel === '_otro' ? (document.getElementById('inf-nombre').value || 'Medicamento') : sel;
+  const d = INFUSIONS.find(x => x.name === sel);
+  const u = (d && d.unitLabel) || 'mg';
+  const peso = document.getElementById('inf-peso').value || '_';
+  const mg = document.getElementById('inf-mg').value || '_';
+  const vol = document.getElementById('inf-vol').value || '_';
+  const dosis = document.getElementById('inf-dosis').value || '_';
+  const unit = document.getElementById('inf-unidad').value;
+  const conc = document.getElementById('inf-conc').textContent;
+  const mlh = document.getElementById('inf-result').textContent;
+  const txt =
+`/URG PERFUSIÓN
+Medicamento: ${nombre}
+Peso: ${peso} kg
+Dilución: ${mg} ${u} en ${vol} mL → ${conc} ${u}/mL
+Dosis: ${dosis} ${unit}
+Resultado: ${mlh} mL/h`;
+  navigator.clipboard.writeText(txt).then(showToast);
+}
+
+function resetInfusion() {
+  document.getElementById('inf-peso').value = '70';
+  document.getElementById('inf-farmaco').selectedIndex = 0;
+  document.getElementById('inf-nombre').value = '';
+  selectInfusionDrug();
+  renderInfusionGrid();
+}
+
+/* ==================================================================
+   FICHAS TÉCNICAS — modal de medicamento
+   ================================================================== */
+function _fichaSection(title, text, cls) {
+  if (!text) return '';
+  return '<div class="ficha-section' + (cls ? ' ' + cls : '') + '"><div class="ficha-section-title">' + title +
+    '</div><div class="ficha-section-text">' + text.replace(/\n/g, '<br>') + '</div></div>';
+}
+
+function _fichaHTML(f) {
+  let html = '<div class="ficha-head"><div>' +
+      '<div class="ficha-name">' + f.nombre + '</div>' +
+      (f.subtitulo ? '<div class="ficha-subtitulo">' + f.subtitulo + '</div>' : '') +
+    '</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' +
+      (f.altoRiesgo ? '<span class="badge badge-red">Alto riesgo</span>' : '') +
+      '<button class="ficha-close" onclick="closeFicha()" aria-label="Cerrar">✕</button>' +
+    '</div></div>';
+  html += '<div class="ficha-body">';
+  if (f.alerta) html += '<div class="ficha-alerta">⚠️ ' + f.alerta + '</div>';
+  html += _fichaSection('Presentación', f.presentacion);
+  html += _fichaSection('Propiedades', f.propiedades);
+  html += _fichaSection('Indicaciones', f.indicaciones);
+  html += _fichaSection('Dosis / vía de administración', f.dosis);
+  html += _fichaSection('Pediatría', f.pediatria, 'ficha-nota');
+  html += _fichaSection('Contraindicaciones', f.contraindicaciones, 'ficha-riesgo');
+  html += _fichaSection('Efectos secundarios', f.efectosSecundarios, 'ficha-adverso');
+  html += _fichaSection('Observaciones', f.observaciones);
+  if (f.embarazo || f.lactancia) {
+    const parts = [];
+    if (f.embarazo) parts.push('<strong>Embarazo:</strong> ' + f.embarazo);
+    if (f.lactancia) parts.push('<strong>Lactancia:</strong> ' + f.lactancia);
+    html += _fichaSection('Embarazo y lactancia', parts.join('<br><br>'), 'ficha-nota');
+  }
+  if (f.fuente) html += '<div class="ficha-src">Fuente: <a href="' + f.fuente + '" target="_blank" rel="noopener">Guies Clíniques SEM Catalunya ↗</a></div>';
+  html += '</div>';
+  return html;
+}
+
+function showFicha(file) {
+  const f = (window.FICHAS || []).find(x => x.file === file);
+  if (!f) { console.warn('Ficha no encontrada:', file); return; }
+  document.getElementById('ficha-modal').innerHTML = _fichaHTML(f);
+  document.getElementById('ficha-overlay').style.display = 'flex';
+}
+
+function closeFicha() {
+  document.getElementById('ficha-overlay').style.display = 'none';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFicha(); });
+
+function renderFichaList(filter) {
+  const container = document.getElementById('fichas-list');
+  const list = (window.FICHAS || []).slice().sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  const t = (filter || '').trim().toLowerCase();
+  const filtered = t ? list.filter(f => f.nombre.toLowerCase().includes(t)) : list;
+  if (!filtered.length) { container.innerHTML = '<div class="tile-aux">Sin resultados</div>'; return; }
+  container.innerHTML = filtered.map(f =>
+    '<button class="ficha-list-btn" onclick="showFicha(\'' + f.file + '\')">' + f.nombre +
+      (f.altoRiesgo ? '<span class="badge badge-red">Alto riesgo</span>' : '') +
+    '</button>'
+  ).join('');
+}
+
+function renderBibliografia() {
+  const container = document.getElementById('bibliografia-list');
+  const lotes = window.BIBLIOGRAFIA || [];
+  container.innerHTML = lotes.map(b => {
+    const guias = b.guiasBase.map(g => g.nombre + ' (' + g.año + ')').join(' · ');
+    const farmacos = b.farmacos.join(' · ');
+    const cambios = b.cambiosAplicados.length ?
+      '<div class="ficha-section ficha-nota"><div class="ficha-section-title">✅ Cambios aplicados</div><div class="ficha-section-text">' +
+      b.cambiosAplicados.map(c => '<strong>' + c.ficha + ':</strong> ' + c.cambio).join('<br><br>') + '</div></div>' : '';
+    const pendientes = b.pendientes.length ?
+      '<div class="ficha-section ficha-adverso"><div class="ficha-section-title">⏳ Pendientes / focalizar en la próxima revisión</div><div class="ficha-section-text">' +
+      b.pendientes.map(p => '<strong>' + p.ficha + ':</strong> ' + p.nota).join('<br><br>') + '</div></div>' : '';
+    const vera = b.referenciasVera.map(r =>
+      r.titulo + ' — ' + r.autor + ' — ' + r.revista + ' ' + r.año + ' — PMID ' + r.pmid +
+      (r.doi ? ' — <a href="https://doi.org/' + r.doi + '" target="_blank" rel="noopener">DOI ↗</a>' : '')
+    ).join('<br><br>');
+    const pplx = b.referenciasPerplexity.map(r =>
+      r.titulo + ' — <a href="' + r.url + '" target="_blank" rel="noopener">' + r.url + ' ↗</a>'
+    ).join('<br><br>');
+    return '<details class="protocol-card">' +
+      '<summary class="scale-header"><div>' +
+        '<div class="scale-title">' + b.tema + '</div>' +
+        '<div class="scale-subtitle">Verificado: ' + b.fecha + ' · ' + b.farmacos.length + ' fármacos</div>' +
+      '</div></summary>' +
+      '<div class="scale-body">' +
+        '<div class="ficha-section"><div class="ficha-section-title">Guías base — revisar si hay versión más reciente</div><div class="ficha-section-text">' + guias + '</div></div>' +
+        '<div class="ficha-section"><div class="ficha-section-title">Fármacos cubiertos</div><div class="ficha-section-text">' + farmacos + '</div></div>' +
+        cambios + pendientes +
+        '<div class="ficha-section"><div class="ficha-section-title">Referencias Vera</div><div class="ficha-section-text">' + (vera || '—') + '</div></div>' +
+        '<div class="ficha-section"><div class="ficha-section-title">Referencias Perplexity</div><div class="ficha-section-text">' + (pplx || '—') + '</div></div>' +
+      '</div>' +
+    '</details>';
+  }).join('');
+}
+
 /* El <script> se carga al final del <body>: ejecución directa. */
 renderCheatsheets();
 renderScales();
 renderProtocols();
 renderDrugs();
 calcSCA();
+renderBibliografia();
+renderInfusionSelect();
+selectInfusionDrug();
+renderInfusionGrid();
+renderFichaList('');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');

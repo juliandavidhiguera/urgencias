@@ -1,7 +1,7 @@
 // SUBIR ESTA VERSION EN CADA CAMBIO DE data/*.js O index.html.
 // El fetch es cache-first: sin bump, quien ya tenga la app instalada seguira
 // viendo el contenido clinico antiguo indefinidamente.
-const CACHE = 'urg-v9';
+const CACHE = 'urg-v16';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,9 @@ const ASSETS = [
   '/data/scales.js',
   '/data/protocols.js',
   '/data/drugs.js',
+  '/data/infusions.js',
+  '/data/fichas.js',
+  '/data/bibliografia.js',
   '/manifest.json',
   '/icon.svg'
 ];

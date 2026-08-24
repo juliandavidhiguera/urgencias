@@ -1,0 +1,1360 @@
+[
+  {
+    "file": "Acetilsalicilat de lisina.md",
+    "name": "Acetilsalicilat de lisina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/2/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial  900  mg,  equivalent  a  500  mg  d'àcid  acetilsalicílic  (AAS).  Pols  liofilitzada  per\nreconstituir.",
+      "propiedades": "forma  salina  hidrosoluble  de  l’àcid  acetilsalicílic  amb  inici  d’acció  més  ràpid  i  millor\ntolerància digestiva. Analgèsic, antipirètic, antiinflamatori i antiagregant plaquetari.",
+      "indicaciones": "tractament  de  malaltia  tromboembòlica  (síndrome  coronària  aguda).  Control  del  dolor.\nHipertèrmia (en majors de 16 anys).\ndolor.",
+      "dosis": "• SCA: 450 mg i.v. (equivalent a 250 mg d’AAS). Reconstituïu el vial de 900 mg amb 5 ml d'aigua\nper injecció o en 50 ml de SF 0,9 % i administreu lentament.\n• Dolor / febre: 900 mg i.v. (equivalent a 500 mg d’AAS). Reconstituïu el vial de 900 mg amb 5 ml\nd'aigua per injecció o en 50 ml de SF 0,9 % i administreu lentament.\n20 – 50 mg/kg/dia i.v. lenta o i.m.",
+      "contraindicaciones": "hipersensibilitat coneguda a l'AAS o els AINE (precaució en asmàtics). Alteracions\nde la coagulació. HDA. Úlcera pèptica. Hemofília. Insuficiències renal o hepàtica greus. Administració\nd’anticoagulants orals i/o metotrexat. Menors de 16 anys amb febre, grip o varicel·la per risc d'aparició\nd'una síndrome de Reye.\nmenors de 16 anys amb febre, grip o varicel·la pel risc d'aparició d'una\nsíndrome de Reye. Infants amb úlcera gastrointestinal, diàtesi hemorràgica o hipersensibilitat als\nsalicilats, i resta de contraindicacions de l'adult.",
+      "efectosSecundarios": "vòmits, hemorràgia digestiva. Erupcions cutànies. Espasme bronquial (si asma o\nal·lèrgies).\nEfectes adversos: síndrome de Reye (en nens i adolescents amb febre, grip o varicel.la).",
+      "observaciones": "• Alternativa a l'AAS quan no es pot administrar per v.o.\n• Potencia l'efecte dels anticoagulants.",
+      "embarazo": "contraindicat en el tercer trimestre d’embaràs.",
+      "lactancia": "s'excreta amb la llet materna i és preferible evitar-ne l’administració. Valoreu-la en cas de\nSCA, si no es pot administrar AAS oral.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Adenosina.md",
+    "name": "Adenosina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/4/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 6 mg / 2 ml (3 mg/ml).",
+      "propiedades": "alenteix la conducció del node AV, pot interrompre les vies de reentrada del node AV i\nrestaurar el ritme sinusal en pacients amb TPSV. Vida mitjana en sang molt curta (menor a 10 s).",
+      "indicaciones": "• Terapèutiques: taquicàrdia per reentrada AV i del node AV, en pacient amb estabilitat\nhemodinàmica i quan les maniobres vagals no han produït el resultat esperat.\n• Diagnòstiques: diagnòstic de TPSV (amb complex QRS ample o estret). Pot revelar activitat\nauricular en cas de fibril·lació auricular, flutter o taquicàrdia ventricular per alentiment de la\nconducció del node AV.",
+      "dosis": "6 mg en bolus i.v. Si no hi ha resposta al cap d’1 – 2 min, valoreu\nadministrar 12 mg. Si tampoc hi ha resposta al cap d’1 – 2 min, valoreu administrar 18 mg segons\ntolerància i efectes secundaris.\nAtenció! Administreu en bolus ràpid i.v. (preferentment per una via venosa proximal i de gran calibre;\namb allargador, administreu pel port proximal), seguit d'un rentat ràpid amb SF 0,9 %. Apliqueu-ho per\na totes les dosis.",
+      "contraindicaciones": "hipersensibilitat al principi actiu. FA / flutter amb preexcitació (WPW).\nBroncoespasme sever. BAV de 2n o 3r grau o malaltia del sinus (excepte en pacients amb\nmarcapassos normofuncionant). Hipotensió greu. Síndrome de QT llarg. Insuficiència cardíaca\ndescompensada.",
+      "efectosSecundarios": "acostumen a ser transitoris. Cal que advertiu el malalt de possibilitat de dispnea,\ndolor toràcic, calor, nàusees, cefalea, mareig i/o malestar general. Bradicàrdia transitòria. Bradicàrdia\no asistòlia perllongades (en malalties del sinus no detectades). Torsade de pointes, (sobretot en\npacients amb augment de l'interval QT) i altres arrítmies. Hipotensió arterial. Empitjorament del\nbroncoespasme. Convulsions en pacients susceptibles de patir-ne.",
+      "observaciones": "• Monitoratge continu durant el tractament i preparació prèvia d’equip de reanimació.\n• En pacients en tractament amb dipiridamol o carbamazepina, o amb un trasplantament cardíac\nrecent (< 1 any) valoreu reduir dosi.\n• Pacients en tractament amb teofil·lina o aminofil·lina, poden requerir dosis més elevades.\n• Precaució si IAM recent, angina inestable o dèficits de conducció menors (blocatge AV de 1r\ngrau o blocatge de branca).\n• Antídot: metilxantines (cafeïna i teofil·lina).",
+      "embarazo": "no hi ha estudis en gestants. Utilitzeu-lo si no hi ha alternatives més segures.",
+      "lactancia": "fàrmac segur.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Adrenalina.md",
+    "name": "Adrenalina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/5/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1 mg = 1 ml (1:1000).",
+      "propiedades": "agonista adrenèrgic alfa i beta dosi depenent. A dosis baixes (menor de 0,04\nmicrograms/kg) efecte βeta i, a dosis més altes, efecte alfa.\n• Efecte βeta 2 (menor de 2 micrograms/min): relaxa el múscul llis i disminueix les RVP,\naugmenta el flux sanguini cerebral i coronari, produeix broncodilatació i augment de la glucèmia.\n• Efecte βeta 1 (2 - 10 micrograms/min): augmenta la contractilitat, la FC i el consum d'O2 del\nmiocardi.\n• Efecte alfa (major de 10 micrograms/min): vasoconstricció i augment de la TA, disminueix el\nflux esplènic, renal i cutani.",
+      "indicaciones": "ACR, bradicàrdia simptomàtica, BAV 3r grau, anafilaxi i hipotensió mantinguda mentre\nles dosis βeta de L-norepinefrina fan efecte. Com a premedicació a dosi βeta en SIR en estats de xoc\n(reals o ocults) previs a la inducció.\n(+P) En pediatria es pot utilitzar nebulitzat en crup, laringitis i epiglotitis. Hipoglucèmia severa que no\nreverteix havent fet tres determinacions post tractament amb glucosa i hidrocortisona (última opció)",
+      "dosis": "Adult: i.v.- i.m. - neb.\n• Aturada cardiorespiratòria (ACR): 1 mg després de la 3a desfibril·lació i continueu\nadministrant 1 mg cada 3 - 5 min i.v.\n• ACR presenciada monitorada: si feu fins a tres descàrregues seguides, per a l’adrenalina\ncompta com a una i cal administrar 1 mg a la 3a desfibril·lació de l’ACR no monitorada. Continueu\nadministrant 1 mg cada 3 - 5 minuts.\n• Bradicàrdies:\n   ◦ Perfusió contínua: diluïu 1 mg en 100 ml SF = 0,01 mg/ml (1/100.00) per tant tindreu: 1\nml/kg/h equival a 0,01 mg/kg/h (0,17 micrograms/kg/min). Inicieu a 2 - 10\nmicrograms/kg/min. Si no hi ha resposta a la isoprenalina, perfusió contínua a 0,02 -\n0,08 mg/kg/hora fins que sigui necessari.\n• Xoc anafilàctic:\n   ◦ Via intramuscular d'elecció: 0,5 mg i.m. (preferiblement a quàdriceps quadrant extern).\nEs pot repetir als 5 - 15 min si no hi ha resposta (màxim 3 dosis). En pacients hipotensos\nmalgrat dosis múltiples i.m. i seroteràpia, el personal experimentat pot administrar-la via\ni.v. amb monitoratge cardíac estret.\n   ◦ Via i.v., si no teniu disponible la perfusió contínua o mentre la prepareu, podeu\nadministrar bolus d’adrenalina:  diluïu 0,5 mg en 49,5 ml SF i administreu 2 ml = 0,02"
+    }
+  },
+  {
+    "file": "Amiodarona.md",
+    "name": "Amiodarona",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/6/1)",
+    "subtitulo": null,
+    "alerta": "Atenció! El subministrament d’amiodarona risc de trencar l’estoc a magatzem. El temps d’aquesta incidència és indeterminat, per això, les Societats Científiques han elaborat un document amb les alternatives farmacològiques davant les següents situacions clíniques que poden requerir l’administració d’amiodarona s’ha vist afectat a nivell internacional i estem en .",
+    "sections": {
+      "presentacion": "ampul·la 150 mg / 3 ml (50 mg/ml).",
+      "propiedades": "antiarrítmic de classe III que inhibeix els corrents de potassi, pel que pot perllongar\nl'interval QT. Inhibidor alfa (vasodilatació i hipotensió) i beta (inotròpic negatiu, disminueix el consum\nde O2 i broncoespasme).",
+      "indicaciones": "TV/FV. Fibril·lació auricular i flutter auricular (tercera línia de tractament, després de\nflecaïnida i procaïnamida, si no es poden donar per contraindicacions).",
+      "dosis": "• Aturada cardiorespiratòria (ACR): administreu un bolus de 300 mg i.v. després de la 3a\ndescàrrega (diluïu 2 vials en SG 5 % fins a 20 ml) i un bolus de 150 mg i. v. després de la 5a\ndescàrrega (diluïu 1 vial en SG 5 % fins a 20 ml). Després de cada bolus administreu 20 ml de\nSF 0,9 % i aixequeu l’extremitat.\n• ACR presenciada monitorada: si feu fins a 3 descàrregues consecutives compteu-les com\nuna sola*. Administreu un bolus de 300 mg i. v. després de la 3a descàrrega (abans o després\nde l'adrenalina, durant el tercer cicle de dos minuts) i un bolus de 150 mg i. v. després de la 5a\ndescàrrega.\n* En els adults, les tres desfibril·lacions consecutives compten com a una pel que fa a l'administració\nd'amiodarona. Això difereix del SV pediàtric, on compten com a tres. No hi ha evidència actual en favor d'una o\naltra alternativa i les Guies ERC 2025 han definit opcions diferents en el SVA de l'adult i el pediàtric.\n• Taquiarrítmies: 300 mg i.v. diluïts en SG 5 % fins a 50 ml (6 mg/ml) a passar en 20 – 30 min si\ntaquicàrdia ben tolerada, o en 10 – 20 min si taquicàrdia mal tolerada.\n   ◦ Dosi de manteniment: 900 mg en 24 h.\n   ◦ Perfusió contínua de manteniment: 150 mg en SG 5 % fins a 50 ml (3 mg/ml) a passar a\n12,5 ml/ hora.",
+      "contraindicaciones": "taquicàrdies irregulars de complex QRS ample (FA preexcitades). Xoc, hipotensió\nsevera, bradicàrdia i alteracions de la conducció: BAV i síndrome del node sinusal malalt (tret de\nmarcapassos normofuncionant), interval QT llarg secundari a fàrmacs, i torsade de pointes.\nHipersensibilitat al iode (povidona iodada, contrasts iodats). Alteracions tiroidals. Tractament\nconcomitant amb sotalol.",
+      "efectosSecundarios": "proarrítmic, torsade de pointes. Hipotensió si infusió ràpida i.v.\nDeteriorament d’IC preexistent, disfunció sinusal i BAV.",
+      "observaciones": "• Potencia l'efecte d'anticoagulants orals, digoxina, blocadors beta i blocadors dels canals de"
+    }
+  },
+  {
+    "file": "Atropina.md",
+    "name": "Atropina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/7/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la 1 mg / 1 ml.",
+      "propiedades": "anticolinèrgic muscarínic (parasimpaticolític) amb blocatge vagal (eleva la FC). Inhibeix\nles secrecions salivals, bronquials i gastrointestinals. Midriasi.",
+      "indicaciones": "bradicàrdia simptomàtica (associada o no a SCA). BAV. Intoxicació per organofosforats i\ncarbamats (insecticides), fàrmacs amb acció colinèrgica (pilocarpina, rivastigmina), armes químiques\nneurotòxiques (gas sarín, tabun) i bolets. En preanestèsia, s'usa per reduir les secrecions.",
+      "dosis": "• Bradicàrdia simptomàtica: 0,5 mg i.v., cada 3 – 5 min (màx. 3 mg).\n• Toxíndrome colinèrgica: bolus inicial de 1 – 2 mg i.v., directe o diluït en SF 0,9 % fins a 10 ml.\nPosteriorment, bolus i.v. doblant la dosi cada 5 min fins aconseguir l’atropinització clínica:\nauscultació pulmonar clara, millora d’oxigenació, assecat de secrecions, FC > 80 bpm i\nTAS > 80 mmHg.\nExemple pauta dosificació:\n   ◦ 1a dosi: 1 – 2 mg.\n   ◦ Si no hi ha resposta als 5 min, 2a dosi: 2 – 4 mg.\n   ◦ Si no hi ha resposta als 5 min, 3a dosi 4 – 8 mg.\n   ◦ Si no hi ha resposta als 5 min, 4a dosi: 8 – 16 mg.\nDesprés de l'atropinització, el tractament de manteniment indicat és la perfusió contínua del\n10 – 20 % de la dosi total de càrrega acumulada (expressada en mg/h), amb un màx. de 2 mg/h\n(diluïu l’atropina en SF 0,9 % per obtenir una concentració de 0,1 mg/ml). Manteniu monitoratge\nestricte i ajusteu perfusió segons evolució.\n• Preanestèsic (no és d’ús rutinari): dosi de 0,5 mg i.v., entre 3 – 5 min abans de l'inici de la SIR.",
+      "contraindicaciones": "insuficiència coronària, bradicàrdia en xoc hipovolèmic (pot provocar arrítmies\nmalignes pel reflex de Bezold-Jarisch). BAV amb complex QRS ample (sospita malaltia de His-\nPurkinje). Trasplantament cardíac (pot produir blocatge AV de tercer grau i ACR).",
+      "efectosSecundarios": "dosis altes provoquen síndrome anticolinèrgica (sequedat de boca, visió\nborrosa, fotofòbia, midriasi, taquicàrdia, anhidrosi, etc.). Dosis tòxiques: agitació psicomotora, deliri,\nal·lucinacions, coma, pell vermella i calenta, atàxia, paràlisi muscular, ili paralític, RAO, arrítmies,\nSCA. En casos greus, pot provocar ACR.",
+      "observaciones": "• Una dosi inferior a 0,5 mg pot provocar bradicàrdia paradoxal.\n• Es pot administrar també per via i.m. o s.c. Efecte més tardà i absorció irregular.\n• En cas d'un pacient inconscient amb intoxicació, les dosis inicials poden ser més elevades.\n• Antídot de l'atropina: fisostigmina a dosi 0,04 mg/kg (màx. 2 mg), i.m. o i.v. lenta. Monitoratge\nper risc de bradicàrdia i convulsions.",
+      "embarazo": "contraindicat, excepte en situació d'emergència vital.",
+      "lactancia": "compatible a dosis aïllades. Mesura preventiva: extreure i descartar la llet materna durant"
+    }
+  },
+  {
+    "file": "Bicarbonat sòdic.md",
+    "name": "Bicarbonat sòdic",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/8/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "hipertònic 1 Molar: vial 10 mEq = 10 ml (1 ml = 1 mEq = 0,084 mg).",
+      "propiedades": "alcalinitzant, tampó per l'acidosi. Neutralitza H+. Augmenta el pH urinari quan la funció\nrenal és normal, facilitant l'eliminació d'àcids (AAS, fenobarbital, etc.).",
+      "indicaciones": "acidosi metabòlica greu després de tractament etiològic o ACR amb més de 20 minuts de\nRCP (amb sospita d'intoxicació per antidepressius o barbitúrics o hiperpotassèmia). Alcalinització de\nl'orina. Hiperpotassèmia greu. Intoxicació per antidepressius tricíclics i salicilats. Síndrome de\nl’esclafament (crush syndrome). No serveix per a ROSC.",
+      "dosis": "Administreu-lo per via i.v. Eviteu-ne l’administració ràpida. No administreu altres fàrmacs per la mateixa\nvia.\nAdult:\n·         ACR per alta sospita de hiperpotassèmia: 50 mEq (50ml al 8.4%).\n·         ACR per intoxicació per tricíclics, salicilats o hipertermia maligna: 1-2 mEq/kg a\npassar en 1-2 min.\n·         Toxíndrome anticolinèrgica o muscarínica que pugui provocar un bloqueig de la\nbomba de sodi cardíaca (QRS >100 ms): administreu 1 - 2 mEq/kg en bolus i.v. en 1 - 2\nmin. En adults és habitual emprar de 50 - 100 mEq (50 - 100 ml) en 1 h i valoreu perfusió\ncontínua de 40 mEq/h fins aconseguir la rectificació del QRS o pH 7,45-7,5.\n·        Síndrome de l'esclafament (crush syndrome): administreu 20 mEq per cada 500 ml de\nSSF si alta sospita (per imatges elèctriques o documentada) d'hiperpotassèmia per\nextracció perllongada (més de 6 h).",
+      "contraindicaciones": "no existeixen contraindicacions absolutes. Precaució si hi ha sospita d'alcalosi\nmetabòlica o respiratòria, acidosi respiratòria, hipocalcèmia o hipoclorèmia, estats edematosos i\ncardiopatia isquèmica.",
+      "efectosSecundarios": "en bolus produeix disminució transitòria del cabal cardíac, resistència vascular\nperifèrica, TA i augment de la PIC; pot produir hemorràgia intraventricular en nounats; produeix\nalcalosi metabòlica (alteracions de la conducta, hiperreflèxia, tetània, convulsions), hipercàpnia i\nhiperosmolaritat (hipernatrèmia amb hiperpotassèmia). Si hi ha extravasació, pot produir-se necrosi\ntissular (tracteu-ho amb infiltració local de lidocaïna). Exacerba l'acidosi intracel·lular (efecte\nparadoxal).",
+      "observaciones": "• Monitoreu el pacient durant la seva administració.\n• El seu ús sense gasometria s'ha de limitar a les sospites franques d'acidosi metabòlica,\nhipercalièmia greu i intoxicació greu per barbitúrics i salicilats.\n• Inhibeix l'acció de tetraciclines, clorpromazina, liti, salicilats i metrotexatè.\n• Potencia els efectes d'amfetamines, simpaticomimètics, flecaïnida i quinidina."
+    }
+  },
+  {
+    "file": "Biperidèn.md",
+    "name": "Biperidèn",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/9/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la 5 mg / 1 ml.",
+      "propiedades": "antagonista dels receptors muscarínics, amb efectes centrals i perifèrics.",
+      "indicaciones": "síndrome  extrapiramidal  (distonies,  rigidesa,  sialorrea,  síndrome  parkinsoniana)  induïda\nper  fàrmacs  neurolèptics,  antagonistes  del  calci  (cinnarizina,  flunarizina,  diltiazem)  i  metoclopramida.\nManeig del parkinsonisme.\nrevertir simptomatologia extrapiramidal (distonia aguda, acatísia i síndromes",
+      "dosis": "• Intravenosa: 2,5 – 5 mg (directe o diluït en SF 0,9 % fins a 10 ml), administració lenta (1 –\n2 min).\n• Intramuscular: 2,5 – 5 mg.\nSi la simptomatologia persisteix repetiu dosi als 20 – 30 min (si és clínicament necessari, administreu-\nlo abans).\nEn casos greus de parkinsonisme induït per fàrmacs sense opció de medicació oral: 2 – 4 mg/dia i.v.\n(dividit en 1 – 2 dosis), ajustant segons resposta i tolerància.",
+      "contraindicaciones": "hipersensibilitat al principi actiu o als seus excipients, glaucoma (sobretot d'angle\nestret), obstrucció intestinal o megacòlon.",
+      "efectosSecundarios": "efectes  anticolinèrgics  (mareig,  sedació,  sequedat  de  boca,  midriasi  i  visió\nborrosa, taquicàrdia). Greus i rars: bradicàrdia paradoxal (associada a velocitat d’administració ràpida\ni dosi alta), deliri i confusió, al·lucinacions / agitació psicomotora / psicosi tòxica, ili paralític.",
+      "observaciones": "• NO el diluïu en SG 5 %.\n• Precaució en pacients amb arrítmies, miastènia gravis o epilèpsia, així com en persones d’edat\navançada (+V), amb deteriorament cognitiu o comorbiditat cardíaca. En la descompensació\naguda del parkinsonisme (per interrupció de medicació o factors intercurrents) cal reiniciar o\noptimitzar la teràpia dopaminèrgica (levodopa, agonistes dopaminèrgics).\n• En cas de sobredosi o intoxicació anticolinèrgica greu, la fisostigmina (1 – 2 mg subcutània o\ni.v.) pot revertir els símptomes.",
+      "embarazo": "pot administrar-se en emergències (distonia aguda severa). Valoreu risc-benefici.",
+      "lactancia": "una dosi única en emergència és acceptable. Valoreu descartar la llet de les següents 4 –\n6 h.",
+      "pediatria": "Valoreu el risc-benefici. Consulteu amb pediatria CECOS."
+    }
+  },
+  {
+    "file": "Bromur de butilescopolamina.md",
+    "name": "Bromur de butilescopolamina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/12/1)",
+    "subtitulo": "Bromur de butilescopolamina (Buscapina ®)",
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la 20 mg/ml (1 ml).",
+      "propiedades": "anticolinèrgic, antiespasmòdic, antisecretor. Espasmolític de fibra muscular llisa (tracte\ngastrointestinal, biliar i genitourinari). No travessa la barrera hematoencefàlica.",
+      "indicaciones": "espasme agut (gastrointestinal, del tracte biliar, pancreàtic i genitourinari).\nÚs fora de fitxa tècnica: tractament de secrecions bronquials i ranera premortal en sedació pal·liativa.\nespasme agut (gastrointestinal, del tracte biliar, pancreàtic i genitourinari).",
+      "dosis": "20 – 40 mg (1 o 2 amp.) i.v. lenta (per reduir els efectes adversos\ncardiovasculars), i.m. o subcutània, cada 6 - 12 hores (màx. 100 mg/dia).\n• Infants: 0,3 – 0,6 mg/kg pes corporal i.v. lenta, i.m. o bé subcutània (màx. 1,5 mg/kg/dia).\n• Adolescents majors de 12 anys: 20 – 40 mg i.v. lenta, i.m. o bé subcutània (màx.\n100 mg/dia).",
+      "contraindicaciones": "hipersensibilitat al principi actiu o a algun excipient. Retenció urinària per\npatologia uretroprostàtica. Estenosi del tracte gastrointestinal. Ili paralític o obstructiu. Megacòlon.\nTaquicàrdia. Glaucoma d’angle estret. Miastènia gravis. Contraindicada la via i.m. en tractament amb\nanticoagulants.",
+      "efectosSecundarios": "anticolinèrgics (visió borrosa, mareig, RAO, taquicàrdia). Anafilaxi (si\nadministració parenteral). Arrítmia (alerta en pacients amb afeccions cardíaques). Hipotensió. Elevació\npressió intraocular en pacients amb glaucoma d’angle estret no diagnosticat o no tractat.",
+      "observaciones": "en pacients en tractament amb anticoagulants descarteu via i.m. (risc d’hematomes), i\nadministreu via i.v. lenta o subcutània. Monitoratge en pacients amb afeccions cardíaques per risc de\ntaquicàrdia. Cal descartar glaucoma si apareix clínica d'ull vermell, dolorós i/o amb pèrdua de visió\ndesprés de l'administració. Pot potenciar els efectes sedants de fàrmacs depressors del SNC. Antídot:\nfisostigmina (per revertir la toxicitat anticolinèrgica).",
+      "embarazo": "dades sobre l’ús del fàrmac limitades. Eviteu-ne l'administració, travessa la\nbarrera placentària. S’excreta amb la llet materna.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Bromur d’ipratropi.md",
+    "name": "Bromur d’ipratropi",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/10/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "solució per nebulitzar 500 micrograms / 2 ml.",
+      "propiedades": "anticolinèrgic (parasimpaticolític) i broncodilatador.",
+      "indicaciones": "broncoespasme en MPOC i exacerbacions moderades-severes d'asma. Pacient cremat\namb afectació respiratòria.\nexacerbacions d'asma.",
+      "dosis": "• Nebulització: 500 micrograms cada 20 min durant la primera hora (màx. 3 dosis), flux de 6 –\n8 l/min. Es pot administrar conjuntament amb el salbutamol, especialment en el context\nd'exacerbació aguda d'asma o MPOC, mesclant les dues medicacions a la cambra\nnebulitzadora amb 2,5 ml de SF 0,9 %. Posteriorment, seguiu amb 500 micrograms cada 4 –\n6 h, segons evolució.\n• Nebulització, dosi de càrrega:\n   ◦ Menys de 10 kg: 125 micrograms / dosi.\n   ◦ Més de 10 kg: 250 micrograms / dosi.\n   ◦ Més de 30 kg: 500 micrograms / dosi.\nEn episodis severs, 1 dosi cada 20 min durant la primera hora (màx. 3 dosis) administrada\nsimultàniament amb el salbutamol. Mescleu els dos fàrmacs a la cambra nebulitzadora amb\n2,5 ml de SF 0,9 % i administreu-los a un flux de 6 – 8 l/min. Dosi de manteniment: cada 6 – 8 h\ndurant les primeres 24 48 h",
+      "contraindicaciones": "hipersensibilitat al fàrmac i substàncies afins a l'atropina.",
+      "efectosSecundarios": "precaució en pacients amb glaucoma d'angle estret. Tos, cefalea, taquicàrdia,\nretenció urinària i erupció cutània amb pruïja. En contacte directe amb els ulls pot causar visió borrosa\ni dolor ocular.",
+      "observaciones": "interacciona amb agonistes beta adrenèrgics i xantines, potenciant l'efecte\nbroncodilatador.",
+      "embarazo": "administreu-lo si no existeixen alternatives terapèutiques més segures i els beneficis\nsuperen els possibles riscs pel fetus.",
+      "lactancia": "compatible i segur.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Budesonida.md",
+    "name": "Budesonida",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/11/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la monodosi de suspensió per nebulitzar 0,5 mg / 2 ml (0,25 mg/ml).",
+      "propiedades": "corticoesteroide amb activitat antiinflamatòria local. Disminueix la hiperreactivitat bronquial i la\ninflamació de la via aèria.",
+      "indicaciones": "asma bronquial (tractament de segona línia en crisis moderades-greus).\ncrup laringi (laringitis moderades-greus), si no es disposa de dexametasona o no es\ntoleren els corticoides orals.",
+      "dosis": "0,5 mg NEB (màx. 1 – 2 mg/dia). Diluïu fins a 2 – 4 ml amb SF 0,9 %,\ni nebulitzeu amb O2 a 6 – 8 l/min.\n2 mg/dosi NEB, independentment d'edat i pes. Diluïu fins a 4 ml amb\nSF 0,9 %. Nebulitzeu amb O2 a 4 – 5 l/min.",
+      "contraindicaciones": "al·lèrgia al principi actiu o a algun excipient.",
+      "efectosSecundarios": "disfonia (inclosa ronquera), tos, irritació de coll i de la mucosa oral.",
+      "embarazo": "pot utilitzar-se durant l’embaràs valorant benefici/risc. És compatible amb la\nlactància.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Captopril.md",
+    "name": "Captopril",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/13/2)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits de 25 mg.",
+      "propiedades": "inhibidor de l’enzim convertidor de l'angiotensina (IECA) que produeix relaxació dels vasos\nsanguinis i disminució de la pressió arterial.",
+      "indicaciones": "HTA i urgències hipertensives (sobretot si van acompanyades d'ICC).",
+      "dosis": "25 – 50 mg/dia v.o. (màx. 150 mg/dia). L'absorció per via sublingual\nés erràtica i pot provocar hipotensió. Temps d'inici acció: 15 - 30 min.",
+      "contraindicaciones": "hipersensibilitat al principi actiu. Disminuïu la dosi en pacients amb estenosi de\nl'artèria renal.",
+      "efectosSecundarios": "hipotensió arterial. Tos seca. Nàusees. Vòmits. Dolor abdominal. Diarrea. Erupció\ncutània.",
+      "observaciones": "• Hi pot haver una excessiva resposta hipotensora si s'administra conjuntament amb diürètics.\n• En presència d'aliments la seva absorció es redueix un 30 – 40 %.",
+      "embarazo": "no recomanat en el primer trimestre; contraindicat en el segon i tercer trimestres.",
+      "lactancia": "compatible.",
+      "pediatria": "No indicat en situacions d’emergència en pediatria. No s’utilitza pel tractament de l'HTA urgent ni\nemergent."
+    }
+  },
+  {
+    "file": "Carbó activat.md",
+    "name": "Carbó activat",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/14/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "flascó amb suspensió oral 50 g / 250 ml (200 mg/ml).",
+      "propiedades": "adsorbent intestinal contra intoxicacions.",
+      "indicaciones": "intoxicacions agudes per sobredosi de fàrmacs o ingestió de tòxics que estiguin presents\nal tracte digestiu (per ingesta oral o per circulació enterohepàtica). Està indicat en les primeres 2 h. En\nintoxicacions massives o ingesta de fàrmacs d’absorció retardada, amb coberta entèrica o d’elevada\ntoxicitat, es pot administrar fins a 6 h després de la ingesta.\nintoxicacions  agudes  per  sobredosi  de  fàrmacs  o  ingestió  de  tòxics  que  estiguin\npresents al tracte digestiu. Està indicat en les primeres 2 h. En intoxicacions massives o ingesta de\nfàrmacs d’absorció retardada, amb coberta entèrica o d’elevada toxicitat, es pot administrar fins a\n6 h després de la ingesta.",
+      "dosis": "dosi inicial 25 – 50 g v.o. o per SNG.\n• < 1 any: no recomanat",
+      "contraindicaciones": "hipersensibilitat al carbó activat o a algun dels seus excipients. Intoxicació lleu.\nIntoxicat  amb  distensió  abdominal,  sospita  d’abdomen  agut  o  d’obstrucció  intestinal  o  perforació\ngastrointestinal,  o  si  hi  ha  risc  d’hemorràgia  digestiva.  Dificultats  per  la  deglució.  Via  aèria  no\nprotegida.  Eviteu-lo  en  pacients  amb  disminució  important  del  nivell  de  consciència  si  no  feu  IOT\nprèviament.  Ingesta  de  bases  fortes  (sosa  càustica  i  altres  càustics)  i  àcids  forts  (àcid  clorhídric).\nIngesta d’hidrocarburs, excepte en ingestes massives > 5 ml/kg, derivats halogenats (tetraclorur de\ncarboni)  i  tòxics  que  actuen  com  a  solvents  de  substàncies  més  tòxiques  (com  els  pesticides).\nIngesta de substàncies no adsorbibles com ferro, liti, etanol, metanol i etilenglicol, etc.",
+      "efectosSecundarios": "nàusees, vòmits i restrenyiment.",
+      "observaciones": "• Agiteu l'envàs abans d’utilitzar.\n• Valoreu fer aspiració de contingut gàstric previ a l’administració de carbó activat.\n• Considereu l'administració per SNG quan la via oral no sigui factible. En pacients amb\ndisminució del nivell de consciència o risc d’aspiració de contingut gàstric, aïlleu la VA\nprèviament.\n• No utilitzeu conjuntament amb emètics o antídots administrats de forma oral perquè impedirà la\nseva absorció.\n• Augment en l'eliminació de fàrmacs, fins i tot després de ser absorbits (digoxina, àcid\nacetilsalicílic, carbamazepina, fenobarbital, fenitoïna, quinina i teofil·lina).\nAtenció! El carbó activat també redueix l'absorció de la medicació habitual que hagi pres el\npacient.",
+      "embarazo": "fàrmac inert i sense risc de toxicitat en l'embaràs ni la lactància.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Ceftriaxona.md",
+    "name": "Ceftriaxona",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/15/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de pols 2 g per solució intravenosa.",
+      "propiedades": "antibiòtic  betalactàmic.  Cefalosporina  de  3a  generació  d'ampli  espectre  i  acció\nperllongada.",
+      "indicaciones": "tractament empíric de la sospita de meningitis aguda d'origen bacterià en pacients sense\npatologia de base (amb o sense púrpura fulminant). Sèpsia. Síndrome del xoc tòxic (estafilocòccic o\nestreptocòccic).  Profilaxi  en  fractures  obertes  i  ferides  àmplies  amb  risc  d’infecció,  si  no  es  disposa\nd’un antibiòtic més adequat.\nsèpsia. Xoc sèptic (o xoc d’origen incert). Meningitis.",
+      "dosis": "• Intravenosa: 2 g (màx. 4 g/dia), diluïts en SF 0,9 % o SG 5 % fins a 50 ml.\n• Intramuscular: si l'accés vascular perifèric o intraossi resulta dificultós o no està disponible.\nMateixa dosi que per via i.v. Escolliu un múscul relativament gran i no administreu més d’1 g en\nel mateix lloc.\nAtenció! Assegureu-vos que l'etiqueta del producte especifiqui que es pot administrar per via\ni.m. i reconstituïu el fàrmac amb el dissolvent que s'adjunta amb l'envàs.\n• Intravenosa: 100 mg/kg (màx. 2 g/dosi i 4 g/dia). Pot administrar-se com a bolus en 2 – 5\nmin, o en perfusió en 20 min.\nLa dilució ha de tenir una concentració com a màx. de 40 mg/ml (p. ex. si la dosi a administrar\nés de 800 mg, dividiu 800:40 = 20 ml. Dissoleu els 800 mg de ceftriaxona en 20 ml de SF 0,9\n% o SG 5%, com a mínim).\n• Intramuscular: mateixa dosi que per via i.v. Molt recomanable si l'accés vascular perifèric o",
+      "contraindicaciones": "hipersensibilitat  a  les  penicil·lines  o  a  qualsevol  altre  betalactàmic.  No\nl'administreu en nounats amb hiperbilirubinèmia.",
+      "efectosSecundarios": "rash  cutani,  nàusees,  vòmits,  dolor  abdominal,  diarrea,  trombocitopènia,\naugment de la bilirubina i transaminases.",
+      "observaciones": "no l’administreu per la mateixa via que altres solucions que continguin calci.",
+      "embarazo": "no  s’aconsella  durant  l’embaràs.  Només  administreu-lo  després  de  valorar  risc-benefici,\nespecialment en el primer trimestre.",
+      "lactancia": "fàrmac segur durant la lactància.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Clonazepam.md",
+    "name": "Clonazepam",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/16/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la 1 mg/ml.",
+      "propiedades": "benzodiazepina amb efecte sedant i anticonvulsiu.",
+      "indicaciones": "crisis tonicoclòniques, estat epilèptic i síndrome de privació de benzodiazepines.\nestat epilèptic.",
+      "dosis": "1 mg i.v. administrat en 1 min. Si és necessari, repetiu la dosi als\n5 min (màx. 3 mg).\n• Bolus i.v.: 0,01 – 0,09 mg/kg i.v. en 2 min (màx. 2 mg/dosi). Es pot repetir als 10 min.\n• Perfusió contínua: 0,01 – 0,06 mg/kg/h i.v.\nDiluïu 1 mg en 49 ml de SF 0,9 % (0,02 mg/ml)\nmg/kg/h kg de pes\n5\n2,5\n5\n0,01\n0,02\n10\n5\n10\n15\n7,5\n15\n20\n10\n20\n25\n12,5\n25\n30\n15\n30",
+      "contraindicaciones": "al·lèrgia al principi actiu i/o a qualsevol excipient. Depressió respiratòria.\nMiastènia gravis. Dependència alcohòlica. Glaucoma d’angle estret.",
+      "efectosSecundarios": "somnolència, hipotonia, atàxia, mareig, depressió respiratòria.",
+      "observaciones": "• Pot provocar tromboflebitis si l'administració és ràpida o el calibre de la vena no és l’adequat.\n• Potencia els efectes de l'alcohol i altres depressors del SNC.\n• Pot produir apnea, hipotensió arterial i ACR.\n• Antídot: flumazenil. No l'administreu si el pacient ha presentat convulsió prèviament.",
+      "embarazo": "administreu-lo només en situacions d'emergència quan els beneficis esperats sobre la mare\nsiguin majors que el potencial risc sobre el fetus (valoreu alternatives).",
+      "lactancia": "s'excreta amb la llet materna. Administreu-lo valorant el risc-benefici.",
+      "pediatria": "És un fàrmac poc utilitzat en pediatria. Les benzodiazepines d'elecció són el midazolam o el\ndiazepam."
+    }
+  },
+  {
+    "file": "Clopidogrel.md",
+    "name": "Clopidogrel",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/17/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits de 75 - 300 mg.",
+      "propiedades": "inhibidor de l'agregació plaquetària.",
+      "indicaciones": "administreu en SCAEST si hi ha impossibilitat d’obtenir informació del pacient o si presenta\ncriteris d’alt risc hemorràgic (sempre que no compleixi criteris de contraindicació).",
+      "dosis": "• Si ICP primària: 600 mg v.o.\n• Si fibrinòlisi:\n   ◦ Menys de 75 anys: 300 mg v.o.\n   ◦ Més de 75 anys: 75 mg v.o.\n• No criteris de reperfusió: 75 mg v.o.",
+      "contraindicaciones": "en SCAEST, no administreu segon antiagregant si hi ha hemorràgia activa greu, si hi\nha impossibilitat de via oral o si ja té doble antiagregació prèvia.\nAltres: hemorràgia activa (la menstruació no és hemorràgia activa), ictus, insuficiència hepàtica greu i\nhipersensibilitat.",
+      "efectosSecundarios": "afavoreix l'aparició d'hemorràgies i alteracions gastrointestinals.",
+      "observaciones": "• Fàrmac d'efecte lent.\n• S'inhibeix la seva absorció amb omeprazole. No amb pantoprazole.",
+      "embarazo": "no l'administreu."
+    }
+  },
+  {
+    "file": "Clorur de sodi 0,9%.md",
+    "name": "Clorur de sodi 0,9%",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/117/1)",
+    "subtitulo": "Clorur de sodi 0,9% (sèrum fisiològic 0,9%)",
+    "alerta": null,
+    "sections": {
+      "presentacion": "flascó de 10 ml, de 50 ml i de 500 ml.  Dissolvent per ús parenteral.\nOsmolaritat teòrica: 308 mOsm/l.\nPH: 4,5 – 7,0\nPrincipi actiu\nClorur de sodi\nElectròlits\nSodi\nClorurs\n10 ml\n90 mg\nmmol/l\n154\n154\n50 ml\n450 mg\nmEq/l\n154\n154\n100 ml\n900 mg\nmEq/l\n154\n154\n250 ml\n9 g\nmEq/l\n154\n154\n500 ml\n4,50 g\nmEq/l\n154\n154",
+      "propiedades": "el sèrum fisiològic té la mateixa osmolaritat que el plasma. L'administració d'aquesta\nsolució comporta una reposició de l'espai intersticial, que representa aproximadament 2/3 parts de\nl'espai extracel·lular total. Només 1/3 del volum administrat roman a l'espai intravascular. Per tant,\nl'efecte hemodinàmic de la solució és de curta durada.",
+      "indicaciones": "dissolvent i vehicle de medicaments compatibles que s'hagin\nd'administrar per via parenteral. En hiponatrèmies i alcalosis metabòliques hipoclorèmiques.\nreposició de volum a suport vital neonatal, suport vital pediàtric, suport vital\navançat, suport vital avançat en pacient traumàtic, traumatisme abdominal i pelvià (+P), traumatisme\nmusculoesquelètic (+P), lesions per ona expansiva o blast injuries, lesions per cremades (+P),\ntraumatisme en pacient d'edat avançada (+V),  maneig de ferides per arma blanca, pacient amb\nbronquiolitis, taquiarrítmies (+P), atenció al part prehospitalari i cures al nounat, complicacions del\npart: prolapse del cordó umbilical, emergències obstètriques del 2n i 3r trimestres: hemorràgia\n(placenta prèvia, despreniment de placenta, vasos previs, ruptura uterina), pacient amb hipotèrmia\naccidental (+P), pacient amb patologia per calor (+P), lesions per submersió/immersió: ofegat (+P),\npicades i mossegades (+P) , pacient amb patologia per calor, pacient amb sospita de xoc indiferenciat\n(+P), pacient amb xoc sèptic (+P) (+V), pacient amb xoc cardiogènic (+P), control de símptomes en\npacients amb malaltia avançada progressiva o terminal (+V) i pacient fràgil i/o d’edat avançada en\nsituació urgent/emergent en l'adult.",
+      "dosis": "Via intravenosa o altres vies d'administració depenent de la forma d'administració del medicament que\nes dissol.\nAdult:\n• Dosi recomanada per fitxa tècnica: la dosi s'ha d'ajustar a la concentració desitjada del\nmedicament que es dissol.\n• Dosi SEM: aneu als capítols referenciats i enllaçats a les indicacions per SEM per consultar\ndosi específica."
+    }
+  },
+  {
+    "file": "Clorur de sodi 7,5 %.md",
+    "name": "Clorur de sodi 7,5 %",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/118/1)",
+    "subtitulo": null,
+    "alerta": "Clorur de sodi 7,5 % (sèrum salí hipertònic - SSH)",
+    "sections": {
+      "presentacion": "bossa de clorur de sodi de 100 ml al 7,5 %.\nEn cas de no disposar d'aquesta preparació consulteu a l'apartat d'Observacions les instruccions de\npreparació de SSH 7,5 % a partir de SF 0,9 % i NaCl 20 %.\nEn cas de requerir SSH 3 % consulteu a l'apartat d'Observacions les instruccions de preparació de\nSSH 3 % a partir de SF 0,9 % i NaCl 20 % o a partir de SSH 7,5 %.",
+      "propiedades": "incrementa  l’osmolaritat  plasmàtica  perquè  mobilitza  aigua  dels  teixits  cap  als  vasos\nsanguinis, i redueix l’edema intersticial i intracel·lular.",
+      "indicaciones": "• SSH 7,5 %: hipertensió intracranial (HTIC) per TCE, ictus i postanòxia. Xoc hipovolèmic en\nescenaris on no es disposi de fluids suficients (IMA, IMAi).\n• SSH 3 %: hiponatrèmia amb simptomatologia greu o Na < 100 – 115 mEq/l. Cop de calor amb\nafectació neurològica greu i hiponatrèmia.",
+      "dosis": "• SSH 7,5 %: 2 – 4 ml/kg i.v. en bolus en 15 min màxim.\n• SSH 3 %:\n   ◦ 100 – 150 ml i.v. en bolus en hiponatrèmia amb simptomatologia greu. Es pot repetir\ndosi als 10 min.\n   ◦ 2 – 3 ml/kg i.v. en bolus en cop de calor amb afectació neurològica greu en context\nd'hiponatrèmia.",
+      "contraindicaciones": "incontrolada. Edema pulmonar. Retenció d'aigua i clorur de sodi. Insuficiència cardíaca. Hipertensió.\ninsuficiència  renal.  Alteracions  greus  del  balanç  electrolític  Hemorràgia",
+      "efectosSecundarios": "hipernatrèmia.  Hipocalcèmia.  Hipopotassèmia.  Hiperclorèmia.  Mielinosi  pòntica\n(si  correcció  molt  ràpida  d’hiponatrèmia  crònica).  HTA.  ICC  aguda  (especialment  edema  pulmonar).\nFlebitis, trombosi. L'administració massa ràpida pot provocar hipotensió i arrítmies.",
+      "observaciones": "l'administració  errònia  de  sodi  a  pacients  deshidratats  els  pot  provocar  la  mort.\nAnalitzeu prèviament els valors de sodi.\nEn cas de no disposar d’aquesta presentació o del SSH 3 %, podeu fer alguna d’aquestes\npreparacions:"
+    }
+  },
+  {
+    "file": "Clorur mòrfic.md",
+    "name": "Clorur mòrfic",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/18/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 10 mg = 1 ml.",
+      "propiedades": "opioide. Agonista pur dels receptors opiacis. Acció sobre el SNC i òrgans amb\nmusculatura llisa. Efecte també narcòtic/sedant.",
+      "indicaciones": "analgèsia en dolor greu. SCAEST de baix risc estable hemodinàmicament i dissecció\naòrtica, a dosis baixes, segons índex diastòlic (ID=FC/TAD). Acoblament a la VMNI si malalt agitat, a\ndosis baixes (1 - 2 mg). Pal·liació de la dispnea en malalties en estat terminal i limitació de l'esforç\nterapèutic.",
+      "dosis": "Adult:\n• Dosi estandarditzada: 0,05 - 0,2 mg/kg i.v. Diluïu 1 vial + 9 ml de SF (1 mg/ml). Bolus inicial de\n2 mg i repetir segons resposta i/o efectes secundaris.\n• En cures pal·liatives: no hi ha sostre i es pot administrar subcutani.",
+      "contraindicaciones": "hipersensibilitat als opiacis, asma bronquial, depressió respiratòria, ICC o EAP\ncardiogènic. SCASEST i SCAEST d'alt risc amb molt miocardi afectat. Utilitzeu-lo amb precaució en\nestats d'hipotensió, xoc, bradicàrdia, persones grans i lesions intracranials (sobretot si hi ha\naugment de la PIC).",
+      "efectosSecundarios": "depressió respiratòria, bradicàrdia, hipotensió, nàusees, vòmits, somnolència,\ndolor abdominal per contracció de l'esfínter d'Oddi i retenció d'orina.",
+      "observaciones": "• Interfereix en l'absorció ràpida dels antiagregants plaquetaris (ticagrelor i prasugrel) →\nmillor fentanil en SCASEST i SCAEST d'alt risc, associat a procinètic.\n• Produeix vasodilatació i disminueix la TA en pacients hipovolèmics.\n• Si es produeix sobredosificació, l'antídot és la naloxona.\n• Augmenten la seva acció: IMAO, antidepressius tricíclics i betablocadors.",
+      "embarazo": "no teratogen. Pot crear dependència materna i síndrome d'abstinència neonatal. Travessa\nla placenta.",
+      "lactancia": "baixa concentració en la llet materna, pot ser compatible si la mare en consumeix una dosi\nbaixa (inferior a 20 mg/dia). Es recomana que es realitzi la lactància abans de la dosi per tal que el\nnivell de fàrmac a la llet sigui mínim.",
+      "pediatria": "• i.m./i.v.: 0,05 - 0,2 mg/kg. Es pot repetir c/2 - 4 h (màxim 15 mg). Per i.v. diluïu 1 ml de solució\nconcentrada + 9 ml de SF o SG 5% (1 mg/ml).\n• Perfusió contínua: 10 - 70 micrograms/kg/hora. Preparació de la perfusió contínua (mg fins"
+    }
+  },
+  {
+    "file": "Dexclorfeniramina.md",
+    "name": "Dexclorfeniramina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/19/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 5 mg = 1 ml.",
+      "propiedades": "antihistamínic H1 amb efecte sedant.",
+      "indicaciones": "al·lèrgies, reaccions anafilàctiques, urticària i angioedema.",
+      "dosis": "Adult: 5 mg i.v. o i.m. Màxim 40 mg/dia.",
+      "contraindicaciones": "tractament amb IMAO (risc d'hipotensió greu), glaucoma, hipertròfia prostàtica i\nasma bronquial.",
+      "efectosSecundarios": "somnolència, urticària, sequedat de mucoses i ocasionalment xoc anafilàctic. En\npediatria poden haver-hi al·lucinacions, irritabilitat o convulsions.",
+      "observaciones": "• Antagonitza l'efecte de l'heparina.\n• Potencia l'efecte de la noradrenalina, etanol, benzodiazepines, barbitúrics, narcòtics, i altres\ndepressors del SNC.",
+      "embarazo": "no l'administreu.",
+      "pediatria": "i.v. o i.m.:\n• 0,1 mg/kg/6 - 8 hores. Màxim 5 mg/dosi o 20 mg/dia.\n• En administració i.v. diluïu-lo fins a 10 ml de SF i administreu-lo lentament.\nv.o.:\n• Infants de 2 a 6 anys: 0,5 mg (1,25 ml) 3 o 4 vegades al dia.\n• Infants de 6 a 12 anys: 1 mg (2,5 ml) 3 o 4 vegades al dia."
+    }
+  },
+  {
+    "file": "Dexketoprofèn.md",
+    "name": "Dexketoprofèn",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/20/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 50 mg = 2 ml (25 mg/ml).",
+      "propiedades": "AINE amb efecte analgèsic moderat i antipirètic.",
+      "indicaciones": "dolor musculoesquelètic moderat-intens. Dolor lumbar. Còlic renal. Associat a opiacis en el\ndolor intens.",
+      "dosis": "Adult:\n• Via i.m.:  50 mg (sense diluir).\n• Via i.v.: diluïu-lo en 50 ml SF o SG 5 % i administreu-lo lentament.",
+      "contraindicaciones": "hipersensibilitat als AINE o AAS, antecedents d'asma, broncoespasme, rinitis agudes\nque causen pòlips nasals, hemorràgia gastrointestinal o perforació, Crohn o colitis ulcerosa activa,\ninsuficiència cardíaca greu, insuficiència renal moderada o greu, insuficiència hepàtica greu, diàtesi\nhemorràgica i altres trastorns de la coagulació. Disminuïu-ne la dosi en malaltia renal o hepàtica lleu.",
+      "efectosSecundarios": "somnolència, insomni, vertigen, nàusees, vòmits, hipotensió i broncoespasme.",
+      "observaciones": "• L'administració amb anticoagulants i trombolítics augmenta el risc de sagnat.\n• Augmenta la toxicitat del digital. Potencia l'efecte dels betablocadors i altres hipotensors.\n• No indicat en menors de 15 anys ja que no se n'ha estudiat l'eficàcia i la seguretat.",
+      "embarazo": "no l'administreu, sobretot en el 1r i 3r trimestre.",
+      "lactancia": "no l'administreu."
+    }
+  },
+  {
+    "file": "Diazepam.md",
+    "name": "Diazepam",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/21/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits 5 - 10 mg.",
+      "propiedades": "benzodiazepina amb efecte sedant i anticonvulsiu.",
+      "indicaciones": "ansietat, sedant, hipnòtic, relaxant muscular, crisis comicials, privació alcohòlica,\nintoxicació per cocaïna i d'altres drogues estimulants o agitació psicomotora sense risc.",
+      "dosis": "Adult: 5 - 10 mg v.o. o sublingual.",
+      "contraindicaciones": ": precaució i reducció de la dosi en gent gran, hepatopaties i nefropaties.\nPrecaució en malalts respiratoris. Eviteu-lo en miastènia gravis i glaucoma.",
+      "efectosSecundarios": "somnolència, atàxia, depressió respiratòria, hipotensió i apnea.",
+      "embarazo": "no l'administreu. Possiblement teratogen.",
+      "lactancia": "no l'administreu.",
+      "pediatria": "• v.o.: 0,12 - 0,8 mg/kg/dia.\n• i.v.: 0,04 - 0,3 mg/kg/dosi cada 2 - 4 hores (màxim 0,6 mg/kg en un període de 8 hores i dosi\nmàxima 10 mg/dosi).\n• rectal:\n   ◦ 1 - 5 anys: 0,5 mg/kg.\n   ◦ 6 - 11 anys: 0,3 mg/kg.\n   ◦ Majors de 12 anys: 0,2 mg/kg.\nAtenció! No recomanat en nounats."
+    }
+  },
+  {
+    "file": "Digoxina.md",
+    "name": "Digoxina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/22/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de 0,5 mg = 2 ml (0,25 mg/ml).",
+      "propiedades": "inotròpic positiu. Cronotrop negatiu.",
+      "indicaciones": "control de la freqüència ventricular mitjana en arrítmies supraventriculars.",
+      "dosis": "Temps d'acció (inici):  i.v. 15 – 30 minuts. Efecte màxim 1- 4 hores.\nDuració aproximada:  3 – 4 dies.\nAdult:\n• Digitalització ràpida: 0,5 mg diluït en 8 ml SF o SG 5 % i.v. lent. Seguit de 0,25 mg a les 4 - 6\nhores. Dosi màxima: 1,5 mg/dia.\n• Dosi de manteniment: 0,25 mg / 24 hores, segons digoxinèmia (no en entorn prehospitalari).",
+      "contraindicaciones": "malaltia del sinus, BAV, miocardiopatia hipertròfica obstructiva,\narrítmies supraventriculars en presència de preexitació (WPW). Ajusteu la dosi en insuficiència renal\ni gent gran.",
+      "efectosSecundarios": "intoxicació digitàlica (nàusees, vòmits, confusió, visió borrosa, arrítmies supra i\nventriculars), bradicàrdia i BAV.",
+      "observaciones": "• Augmenta la seva toxicitat\namb: hipopotassèmia, hipomagnesèmia, hipercalcèmia, succinilcolina, amiodarona, verapamil,\nsals de calci, antibiòtics d'ampli espectre, diazepam, ibuprofèn i altres AINE. El BAV es potencia\namb betablocadors i blocadors del canal de calci.\n• Disminueix la seva eficàcia: fenitoïna, levotiroxina, antiàcids i metoclopramida.\n• Estret marge terapèutic.",
+      "embarazo": "no l'administreu.",
+      "lactancia": "no l'administreu. Es pot utilitzar en situacions de risc vital.",
+      "pediatria": "Nounats, lactants, menors de 10 anys (si no han rebut glucòsids cardíacs durant les dues\nsetmanes anteriors):"
+    }
+  },
+  {
+    "file": "Dobutamina.md",
+    "name": "Dobutamina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/23/1) 1/1",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 250 mg = 20 ml (12,5 mg/ml).",
+      "propiedades": "catecolamina sintètica amb predominant efecte beta1 (inotròpica positiva, augmenta la\ncontractilitat i la despesa cardíaca sense elevar excessivament la FC ni el consum d'O  miocardíac).\n2\nÉs vasodilatador coronari i sistèmic amb disminució de les resistències pulmonars. No augmenta\nsignificativament el flux renal. En ocasions pot elevar la TA.",
+      "indicaciones": "xoc cardiogènic amb hipotensió greu, sobre tot si FEVE disminuïda (s'associa a\nnoradrenalina). Com el component cardiogènic pot aparèixer a qualsevol tipus de xoc, si l'índex\ndiastòlic augmenta, està indicat el seu ús tot i TA falsament normal (ID = FC/TAD).",
+      "dosis": "Temps d'acció (inici):  1 - 2 minuts.\nDuració aproximada:  10 - 15 minuts (mentre dura la infusió).\nAdult:\nPerfusió contínua de 2 a 20 micrograms/kg/min. Dosi habitual: 10 micrograms/kg/min. i.v.\nBona resposta generalitzada amb dosi de: 2,5 - 10 micrograms/kg/min.\nNo l'administreu per la mateixa via que solucions alcalines (s'inactiva el preparat) com bicarbonat,\nfenitoïna, aminofil·lina o furosemida.\nKg (pes) Dissolució a 5 mg/ml: 1 vial 250 mg en 30 ml.\nSF o SG 5% (1ml = 5 mg = 5000 micrograms).\n|     | 10 20     | 30 40     | 50 60      | 70 80       | 90 100     |\n| 2   | 0,24 0,48 | 0,72 0,96 | 1,2 1,44   | 1,68 1,92   | 2,16 2,4   |\n| 4   | 0,48 0,96 | 1,44 1,92 | 2,4 2,88   | 3,36 3,84   | 4,32 4,8   |\n| 6   | 0,72 1,44 | 2,16 2,88 | 3,6 4,32   | 5,04 5,76   | 6,48 7,2   |\n| 8   | 0,96 1,92 | 2,88 3,84 | 4,8 5,76   | 6,72 7,68   | 8,64 9,6   |\n| 10  | 1,2 2,4   | 3,6 4,8   | 6 7,2      | 8,4 9,6     | 10,8 12    |\n| 12  | 1,44 2,88 | 4,32 5,76 | 7,2 8,64   | 10,08 11,52 | 12,96 14,4 |\n| 14  | 1,68 3,36 | 5,04 6,72 | 8,4 10,08  | 11,76 13,44 | 15,12 16,8 |\n| 16  | 1,92 3,84 | 5,76 7,68 | 9,6 11,52  | 13,44 15,36 | 17,28 19,2 |\n| 18  | 2,16 4,32 | 6,48 8,64 | 10,8 12,96 | 15,12 17,28 | 19,44 21,6 |\n| 20  | 2,4 4,8 | 7,2 9,6 | 12 14,4 | 16,8 19,2 | 21,6 24 |"
+    }
+  },
+  {
+    "file": "Enoxaparina.md",
+    "name": "Enoxaparina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/24/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "xeringa precarregada amb diferents dosis: 40 i 100 mg.",
+      "propiedades": "anticoagulant. Heparina de baix pes molecular.",
+      "indicaciones": "• Tractament de l'SCAEST, associat a fibrinòlisi amb tenecteplasa.\n• Tractament de l’SCASEST que no vagi a angioplàstia primària. Profilaxi de TVP en cirurgia o\nimmobilitzats amb risc moderat-alt. Profilaxi de coàguls durant la diàlisi. TVP i TEP perifèric\nestable hemodinàmicament establert.",
+      "dosis": "Adult: 0,75 - 1 mg/kg. i.v. o subcutània.\n• Profilaxi de la TVP 2.000 UI (20 mg) subcutània / 24 hores (diferiu-ne l'administració a\nl'arribada a l'hospital).\n• Tractament de la TVP i TEP 100 UI/kg (1 mg/kg) subcutània (cada 12 - 24 hores segons funció\nrenal).\n• Tractament de l'angina inestable i SCASEST 100 UI/kg (1 mg/kg) via subcutània (cada 12 -\n24 hores segons funció renal).\n• Tractament del SCAEST si fibrinòlisi amb TNK en medi extrahospitalari:\n   ◦ SCAEST en menors de 75 anys: 3.000 UI (30 mg) bolus i.v. + 100 UI/kg (1 mg/kg) via\nsubcutània als 15 minuts del bolus i.v.\n   ◦ SCAEST en majors de 75 anys: no bolus i.v. inicial. 75 UI/kg (0.75 mg/kg) via subcutània.",
+      "contraindicaciones": "al·lèrgia. Discràsies sanguínies, trombocitopènia, hemofília, HTA no controlada,\nHDA, endocarditis bacteriana aguda, cirurgia recent (ocular o SNC), AVC (no contraindicada si hi ha\nembòlia sistèmica) i alteració renal o hepàtica greu.\nEfectes secundari (poc freqüents): hemorràgia (risc augmentat en pacients amb APTT major de 3\nvegades el control, cardiopatia, insuficiència renal o hepàtica i majors de 60 anys) i trombocitopènia\n(en tractaments crònics per osteoporosi).",
+      "observaciones": "No precisa control APTT.\nEn cas d'hemorràgia, el seu antídot és la protamina (1 mg neutralitza 100 UI) tot i que el seu\nefecte és parcial.\nNO s'ha d'administrar per via i.m.\nConservació a temperatura menor de 25ºC.",
+      "embarazo": "fàrmac segur."
+    }
+  },
+  {
+    "file": "Etomidat.md",
+    "name": "Etomidat",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/25/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "20 mg = 10 ml (2mg/ml).",
+      "indicaciones": "SIR (indicat en malalts amb TCE, hipovolèmics en estat de xoc o pacients coronaris).\nSedació conscient per procediments en malalt inestable HDC (CV sincronitzada), associat\na fentanil 25 - 50 micrograms.",
+      "dosis": "Temps d'acció (inici):  30 - 60 segons.\nDuració aproximada:  3 - 5 minuts.\nAdult:\n0,025 - 0,5 mg/kg en 30 seg.\n• Sedació conscient: 0,025 - 0,1 mg/kg. i.v.\n• Sedació superficial: 0,1 - 0,2 mg/kg. i.v.\n• Sedació profunda (SIR): 0,4 - 0,5 mg/kg. i.v",
+      "contraindicaciones": "eviteu-lo en porfíria, epilèpsia i malaltia d'Addison.",
+      "efectosSecundarios": "depressió respiratòria, apnea, hipotensió arterial, depressió miocardíaca,\nnàusees, vòmits (es minimitzen si bolus lent), flebitis, moviments mioclònics, trisme i insuficiència\nsuprarenal.",
+      "observaciones": "• No l'administreu en infusió continuada per supressió suprarenal.\n• La morfina augmenta la vida mitjana d'eliminació i el fentanil disminueix l'aclariment plasmàtic.\n• Els moviments mioclònic i trisme es poden atenuar amb 1 - 2 mg de midazolam en\npremedicació de SIR.\n• És el recomanat quan no es pot administrar ketamina en SIR per malalt inestable.\n• Pacients d'edat avançada, als quals se'ls ha administrat dosis superiors a les recomanades,\npoden presentar risc potencial de baix cabal cardíac.\n• Símptomes de privació de cortisol: hipotensió, hipoglucèmia, sudoració, nàusees, vòmits,\ndiarrea i febre alta. Es tracta amb 40 mg de prednisona o 200 mg de hidrocortisona i.v.",
+      "embarazo": "no l'administreu.",
+      "pediatria": "administració lenta endovenosa de 0,15 - 0,3 mg/kg. Es pot augmentar a\n0,4 mg/kg com a dosi màxima."
+    }
+  },
+  {
+    "file": "Fentanil.md",
+    "name": "Fentanil",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/26/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 150 micrograms = 3 ml (50 micrograms/ml).",
+      "propiedades": "analgèsic  opioide.  Agonista  opiaci.  Allibera  histamina.  77  vegades  més  potent  que  la\nmorfina.",
+      "indicaciones": "analgèsia  major  i  premedicació  anestèsia  SIR.  D'elecció  actualment  en  tractament  del\ndolor  en  SCASEST  i  en  SCAEST  extensa  o  de  VD  (altera  menys  l'absorció  dels  antiagregants\nplaquetaris),  associat  sempre  a  un  procinètic  (veieu  clorur  mòrfic). Associat  a  l'etomidat  en  sedació\nconscient en malalt inestable.",
+      "dosis": "Temps d'acció (inici):  1 - 2 minuts.\nDuració aproximada:  30 - 60 minuts.\nAdult:\n1  -  2  micrograms/kg  (màxim  3  micrograms/kg).  Es  recomana\nadministrar inicialment la meitat de la dosi i valorar-ne l'efecte analgèsic.\nEn premedicació SIR o sedació conscient associat a l'etomidat si malalt inestable: reduïu\nla dosi a 25 - 50 micrograms si l'índex de xoc s'eleva per sobre de 0,8 (IX = FC/TAS).\nEn analgèsia SCA: si EVA major o igual a 7, administreu-ne 25 - 75 micrograms per control del\ndolor.\nIntranasal: 2 micrograms/kg (màxim 75 micrograms/dosi, que es pot repetir als 10 min).",
+      "contraindicaciones": "al·lèrgia,  valoreu  risc  benefici  en  hepatopaties,  precaució  en  asma,  MPOC,\nbradiarítmies, hipotiroïdisme i consum d'IMAO.",
+      "efectosSecundarios": "rigidesa  de  la  paret  toràcica,  dolor  abdominal  (espasme  de  l'esfínter  d'Oddi),\nrigidesa  muscular,  pruïja,  nàusees,  vòmits,  depressió  respiratòria,  somnolència,  miosi,  confusió,\nal·lucinacions,  agitació,  retenció  urinària,  HTA  i  hipotensió  arterial,  bradicàrdia,  inversió  de  l'ona  T  i\ndepressió miocardíaca.",
+      "observaciones": "Administreu-lo sempre associat a un procinètic.\nEls seus efectes poden revertir-se amb naloxona i.v.\nPotencia els efectes d'altres analgèsics i dels depressores del SNC.",
+      "embarazo": "utilitzeu-lo  només  si  no  hi  ha  cap  altra  alternativa  més  segura.  L'ús  perllongat  pot  crear\ndependència materna i síndrome d'abstinència neonatal."
+    }
+  },
+  {
+    "file": "Flecaïnida.md",
+    "name": "Flecaïnida",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/27/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits 100 mg.",
+      "propiedades": "antiarrítmic  classe  IC  (blocador  dels  canals  de  sodi:  alenteix  la  conducció  i  redueix  la\ndurada del potencial d'acció en les fibres de Purkinje. Eixamplament del complex QRS).",
+      "indicaciones": "en pacients amb taquicàrdia supraventricular sense cardiopatia de base, està indicat en:\nreversió  a  ritme  sinusal  de  l'ACxFA  /  flutters  supraventriculars  paroxismals  simptomàtics  i  ACxFA\nassociada a la presència de vies accessòries (WPW).",
+      "dosis": "Adult:\nCardioversió de l'ACxFA paroxismal: es pot administrar una dosi única de 300 mg (200 mg en\nmenors de 70 kg). És aconsellable que el pacient romangui tombat.\nArrítmies  supraventriculars:  inicialment  50  mg  /  12  hores,  augmentant  a  raó  de  50  mg  /  12\nhores / 3 - 5 dies, fins obtenir resposta o un màxim de 300 mg / dia. Reduïu posteriorment a dosi\nde manteniment de 100 mg / 12 hores.",
+      "contraindicaciones": "IC, trastorns de conducció sinoauricular, BAV de 2n i 3r grau, blocatge complet\nde  branca  dreta  (BCBD),  hemiblocatge  anterosuperior  de  branca  esquerra  (HASBE),  cardiopatia\nestructural  amb  o  sense  FEVE  alterada  (miocardiopaties,  valvulopaties,  cardiopaties  congènites,\ncardiopatia  isquèmica  i  Síndrome  dels  Brugada). Ajusteu  la  dosi  a  la  meitat  en  casos  d'insuficiència\nrenal.",
+      "efectosSecundarios": "tremolor,  agitació,  leucopènia,  trombocitopènia,  mareig,  visió  borrosa  o  doble,\nbradicàrdia,  BAV  de  2n  i  3r  grau,  hipotensió  arterial,  augmenta  l'acció  de  la  digoxina  i  l'amiodarona,\narrítmies ventriculars i ICC.",
+      "observaciones": "No  l'administreu  amb  altres  antiarrítmics  com  antagonistes  del  calci  o  IMAO  pel  risc  de  depressió  i\narrítmies cardíaques.",
+      "embarazo": "contraindicat. FDA: C. Utilitzeu-lo només en absència d’alternatives terapèutiques més\nsegures.",
+      "lactancia": "s’excreta per la llet materna. Només s’ha d’utilitzar durant la lactància si els beneficis són\nsuperiors als riscos.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Flumazenil.md",
+    "name": "Flumazenil",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/28/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 0,5 mg = 5 ml (0,1 mg/ml).",
+      "propiedades": "antagonista competitiu de les benzodiazepines i zolpidem.",
+      "indicaciones": "reversió de sedació, anestèsia, intoxicació o sobredosi per benzodiazepines.",
+      "dosis": "Temps d'acció (inici):  1 – 2 minuts.\nDuració aproximada:  6 – 10 minuts.\nAdult amb sobredosi de benzodiazenipes (BZD):\n• Bolus inicial i.v.: dosi inicial 0,25 mg i.v. bolus lent (mínim 1 min).\nRepetiu dosi en 1 min fins un màxim de 4 bolus (màxim  1 mg) o fins obtenir una millora clínica\n(reversió de la depressió respiratòria, resposta verbal i/o GCS ≥ 12).\nSi reapareix la somnolència després dels bolus inicials, valoreu repetició de bolus lents repetits\nfins un màxim de 3 mg en una hora o perfusió contínua 0,1 –  0,4 mg/h.\n• Perfusió contínua: 0,1 – 0,4 mg/hora si existeix sedació perllongada, coma profund i/o\ndepressió respiratòria.\nDiluïu 0,5 mg (5 ml) en 45 ml de SG 5% o SF (0,01 mg/ml).\nDosi mg/hora\n0,1\n0,2\n0,3\n0,4\nml/hora\n10\n20\n30\n40",
+      "contraindicaciones": "hipersensibilitat, utilitzeu-lo amb precaució en pacients epilèptics o lesió cranial\ngreu (augment de la PIC), i en intoxicacions mixtes amb benzodiazepines i antidepressius tricíclics\npel risc de convulsions i aparició d'arrítmies difícilment tractables i potencialment mortals (mireu si hi\nha ona r en aVR que marca risc epileptogen).",
+      "efectosSecundarios": "ansietat, agitació, cefalea, nàusees, vòmits, tremolor, sudoració, sequedat boca,\ntaquicàrdia, arrítmies i convulsions (especialment en epilèptics, en intoxicats que també han pres\nfàrmacs o substàncies d’abús preconvulsionants, en administracions ràpides o a dosis elevades).",
+      "observaciones": "• No reverteix els efectes sobre el SNC de l'alcohol, analgèsics, antidepressius, barbitúrics o\nnarcòtics.\n• Els pacients pediàtrics entre 1 – 5 anys solen necessitar bolus freqüents i perfusió contínua.\n• En cas d'intoxicació, administreu 2 – 5 mg de midazolam i.v."
+    }
+  },
+  {
+    "file": "Glucagó.md",
+    "name": "Glucagó",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/30/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1 mg (UI) pols + 1 ml de solució injectable.",
+      "propiedades": "hiperglucemiant que mobilitza el glucogen hepàtic, que s'allibera en forma de glucosa.\nInhibeix el to i la motilitat del tracte gastrointestinal. Inici d'acció als 10 min.",
+      "indicaciones": "tractament de les reaccions hipoglucèmiques greus, sobretot en\npacients insulinodependents. Anafilaxi que no respon a adrenalina en pacients tractats amb\nbetablocadors. Sobredosificació per antagonistes del calci. Espasme esofàgic.",
+      "dosis": "i.v., i.m. o subcutània.\nAdult:\n• Hipoglucèmies (si no es disposa de glucosa): 1 mg i.m. Podeu repetir dosi als 15 - 20 min.\n• Intoxicació per blocadors beta i antagonistes del calci: 50 micrograms/kg (0,05 mg/kg) i.v.\nen bolus lent per disminuir risc de nàusees i vòmits (p.ex. per 70 kg la dosi que administrareu\nserà 3,5 mg).\n   ◦ Si no hi ha resposta repetiu dosi als 10 min (màxim 10 mg).\n   ◦ Valoreu perfusió contínua  75 micrograms/kg/h (0,075 mg/kg/h). Màxim 5 mg/h en SG\n5%.\n• Pacient en tractament amb betablocadors en context d'anafilaxi com a tractament\ncoadjuvant (que ha rebut dosis repetides d'adrenalina i presenta hipotensió persistent): 1 mg\ni.v./i.m.",
+      "contraindicaciones": "pacients amb feocromocitoma.",
+      "efectosSecundarios": "HTA, hipotensió, taquicàrdia, nàusees, vòmits, dolor abdominal (administració\nràpida d'altes dosis), hipopotassèmia i hipoglucèmia de rebot (sobretot en insulinomes i\nglucagonomes).",
+      "observaciones": "• No és efectiu en pacients amb el glucogen hepàtic estigui esgotat: dejú durant un període\nperllongat, insuficiència adrenal, hipoglucèmia crònica o hipoglucèmia induïda per alcohol.\n• Pot incrementar l'efecte dels anticoagulants orals antagonistes de la vitamina K.\n• Conservació: refrigerat (2 - 8 ºC) i protegit de la llum. A temperatura ambient (menys de 25 ºC)\nel seu període de validesa es redueix a 18 mesos.",
+      "embarazo": "fàrmac segur.",
+      "pediatria": "• Hipoglucèmia: pot repetir-se als 20 minuts si cal.\n   ◦ Menys de 25 kg : 0,5 mg i.m.\n   ◦ Més de 25 kg: 1 mg i.m.\n• Intoxicació per betablocadors i blocadors dels canals del calci: 0 05 0 15 mg/kg i v"
+    }
+  },
+  {
+    "file": "Gluconat de calci.md",
+    "name": "Gluconat de calci",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/31/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial al 10% 10 ml (1 ml = 94 mg de gluconat de calci monohidrat = 0,21 mmol calci com\na principi actiu = 1 ml). El contingut total de calci és de 0,23 mmol/ml (equivalent a 9,22 mg/ml de\ncalci) o 2,25 mmol/10 ml (92,2 mg/10 ml de calci).",
+      "propiedades": "el calci és necessari per a la integritat funcional el sistema nerviós i muscular. És\nimprescindible per a la contracció muscular, la funció cardíaca i la coagulació sanguínia. Efecte\ninotròpic positiu.",
+      "indicaciones": "arrítmies severes associades a hiperpotassèmia aguda greu (major de 7 mEq/l) i\nhipermagnesèmia, hipocalcèmia severa i intoxicació per antagonistes del calci (que presentin hipotensió\no bradicàrdia). Xoc hipovolèmic quan s'introdueixen drogues\nvasoactives i/o inotròpiques (tríada letal del xoc).",
+      "dosis": "Duració aproximada:  1 hora.\nAdult:\nPreferiblement per via central i.v. i amb monitoratge continuat. Es pot diluir amb SF o SG 5%. La\nvelocitat d'administració i.v. no ha d'excedir dels 2 ml/min.\n• Hiperpotassèmia greu (K+ major o igual 6'5 mmol/l) amb canvis ECG: administreu 30 ml de\ngluconat de calci al 10 % (6,8 mmol, és a dir 3 vials al 10 %) i.v./i.o. o 15* ml de clorur de calci\nal 10 % en bolus lent durant 3 - 5 minuts o diluïu en 50 ml de SF o SG 5 % (inici de l'efecte en\n1  -3 min). Repetiu ECG. Valoreu necessitat d'una dosi addicional després de 5 min si\npersisteixen els canvis a l'ECG. Atenció!: El volum a administrar del clorur de calci difereix del\nque recomana l'ERC'21 perquè a l'estat espanyol es comercialitza únicament el clorur de calci\nhexahidrat, que conté 4,6 mmol/l de Ca i que té una equivalència 1:2 amb el gluconat de calci.\n• Hipocalcèmia: 2,5 vials (25 ml) diluïts en 100 ml de SF o SG 5 % a passar en 15 min.\n• Intoxicació per antagonistes del calci: 3 g (30 ml) a passar en 10 min. Si no hi ha resposta,\nrepetir als 20 minuts. Després perfusió contínua a dosi de 0,6 - 1,2 ml/kg/hora o 60 - 120\nmg/kg/h, un vial (10 ml) diluït en 40 ml de SF o SG 5%, i inicieu a 20 ml/h.\n• Xoc hipovolèmic: 1 vial en 50 ml SF o SG 5 % a passar en 15 min.",
+      "contraindicaciones": "eviteu-lo en insuficiència renal severa, hipercalcèmia i intoxicació digitàlica.",
+      "efectosSecundarios": "vasodilatació, disminució de la TA, bradicàrdia, arrítmies cardíaques, síncope i\nACR (en administració i.v. ràpida). Important monitoratge en la seva administració.",
+      "observaciones": "• L'administració de calci precipita amb bicarbonat i ceftriaxona. No l'administreu per la mateixa\nvia.\n• Les sals de calci són incompatibles amb agents oxidants, citrats, carbonats solubles,\nbicarbonats, fosfats, oxalats, tartrats, sulfats, amfotericina, cefalotina sodi, ceftriaxona,\nproclorperazina i tetraciclines"
+    }
+  },
+  {
+    "file": "Glucosa.md",
+    "name": "Glucosa",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/32/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de 10 ml al 33% (0,33 g/ml).",
+      "propiedadesIndicaciones": "hipoglucèmia greu. Coma hipoglucèmic. Intoxicació etílica greu amb\nglucosa baixa (administreu-lo després de la tiamina, es pot desencadenar encefalopatia de Wernicke\nsi alcoholisme crònic).",
+      "dosis": "Adult:\n• Hipoglucèmia: 15 g en bolus i.v. (4 - 5 vials de 10 ml de glucosa al 33% segons glucèmia\ninicial) i realitzeu control de glucèmia als 10 - 15 min.  Es pot repetir si no s'assoleix glucèmia >\n90 mg/dl.\n• Hiperpotassèmia: 25 g glucosa en bolus i.v. (50 ml de glucosa al 50% o 75 ml de glucosa al\n33% o 125 ml de glucosa al 20% o 250 ml de glucosa al 10%).",
+      "contraindicaciones": "hiperglucèmia i DM descompensada. Malaltia d'Addison.",
+      "efectosSecundarios": "Flebitis en el lloc d'administració, sobretot si la vena és de petit calibre.\nHipoglucèmia de rebot si intoxicació per sulfonilurees.",
+      "observaciones": "• S'ha d'administrar sempre diluït, per evitar la irritació de la vena.\n• NO l'administreu per via i.m. (necrosi).",
+      "embarazo": "segur.",
+      "lactancia": "risc molt baix. Considerat segur.",
+      "pediatria": "0,25 g/kg i.v., preferentment diluït al 50% en SF.\nNOUNATS:\nSi hipoglucèmia simptomàtica o glucèmia inferior a 50 mg/dl (< 50 mg/dl), es recomana\nreposició de glucosa en bolus, idealment per via central (inclosa la via umbilical).\n• SG 33% 0,8 - 1 ml/kg.\n• SG 10% 3 ml/kg.\n• SG 5% a 6 ml/kg.\nMesureu la glucosa als 30 minuts amb l’objectiu de mantenir glucèmies > 50 mg/dl."
+    }
+  },
+  {
+    "file": "Granisetró.md",
+    "name": "Granisetró",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/33/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1 mg = 1 ml.",
+      "propiedades": "antiemètic que actua com a antagonista selectiu dels receptors de la 5-hidroxitriptamina\n(5-HT3), activats per la serotonina, principal neurotransmissor responsable de l'emesi després de\nquimioteràpia i radioteràpia.",
+      "indicaciones": "prevenció i tractament de nàusees i vòmits aguts o diferits, associats amb quimioteràpia,\nradioteràpia i vòmits postoperatoris. Prevenció i tractament de nàusees i vòmits associats als mòrfics.\nEn infants menors de 2 anys, per a la prevenció i el tractament de nàusees i vòmits aguts associats a la\nquimioteràpia.",
+      "dosis": "Adult: 1 - 3 mg (0,01 - 0,04 mg/kg) i.v. lenta (30 seg.) diluït 5 ml o sense diluir. Dilució de seguretat: 20\no 50 ml de SF o SG 5% a passar en 5 min.\nEs poden administrar dosis posteriors de manteniment cada 10 min (màxim 9 mg / 24 hores).",
+      "contraindicaciones": "hipersensibilitat al principi actiu i a altres antagonistes de receptors 5-HT3.",
+      "efectosSecundarios": "insomni, cefalea, nàusees, restrenyiment, diarrea i transaminases elevades.",
+      "observaciones": "• Pot reduir la motilitat del budell inferior. Pacients amb signes d'obstrucció intestinal subaguda\nhan de ser monitorats després de l'administració de granisetró.\n• Augmenta l'efecte de fàrmacs que perllonguen QT.",
+      "embarazo": "s'aconsella evitar-ne l'ús.",
+      "pediatria": "0,01 - 0,04 mg/kg (màxim 3 mg/dosi o 9 mg/dia) i.v. lenta (30 s) diluït en 5 ml o sense diluir.\nDilució de seguretat: 10 - 30 ml de SF o SG 5% a passar en 5 min."
+    }
+  },
+  {
+    "file": "Haloperidol.md",
+    "name": "Haloperidol",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/34/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 5 mg = 1 ml.",
+      "propiedades": "neurolèptic. Antipsicòtic. Antiemètic. Sedant psicomotriu (a altes dosis).",
+      "indicaciones": "Agitació psicomotora aguda greu associada a trastorns psicòtics o episodis maníacs del\ntrastorn bipolar. Síndrome confusional. Corea de Huntington lleu o moderada. Profilaxi i tractament de\nles nàusees i vòmits postoperatoris.",
+      "dosis": "Adult:\nAgitació psicomotora:\nD’origen psiquiàtric i agitació d’origen orgànic o indiferenciada: 5 - 10 mg i.m. o i.v.\nrepetiu, si cal, cada 30 minuts fins que el pacient es tranquil·litzi.\nPer intoxicació alcohòlica: 5 mg i.m. Podeu repetir la dosi als 30 minuts.\nSíndrome confusional: 1 a 10 mg i.m. La dosi ha de ajustar-se a intervals de 2 a 4 hores si\ncontinua l'agitació, fins a un màxim de 10 mg/dia.\nCorea de Huntington lleu o moderada: 2 a 5 mg i.m. L'administració pot repetir-se cada hora\nfins a un màxim de 10 mg/dia.\nNàusees i vòmits postoperatoris: 1 a 2 mg per via i.m.",
+      "contraindicaciones": "hipersensibilitat, malaltia de Parkinson, intoxicació per cocaïna o amfetamines,\nantecedents de prolongació de l'interval QTc o QT llarg congènit (tractament concomitant amb\nmedicaments que perllonguen QT), SCA recent, IC descompensada, antecedents d'arrítmia ventricular\no torsade de pointes, hipopotassèmia i hipomagnessèmia no corregida. Utilitzeu-lo amb precaució en\netilisme, epilèpsia, MPOC, cardiopatia isquèmica crònica i hipertiroïdisme.",
+      "efectosSecundarios": "símptomes extrapiramidals, anticolinèrgics, blocatge alfa, síndrome neurolèptica\nmaligna, convulsions i hiperprolactinèmia",
+      "observaciones": "• Només se'n recomana l'administració per via i.m. No obstant, si s'administra per via i.v., cal\nprocedir a un monitoratge continuat per la possible aparició de prolongació del QTc i arrítmies\nventriculars.\n• Potencia els efectes del anestèsics, opiacis i alcohol.\n• Els efectes extrapiramidals s'atenuen amb biperidèn.",
+      "embarazo": "eviteu-ne l’ús ja que travessa la placenta.",
+      "lactancia": "s'excreta amb la llet materna. Risc baix per a la lactància.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Heparina sòdica.md",
+    "name": "Heparina sòdica",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/35/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial al 1% 50 mg = 5.000 UI = 5 ml (10 mg = 1.000 UI = 1 ml).",
+      "propiedades": "anticoagulant. Inhibidor indirecte de la trombina mitjançant la fibrina.",
+      "indicaciones": "tractament i prevenció de la malaltia tromboembòlica venosa: TVP, tromboembolisme\narterial perifèric i TEP. Tractament de la SCA candidat a ICP primària (administreu-la màxim 30 min\nabans de la pujada del catèter).",
+      "dosis": "Adult:\n• IAM + ICP primària: 70 UI/kg i.v., intraarterial o via subcutània.",
+      "contraindicaciones": "antecedents o sospita de trombocitopènia induïda per heparina, hemorràgia\nactiva o increment del risc de sagnat a causa d'alteracions de l'hemostàsia, trastorn greu de la funció\nhepàtica i pancreàtica, endocarditis, lesions orgàniques susceptibles de sagnar (úlcera pèptica activa,\nAVC hemorràgic, aneurismes o neoplàsies cerebrals), TCE sever i HTA greu no controlada. Disminuïu-\nne la dosi en insuficiència hepàtica severa.",
+      "efectosSecundarios": "hemorràgia i trombopènia.",
+      "observaciones": "• En cas d'hemorràgia greu l'antídot és la Protamina.\n• NO l'administreu per via i.m. pel risc d'hematomes locals.",
+      "embarazo": "no travessa la placenta. Es pot fer servir encara que pot produir hemorràgia materna en el\n3r trimestre i en el postpart.",
+      "lactancia": "no s'excreta amb la llet materna. Risc molt baix per la lactància i el lactant.",
+      "pediatria": "Tractament trombosi: 80 UI/kg en bolus durada 10 minuts, seguit de 18 UI/kg/hora, ajustant\nla dosi per mantenir un TPTA entre 1,5 i 2,5 vegades el valor control."
+    }
+  },
+  {
+    "file": "Hidroclorur de fenilefrina.md",
+    "name": "Hidroclorur de fenilefrina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/114/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 10 mg/ 1 ml.",
+      "propiedades": "agent simpaticmimètic amb efecte selectiu alfa-adrenèrgic.",
+      "indicaciones": "tractament de la hipotensió durant l'anestèsia espinal, epidural o general i hipotensió\ninduïda per fàrmacs i xoc associat.",
+      "dosis": "Adult:\n• Via subcutània o intramuscular: de 2 a 5 mg amb dosis addicionals de 1 a 10 mg si cal, en\nfunció de la resposta clínica. Sense diluir.\n• Bolus i.v. lent: diluïu 10 mg (1 vial) en 9 ml de SF (1 mg/ml) i administreu de 100 a 500\nmicrograms (0,1 a 0,5 mg) com una solució al 0,1%, repetint si cal després que hagin\ntranscorregut un mínim de 15 minuts.\n• Perfusió contínua: diluïu una ampolla de 10 mg en 500 ml de SF o SG al 5% a una velocitat\ninicial màxima de 180 micrograms per minut (11 mg/h), reduint-la a 30 - 60 micrograms per\nminut (1,8 - 3,6 mg/h) segons resposta clínica.\nHipotensió /xoc:\n• Via subcutània o intramuscular: 100 micrograms/kg (0,1 mg/kg) cada 1 - 2 horas si precisa.\nDosi màxima 5 mg.\n• Bolus i.v. lent: diluïu 10 mg (1vial) en 9 ml de SF (1 mg/ml) i administreu de 5 a 20\nmicrograms/kg (0,005-0,02 mg/kg) cada 10 - 15 minuts, si precisa.",
+      "contraindicaciones": "hipersensibilitat al principi actiu o a algun dels excipients. Hipertensió severa o\nmalaltia vascular perifèrica a causa del risc de gangrena isquèmica o trombosi vascular. Concomitant\namb inhibidors no selectius de la monoaminooxidasa (MAO) (o dins de les 2 setmanes posteriors a la\nretirada) a causa del risc d'hipertensió paroxística i possiblement d'hipertèrmia mortal. Hipertiroïdisme\ngreu.  Risc d'arrítmies amb: glucòsids cardíacs, quinidina, antidepressius tricíclics, antidepressius\nnoradrenèrgics-serotoninèrgics (venlafaxina).  Feocromocitoma. Diabetis mellitus. Hipertensió greu.\nPancreatitis aguda. Hepatitis. Pacients amb malalties cardiovasculars, sobretot malaltia coronària,\nmiocardiopaties i arrítmies. Asma. Glaucoma d'angle estret. Contraindicada en combinació amb\nanestèsics locals als dits de les mans i peus, nas i genitals atès que pot ocasionar necrosis dels\ncapil·lars.",
+      "efectosSecundarios": "freqüència no coneguda: bradicàrdia i taquicàrdia reflexa, arrítmies\ncardíaques, dolor anginós, palpitacions, aturada cardíaca, HTA, hipotensió, rubor, mal de cap,\nhemorràgia cerebral, vertigen, esvaïment, dispnea, edema pulmonar, vòmits, hipersalivació,\ndificultat en la micció, retenció urinària, sudoració, formigueig, sensació de fred i alteració al\nmetabolisme de glucosa.",
+      "observaciones": "Atenció! la fenilefrina pot empitjorar la insuficiència cardíaca com a conseqüència de la\nvasoconstricció induïda i l’augment de la postcàrrega. Preveniu l'extravasació, ja que pot causar\nnecrosi tissular Els pacients amb cirrosi hepàtica poden necessitar dosis més elevades de fenilefrina i"
+    }
+  },
+  {
+    "file": "Hidrocortisona.md",
+    "name": "Hidrocortisona",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/36/1)",
+    "subtitulo": "Hidrocortisona base",
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de 100 mg en pols per reconstituir amb 1 ml de solució per injecció.",
+      "propiedades": "mineral-glucocorticoide d'acció ràpida i efecte curt. Antiinflamatori i antial·lèrgic.",
+      "indicaciones": "asma (exacerbació aguda). MPOC. Reaccions d'hipersensibilitat agudes i xoc anafilàctic.\nCrisi d'Addison en malalts corticodepenents. Supressió de l'eix suprarenal agut per etomidat.\nHipoglucèmia severa que no reverteix post tractament amb glucosa i havent pres tres determinacions\nprèvies.",
+      "dosis": "Temps d'acció (inici):  en minuts, pic màxim als 60 min.\nAdult: 100 a 500 mg i.v. diluïts en 50 -100 ml de SF 0,9 % en 10 min. Es pot administrar directament\nperò és irritant per la via venosa i pruïja genital i perianal. Es pot repetir la dosi als 30 min. Per\nhipoglucèmia severa que no reverteix post tractament amb glucosa i havent pres tres determinacions\nprèvies, 100 mg i.v. diluït en 50 ml SG 5%.",
+      "contraindicaciones": "infeccions fúngiques sistèmiques. Utilitzeu-lo amb precaució en DM, IC, HTA,\npacients hipovolèmics i osteoporosi. Perill de perforació corneal si hi ha herpes simple\nocular. (Considereu-les relatives en cas d'emergència).",
+      "efectosSecundarios": "HTA, IC, edemes, hipopotassèmia, hiperglucèmia, debilitat muscular, glaucoma,\nincrement de la susceptibilitat a infeccions sistèmiques, disminueix nivells sèrics de salicilats,\npotencia l'arrítmia associada a hipercalièmia per digital. Augmenta el risc d'úlceres gastrointestinals\namb AINE.",
+      "observaciones": "• Efecte disminuït per rifampicina, rifabutina, carbamazepina, fenobarbital, fenitoïna, efedrina\ni aminoglutetimida.\n• Antagonitza l'efecte d'hipoglucemiants, antihipertensius i diürètics.\n• Augmenta l'efecte de: acetazolamida, diürètics de nansa, carbenoxolona,\nanticoagulants cumarínics i succinilcolina.",
+      "embarazo": "travessa barrera placentària. Administreu-lo si el benefici per la mare justifica el risc\npotencial.",
+      "lactancia": "compatible, risc molt baix.",
+      "pediatria": "• Asma: 2 - 10 mg/kg (màx. 250 mg) i.v. Considereu de primera elecció metilprednisolona.\n• Reaccions d'hipersensibilitat agudes, xoc anafilàctic i xoc refractari a\ncatecolamines: 2 mg/kg (màx. 100 mg) i.v.\nInsuficiència suprarenal aguda: 1 4 mg/kg i v (mínim 25 mg màxim 100 mg)"
+    }
+  },
+  {
+    "file": "Hidroxocobalamina.md",
+    "name": "Hidroxocobalamina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/37/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "1 flascó de 5 g, pols per reconstituir amb 200 ml de SF (25 mg/ml).",
+      "propiedades": "antídot de les intoxicacions per cianur confirmades o sospitades.",
+      "indicaciones": "• Víctimes d'incendis en ACR amb signes d'inhalació de fum (sospita d'intoxicació per cianhídric -\nHCN).\n• En pacients amb sospita d'intoxicació per HCN, si es compleixen els 8 criteris de Baud. Si no és\npossible la determinació de pH ni lactat in situ, valoreu l'administració de l'antídot en malalts\namb inestabilitat hemodinàmica o coma, que es trobin en un ambient suggestiu de presència de\ncianhídric.\n• En pacients amb sospita d'intoxicació per cianur amb altres formes químiques (sals).\n• En intoxicació per nitroprussiat sòdic (el metabolisme d'aquest fàrmac produeix tiocianat).",
+      "dosis": "Adult: 5 g (màxim 10 g) i.v.\n• Es recomana invertir o agitar suaument el flascó abans de la infusió.  Administreu-lo aprox. en\n15 min.\n• Administreu la segona dosi (5 g)  immediatament després d’acabar la primera si el pacient\ncontinua inestable (xoc, ACR , acidosi severa, no resposta clínica).\n• Atenció  No administreu cap altre medicament per la mateixa via per risc de precipitació.",
+      "contraindicaciones": "hipersensibilitat a la vitamina B12 (no en cas de risc vital), malaltia de Parkinson\ni símptomes extrapiramidals.\nEfectes adversos: coloració rosada reversible de pell, mucoses i orina. HTA.",
+      "observaciones": "• La seva eficàcia depèn de la rapidesa d'administració i, davant de sospita clínica, s'ha de donar\nel més aviat possible.\n• No substitueix l'administració d'O2.\n• No administreu cap altre medicament per la mateixa via.",
+      "embarazo": "travessa barrera placentària. No recomanat (valoreu risc benefici individualitzat segons\nedat gestacional).",
+      "lactancia": "compatible. Present en la llet materna.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Insulina.md",
+    "name": "Insulina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/38/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de 1000 UI en 10 ml (100 UI/ml).",
+      "propiedades": "hormona que estimula l'entrada de glucosa i hiperpotassèmia (K+) a l'espai intracel·lular.",
+      "indicaciones": "hiperpotassèmia aguda greu (K+ major de 6 mEq/l) i hiperglucèmia en xoc sèptic i pacient crític.\nla  cetoacidosi  diabètica,  coma  hiperosmolar,\nhiperglucèmia.  Coadjuvant  en",
+      "dosis": "Temps d'acció (inici): als 30 min si l'administreu via subcutània (menys si i.v.).\nAdult:\n• Hiperglucèmia simple (sense CAD ni EHH) sigui o no diabètic:\n   ◦ Si la glucèmia és inferior a 350 – 400 mg/dl:\n▪        Bolus d’insulina ràpida subcutània segons glucèmia:\n·    200 – 250 mg/dl: 4 UI subcutània.\n·    251 – 300 mg/dl: 6 UI subcutània.\n·    301 – 350 mg/dl: 8 UI subcutània.\n·    351 – 400 mg/dl: 10 UI subcutània.\n   ◦ Si la glucèmia és superior a 350 – 400 mg/dl:\n▪        Bolus d’insulina ràpida intravenosa a 0,1 UI/kg.\n▪        Administreu sèrum fisiològic (500 – 1000 ml en 1 hora, segons l’estat d’hidratació del\npacient).\n▪        Quan la glucèmia arribi a 250 mg/dl, afegiu sèrum glucosat al 5 % a un ritme de 1000\nml/12 h i iniciar pauta d’insulina subcutània.\n• Cetoacidosi diabètica (CAD) i estat hiperglucèmic hiperosmolar (EHH) amb glucèmies superiors a\n200 mg/dl o amb antecedents de diabètis: insulina i.v. Atenció! només s’aconsella un bolus i.v. de 0,1\nUI/kg en cas de no poder iniciar ràpidament la perfusió contínua.\n   ◦ En fase inicial perfusió contínua a  0,1 UI/kg/hora. Dilució: 50 UI d’insulina en 50 ml de\nsèrum fisiològic (1 UI = 1 ml).\n   ◦ En fase d’estabilització si glucèmia inferior a 250 mg/dl, modifiqueu la perfusió contínua a\n0,05 UI/kg/hora.\n• Pacient crític de qualsevol etiologia amb glucèmies entre 200 – 400 mg/dl podeu fer un\ncontrol inicial amb insulina subcutània:\n   ◦ Calculeu la dosi inicial:  0,05 UI/kg per 80 kg 4 UI d’insulina ràpida."
+    }
+  },
+  {
+    "file": "Isoprenalina.md",
+    "name": "Isoprenalina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/39/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 200 micrograms = 1 ml (0,2 mg/ml).",
+      "propiedades": "agonista adrenèrgic beta-1 i beta-2: inòtrop i cronòtrop positiu, vasodilatador perifèric i\nbroncodilatador.",
+      "indicaciones": "tractament bradiarrítmies que no responen a l'atropina. Sobredosi de betablocadors. Xoc\ncardiogènic per bradicàrdia.",
+      "dosis": "Adult:\nPerfusió contínua a 2 - 10 micrograms/min.\nDilució: 2 vials (400 micrograms) + 48 ml SG 5 % (8 micrograms/ml)\nmicrograms/min\nml/hora\n2\n15\n3\n22,5\n4\n30\n5\n37,5\n6\n45\n7\n52,5\n8\n60\n9\n67,5\n10\n75\nConsidereu perfusió contínua a 5 micrograms/min.",
+      "contraindicaciones": "taquiarrítmies, isquèmia miocardíaca, WPW, blocatge cardíac per digoxina (risc\nd'arrítmies) i estenosi aòrtica.",
+      "efectosSecundarios": "pot provocar taquicàrdia i arrítmies ventriculars. Per augment del consum d'O2\npot produir isquèmia miocardíaca. A dosis altes pot produir hipotensió. Cefalees, nàusees, vòmits i\nvertigen.",
+      "observaciones": "• Es potencia amb antidepressius tricíclics.\n• Risc d'arrítmia amb administració d'adrenalina.",
+      "embarazo": "utilitzeu-lo amb precaució en períodes pròxims al part per inhibició de les contraccions\nuterines.",
+      "lactancia": "risc molt baix.",
+      "pediatria": "Està indicada en totes les edats (inclòs nounats).\nPerfusió contínua 0,05 - 2 micrograms/kg/min. Preparació de la perfusió contínua (mg fins a\n50 l d SF SG 5 %)"
+    }
+  },
+  {
+    "file": "Ketamina.md",
+    "name": "Ketamina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/40/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 500 mg = 10 ml (50 mg/ml).",
+      "propiedades": "anestèsic dissociatiu i analgèsic. La dosi de sedació, preserva reflexes de la via aèria i to\nmuscular amb mínim efecte sobre el centre respiratori: conserva reflexos palpebrals i laringis.\nBroncodilatador en la majoria del pacients.\nEstimula el SN simpàtic: augmenta la TA, FC i la despesa miocardíaca d'O2. Conserva l'intercanvi d'O2\na territori capil·lar. Augmenta el metabolisme cerebral, PPC, PIC i PIO.",
+      "indicaciones": "• Sedació i analgèsia en procediments que no necessiten relaxació muscular.\n• Sedant en cardioversió de malalt inestable mentre ID no pugi en 2 mesures separades 5 min\n(ID = FC/TAD).\n• Malalts amb broncospasme abans d'arribar a IOT o en SIR.\n• Analgèsia en grans cremats.\n• Xoc: associat a fentanil (25 - 50 micrograms en premedicació), permet baixar la dosi i efectes\nsecundaris hemodinàmics.\n• Xoc sèptic: associat a lidocaïna (1 - 1,5 mg/kg en premedicació), permet millorar\nl'hemodinàmica.\n• En TCE greu i/o signes d'HTIC sense HTA associada.\n• SIR invertida.\nAtenció!  La taquicàrdia que provoca es relaciona amb pitjor pronòstic i hipotensió als 15 min de la\nseva administració per augment del consum miocardíac d'O2. Si apareix hipotensió, inicieu drogues\nvasoactives a dosi beta i/o metoprolol i.v. lent.",
+      "dosis": "Temps d'acció (inici):  30 – 60 seg via i.v; 3 - 5 min vies i.m. i intranasal.\nDuració aproximada:  5 - 15 min via i.v.; 10 – 25 min vies i.m. i intranasal.\nAdult:\n• Sedació i analgèsia dissociativa:\n   ◦ Via i.m. o intranasal: 2 - 4 mg/kg.\n   ◦ Via i.v.: 0,25 - 0,5 mg/kg (administració lenta en 1-2 min).\n• Inducció anestèsica: premediqueu amb midazolam 0,01 mg/kg (màx. 2 mg en adult) per evitar\nal·lucinacions, deliris i malsons i atropina en adult bradicàrdic i menors de 10 anys (per\nsialorrea i secrecions bronquials).\n   ◦ Via i.m. / intranasal: 4 - 6 mg/kg. L'efecte hipnòtic pot trigar uns 20 min.\no Via i o / i v : 1 4 mg/kg i v en bolus (administració lenta en 1 2 minuts) Valoreu 0 5"
+    }
+  },
+  {
+    "file": "Labetalol.md",
+    "name": "Labetalol",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/41/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 100 mg = 20 ml (5 mg/ml).",
+      "propiedades": "blocador alfa-adrenèrgic arterial perifèric i beta-adrenègic. Disminució de la TA sense\ntaquicàrdia reflexa, bradicàrdia i broncoconstricció en pacients de risc.",
+      "indicaciones": "HTA maligna, AVC isquèmic i hemorràgic, HTA associada a SCA, malaltia aòrtica aguda\n(dissecció o ruptura), aneurisma aòrtic, HTA secundària a drogues d'abús i preeclàmpsia i eclàmpsia.",
+      "dosis": "Adult:\nAtenció! Recomanada perfusió contínua sobre el bolus, per menys pics hipotensors.\nHTA maligna, AVC isquèmic i hemorràgic, HTA associada a SCA, malaltia aòrtica aguda\n(dissecció o ruptura), aneurisma aòrtic, HTA secundària a drogues d'abús: inicieu bolus lent\n(2 minuts aprox.) de 10-20 mg sense diluir. El primer bolus es pot titular administrant 10 mg i,\npassats 10 minuts, els 10 mg restants. Es pot repetir el bolus de 20 mg cada 10 minuts (la dosi\npot variar ente 20-80 mg). Màxim 300 mg/dia. Si després del 3r bolus segueix la TA elevada,\nadministreu perfusió contínua. Dosi: 0,5-2 mg/min (màx. 300 mg/dia). Podeu diluir 50 mg (mig\nvial=10 ml) + 40 ml SF (1 mg/ml) o 100 mg en 80 ml SF a una velocitat d'infusió de 2-10 ml/h.\nAugmenteu la velocitat de 2 ml en 2 ml fins aconseguir les TA descrites als capítols per a cada\npatologia.\nPreeclàmpsia i eclàmpsia:  i.v. dosi inicial 20 mg en bolus lent en 1 min.  Repetiu-lo si cal,\nduplicant-ne la dosi (40 – 80 mg). Màxim 200 mg/dia.  Seguiu amb la perfusió contínua. Podeu\ndiluir 50 mg (mig vial=10 ml) + 40 ml SF (1 mg/ml) o 100 mg en 80 ml SF a una velocitat d'infusió\nde 2-10 ml/h. Augmenteu la velocitat de 2 ml en 2 ml fins aconseguir els valors de TA del objectiu\nclínic. Atenció! contraindicat en insuficiència cardíaca, bradicàrdia materna (FC inferior a 60\nbpm) i asma.",
+      "contraindicaciones": "al·lèrgia, bradicàrdia severa, BAV, IC esquerra, hipotensió, hipoperfusió\nperifèrica, xoc, DM insulinodependent, WPW i tractament amb IMAO.",
+      "efectosSecundarios": "hipotensió, bradicàrdia, dispnea, broncospasme i cefalea.",
+      "observaciones": "• Administreu-lo amb precaució en menors de 10 anys.\n• L'administració de nitroglicerina pot produir taquicàrdia reflexa.\n• En la majoria dels pacients produeix bradicàrdia lleu. En casos greus es pot controlar injectant\n1-2 mg d'atropina intravenosa.\n• Protegiu-lo de la llum solar.\n• L'administració de betablocadors en malalts MPOC que ho necessiten per patologia cardíaca ja\nNO està contraindicada (redueix la mortalitat)."
+    }
+  },
+  {
+    "file": "Levetiracetam.md",
+    "name": "Levetiracetam",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/107/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 500 mg / 5 ml (100 mg/ml).",
+      "propiedades": "antiepilèptic de segona línia.",
+      "indicaciones": "estat epilèptic (EE) generalitzat tonicoclònic. EE d'inici focal.\nEE generalitzat i EE d'inici focal, si fracassa el tractament amb benzodiazepines.",
+      "dosis": "• Intravenosa: 40 – 60 mg/kg (màx. 4500 mg), diluïts en SF 0,9 % o SG 5 % fins a 100 ml, a\npassar en 15 min.\n40 – 60 mg/kg (màx. 4500 mg) i.v., diluïts en SF 0,9 % o SG 5 % fins\na 100 ml, a passar en 5 min.",
+      "contraindicaciones": "hipersensibilitat al principi actiu, a altres derivats de la pirrolidona o a algun dels\nexcipients.",
+      "efectosSecundarios": "• Neuroconductuals: agressivitat, ansietat, insomni, al·lucinacions, estat confusional, atac de\npànic, ideació autolítica, somnolència, cefalea, convulsió, trastorn de l’equilibri, tremolor.\n• Cardiovasculars: prolongació de l’interval QT.\n• Respiratoris: anafilaxi o angioedema. Tos.\n• Gastrointestinals: dolor abdominal, diarrea, dispèpsia, vòmits, nàusees.\n• Renals: lesió renal aguda.\n• Reaccions d'hipersensibilitat: sd. DRESS, sd. de Stevens-Johnson, sd. de Kounis, necròlisi\nepidèrmica tòxica (TEN), eritema multiforme, rash, èczema, pruïja.\naugment de la TAD en lactants d’1 mes fins a infants menors de 4 anys.",
+      "embarazo": "no hi ha evidència d'absència de risc, però no s’ha establert una associació directa amb\ndefectes congènits o avortaments espontanis. Podeu utilitzar-lo si el considereu clínicament necessari\nvalorant sempre el risc-benefici i administrant la dosi efectiva més baixa. Atenció! En teràpia dual\namb lamotrigina pot provocar avortament espontani.",
+      "lactancia": "s'excreta amb la llet en poca quantitat, però es considera compatible l'ús d'aquesta\nmedicació durant la lactància. Es recomana observar signes de sedació en el lactant. Valoreu\nadministració segons risc-benefici.",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Lidocaïna.md",
+    "name": "Lidocaïna",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/42/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "ampul·la de 5 ml al 2 % (20 mg/ml).",
+      "propiedades": "antiarrítmic classe IB. Anestèsic local.",
+      "indicaciones": "• Antiarrítmic:\n   ◦ En aturada cardiorespiratòria amb ritme desfibril·lable, en absència o alternativa a\nl'amiodarona, però MAI conjuntament.\n• De segona elecció a les TV si existeix SCA. Anestèsia local i blocatge nerviós perifèric.\n• Premedicació anestèsica: disminuir el dolor en injecció de propofol, reduir requeriments\nanestèsics i millorar el control de dolor perioperatori.",
+      "dosis": "• Aturada cardiorespiratòria (ACR): 100 mg i.v. després de la 3a descàrrega i 50 mg i.v.\ndesprés de la 5a descàrrega.\n• ACR presenciada monitorada: si feu fins a 3 descàrregues consecutives compteu-les com\nuna sola descàrrega*. Administreu 100 mg i.v. després de la 3a descàrrega (abans o després\nde l'adrenalina, durant el tercer cicle de dos minuts) i 50 mg i.v. després de la 5a descàrrega.\n* En els adults, les tres descàrregues consecutives compten com a una pel que fa a l'administració\nd'amiodarona/lidocaïna. Això difereix del SV pediàtric, on compten com a tres. No hi ha evidència actual en favor\nd'una o altra alternativa i les Guies ERC 2025 han definit opcions diferents en el SVA de l'adult i el pediàtric.\n• TV si existeix SCA (de segona elecció): bolus d'1 - 1,5 mg/kg i.v. lent, repetiu 0,5 - 0,75 mg/kg\nper bolus cada 5 – 10 min (màx. 3 mg/kg).\n• Blocatge nerviós perifèric i/o anestèsia local: 0,5 – 1 mg/kg perineural o per via subcutània\n(es pot diluir en SF 0,9 % en el moment de la preparació per augmentar la zona impregnada).\nPremedicació: 4,5 mg/kg (sense epinefrina), màx. 300 mg, i 7 mg/kg (amb epinefrina),\nmàx. 500 mg. Ajusteu segons edat, pes i condició clínica.",
+      "contraindicaciones": "hipersensibilitat  coneguda  a  la  lidocaïna  o  altres  anestèsics  locals  tipus  amida.\nBAV  2n  i  3r  grau,  síndrome  de  WPW  o  altres  trastorns  greus  de  conducció  cardíaca.  Insuficiència\nhepàtica greu. Insuficiència cardíaca greu o xoc cardiogènic. Porfíria. Precaució en persones majors\nde 70 anys, insuficiència cardíaca congestiva, insuficiència hepàtica moderada, epilèpsia, insuficiència\nrenal avançada, hipovolèmia i xoc.",
+      "efectosSecundarios": "hipotensió, cefalea, nàusees i vòmits. En casos de sobredosi, poden aparèixer\nsímptomes neurològics (mareig, somnolència, confusió, tinnitus, visió borrosa, tremolor, convulsions) i\ncardiovasculars  (bradicàrdia,  blocatge  cardíac,  arrítmies,  depressió  miocardíaca).  Por  arribar  a\nprovocar ACR.",
+      "observaciones": "• Interacciona amb procaïnamida, blocadors beta i blocadors neuromusculars.\n• No l'administreu MAI conjuntament amb amiodarona.\n• La somnolència sol ser un signe precoç de toxicitat.",
+      "embarazo": "utilitzeu la només en cas de risc vital Monitoratge fetal hospitalari"
+    }
+  },
+  {
+    "file": "Mannitol.md",
+    "name": "Mannitol",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/43/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "flascó al 20 % 250 ml (200 mg/ml).",
+      "propiedades": "diürètic osmòtic que redueix la PIC augmentant l'excreció d'aigua, sodi i bicarbonat.\nProdueix augment de l'osmolaritat i del volum intravascular.",
+      "indicaciones": "hipertensió intracranial associada a edema cerebral en malalt HTA, si l'arribada al\nquiròfan de neurocirurgia és inferior a 3 hores.",
+      "dosis": "Temps d'acció (inici):  15 - 60 minuts.\nDuració aproximada:  3 - 8 hores.\nAdult: 0,25 - 1 g/kg al 20 % en 20 - 30 min via i.v.",
+      "contraindicaciones": "hipotensió, EAP, IC, hemorràgia intracranial per aneurisma o malformacions\narteriovenoses, insuficiència renal crònica severa o hepatopatia greu.",
+      "efectosSecundarios": "EAP, hipotensió, dolor anginós, IC, cefalea, visió borrosa i convulsions. La\ninfusió ràpida pot produir hemoconcentració.",
+      "observaciones": "• Augmenta l'efecte dels blocadors neuromusculars.\n• No administreu els flascons amb dipòsits de cristalls (cristal·litza amb el fred). Porteu-lo a\nl'escalfador de sèrums.\n• Precaució en trasllats perllongats per diüresi osmòtica que provoca sondatge vesical.\n• No barregeu amb sang al sistema d'infusió.",
+      "embarazo": "utilitzeu-lo només en cas de risc vital.",
+      "pediatria": "• Per HTIC: 0,1 - 1 g/kg i.v. en 20 - 30 min. (màxim 1,5 g/kg/dia)."
+    }
+  },
+  {
+    "file": "Mepivacaïna.md",
+    "name": "Mepivacaïna",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/44/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial al 2% 10 ml (20 mg/ml).",
+      "propiedades": "anestèsic local d'acció ràpida, durada moderada i baixa toxicitat.",
+      "indicaciones": "anestèsia per infiltració i per bloqueig nerviós perifèric.",
+      "dosis": "Temps d'acció (inici):  3 - 5 minuts.\nDuració aproximada:  1 – 1,5 hores.\nAdult: 100 - 400 mg via subcutània o perineural. No supereu els 5 mg/kg, dosi única. Màxim 400 mg.",
+      "contraindicaciones": "hipersensibilitat. Disminuïu-ne la dosi si s'associen sedants.",
+      "efectosSecundarios": "a dosis altes pot produir vasoconstricció uterina, depressió respiratòria i col·lapse\ncardíac. L'administració i.v. accidental pot provocar arrítmies greus, hipotensió i depressió respiratòria\nseveres.",
+      "embarazo": "no l'administreu.",
+      "lactancia": "risc baix.",
+      "pediatria": "És més habitual usar lidocaïna 1% subcutània com a anestèsic tòpic en pediatria; en cas d'usar\nmepivacaïna diluïu-lo a dosis de 0,5 - 1% (5 - 10 mg/ml) i administreu- lo fins a un màxim 3 mg/kg\n(0,1 ml/kg)."
+    }
+  },
+  {
+    "file": "Metamizole.md",
+    "name": "Metamizole",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/45/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 2 g = 5 ml (400 mg/ml).",
+      "propiedades": "analgèsic no esteroidal, derivat de la pirazolona. Antipirètic.",
+      "indicaciones": "dolor posttraumàtic lleu-moderat. Dolor per còlic. Síndrome febril.",
+      "dosis": "administreu-lo de forma lenta. Monitoratge TA. No hi associeu solucions correctores de pH.\nAdult:\nVies i.v. i i.m. (mateixa dosi)\n• Analgèsia o antipirètic: 1 – 2 g cada 6 – 8 hores, amb un màxim de 4 g/dia.\n• Dolor oncològic: 1 g cada 6 – 8 hores.\nDilució i velocitat d'administració i.v. en perfusió: Diluïu en 50 – 100 ml de SF o SG 5% i\nadministreu en 15–30 minuts.\n",
+      "contraindicaciones": "al·lèrgia a pirazolones, agranulocitosi, anèmia aplàstica i deficiència congènita\nde glucosa-6-fosfat-deshidrogenasa.",
+      "efectosSecundarios": "xoc anafilàctic i dispnea. Precaució en hipotensió, insuficiència renal i hepàtica,\nHDA, al·lèrgics als salicilats, asma crònica i tractament amb anticoagulants orals. Si l'administració és\nmolt ràpida pot provocar: rubor, calor, palpitacions, nàusees, vòmits i hipotensió. Necrosi vascular\ndistal amb injecció intraarterial. Dolor per via i.m.",
+      "observaciones": "malgrat que a Europa s'accepta el seu ús en el part i postpart, no és així en totes les\nguies internacionals.",
+      "embarazo": "no l'administreu. Contraindicat.",
+      "lactancia": "fàrmac segur.",
+      "pediatria": "Atenció! De primera elecció seria el paracetamol sempre com a analgèsic de primera línia.\nVies d’administració:\n• Via i.v. (preferible): diluïu 1 ml de solució + 9 ml de SF o SG 5 % (40 mg/ml).\nAdministreu  i.v. LENTA en 15 - 30 min per risc d'hipotensió. Es pot repetir cada 6 - 8\nhores.\n• Via i.m.: no diluïu, dosi segons pes."
+    }
+  },
+  {
+    "file": "Metilprednisolona.md",
+    "name": "Metilprednisolona",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/46/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 20 mg i 40 mg pols (+ 1 ml dissolvent).",
+      "propiedades": "glucocorticoide d'acció intermèdia. Antiinflamatori. Antial·lèrgic. Immunosupressor.",
+      "indicaciones": "broncospasme, anafilaxi, exacerbació MPOC, crisi addisoniana, insuficiència\nadrenocortical aguda. Brotades agudes d'esclerosi múltiple (EM). Coadjuvant en quimioteràpia i\ntractament rebuig trasplantament d'òrgans.",
+      "dosis": "dilució en SF o SG 5%.\nAdult:\n• Dosi estandarditzada: 0,5 - 2 mg/kg i.v. lent.\n• Brots d'esclerosi múltiple: 1 g.",
+      "contraindicaciones": "hipersensibilitat, infecció sistèmica per fongs, úlcera pèptica i glaucoma.\nPrecaució en DM, IC, HTA i malalties inflamatòries intestinals.",
+      "efectosSecundarios": "no acostumen a aparèixer en fase aguda. Retard en la cicatrització i alteracions\nhidroelectrolítiques (retenció de sodi i aigua, hipopotassèmia), alteracions de la conducta (eufòria i\ninsomni), trombosi, bradicàrdia i HDA. Augmenta la toxicitat gàstrica dels AINE.",
+      "observaciones": "• A dosis descrites, NO té efecte mineralocorticoide (NO provoca HTA). Per la crisi\naddisoniana o insuficiència suprarrenal aguda és de millor elecció la hidrocortisona.\n• Altera la resposta dels dicumarínics.\n• En pediatria, dosis altes poden produir pancreatitis agudes greus i augment de la PIC, per tant\ns'han d'ajustar les dosis a la relació mg/pes i valorar-ne l’ús de forma estricta.",
+      "embarazo": "administreu-lo amb precaució..",
+      "lactancia": "el fàrmac, malgrat s'excreta amb la llet materna, és segur per la lactància i pel lactant (en\ndosis puntuals).",
+      "pediatria": "Dosi en pediatria (v.o., i.m., i.v.).\nDosi i.v. 0.5 - 2 mg/kg/dosi. Es pot repetir cada 6 - 12h (administració en bolus i.v. diluït en SF\no SG 5% fins a 2 mg/ml; Perfusió i.v. 30 min si més de 2 mg/l).\n• En asma: bolus 2 mg/kg (màxim 60 mg).\n• Lesió medul·lar (si menys de 24h): bolus 30 mg/kg en 15 min. No indicat de forma\nrutinària."
+    }
+  },
+  {
+    "file": "Metoprolol.md",
+    "name": "Metoprolol",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/47/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 5 mg = 5 ml (1 mg/ml).",
+      "propiedades": "antiarrítmic tipus II, betablocador beta 1 inotròpic i cronotròpic negatiu.",
+      "indicaciones": "malaltia aguda aòrtica (dissecció o ruptura), TPSV, HTA, angina de pit, hipertiroïdisme,\ntractament preventiu post IAM i profilaxi de la migranya. Es pot administrar pel control FC en malalts en\nxoc que necessiten dosis altes de L-norepirefrina i/o dobutamina per evitar l'IAM tipus 2.",
+      "dosis": "bolus 5 mg / 2 min. Màxim 15 mg (3 dosis). Administració lenta.\n• Malaltia aguda aòrtica (dissecció o ruptura): 2,5 - 5 mg i.v. en bolus lent de més de 2 minuts. Es\npot repetir cada 5 minuts, un màxim de 15 mg.",
+      "contraindicaciones": "BAV 2n i 3r grau, IC descompensada, bradicàrdia, Sd. sinus, xoc cardiogènic i\nhipersensibilitat al metoprolol i derivats. NO l'administreu en IAM si la FC és de menys de 45 bpm., interval\nPQ menor de 0,24 s o TAS inferior a 100 mmHg.",
+      "efectosSecundarios": "mareig, fatiga, cefalea, bradicàrdia, IC, arrítmies, palpitacions, Raynaud, edema,\ndolor precordial, dispnea d'esforç i acidosi metabòlica.",
+      "observaciones": "• No barregeu amb altres antiarrítmics ja que potència l'efecte inotròpic negatiu.\n• El xoc anafilàctic derivat per hipersensibilitat pot instaurar-se amb major gravetat i descompensar\nuna IC.\n• L'administració de blocadors beta en malalts MPOC que ho necessiten per patologia\ncardíaca ja NO està contraindicada (redueix la mortalitat).",
+      "embarazo": "segur. És d'elecció en la HTA durant l'embaràs, tot i que s'ha de retirar dos dies abans del part\nper risc de bradicàrdia, hipotensió i hipoglucèmia neonatal.",
+      "lactancia": "segur, tot i que s'excreta amb la llet materna. S'ha de controlar als lactants l'aparició de signes\nde blocatge beta adrenèrgic."
+    }
+  },
+  {
+    "file": "Midazolam.md",
+    "name": "Midazolam",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/48/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 15 mg = 3 ml (5 mg/ml).",
+      "propiedades": "benzodiazepina amb efecte sedant i hipnòtic. Ansiolític, anticonvulsiu i miorelaxant.\nProdueix amnèsia retrògrada lleu.",
+      "indicaciones": "premedicació, inducció i manteniment anestèsia. Sedació. Convulsions. Estat epilèptic.\nAnsiolític. Pal·liació en malalties en estat terminal i limitació de l'esforç terapèutic.",
+      "dosis": "Temps d'acció (inici):  1 - 3 minuts.\nDuració aproximada:  20 - 40 minuts.\nAdult:\n• Sedació profunda (manteniment post SIR): 0,1 - 0,4 mg/kg. Dosi de manteniment 0,2  -0,4\nmg/kg.\n• Sedació superficial en malalt conscient: bolus de 0,025 - 0,075 mg/kg (2 - 5 mg\naproximadament per un adult de 70 kg).\n• Mesures de cures pal·liatives: a demanda.\n• Convulsions: i.v. 0,1 - 0,2 mg/kg tituleu-lo cada 2 min segons resposta terapèutica. Si és\nnecessari, es pot repetir la dosi als 10 min (fins un màxim de 15 mg) o i.m. 5- 10 mg.\n• Ansietat: 2,5 - 5 mg i.m. o intranasal.\n• Agitació psicomotora:\n   ◦ D’origen psiquiàtric: 0,2 mg/kg intranasal o i.m. (temps d’acció 5 min) o  0,1 mg/kg i.v.\n   ◦ Per intoxicació drogues estimulants (cocaïna, drogues disseny, etc.): 0,2 mg/kg i.m. o\n0,1 mg/kg i.v.\n   ◦ Per síndrome d’abstinència: 0,2 mg/kg i.m. o 0,1 mg/kg i.v.\n• Síndrome del deliri agitat: 0,2 mg/kg intranasal o i.m., o 0,1 mg/kg i.v.\nPerfusió contínua: 1 vial (15 mg) + 47 ml SF (0,3 mg/ml):\nMicrograms/kg\n0,25\n0,5\n1\n1,5\n2\n10\n0,5\n1\n2\n3\n4\n20\n1\n2\n4\n6\n8\n30\n1,5\n3\n6\n9\n12\n40\n2\n4\n8\n12\n16\n50\n2,5\n5\n10\n15\n20\nkg de pes\n60\n3\n6\n12\n18\n24\nml/h\n70\n3,5\n7\n14\n21\n28\n80\n4\n8\n16\n24\n32\n90\n4,5\n9\n18\n27\n36\n100\n5\n10\n20\n30\n40\n110\n5,5\n11\n22\n33\n44"
+    }
+  },
+  {
+    "file": "Naloxona.md",
+    "name": "Naloxona",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/49/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 0,4 mg = 1 ml.",
+      "propiedades": "antagonista opiaci. Vida mitjana més curta que tots els opiacis.",
+      "indicaciones": "intoxicació per sobredosi d'opiacis per a revertir la depressió respiratòria (inclòs el nadó\namb depressió respiratòria en mare usuària d'opioides), nàusees, espasme de la musculatura llisa,\nhipotensió, efectes cardíacs i tractament coadjuvant en xoc sèptic.",
+      "dosis": "pot administrar-se per via i.v., subcutània, i.m., intranasal o intratraqueal. Per via i.v.\nadministreu-lo lentament.\nAdult.: i.v. bolus 0,2 - 0,4 mg / 2 - 3 min fins aconseguir resposta. Màxim 10 mg.\n• Tractament coadjuvant en xoc sèptic: dosi de càrrega 30 micrograms/kg i.v.\n• Opiacis i opioides sintètics: 0,2 - 0,4 mg i.v. en bolus. Si no hi ha resposta repetiu dosi de 0,4\n- 0,8 mg cada 2 - 3 min, fins milloria (màxim 4 mg).\n   ◦ En sobredosi per opiacis molt potents com el fentanil, es poden requerir dosis més altes\nperò en cap cas sobrepasseu els 10 mg.\n   ◦ Si hi ha re-sedació, com en les intoxicacions per opiacis de semivida d'eliminació\nperllongada (metadona), administreu un bolus addicional de 0,2 mg i/o valoreu la perfusió\ncontínua de 2 mg + 49,5 ml SF. Concentració final: 0,04 mg/ml.\nAjusteu ritme d’infusió segons l'estat clínic del pacient intoxicat.\nVelocitat segons dosi desitjada\nDosi de naloxona\nVelocitat perfusió\n0,2 mg/h\n0,4 mg/h\n0,8 mg/h\n1,2 mg/h\n1,6 mg/h\n5 ml/h\n10 ml/h\n20 ml/h\n30 ml/h\n40 ml/h",
+      "contraindicaciones": "No administreu en intoxicats conscients i/o agitats i hipersensibilitat coneguda al compost.",
+      "efectosSecundarios": "augment de l'activitat simpàtica (taquicàrdia i HTA). Si injecció ràpida, nàusees i\nvòmits i EAP NO cardiogènic per reexpansió pulmonar.",
+      "observaciones": "• Donada la vida mitjana curta, cal vigilar la reaparició de símptomes d'intoxicació."
+    }
+  },
+  {
+    "file": "Nitroglicerina.md",
+    "name": "Nitroglicerina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/50/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "• Ampul·la de 5 mg / 5 ml (1 mg/ml).\n• Esprai 1 puff = 0,4 mg.\nAtenció! Possible trencament d’estoc d’aquesta presentació.\nALTERNATIVA: ampul·la de 50 mg / 10 ml.\nVeieu Dosi / Via d’administració",
+      "propiedades": "vasodilatador arterial i venós perifèric.",
+      "indicaciones": "SCA  i/o  ICC/EAP  o  hipertensió  pulmonar,  estable  hemodinàmicament  amb  índex\ndiastòlic (ID = FC/TAD) que no augmenta. Crisi o emergència hipertensives.",
+      "dosis": "• Sublingual: 1 – 2 puffs / 10 min (màx. 3 – 4 puffs). Vigileu la tolerància hemodinàmica.\n• Intravenosa (si SCA +/- ICC/EAP/HT pulmonar amb HTA franca):\n   ◦ Bolus: diluïu 1 mg en SG 5 % o SF 0,9 % fins a 10 ml (0,1 mg/ml). Administreu\nlentament 2 ml – 3 ml (0,2 mg - 0,3 mg) de la dilució, titulant la resta cada 5 min segons\nresposta hemodinàmica.\n   ◦ Perfusió contínua: diluïu 10 mg en SG 5 % o SF 0,9 % fins a 50 ml (0,2 mg/ml).\nPerfusió 10 – 60 micrograms/kg/hora de la dilució. Augmenteu la dosi cada 3 – 5 min fins\naconseguir l'efecte desitjat o l’aparició d’efectes adversos. Dosi màxima:\n200 micrograms/min (60 ml/hora).\nTaula de perfusió contínua adult (ml/h)\nDiluir 2 amp. (5 mg / 5 ml) en SG 5 % o SF 0,9 % fins a 50 ml (0,2 mg/ml = 200 micrograms/ml)\nmcg/kg/hora*\nPes (kg)\n50 kg\n60 kg\n70 kg\n80 kg\n90 kg\n100 kg\n10\n20\n30\n40\n50\n60\n2,5\n5\n7,5\n10\n12,5\n15\n3\n6\n9\n12\n15\n18\n3,5\n7\n10,5\n14\n17,5\n21\n4\n8\n12\n16\n20\n24\n4,5\n9\n13,5\n18\n22,5\n27\n5\n10\n15\n20\n25\n30"
+    }
+  },
+  {
+    "file": "Nitroprussiat.md",
+    "name": "Nitroprussiat",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/51/1) 1/1",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 50 mg = 5 ml (10 mg/ml).",
+      "propiedades": "vasodilatador arterial i venós d'acció curta. Inici d'acció immediata amb vida mitjana de 2\nmin.",
+      "indicaciones": "emergències HTA, incloses les de l'embaràs. Insuficiència cardíaca greu. Si hi ha\ndissecció aòrtica, inicieu prèviament tractament amb blocadors beta.",
+      "dosis": "Temps d'acció (inici):  immediat.\nDuració aproximada:  1 – 2 min.\nAdult: perfusió contínua 0,5 - 10 micrograms/kg/min.\nSi eclàmpsia o insuficiència renal, inicieu-la a 0,25 micrograms/kg/min. Monitoratge de la TA cada 5\n- 10 min. Incrementeu 0,3 - 0,5 micrograms/kg/min cada 5 minuts fins arribar a l'objectiu de pressió.\nDiluïu 10 mg / 1 ml + 49 ml de SG 5 % (0,2 mg/ml = 200 micrograms/ml)\n|     |     |     | Pes kg |     |     |     |\nDosi micrograms/kg/min\n|     | 50 kg | 60 kg | 70 kg | 80 kg | 90 kg | 100 kg |\n| 0,5 | 7,5   | 9     | 10,5  | 12    | 13,5  | 15     |\n| 1   | 15    | 18    | 21    | 24    | 27    | 30     |\n2\n|     | 30  | 36  | 42  | 48  | 54  | 60  |\n| 3   | 45  | 54  | 63  | 72  | 81  | 90  |\n| 4   | 60  | 72  | 84  | 96  | 108 | 120 |\n5\n|     | 75  | 90  | 105 | 120 | 135 | 150 |\n6\n|     | 90  | 108 | 126 | 144 | 162 | 180 |\n| 7   | 105 | 126 | 147 | 168 | 189 | 210 |\n| 8   | 120 | 144 | 168 | 192 | 216 | 240 |\n9\n|     | 135 | 162 | 189 | 216 | 243 | 270 |\n| 10  | 150 | 180 | 210 | 240 | 270 | 300 |"
+    }
+  },
+  {
+    "file": "Noradrenalina.md",
+    "name": "Noradrenalina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/52/1)",
+    "subtitulo": "L-Norepinefrina (Noradrenalina)",
+    "alerta": null,
+    "sections": {
+      "presentacion": "0,5 mg/ml L-norepinefrina base en ampolla de 10 ml.\n1 ml de solució conté 0,5 mg de L-norepinefrina base, equivalent a 1 mg de L-norepinefrina bitartrat.\n1 ampolla de 10 ml conté 5 mg de L-norepinefrina base, equivalent a 10 mg de L-norepinefrina\nbitartrat.",
+      "propiedades": "pertany al grup farmacoterapèutic dels agents adrenèrgics i dopaminèrgics.\nÉs una catecolamina que actua per una banda, sobre els receptors beta-1 adrenèrgics estimulant el\nmiocardi i augmentant la despesa cardíaca; per altra banda actua sobre els receptors alfa adrenèrgics\nper produir una potent acció vasoconstrictora dels vasos de resistència i capacitància, per la qual cosa\naugmenta la pressió arterial sistèmica i el flux sanguini de les artèries coronàries.\nQuan s’administra a dosis inferiors a 0,4 micrograms/kg/min predomina l’efecte estimulant cardíac; amb\ndosis més elevades l’efecte vasoconstrictor es torna més prominent.",
+      "indicaciones": "utilitzat com a vasopressor amb ús acceptat en el tractament d’estats d’hipotensió\naguda, tals com els que s’ocasionen després d’una feocromocitomia, simpatectomia, poliomielitis,\nanestèsia espinal, infart de miocardi, xoc sèptic, transfusions i reaccions a fàrmacs.\nIndicat com a coadjuvant temporal en el tractament de l’aturada cardíaca i la hipotensió aguda.",
+      "dosis": "Temps d'acció (inici):  segons (immediat amb infusió).\nDuració aproximada:  cessa en 1 - 2 minuts en aturar-se.\nAdult:\nPerfusió contínua: 0,1 - 1 micrograms/kg/min. i.v. Inicieu-la a dosis baixes i aneu-la incrementant\nsegons resposta (màxima dosi recpmanada 1 microgram/kg/min).\nDilució: ampolla de 5 mg/10 ml. Diluïu 1 ampolla de 10 ml, que conté 5 mg de NA base, en 40 ml de\nSG 5 %. Obtindreu una concentració de 0,1 mg/ml de NA base (100 micrograms/ml de NA base).\nDiluïu 1 ampolla (10 ml –conté 5 mg de NA base-) en 40 ml de SG 5%\nDosi\nmicrograms/kg/min*\n0,1\n50 kg\n3\n60 kg\n3,6\nPes Kg\n70 kg\n4,2\n80 kg\n4,8\n90 kg\n5,4\n100 kg\n6"
+    }
+  },
+  {
+    "file": "Olanzapina.md",
+    "name": "Olanzapina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/113/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits bucodispersables de 5 mg.",
+      "indicaciones": "antipsicòtic per esquizofrènia, depressió, ansietat, trastorn maníac de moderat a greu per\nsímptomes com l’excitació o l’eufòria i per prevenir la recurrència d'aquests símptomes en pacients amb\ntrastorn bipolar on els episodis maníacs han respost prèviament al tractament amb olanzapina.",
+      "dosis": "Adult: de 5 – 20 mg/dia v.o.",
+      "contraindicaciones": "hipersensibilitat a l’olanzapina i glaucoma d’angle estret.",
+      "efectosSecundarios": "coagulopaties, augment de la glucosa, del colesterol i dels triglicèrids. Pot provocar\nmoviments involuntaris, sobretot a cara i llengua. Ocasionalment pot haver-hi febre, respiració accelerada,\nsudoració, rigidesa muscular, estat d'obnubilació o somnolència i DRESS (reacció a fàrmac amb eosinofília\ni símptomes sistèmics).",
+      "observaciones": "Atenció! No es recomana en pacient d’edat avançada amb demència pels seus efectes adversos\ngreus i estricta vigilància per metge de família si pateix infart cerebral o manca de reg sanguini transitori al\ncervell (símptomes passatgers d'infart cerebral), malaltia de Parkinson, problemes de pròstata, bloqueig\nintestinal (ili paralític), malalties del fetge o ronyó, alteracions de la sang, malalties del cor, diabetis i\nconvulsions.",
+      "embarazo": "compatible amb estreta vigilància el tercer trimestre pels efectes que pot provocar al nounat. No\nadministreu si el benefici no supera el risc.",
+      "lactancia": "no es recomana ja que petites quantitats s’excreten per la llet.",
+      "pediatria": "no es recomana la seva administració en menors de 13 anys."
+    }
+  },
+  {
+    "file": "Omeprazole.md",
+    "name": "Omeprazole",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/53/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 40 mg de pols liofilitzada.",
+      "propiedades": "antisecretor gàstric, antiulcerós: inhibidor de la bomba de protons.",
+      "indicaciones": "úlcera gastroduodenal, esofagitis per reflux, Zollinger-Ellison, úlcera gastroduodenal per\nHelicobacter pylori i profilaxi d'úlcera gastroduodenal induïda per AINE.",
+      "dosis": "Adult.: 40 - 80 mg i.v. lenta diluïts en 50 ml de SF a passar en 20-30 min.",
+      "contraindicaciones": "hipersensibilitat a l'omeprazole.",
+      "observaciones": "precaució amb pacients amb insuficiència hepàtica.",
+      "efectosSecundarios": "eritema, prurit, artràlgies, cefalea, diarrea, estrenyiment, leucopènia,\ntrombocitopènia, reacció al·lèrgica.",
+      "embarazo": "eviteu-lo si no és imprescindible.",
+      "lactancia": "segur. No s’han registrat problemes en lactants. Baix risc.",
+      "pediatria": "1 mg/kg (màx. 40 mg) en 50 ml de SF en un període de temps en 20 - 30 min.\nAtenció! No l'administreu en neonats."
+    }
+  },
+  {
+    "file": "Oxitocina.md",
+    "name": "Oxitocina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/54/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1 ml = 10 UI oxitocina sintètica.",
+      "propiedades": "provoca l'alliberament de calci intracel·lular i contracció del miometri, de ritme, freqüència i\ndurada indistingibles a les del treball de part. Tot i ser una forma sintètica, pot tenir efecte antidiürètic\nlleu. Estimula la secreció de la llet.",
+      "indicaciones": "estimulació de la contractilitat uterina en cas d'atonia postpart com a prevenció i\ntractament de l'hemorràgia postpart.",
+      "dosis": "• Part eutòcic, de natges o podàlic:\n   ◦ Expulsiu: si alt risc de sagnat (macrosomia, sagnat previ, part múltiple, etc.)\nadministreu oxitocina just després de néixer el nadó. Dosi: 10 UI i.m. o 5 UI i.v. (dilució: un\nvial de 10 UI + 9 ml SF per aconseguir 1 UI/ml) en un temps de 5 min aproximadament.\n   ◦ Deslliurament: si s’ha produït el deslliurament, inicieu la perfusió contínua, diluïu 1 vial de\n10 UI + 49 ml SF 0,9 % (0,2 UI/ml) de 3 a 12 ml/hora i.v. (per la prevenció de l’hemorràgia\npostpart). Atenció! NO la inicieu si no s’ha produït el deslliurament.\n• Part múltiple:\n   ◦ Expulsiu: si hi ha hipodinàmia uterina entre l'expulsiu del 1r i del 2n fetus, inicieu\nl’estimulació. Dosi: 10 UI i.m. o 5 UI i.v. (dilució: un vial de 10 UI + 9 ml SF per aconseguir\n1 UI/ml) en un temps de 5 min aproximadament. Si NO hi ha hipodinàmia uterina entre\nl’expulsiu del 1r i del 2n fetus, administreu l’oxitocina després que surti el segon nadó,\nsi alt risc de sagnat (exemples: macrosomia, sagnat previ, part múltiple, etc.). Dosi:\n10 UI i.m. o 5 UI i.v. (dilució: un vial de 10 UI + 9 ml SF per aconseguir 1 UI/ml) en un temps\nde 5 min aproximadament.\n   ◦ Deslliurament: si s’ha produït el deslliurament, inicieu la perfusió contínua, diluïu 1 vial de\n10 UI + 49 ml SF 0,9 % (0,2 UI/ml) de 3 a 12 ml/hora i.v. (per la prevenció de l’hemorràgia\npostpart). Atenció! NO la inicieu si no s’ha produït el deslliurament.\nAcompanyeu-ho de massatge uterí enèrgic.",
+      "contraindicaciones": "hipersensibilitat a l'oxitocina o excipients, contraccions uterines hipertòniques\n(perill pel fetus si el part no és imminent), sempre que el part espontani o vaginal estigui\ndesaconsellat, eclàmpsia/preeclàmpsia i pacients amb antecedents d'isquèmia miocardíaca.",
+      "efectosSecundarios": "• En la mare:\n   ◦ Freqüents: hipotensió, taquicàrdia reflexa i nàusees/vòmits."
+    }
+  },
+  {
+    "file": "Paracetamol.md",
+    "name": "Paracetamol",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/55/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1000 mg = 100 ml (10 mg/ml) i supositoris 150 i 300 mg.",
+      "propiedades": "analgèsic, antipirètic i escassa acció antiinflamatòria, pocs efectes gàstrics però presenta\nhepatotoxicitat a dosis altes. Actua a nivell del canals de Ca i K i és serotoninèrgic.",
+      "indicaciones": "dolor lleu a moderat sobretot de tipus somàtic (músculoesquelètic). Associat a mòrfics\npotencia la seva acció analgèsica. Estats febrils. Control de la temperatura superior a 37,5 ºC en\nmalalts neurocrítics.",
+      "dosis": "Adult:\n• Més de 50 kg de pes: 1 g i.v. lent.\n• 30 - 50 kg: 15 mg/kg.\n4 g/dia.",
+      "contraindicaciones": "hipersensibilitat i hepatopatia severa (eviteu-ne l'ús en l'enolisme crònic i\nperllongat).",
+      "efectosSecundarios": "hepatotoxicitat i insuficiència hepàtica (sobretot a dosis altes, en hepatopatia\nprèvia i en l'ús perllongat). Alguns casos descrits d'HTA.",
+      "observaciones": "• Si hi ha sobredosificació, l'antídot és N-Acetil-Cisteïna.\n• Si es pren de manera continuada, calculeu-ne la dosi, sobretot en gent d’edat avançada o baix\npes.\n• Disminuïu-ne la dosi en malalts descoagulats i que prenen altres AINE de forma crònica.",
+      "embarazo": "compatible. Risc d'anèmia hemolítica, sobretot en el 3r trimestre, en que pot produir\npreeclàmpsia.",
+      "lactancia": "compatible. Estan descrites crisis d'asma en lactants si la mare el pren, tot i que el risc és\nmolt baix.",
+      "pediatria": "Via oral:\n• Nounat a terme de menys de 10 dies: 10 - 15 mg/kg/dosi cada 6 hores.\n• Nounat a terme de 10 dies o més fins als 10 anys: 15 mg/kg cada 6 hores o 10 mg/kg"
+    }
+  },
+  {
+    "file": "Plasmalyte.md",
+    "name": "Plasmalyte",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/115/1)",
+    "subtitulo": "Solució isotònica d’electròlits (Plasmalyte®)",
+    "alerta": null,
+    "sections": {
+      "presentacion": "és una solució isotònica d'electròlits. Osmolaritat: 295 mOsm/l (aprox.) pH: aprox. 7,4\n(de 6,5 a 8,0).\nmmol/l\nmEq/l\nNa+\n140\n140\nK+\n5,0\n5,0\nMg++\n1,5\n3\nCl-\n98\n98\nCH3COO\n(acetat)\nC6H11O7\n(gluconat)\n27\n27\n23\n23",
+      "propiedades": "els components electrolítics de la solució isotònica 148 (pH 7,4) i les seves\nconcentracions, s'han preparat per coincidir amb les del plasma. Clorur de sodi: 5,26 g/l, clorur de\npotassi: 0,37 g/l, clorur de magnesi hexahidratat: 0,30 g/l, acetat de sodi trihidratat: 3,68 g/l, gluconat\nde sodi: 5,02 g/l.",
+      "indicaciones": "• Indicacions SEM: traumatisme raquimedul·lar, traumatisme toràcic, traumatisme abdominal i\npelvià, traumatisme musculoesquelètic, lesions per ona expansiva o blast injuries, lesions per\ncremades, lesions per electricitat, traumatisme en pacient d'edat avançada, emergències\nobstètriques del 1r trimestre: amenaça d'avortament, avortament i embaràs ectòpic, patologia\nper calor, accident disbàric, xoc indiferenciat, xoc hipovolèmic, xoc cardiogènic, xoc sèptic,\nanafilaxi / xoc anafilàctic, hiperglucèmia.\n• Indicacions de la fitxa tècnica: acidosi metabòlica lleu o moderada, en cas de problemes per\nmetabolitzar el lactat i irritació peritoneal.",
+      "dosis": "Adult:\nLa dosi recomanada és de 500 ml a 3 litres/24 h. i.v. (veieu els capítols enllaçats a les indicacions). La\nvelocitat d’administració: 40 ml/kg/24 h. en pacients adults, pacients d’edat avançada i adolescents.",
+      "contraindicaciones": "hiperpotassèmia, insuficiència renal, blocatge cardíac, alcalosi metabòlica o\nrespiratòria, hipoclorhídria i hipersensibilitat als principis actius o a algun dels excipients.",
+      "efectosSecundarios": "en excés o l'administració massa ràpida pot provocar hiperpotassèmia,\nhipermagnessèmia o risc d'edema si l'eliminació renal és deficient.",
+      "observaciones": "Atenció! En pacients amb i insuficiència renal, l'administració en excés de compostos com l'acetat\nsòdic i el gluconat sòdic, que es metabolitzen per formar l'anió del bicarbonat, pot probocar\nhipopotassèmia i alcalosi metabòlica."
+    }
+  },
+  {
+    "file": "Prasugrel.md",
+    "name": "Prasugrel",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/56/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits 10 mg.",
+      "propiedades": "inhibidor de l'agregació plaquetària.",
+      "indicaciones": "en SCAEST si compleix tots dels següents criteris:\n• No hemorràgia activa greu.\n• No doble antiagregació prèvia.\n• No criteris d’alt risc hemorràgic.\n• No antecedent d’ictus isquèmic o AIT previ.\n• Menor de 75 anys (<75 anys).\n• Més de 60 kg (> 60 kg).",
+      "dosis": "Temps d'acció (inici):  15 - 30 minuts.\nDuració aproximada:  2 - 15 hores.\nAdult: 60 mg v.o. (dosi de càrrega).",
+      "contraindicaciones": "en SCAEST, No administreu segon antiagregant si hi ha hemorràgia activa greu,\nsi hi ha impossibilitat de via oral o si ja té doble antiagregació prèvia. No l’administreu si fibrinòlisi.\nAltres: hipersensibilitat, hemorràgia patològica activa, ictus o AIT, insuficiència hepàtica greu. Més de\n75 anys.",
+      "observaciones": "• Atenció! NO l'administreu amb clorur mòrfic.\n• Criteris de SCAEST extensa: aixecament ST V1-V4 o més de 2 mm a V3 i V4 amb imatge\nespecular en cara inferior (sospita DA proximal). Aixecament ST aVR major que ST V1 i\ndescens difús de vàries derivacions (sospita TC).",
+      "embarazo": "no s'han fet estudis i no se n'aconsella l'ús. Decisió individualitzada segons edat\ngestacional i risc/benefici.",
+      "lactancia": "no l'administreu.",
+      "pediatria": "NO està descrit el seu ús."
+    }
+  },
+  {
+    "file": "Procaïnamida.md",
+    "name": "Procaïnamida",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/57/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial  1 g = 10 ml (100 mg/ml).",
+      "propiedades": "antiarrítmic classe IA amb efectes anticolinèrgics. Disminueix l'automatisme, l'excitabilitat, la\nvelocitat de conducció i la contractilitat miocardíaca amb escàs efecte sobre el nòdul AV. Eixampla QRS\ni allarga QT.",
+      "indicaciones": "arrítmies ventriculars. AC x FA o flutter. Taquicàrdia o extrasístoles en absència d'IC.\nWPW.",
+      "dosis": "Temps d'acció (inici):  2 - 3 minuts.\nDuració aproximada:  3 - 4 hores.\nAdult: 10 - 15 mg/kg en bolus lent (20 min), dosi màxima 1 g, en la taquicàrdia inestable que no\nrespon a la cardioversió. Reintenteu la cardioversió.",
+      "contraindicaciones": "BAV, Torsade de Pointes, QT llarg, TV en SCA. Precaució en persones que\nprenen digitàlics, IC, insuficiència renal, hepatopatia, miastènia gravis i lupus.",
+      "efectosSecundarios": "febre, calfreds, artritis, rash, TV, FV/asistòlia (si l'administració és ràpida), BAV,\nhipotensió severa (agreujada per altres antihipertensius), prolongació del PR i QT, ampliació del QRS,\nnàusees, vòmits i confusió mental.",
+      "embarazo": "no l'utilitzeu en embaràs.",
+      "lactancia": "risc molt baix. Segur i compatible.",
+      "pediatria": "Dosi de càrrega 3 - 6 mg/kg en 5 min (màxim 100 mg/dosi). Repetiu-la cada 5 - 10 min fins un\nmàxim dosi de càrrega de 15 mg/kg. Velocitat d'infusió màxima 500 mg en 30 min."
+    }
+  },
+  {
+    "file": "Propofol.md",
+    "name": "Propofol",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/58/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de 200 mg = 20 ml al 1% (10 mg/ml).",
+      "propiedades": "anestèsic: Hipnòtic sedant d'inici i vida mitja curta (5 - 10 min). Disminueix la PPC, PIC i\nPIO.",
+      "indicaciones": "manteniment de l'anestèsia en SIR i sedació conscient per pràctica de tècniques,\nmentre estigui hemodinàmicament estable (PRECAUCIÓ: mireu índexs de xoc per detecció de xoc\nocult).",
+      "dosis": "Temps d'acció (inici):  30 – 60 segons.\nDuració aproximada:  5 - 10 minuts (una dosi); més llarg si infusió.\nAdult.: 1 - 2,5 mg/kg, si més de 55 kg. Fàrmac a administrar per pes real del malalt.\nSedació conscient: 0,25 - 1 mg/kg i.v. en 30 segons. Resposta individual variable a dosis baixes.\nPerfusió contínua: 2 vials = 400 mg / 40 ml (10 mg/ml) a 0,3 – 4 mg/kg/h, sense diluir.\nSense diluir 2 vials: 400 mg / 40 ml (10 mg/ml)  (mg/kg/h).\nmicrograms/h\n0,3\n0,6\n1\n2\n3\n4\n50\n2\n3\n6\n11\n17\n22\n60\n2\n4\n6\n12\n18\n24\n70\n2\n4\n7\n11\n21\n28\nPes kg\n80\n2\n5\n8\n16\n24\n32\nml/h\n90\n3\n5\n9\n18\n27\n36\n100\n110\n3\n6\n10\n20\n30\n40\n3\n7\n11\n22\n33\n44",
+      "contraindicaciones": "eviteu-lo en situacions d'inestabilitat hemodinàmica, real o oculta.\nHipersensibilitat coneguda al compost. Administreu-lo amb precaució en menors de 3 anys. Vigileu-ne\nl'ús en cardiopatia amb disfunció ventricular (CV sincronitzada).",
+      "efectosSecundarios": "administrat ràpidament, pot produir hipotensió amb taquicàrdia reflexa. Dosis\nmolt altes poden produir bradicàrdia i hipotensió. Hipotensió sobretot en pacients grans. Depressió\nrespiratòria i irritació venosa. Associat a la síndrome per perfusió de propofol (mortal). La infusió\nperllongada i a dosis elevades s'ha associat a ACR, fallida multiorgànica i acidosi làctica en lactants.\nVerborrea i desinhibició.",
+      "observaciones": "En pacients hipovolèmics reals o ocults administreu líquids segons tolerància i/o"
+    }
+  },
+  {
+    "file": "Rocuroni.md",
+    "name": "Rocuroni",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/59/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 50 mg = 5 ml (10 mg/ml).",
+      "propiedades": "blocador neuromuscular no despolaritzant de durada intermèdia i efecte ràpid. No\naugmenta la PIC i és bastant estable HDC.",
+      "indicaciones": "manteniment de la relaxació neuromuscular durant l'anestèsia. Pot substituir com\ninductor a la succinilcolina si està contraindicada. PRECAUCIÓ si té criteris de VAD (no tenim altre\nfàrmac alternatiu ni antídot).",
+      "dosis": "Temps d'acció (inici):  45 - 90 segons.\nDuració aproximada:  30 - 60 minuts (a dosis de SRI, fins a 60 - 90 minuts).\nAdult.: administreu-lo per càlcul del pes ideal. Inducció anestèsica: bolus 0,6 - 1,2 mg/kg i.v.\nPerfusió contínua: dosi de manteniment: 0,3 - 0,6 mg/kg i.v.\nDissolució: 1 vial + 45 ml SF (1 mg/ml)\nmg/kg\n0,3\n0,4\n0,5\n0,6\n10\n3\n4\n5\n6\n20\n6\n8\n10\n12\n30\n9\n12\n15\n18\n40\n12\n16\n20\n24\n50\n15\n20\n25\n30\nPes kg\n60\n18\n24\n30\n36\nml/hora\n70\n21\n28\n35\n42\n80\n24\n32\n40\n48\n90\n27\n36\n45\n54\n100\n110\n30\n40\n50\n60\n33\n44\n55\n66",
+      "contraindicaciones": "hipersensibilitat, malalties neuromusculars i nounats de menys d'1 mes de vida.\nPrecaució en pacients d'edat avançada, malaltia hepàtica o insuficiència renal\navançada/trasplantats de ronyó.",
+      "efectosSecundarios": "taquicàrdia, hipotensió lleugera (sobretot en administracions ràpides),\nbroncoespasme o laringoespasme per alliberament d'histamina, pot desencadenar hipertèrmia\nmaligna, nàusees i vòmits.",
+      "observaciones": "• Augmenten el seu efecte: tiopental, ketamina, fentanil, etomidat, propofol i administració prèvia\nde succinilcolina.\n• Disminueixen el seu efecte: noradrenalina, teofilina i fenitoïna.\n• Preserveu de la llum, conservació en nevera (pot aguantar fora 12 setmanes).\n• Els seus efectes s'antagonitzen amb sugammadex."
+    }
+  },
+  {
+    "file": "Salbutamol.md",
+    "name": "Salbutamol",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/60/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "• Inhalador 1 puff = 0,1 mg.\n• Solució per nebulitzar 2,5 mg/2,5ml.",
+      "propiedades": "agonista beta-2 adrenèrgic. Relaxa la musculatura llisa bronquial i disminueix la secreció\nde mucositats. Inhibeix les contraccions uterines. Hipopotassèmic.",
+      "indicaciones": "crisi i estatus asmàtic i MPOC reaguditzada. Maneig coadjuvant de la hiperpotassèmia.\nManeig indirecte de la bradicàrdia sinusal en persones d’edat avançada.",
+      "dosis": "Adult:\n• NEB: 2,5 - 5 mg (1 - 2 ml) es pot repetir als 10 min, segons gravetat o resposta del malalt o\nmanteniu-la continuada 10 - 15 mg/hora si no apareixen efectes secundaris.\n• Si hiperpotassèmia, NEB de 10 - 20 mg en 10 min + la resta de teràpies.\n• Si anafilaxi nebulitzeu a 6 l/min.\n• Inhalat: 0,1 - 0,2 mg (2 - 4 puffs) / 4 - 8 hores. Es pot administrar en malalt intubat o VMNI amb\nun adaptador.",
+      "contraindicaciones": "al·lèrgia. Precaució en hipertiroïdisme, cardiopatia isquèmica, HTA, gent d’edat\navançada, DM, feocromocitoma i antecedents d'arrítmies i/o de IC.",
+      "efectosSecundarios": "taquicàrdia, angor, HTA, tremolor, hipertèrmia, nerviosisme, mal de cap,\nhipopotassèmia, excitació SNC i convulsions.",
+      "embarazo": "es pot utilitzar. Eviteu-lo en part prematur associat a eclàmpsia o en hemorràgia\nantepartum. Eviteu-lo en risc d'avortament durant 1r i 2n trimestre de gestació.",
+      "lactancia": "es pot utilitzar. Risc molt baix.",
+      "pediatria": "Inhalació amb polvoritzador. Sempre que es pugui amb cambra.\nTractament agut:\n• Exacerbació lleu: 200 - 400 micrograms (2 - 4 inhalacions).\n• Exacerbació moderada: 400 - 800 micrograms (4 - 8 inhalacions).\n• Exacerbació greu: 800 - 1000 micrograms (8 - 10 inhalacions).\nInicialment es pot repetir la dosi 3 cops, espaiats per 20 min.\nNEB. 0,15 mg/kg o segons pes:\n• Menys de 10 kg: 1,5 mg.\n• 10 - 20 kg: 2,5 mg.\n• Més de 20 kg: 5 mg."
+    }
+  },
+  {
+    "file": "Somatostatina.md",
+    "name": "Somatostatina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/61/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 3 mg en pols per reconstituir en 1 ml de dissolvent.",
+      "propiedades": "vasoconstrictor esplàncnic. A nivell gàstric inhibeix la secreció de pepsina i àcid clorhídric.",
+      "indicaciones": "HDA, especialment per varices esofàgiques.",
+      "dosis": "Adult:\n0,25 mg (250 micrograms) via endovenosa lenta en 3 minuts.\nPerfusió contínua: 3,5 micrograms/kg/hora i manteniu fins 48-72 hores després de controlada\nl'hemorràgia. Durada màxima del tractament 5 dies (120 hores).\nEn pacients amb creatinina de més de 30 ml/min, reduïu la dosi a 1,75 micrograms/kg/hora.\nDilució: Diluïu el vial de 3 mg en pols amb el dissolvent d’1 ml i després diluïu-ho en 49 ml de SF\n(0,06 mg/ml). D'aquesta dilució de 50 ml, agafeu-ne 4,16 ml que es corresponen amb els 250\nmicrograms (0,25 mg) i passeu-lo en bolus i.v. lent en 3 min.\nPerfusió contínua per la dosi de 3,5 micrograms/kg/hora: useu els restants 45,84 ml (2,75 mg) de\nla dilució de 50 ml i perfoneu-los segons la taula.\nUtilitzeu els restants 45,84 ml (2,75 mg) de la dilució de 50 ml\nmicrograms/kg/hora\n3,5\n50 kg\n2,93\n60 kg\n3,51\n70 kg\n4,10\n80 kg\n4,68\n90 kg\n5,27\n100 kg\n5,85\nml/h",
+      "contraindicaciones": "hipersensibilitat.",
+      "efectosSecundarios": "hipoglucèmia/hiperglucèmia, fogots, vertigen i nàusees.",
+      "observaciones": "• Cal controlar la glucèmia especialment en DM.\n• Atenció! NO el diluïu en SG 5%.\n• Necessita nevera.",
+      "embarazo": "no l'administreu."
+    }
+  },
+  {
+    "file": "Succinilcolina.md",
+    "name": "Succinilcolina",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/62/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 100 mg = 2 ml (50 mg/ml).",
+      "propiedades": "blocador neuromuscular despolaritzant. Allibera histamina i potassi. Necessita nevera\nperò pot estar fora durant 4 mesos.",
+      "indicaciones": "relaxació muscular. Indicat d'elecció en SIR.",
+      "dosis": "Temps d'acció (inici):  30 - 60  segons.\nDuració aproximada:  4 - 6 minuts.\nAdult:  1 - 1,5 mg/kg bolus i.v. (segons pes real) → premediqueu amb atropina en SIR de menys de\n10 anys o bradicàrdic d'entrada.",
+      "contraindicaciones": "hipersensibilitat. Utilitzeu-lo amb precaució en grans cremats, lesions\ntraumàtiques extenses, lesió medul·lar aguda (LMA), síndrome de l’esclafament, ferides oculars\npenetrants, insuficiència renal crònica i  hepatopatia. Hiperpotassèmia severa.",
+      "efectosSecundarios": "fasciculacions, bradicàrdia, taquiarrítmies, HTA, broncoespasme/anafilaxi,\nhipersalivació, augment PIO, augment PIC, hiperpotassèmia, hipertèrmia maligna i lesions pulmonars\nperllongades associades a restes de relaxació.",
+      "observaciones": "• Augmenten la seva acció: hipopotassèmia, hipocalcèmia, miastènia gravis i dèficit de\ncolinesterasa.\n• Infants i adolescents aparentment sans poden patir miopaties no diagnosticades en què\nl'administració pot produir rabdomiòlisi, hiperpotassèmia i ACR.\n• El monitoratge cardíac continuat permet estimar (i tractar) els nivells de potassi en sang.\n• Ja NO es recomana la premedicació amb la 10a part del rocuroni per control PIC/PIO. Els\nefectes són transitoris i no modifiquen la morbimortalitat. Les fasciculacions poden disminuir-se\namb microdosi de midazolam 1 - 2 mg en l'adult.",
+      "embarazo": "no està contraindicat, però augmenta la seva durada pel dèficit de colinesterasa\nplasmàtica.",
+      "lactancia": "risc molt baix.",
+      "pediatria": "• Lactants: 2 mg/kg/dosi, manteniment 0,3 - 0,6 mg/kg/dosi cada 5 - 10 min, si és necessari.\n• Infants/adolescents: 1 mg/kg/dosi, manteniment 0,3 - 0,6 mg/kg/dosi cada 5 - 10 min, si és\nnecessari."
+    }
+  },
+  {
+    "file": "Sulfat de magnesi.md",
+    "name": "Sulfat de magnesi",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/63/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 1,5 g = 10 ml (150 mg/ml).",
+      "propiedades": "disminució de l'alliberament presinàptic d'acetilcolina a la placa motora.",
+      "indicaciones": "tractament d'elecció en la torsade de pointes. Crisis convulsives en l'eclàmpsia o la\npreeclàmpsia. Arrítmies relacionades amb hipopotassèmia aguda associada a hipomagnesèmia greu.\nTV i FV en pacients amb hipomagnesèmia o eclàmpsia. Com a teràpia coadjuvant a corticoesteroides\ni agonistes beta en aguditzacions severes asmàtiques (no és broncodilatador per si mateix, però si\nque en potencia l'efecte). Neuroprotecció del nadó en part prematur de més de 24 setmanes\n(segons test de Malinas).",
+      "dosis": "Adult:\nAntídot/tractament de:\n• Eclàmpsia: preveniu les convulsions i la seva recurrència amb sulfat de magnesi i.v. dosi inicial\nde 4,5 g (3 vials) diluït en 70 ml de SG 5 % a passar en 15 - 20 minuts. Continueu amb perfusió\ncontínua diluint 2 g (1,5 vials) + 35 ml de SG 5 % a una velocitat entre 15 - 30 ml/hora.  En cas\nde no resposta al tractament cal repetir un segon bolus de 2 g de sulfat de magnesi o\naugmentar el ritme de la perfusió contínua a 4 g/ hora.\nAtenció! Si no aconseguiu una via perifèrica, administreu-lo per via intramuscular a dosi 5 g\ni.m. a cada gluti, total 10 g i, posteriorment, seguiu amb la perfusió contínua endovenosa a 2\ng/h.\nSi apareixen efectes secundaris degut al sulfat de magnesi (p.ex. depressió respiratòria)\nadministreu gluconat de calci al 10 %, com antídot (un bolus de 10 ml en 3 - 4 minuts (1 g)\nlent).\nControleu ROT cada 2 h per valorar l'afectació de la placa neuromuscular.\n• Hipomagnesèmia (inclosa la induïda per intoxicació per fluor o bari): 1 – 2 g i.v. diluïts en\n50 ml de SG 5 % en 10 – 15 min.\n• Torsade de pointes (associada a fàrmacs o drogues d’abús: metadona, neurolèptics,\nantidepressius, cocaïna): 2 g i.v.en 50 ml de SG 5 % en 10 – 15 min. Pot repetir-se fins a un\nmàxim de 6 g.\n• FV o TV sense pols (especialment si està associada a QT llarg / sospita de torsade de\npointes): 2 g i.v. en bolus lent (1 – 2 minuts)- Si no hi ha resposta, repetir la dosi cada 5 – 15\nminuts, fins a un màxim de 6 g.\n• Asma greu: 2 g i.v. diluïts en 50 ml de SG 5%, a passar en 20 min.",
+      "contraindicaciones": "miastènia gravis, tractament amb blocadors dels del calci, lesió miocardíaca.\nUtilitzeu-lo amb precaució en pacients amb trastorns de la conducció, insuficiència renal i hepàtica,\nmalalts digitalitzats i motilitat gastrointestinal reduïda.",
+      "efectosSecundarios": "hipermagnesèmia, hipotensió, blocatge cardíac, dispnea, hipoglucèmia,"
+    }
+  },
+  {
+    "file": "Tenecteplasa.md",
+    "name": "Tenecteplasa",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/64/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial de pols 10.000 UI (50 mg) + xeringa amb 10 ml de dissolvent per reconstituir. Un\ncop reconstituït, hi ha 1.000 UI (5 mg) / ml.",
+      "propiedades": "fibrinolític.",
+      "indicaciones": "SCAEST, si el temps ECG-arribada a hospital amb ICP és major de 90 min, o el temps\nECG-obertura del vas és superior a 120 min. TEP d’alt risc amb inestabilitat hemodinàmica (xoc,\nhipotensió persistent) o ACR per sospita de TEP.",
+      "dosis": "Reconstituïu el preparat amb el dissolvent de la xeringa i no l'agiteu.\n• Bolus intravenós: administreu en uns 10 s, en funció del pes del malalt:\n   ◦ < 60 kg: 6.000 UI (30 mg, 6 ml de solució reconstituïda).\n   ◦ De 60 a < 70 kg: 7.000 UI (35 mg, 7 ml de solució reconstituïda).\n   ◦ De 70 a < 80 kg: 8.000 UI (40 mg, 8 ml de solució reconstituïda).\n   ◦ De 80 a < 90 kg: 9.000 UI (45 mg, 9 ml de solució reconstituïda).\n   ◦ ≥ 90 kg: 10.000 UI (50 mg, 10 ml de solució reconstituïda).\nAbans i després de cada bolus administreu 10 ml de SF 0,9 %.\nEn SCAEST: idealment en els primers 10 min des de l'ECG, juntament amb la doble antiagregació i\nl'anticoagulació.\nEn TEP: en pacient inestable o amb ACR amb sospita de TEP. Administreu com a tractament de\nsuport 5.000 UI i.v. d’heparina sòdica en bolus (també es pot fer servir qualsevol HBPM com\nl’enoxaparina ajustada per pes i funció renal).",
+      "contraindicaciones": "• Absolutes:\n   ◦ Reacció anafilàctica a qualsevol dels components o a la gentamicina.\n   ◦ Antecedent hemorràgia intracranial prèvia o AVC de causa desconeguda.\n   ◦ AVC isquèmic en els últims 6 mesos.\n   ◦ Lesió intracranial estructural coneguda (p. ex. neoplàsia intracranial, malformació vascular\ncerebral o aneurisma cerebral).\n   ◦ Traumatisme cranial /craniofacial greu o cirurgia intracranial o espinal en els últims 2\nmesos.\n   ◦ Cirurgia major en el darrer mes.\n   ◦ Sagnat actiu significatiu (excepte menstruació).\n   ◦ Sagnat intern en el darrer mes  (gastrointestinal, urinari, pulmonar).\n   ◦ Sospita de dissecció aòrtica.\n   ◦ Punció no compressible en les darreres 24 h (biòpsia hepàtica, punció lumbar, etc.).\n   ◦ Hipertensió greu no controlada (no respon al tractament) amb PAS > 180 mm Hg o PAD >\n110 mm Hg (Guies ACC/AHA 2025).\nEn l'atenció prehospitalària el tractament amb anticoagulants orals amb qualsevol ACOD*"
+    }
+  },
+  {
+    "file": "Tiamina.md",
+    "name": "Tiamina",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/65/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 100 mg = 1 ml.",
+      "propiedades": "vitamina B1. Coenzim de la piruvat deshidrogenasa que afavoreix l'oxidació del piruvat (via final\nde la glucòlisi) perquè pugui obtenir ATP. L'alcohol inhibeix la seva absorció.",
+      "indicaciones": "intoxicació etílica aguda, estats amb dèficit de tiamina (malnutrició, alcoholisme crònic,\nmalalties intestinals -malabsorció-). Tractament del beri-beri, encefalopatia de Wernicke i psicosi de\nKorsakoff i (Síndrome de Wernicke-Korsakoff). Tractament ideal en les primeres 48-72 hores de l'inici dels\nsímptomes.",
+      "dosis": "Adult: 100 mg i.m. o i.v. diluïda en 50 ml de SF. Fins a 200 mg si es considera necessari.\n• La via i.m. presenta menor incidència de reaccions anafilàctiques.\n• NO el barregeu amb cap altre producte per via parenteral.",
+      "contraindicaciones": "Hipersensibilitat (el risc s'incrementa amb administracions i.v. o i.m. repetides).",
+      "efectosSecundarios": "anafilaxi (pocs casos descrits), nàusees, vòmits, rash cutani i prurit.",
+      "observaciones": "en alcohòlics amb hipoglucèmia primer administreu tiamina i.m. i després glucosa i.v. per\ntal de prevenir la precipitació de la Sd. de Wernicke-Korsakoff. La via i.v. es reserva per a casos greus.",
+      "embarazo": "estudis insuficients. No l'administreu.",
+      "lactancia": "s'excreta amb la llet. No es recomana."
+    }
+  },
+  {
+    "file": "Ticagrelor.md",
+    "name": "Ticagrelor",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/66/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits de 90 mg v.o.",
+      "propiedades": "inhibidor de l'agregació plaquetària.",
+      "indicaciones": "en SCAEST,\nSi compleix tots els següents criteris:\n• No hemorràgia activa greu.\n• No doble antiagregació prèvia.\n• No criteris d’alt risc hemorràgic.\nI, a més a més, algun dels següents:\n• Antecedents d’ictus isquèmic o AIT previ.\n• Major o igual a 75 anys (> 75 anys).\n• Menys de 6 0kg (< 60 kg).",
+      "dosis": "Adult: 180 mg v.o. (dosi única de càrrega).",
+      "contraindicaciones": "en SCAEST, no administreu segon antiagregant si hi ha hemorràgia activa greu,\nsi hi ha impossibilitat de via oral o si ja té doble antiagregació prèvia. No l’administreu si fibrinòlisi.\nAltres: hipersensibilitat, hemorràgia patològica activa, antecedent d'hemorràgia intracranial,\ninsuficiència hepàtica greu. Augmenta l'activitat de fàrmacs que potencien el risc d'hemorràgia (AINE,\nanticoagulants orals i fibrinolítics) i de fàrmacs que afavoreixen bradicàrdia (betablocadors, blocador\ndels canals de calci i digoxina). Precaució en pacients amb asma i MPOC.",
+      "efectosSecundarios": "dispnea, hemorràgies menors, bradicàrdia (pauses ventriculars de menys de 3\ns) i cefalea.",
+      "embarazo": "no l'administreu.",
+      "lactancia": "s'excreta amb la llet. No es pot excloure el risc pels lactants."
+    }
+  },
+  {
+    "file": "Tramadol.md",
+    "name": "Tramadol",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/67/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 100 mg = 2 ml (50 mg/ml).",
+      "propiedades": "agonista pur no selectiu dels receptors opioides.",
+      "indicaciones": "dolor de moderat a sever.",
+      "dosis": "Adult.: 1 - 2  mg/kg via i.m. lent de 1 a 2 minuts o i.v dissolt en 50 ml SF. Prèviament valoreu si precisa\nadministrar antiemètic.",
+      "contraindicaciones": "intoxicació aguda o sobredosi amb depressors del SNC, hipersensibilitat, menors d'1\nany, intoxicació alcohòlica aguda, epilèpsia no controlada adequadament, insuficiència respiratòria greu\ni insuficiència renal/hepàtica greus. En insuficiència renal moderada perllongar intervals de\ndosificació.",
+      "efectosSecundarios": "mareig, vertigen, diaforesi, nàusees, vòmits, hipotensió ortostàtica, verborrea,\ndesinhibició i al·lucinacions.",
+      "observaciones": "es pot associar a AINES o paracetamol en el dolor sever, sobretot d'origen somàtic.",
+      "embarazo": "no recomanat. Efectes sobre el fetus.",
+      "lactancia": "s'excreta amb la llet. Dosi única, no cal interrompre-la. Més dosi, interrompre-la.",
+      "pediatria": "Ús en majors 3 anys: 1 - 2 mg/kg cada 6 - 8h. Màxim dosi 100 mg. Màxim dia 400 mg."
+    }
+  },
+  {
+    "file": "Urapidil.md",
+    "name": "Urapidil",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/68/1) 1/1",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 50 mg = 10 ml (5 mg/ml).",
+      "propiedades": "antihipertensiu. Antagonista selectiu del receptor alfa-1 adrenèrgic postsinàptic perifèric. A\nnivell central estimula receptor 5HT1A serotoninèrgic: vasodilatació i disminució de les resistències\nvasculars perifèriques, disminució postcàrrega i TA, i disminució del to simpàtic.",
+      "indicaciones": "crisis o emergències HTA. HTA a període peripostoperatori.",
+      "dosis": "Temps d'acció (inici):  2 - 5 minuts amb efecte màxim als 10 – 15 min.\nDuració aproximada:  l’eliminació sèrica s’inicia passades 2 hores.\nAdult: bolus inicial 25 mg i.v. (5 ml) en bolus lent (de 20 segons a 2 min. màxim). Si no hi ha resposta\nals 5 min, nova dosi de 25 mg. Si no hi ha resposta als 5 min, administreu-ne 50 mg.\n2 - 7 micrograms/kg/min.\nDissolució: 1 vial (50 mg) + 40 ml SF (1 mg/ml)\nPes kg\nmicrograms/min\n|     | 10  | 20 30    | 40   | 50 60   | 70 80     | 90 100  | 110  |\n| 2   | 1,2 | 2,4 3,6  | 4,8  | 6 7,2   | 8,4 9,6   | 10,8 12 | 13,2 |\n| 3   | 1,8 | 3,6 5,4  | 7,2  | 9 10,8  | 12,6 14,4 | 16,2 18 | 19,8 |\n| 4   | 2,4 | 4,8 7,2  | 9,6  | 12 14,4 | 16,8 19,2 | 21,6 24 | 26,4 |\n| 5   | 3   | 6        | 9 12 | 15 18   | 21 24     | 27 30   | 33   |\n| 6   | 3,6 | 7,2 10,8 | 14,4 | 18 21,6 | 25,2 28,8 | 32,4 36 | 39,6 |\n| 7   | 4,2 | 8,4 12,6 | 16,8 | 21 25,2 | 29,4 33,6 | 37,8 42 | 46,2 |\n|     |     |          |      | ml/h    |           |         |      |",
+      "contraindicaciones": "hipersensibilitat, estenosi valvular aòrtica i shunt A-V. Precaució en edat\navançada, hipovolèmia, insuficiència renal i hepàtica severes i IC.",
+      "efectosSecundarios": "més freqüents: mareig, nàusees i cefalea. Altres: hipotensió severa, arrítmies,\nangor, palpitacions, taquicàrdia, dispnea, diaforesi, vertigen, agitació, xerostomia i insomni.",
+      "observaciones": "el seu efecte es potencia amb l'alcohol i fàrmacs antihipertensius (especialment IECA\n| i nitroprussiat) | No el barregeu | amb altres | hipotensors |     |     |     |     |"
+    }
+  },
+  {
+    "file": "Valproat sòdic.md",
+    "name": "Valproat sòdic",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/69/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 400 mg + 4 ml dissolvent (100 mg/ml).",
+      "propiedades": "anticonvulsiu.",
+      "indicaciones": "epilèpsia generalitzada o parcial. Estat epilèptic, incloent les crisis d'absència.",
+      "dosis": "Forma d'administració: bolus de càrrega, seguit d'infusió continuada.\nAdult: bolus 20 - 40 mg/kg, 1200 - 2000 mg en 5 - 10 min. El podeu diluir en 50 – 100 ml SF o sense\ndiluir. Màxim 6 mg/kg/min.\nPerfusió contínua: 0,5 - 1 mg/kg/hora. 30 min després del bolus inicial. Màxim 25 mg/kg/dia.",
+      "contraindicaciones": "hipersensibilitat, insuficiència hepàtica o pancreàtica, porfíria hepàtica i\ncoagulopatia. No l’administreu en dones en edat fèrtil.",
+      "efectosSecundarios": "trombopènia, hepatotoxicitat, somnolència, arrítmies (extrasístoles i bradicàrdia),\nnàusees, vòmits, dispèpsia gàstrica i tremolor. Si sobredosificació: confusió, coma, miastènia i hipo- o\narreflèxia.",
+      "observaciones": "• Administreu el fàrmac per via aïllada.\n• Potencia l'efecte de: neurolèptics, antidepressius i benzodiazepines.\n• Concentracions sèriques disminuïdes per: fenitoïna, fenobarbital, carbamazepina i\ncarbapenems.\n• Risc d'hemorràgia amb: anticoagulants i AAS.\n• Augmenta exposició de propofol (reduïu la dosi de propofol).",
+      "embarazo": "no l'administreu. És teratogen.",
+      "lactancia": "fàrmac segur.",
+      "pediatria": "20 mg/kg (1 vial 400 mg + 10 ml SF). Perfusió contínua: 1 mg/kg/hora.\n• Convulsió: 15 mg/kg en bolus lent (3 - 5 min) i al cap de 30 min iniciar infusió d’1\nmg/kg/hora fins màxim 25 mg/kg/dia.\n• Estatus epilèptic: dosi de càrrega 20 - 40 mg/kg a passar en 5 - 10 min, manteniment\n1 - 5 mg/kg/hora depenent de si està en tractament amb inductors o inhibidors\nenzimàtics."
+    }
+  },
+  {
+    "file": "Verapamil.md",
+    "name": "Verapamil",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/70/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 5 mg = 2 ml (2,5 mg/ml).",
+      "propiedades": "antiarrítmic classe 4 (blocador dels canals del calci) amb efecte cronotròpic i inotròpic\nnegatius. Actua sobre el node AV disminuint la conducció i la FC. Produeix vasodilatació coronària i\nperifèrica.",
+      "indicaciones": "acció antiarrítmica, hipotensora i antianginosa. Tractament de taquicàrdies\nsupraventriculars. Control de la freqüència ventricular en ACxFA i flutter auricular (excepte si s'associa\na vies accessòries de conducció: WPW o síndrome de Lown-Ganong-Levine).",
+      "dosis": "Adult: 5 - 10 mg via i.v. lenta (2 - 3 minuts) diluït en 10 ml SF. Repetiu, si cal, 30 minuts després amb\n10 mg.",
+      "contraindicaciones": "hipersensibilitat, SCA amb bradicàrdia i hipotensió, hipotensió, xoc cardiogènic,\nBAV 2n - 3r, malaltia del sinus (excepte si és portador de marcapassos ventricular funcional), ICC (pot\nprecipitar EAP), tractament amb betablocadors, flutter auricular o fibril·lació auricular amb tracte AV\naccessori (WPW), TV (excepte si verapamil-sensible). Administreu-lo amb precaució en asmàtics i\nMPOC.",
+      "efectosSecundarios": "mareig, mal de cap, somnolència, nerviosisme, envermelliment facial, angor,\npalpitacions, taquicàrdia reflexa, ICC, nàusees, sequedat oral, hipotensió, xoc i BAV.",
+      "observaciones": "• Potenciació per betablocadors.\n• Augmenten els seus efectes els nitrats, digoxina, blocador neuromuscular i teofil·lina.\n• Potencia efectes hipotensors amb antihipertensius, diürètics i vasodilatadors.\n• Si hipotensió o xoc, administreu clorur o gluconat càlcic.",
+      "embarazo": "es pot utilitzar encara que hi ha risc d'hipòxia fetal.",
+      "lactancia": "fàrmac segur.",
+      "pediatria": "• Menors d'1 any: només en cas imprescindible a 0,1 - 0,2 mg/kg en bolus de 2 minuts\nmínim amb monitoratge d'ECG i TA pel risc d'hipotensió i baix dèbit cardíac.\n• Majors d'1 any: 0,1 - 0,3 mg/kg (màxim 5 mg/dosi), si no hi ha resposta, repetiu als 30\nminuts segona dosi (màxim 10 mg/dosi).\n• Perfusió contínua: 1 - 5 microgram/kg/min.\nAtenció! No l’administreu en bolus ràpid, ja que s’han descrit situacions de col·lapse"
+    }
+  },
+  {
+    "file": "Àcid acetilsalicílic.md",
+    "name": "Àcid acetilsalicílic",
+    "altoRiesgo": true,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/3/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "comprimits 500 mg.",
+      "propiedades": "antiagregant plaquetari, analgèsic, antipirètic i antiinflamatori.",
+      "indicaciones": "síndrome coronària aguda (SCA). Control del dolor. Hipertèrmia (en majors de 16 anys).\ndolor.",
+      "dosis": "• SCA: 250 mg v.o. (mastegat o dissolt).\n• Dolor / febre: 500 mg / 4 – 8 h v.o. (màx. 4.000 mg/dia). Administreu la dosi menor efectiva.\n10 – 15 mg/kg v.o.",
+      "contraindicaciones": "hipersensibilitat  a  l'AAS  o  els  AINE  (precaució  en  asmàtics).  Alteracions  de  la\ncoagulació i hemofília. HDA. Úlcera pèptica. Insuficiències renal, hepàtica o cardíaca greus. Tractament\namb metotrexat a dosis altes (> 15  mg/setmana). Menors de 16 anys amb febre, grip o varicel·la (risc\nde síndrome de Reye).\nmenors de 16 anys amb febre, grip o varicel·la (risc de síndrome de Reye).",
+      "efectosSecundarios": "hemorràgies  (digestiva,  epistaxi,  urogenital,  etc.).  Broncoespasme.  Xoc\nanafilàctic.  Lesions  cutànies  (urticària,  angioedema,  erupció,  etc.).  Trastorns  gastrointestinals\n(nàusees, dispèpsia, vòmits, úlcera).",
+      "observaciones": "• Potencia l'efecte dels anticoagulants (augmenta el risc d’hemorràgia), la nitroglicerina, la digoxina,\nl’àcid valproic i els antidiabètics orals.\n• Disminueix l'efecte dels blocadors beta.\n• Disminueix  l’efecte  dels  IECA,  ARA-II  i  diürètics  i  en  tractament  concomitant  pot  afavorir  la\ninsuficiència renal aguda, sobretot en pacient deshidratat o amb insuficiència renal prèvia.\n• Augmenta el risc d'hemorràgia en tractament concomitant amb corticosteroides.",
+      "embarazo": "contraindicat  en  el  tercer  trimestre.  En  el  primer  i  segon  trimestres  dosi  i  durada  mínimes\npossible.",
+      "lactancia": "es  pot  administrar  a  dosis  baixes  en  cas  de  SCA.  No  es  recomana  a  dosis  altes  (si\nl'administreu, valoreu descartar la propera presa de llet).",
+      "pediatria": ""
+    }
+  },
+  {
+    "file": "Àcid tranexàmic.md",
+    "name": "Àcid tranexàmic",
+    "altoRiesgo": false,
+    "fuente": "https://guiescliniques.sem.gencat.cat/#/farmacs/(cev:viewer/farmacs/1/1)",
+    "subtitulo": null,
+    "alerta": null,
+    "sections": {
+      "presentacion": "vial 500 mg / 5 ml (100 mg/ml).",
+      "propiedades": "antifibrinolític sintètic.",
+      "indicaciones": "traumatisme amb hemorràgia greu o risc d’hemorràgia massiva (fractura\npelviana, lesió d'òrgan sòlid, amputació traumàtica amb sagnat actiu, TCE amb xoc\nhemorràgic). Hemorràgia espontània (metrorràgia, hemorràgia postpart, hemoptisi).\nHemorràgia postquirúrgica. Hemorràgia associada a administració d'agent fibrinolític.",
+      "dosis": "• Intravenosa: 1 g (dos vials) diluït en 50 – 100 ml de SF 0,9 % o SG 5 %, i administreu en\n10 min, dins de les 3 primeres hores després de la lesió, seguit d'una perfusió d’1 g durant 8 h.\n   ◦ Perfusió contínua: dilució: 1 g en SF 0,9 % o SG 5 % fins a 50 ml a 6,25 ml/hora\ndurant 8 h. Valoreu iniciar la perfusió segons isòcrona.\nEn pacients amb insuficiència renal, la dosi inicial és d’1 g. En cas de considerar\nperfusió contínua per isòcrona en pacients amb FG < 50 ml/min o\ncreatinina > 1,35 mg/dl (120 µmol/l), la dosi serà de 10 mg/kg (màx. 1 g), ajustant el\ntemps de perfusió segons la funció renal.\n• Intramuscular: quan no està disponible la via i.v. La dosi és d’1 g.\n• Nebulització: 500 mg / 8 h en hemoptisi no massiva. Poseu el contingut d'1 vial l recipient\nnebulitzador i nebulitzeu a 9 l/min. Considereu broncodilatació prèvia, segons el cas.\n• Via tòpica: apliqueu 500 mg diluïts en gasses en sagnats mucosos durant 10 – 15 min\n(absorció sistèmica mínima).",
+      "contraindicaciones": "hipersensibilitat coneguda a l’àcid tranexàmic. Tromboembolisme actiu (TVP,\nTEP, trombosi cerebral). Història de trombosi arterial o venosa, hemorràgia subaracnoidal, CID activa\no condicions fibrinolítiques secundàries.",
+      "efectosSecundarios": "mareig. Cefalea. Somnolència. Nerviosisme. Rubor facial. Angor. Palpitacions.\nTaquicàrdia reflexa. ICC. Nàusees. Xerostomia. Alteracions visuals (oclusió artèria retinal). Hipotensió\n(particularment en infusió ràpida). Xoc. BAV. Convulsions (sobretot a dosis altes, en infants i persones\nde baix pes).",
+      "observaciones": "• L'administració ràpida condiciona risc d’hipotensió.\n• Administració precoç: < 3 hores des de l’inici de l'episodi hemorràgic, evident o sospitat.\n• En hemorràgia digestiva no es recomana el seu ús rutinari.\n• Especial atenció i precaució en: història de convulsions, TCE sense xoc hemorràgic, pacients\namb factors de risc trombòtic (valvulopatia, arrítmia trombògena, hipercoagulabilitat) i l’ús\nconcomitant d’anticonceptius hormonals combinats.\n• Precaució extrema i especialitzada en\n   ◦ Ús concomitant amb concentrats de factor IX o agents antiinhibidors (risc de trombosi).\n   ◦ Pacients amb leucèmia promielocítica en tractament amb tretinoïna (ATRA) per risc"
+    }
+  }
+]

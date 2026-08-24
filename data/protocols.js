@@ -5,7 +5,7 @@
    ================================================================== */
 window.PROTOCOLS = [
 
-{id:'anafilaxia', title:'Anafilaxia', sub:'Adrenalina IM inmediata — ERC 2025', badge:'red', tag:'Crítico', steps:[
+{id:'anafilaxia', title:'Anafilaxia', sub:'Adrenalina IM inmediata — ERC 2025', badge:'red', tag:'Crítico', rank:8, steps:[
   {type:'action', text:'Retirar el desencadenante si es posible (fármaco IV, picadura). NO retrasar la adrenalina por esto'},
   {type:'action', text:'ADRENALINA IM 0,5 mg (0,5 mL de solución 1 mg/mL = 1:1000) en cara anterolateral del muslo (vasto lateral), lo antes posible.\nAlternativa ponderal equivalente: 0,01 mg/kg IM, máximo 0,5 mg'},
   {type:'info', text:'IM en muslo, NO subcutánea ni en deltoides. Autoinyector en adultos: 0,5 mg (ERC First Aid 2025)'},
@@ -22,7 +22,7 @@ window.PROTOCOLS = [
   {type:'info', text:'Observación antes del alta según gravedad y respuesta. Alta con autoinyector, plan escrito y derivación a alergología'}],
   src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568 · Actualizacion de evidencia en anafilaxia: Dodd 2021 · PMID 33895231 · Preparacion de la perfusion IV: LoVerde 2017 · PMID 28800865'},
 
-{id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', steps:[
+{id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', rank:13, steps:[
   {type:'action', text:'ECG de 12 derivaciones. Descartar preexcitación (QRS ancho, delta): contraindica frenar el nodo AV'},
   {type:'decision', text:'¿Inestabilidad hemodinámica ATRIBUIBLE a la FA? (shock, hipotensión mantenida, edema agudo de pulmón, isquemia en curso)', yes:'Inestable', no:'Estable'},
   {type:'action', branch:'yes', text:'CARDIOVERSIÓN ELÉCTRICA SINCRONIZADA inmediata. No retrasar por la duración de la FA ni por completar anticoagulación'},
@@ -37,7 +37,7 @@ window.PROTOCOLS = [
   {type:'info', text:'La duración referida por el paciente puede ser falsa si hubo FA asintomática previa. Prudencia en ancianos y cardiopatía estructural'}],
   src:'ESC 2024 · PMID 39210723 · RACE 7 ACWAS NEJM 2019 · PMID 30883054 · AHA ALS 2025 · PMID 41122884'},
 
-{id:'rcp', title:'RCP / SVA', sub:'Soporte vital avanzado adulto — ritmo desfibrilable vs no desfibrilable', badge:'red', tag:'Crítico', steps:[
+{id:'rcp', title:'RCP / SVA', sub:'Soporte vital avanzado adulto — ritmo desfibrilable vs no desfibrilable', badge:'red', tag:'Crítico', rank:6, steps:[
   {type:'action', text:'Confirmar PCR: inconsciente, no respira con normalidad (o gasping), sin pulso central palpable (máx. 10 seg)'},
   {type:'action', text:'Iniciar RCP básica de calidad: 30 compresiones : 2 ventilaciones, conectar monitor/desfibrilador en cuanto esté disponible'},
   {type:'action', text:'Analizar ritmo con palas/parches — minimizar interrupciones de las compresiones'},
@@ -53,7 +53,7 @@ window.PROTOCOLS = [
   src:'ERC 2025 Adult ALS · PMID 41117572 · AHA ALS 2025 · PMID 41122884'
 },
 
-{id:'via-aerea-dificil', title:'Vía aérea difícil', sub:'Algoritmo DAS 2025 — Plan A → B → C → D', badge:'red', tag:'Crítico', steps:[
+{id:'via-aerea-dificil', title:'Vía aérea difícil', sub:'Algoritmo DAS 2025 — Plan A → B → C → D', badge:'red', tag:'Crítico', rank:7, steps:[
   {type:'action', text:'Preoxigenar con FiO₂ 100%, optimizar posición (olfateo/rampa) y preparación del material antes del primer intento'},
   {type:'action', text:'Plan A: laringoscopia directa o videolaringoscopia — máximo 3 intentos + 1 intento adicional por el operador más experto (4 en total)'},
   {type:'decision', text:'¿Intubación exitosa?', yes:'Sí', no:'No'},
@@ -69,7 +69,7 @@ window.PROTOCOLS = [
   src:'Difficult Airway Society 2025 · PMID 41203471'
 },
 
-{id:'sri', title:'Secuencia rápida de intubación (SRI)', sub:'Preparación, preoxigenación, inducción y relajación', badge:'red', tag:'Crítico', steps:[
+{id:'sri', title:'Secuencia rápida de intubación (SRI)', sub:'Preparación, preoxigenación, inducción y relajación', badge:'red', tag:'Crítico', rank:9, steps:[
   {type:'action', text:'Preparación: checklist de equipo (succión, oxígeno, vía aérea con tubos y plan B, fármacos, monitor) — confirmar plan B/C definidos'},
   {type:'action', text:'Preoxigenación: FiO₂ 100% durante 3–5 min (o 8 respiraciones a capacidad vital máxima si urgencia)'},
   {type:'decision', text:'¿Riesgo de respuesta simpática/dolor (TCE, cardiopatía, aneurisma)?', yes:'Sí', no:'No'},
@@ -83,7 +83,7 @@ window.PROTOCOLS = [
   src:'DAS/ICS intubacion en paciente critico 2017 · PMID 29406182 · DAS 2025 · PMID 41203471'
 },
 
-{id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', steps:[
+{id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', rank:11, steps:[
   {type:'action', text:'Confirmar hiperkalemia con ECG y descartar pseudohiperpotasemia (hemólisis de la muestra, torniquete prolongado)'},
   {type:'decision', text:'¿Cambios ECG (T picudas, QRS ancho, aplanamiento de onda P) o K⁺ >6.5 mmol/L?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Estabilización de membrana — elegir UNA sal según el acceso venoso. Son fármacos distintos: aportan calcio elemental equivalente (~270 mg, ~13,6 mEq) pero NO son intercambiables mL a mL.\n• GLUCONATO cálcico 10%: 30 mL IV en 5–10 min. De elección con vía PERIFÉRICA, es menos flebotóxico.\n• CLORURO cálcico 10%: 10 mL IV en 2–5 min. Preferible con vía CENTRAL o en parada, aporta más Ca²⁺ por mL, pero es vesicante y causa necrosis si extravasa.\nReevaluar ECG y repetir a los 5 min si persisten los cambios'},
@@ -102,7 +102,7 @@ window.PROTOCOLS = [
   src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822 · Insulina-glucosa e hipoglucemia: Jessen 2025 · PMID 39761907 · Ibarra 2024 · PMID 39111100'
 },
 
-{id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', steps:[
+{id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', rank:10, steps:[
   {type:'decision', text:'¿Criterios de activación? (>10 CH en 24h, >4 CH en 1h, o hemorragia activa con inestabilidad hemodinámica)', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar protocolo de transfusión masiva: avisar al banco de sangre y al equipo quirúrgico/radiología intervencionista'},
   {type:'action', text:'Solicitar hemoderivados en ratio 1:1:1 (concentrados de hematíes : plasma fresco congelado : plaquetas)'},
@@ -115,7 +115,7 @@ window.PROTOCOLS = [
   src:'European guideline on major bleeding and coagulopathy following trauma, 6th ed · PMID 36859355 · NAEMSP/ACEP/ACS-COT TXA 2025 · PMID 40842057 · Ventana de 3 h, subanalisis de CRASH-2 · PMID 21439633'
 },
 
-{id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', steps:[
+{id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', rank:12, steps:[
   {type:'action', text:'ECG de 12 derivaciones en menos de 10 minutos desde la llegada'},
   {type:'decision', text:'¿Elevación del ST o BRIHH de nueva aparición (SCACEST)?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar código IAM: doble antiagregación + traslado urgente para ICP primaria (<90–120 min) o fibrinólisis si no está disponible'},
@@ -127,6 +127,85 @@ window.PROTOCOLS = [
   {type:'info', text:'Alta con seguimiento ambulatorio si SCA descartado, troponinas negativas seriadas y estratificación de bajo riesgo'}
 ],
   src:'ESC 2023 Acute Coronary Syndromes · PMID 37622654 · ACC/AHA/ACEP 2025 · PMID 40013746'
-}
+},
+
+{id:'codi-iam', title:'Codi IAM', sub:'Activación de código SCA — criterios ECG y estrategia de reperfusión', badge:'red', tag:'Crítico', rank:1, codigo:true,
+  folleto:"codigos/C01._Codi_infart_agut_de_miocardi_(IAM).pdf", steps:[
+  {type:'action', text:'Dolor torácico sugestivo de SCA (valorar alto riesgo de SCA sin dolor en mujeres, diabéticos y ancianos): ECG de 12 derivaciones en <10 minutos'},
+  {type:'decision', text:'¿Cumple criterios ECG de activación del Codi IAM?', yes:'Sí', no:'No'},
+  {type:'info', branch:'yes', text:'Criterios ECG: nueva elevación del ST en el punto J en 2 derivaciones contiguas (≥1 mm en todas excepto V2-V3; en V2-V3 ≥2 mm en hombres >40a, ≥2,5 mm en hombres <40a, ≥1,5 mm en mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación del ST en aVR (sospecha de tronco común/multivaso) · elevación persistente del ST >0,5 mm en V7-V9 con descenso especular en V1-V3 (IAM posterior) · elevación del ST en derivaciones derechas (IAM de VD) · BRIHH o BRDHH de nueva aparición (valorar Sgarbossa-Smith), patrón de Winter o ritmo de marcapasos con BRIHH'},
+  {type:'action', branch:'yes', text:'ACTIVAR CODI IAM: notificar y anotar la hora del ECG'},
+  {type:'decision', branch:'no', text:'¿Cumple criterios de SCASEST de muy alto riesgo? (inestabilidad hemodinámica/shock cardiogénico, dolor recurrente o refractario, arritmias potencialmente mortales, complicaciones mecánicas del IM, IC relacionada, elevación transitoria del ST)', yes:'Sí', no:'No'},
+  {type:'info', branch:'no', text:'Si SÍ: tratar como muy alto riesgo SIN activar Codi IAM. Si NO: protocolo SCASEST específico'},
+  {type:'decision', text:'Estrategia de reperfusión — tiempo estimado de traslado (ECG a llegada al hospital)', yes:'<90 min → angioplastia primaria', no:'>90 min → fibrinólisis prehospitalaria'},
+  {type:'info', text:'Ventana individualizable entre 90 y 120 min según el caso'},
+  {type:'action', text:'Tratamiento inicial: O₂ solo si SpO₂<90%. Analgesia: fentanilo 50-75 mcg IV c/5-10min o cloruro mórfico 4-8 mg IV (+2 mg c/5-15min, máx 15-20mg). AAS 150-300 mg VO masticada (450 mg IV acetilsalicilato de lisina si no puede VO). Heparina sódica 70 UI/kg IV bolus si angioplastia primaria'},
+  {type:'info', text:'Nitroglicerina (SL 0,4 mg o IV 10-60 mcg/kg/h): NO administrar si TAS<90, FC<50, sospecha de IAM de VD o inhibidores de fosfodiesterasa en las 24h previas, ni como prueba diagnóstica del dolor torácico'},
+  {type:'info', text:'2º antiagregante (SCAEST con angioplastia primaria): dudas diagnósticas/hemorragia activa grave/no puede VO/doble antiagregación previa → ninguno · imposibilidad de obtener información o alto riesgo hemorrágico → clopidogrel 600 mg VO · ictus/AIT previo, >75a o <60kg → ticagrelor 180 mg VO · resto → prasugrel 60 mg VO'},
+  {type:'info', text:'Fibrinólisis prehospitalaria: tenecteplasa ajustada al peso (mitad de dosis si >75a). Antiagregación: AAS + clopidogrel (300 mg si <75a, 75 mg si >75a) — NO prasugrel ni ticagrelor. Contraindicaciones absolutas: hemorragia cerebral previa o AVC de causa desconocida, AVC isquémico <6 meses, neoplasia/traumatismo del SNC, cirugía o trauma <1 mes, sospecha de disección aórtica, sangrado activo o gastrointestinal <1 mes, punciones no compresibles recientes'},
+  {type:'info', text:'Clasificación Killip/Kimball: I auscultación normal · II estertores crepitantes y/o 3er ruido · III edema agudo de pulmón · IV shock cardiogénico'}
+], src:'Codi IAM — SEM Catalunya, Grup de Treball SCA, v.03 abril 2023'},
+
+{id:'codi-ictus', title:'Codi Ictus', sub:'Test RAPID/RANCOM, escala RACE y activación', badge:'red', tag:'Crítico', rank:2, codigo:true,
+  folleto:'codigos/C02._Codi_ictus.pdf', steps:[
+  {type:'action', text:'Test RAPID — estado clínico actual: ¿ríe asimétrico? ¿dificultad para levantar o mantener los brazos? ¿disartria?'},
+  {type:'decision', text:'¿RAPID positivo (algún ítem alterado)?', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'Test RANCOM — estado clínico previo: ¿necesitaba ayuda para vestirse, moverse o ir al baño?'},
+  {type:'decision', branch:'yes', text:'¿RANCOM negativo (no necesitaba ayuda previa)?', yes:'Sí', no:'No'},
+  {type:'decision', branch:'yes', text:'¿Síntomas <24h de evolución (incluido AIT), inicio incierto o ictus del despertar?', yes:'Sí', no:'No'},
+  {type:'action', text:'ACTIVAR CODI ICTUS: comunicar cualquier puntuación de la escala RACE a CECOS'},
+  {type:'info', text:'Activar también ante sospecha de ictus de territorio posterior/vertebrobasilar (vértigo, diplopía, ataxia) y SIEMPRE en el paciente pediátrico, independientemente de la puntuación RACE. La sospecha de hemorragia subaracnoidea NO es Codi Ictus (circuito específico)'},
+  {type:'info', text:'Escala RACE (0-9 puntos): paresia facial, paresia de brazo, paresia de pierna, desviación oculocefálica, y afasia (si debilidad derecha) o agnosia (si debilidad izquierda). ≥5 puntos = alta probabilidad de oclusión de gran vaso / ictus grave'},
+  {type:'decision', text:'Paciente adulto (≥15a) — puntuación RACE', yes:'0-4', no:'5-9'},
+  {type:'action', branch:'yes', text:'RACE 0-4: trasladar al centro de referencia de ictus más cercano (CTI, CPI o C-TI)'},
+  {type:'action', branch:'no', text:'RACE 5-9: llamada al neurólogo referente. Si el centro de referencia hace trombectomía mecánica → trasladar allí. Si no, y es candidato a tPA → centro de referencia; si no es candidato → centro más cercano con capacidad de trombectomía'},
+  {type:'info', text:'Candidato a tPA: llegada estimada al centro de referencia <4h desde el inicio de síntomas, sin anticoagulación, sin cirugía en los 15 días previos, sin antecedente de hemorragia cerebral'},
+  {type:'action', text:'Pediátrico (<15a): activar SIEMPRE el Codi Ictus con cualquier puntuación RACE → centro de referencia pediátrico más cercano'},
+  {type:'action', text:'Complicaciones agudas: agitación → haloperidol 2,5-5 mg IV (evitar benzodiacepinas) · coma GCS<9 → valorar aislamiento de vía aérea · crisis comicial → benzodiacepinas IV (no profilácticas) · emergencia hipertensiva (TAS>220 y/o TAD>120) → labetalol IV 10 mg/1-2min (máx 150 mg) o urapidilo si contraindicación a BB, bajar la TA ~10% evitando reducciones >15% · hiperglucemia >180 → insulina rápida IV según glucemia capilar · hipoglucemia <60 → glucosa IV, mantener >70 · hipertermia >37,5°C → paracetamol 1g IV, evitar AAS'},
+  {type:'info', text:'Datos a transmitir a CECOS (registro SITREM): CIP/DNI, hora de inicio de síntomas, toma de anticoagulantes, resultado RAPID/RANCOM, puntuación RACE, glucemia capilar, TA, FC y temperatura'}
+], src:'Codi Ictus — SEM Catalunya, Grup de Treball en Ictus, v.03 abril 2023'},
+
+{id:'codi-ppt', title:'Codi PPT', sub:'Paciente traumático — criterios fisiológicos, anatómicos y mecanismo lesional', badge:'red', tag:'Crítico', rank:3, codigo:true,
+  folleto:"codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf", steps:[
+  {type:'decision', text:'¿Tiene algún criterio FISIOLÓGICO? (box de críticos)', yes:'Sí → Prioridad 0', no:'No'},
+  {type:'info', branch:'yes', text:'Criterios fisiológicos: FR <10 rpm (<20 en <1a) o >29 rpm (todas las edades) · TAS <90 mmHg (<70 en <1a) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en <1a)'},
+  {type:'decision', branch:'no', text:'¿Tiene algún criterio ANATÓMICO? (box de críticos)', yes:'Sí → Prioridad 1', no:'No'},
+  {type:'info', branch:'no', text:'Criterios anatómicos: herida penetrante en cabeza/cuello/tórax/extremidades (proximal a rodilla/codo) · fractura craneal abierta o con hundimiento · tórax inestable (volet) · fractura de pelvis · ≥2 fracturas de huesos largos proximales (húmero/fémur; en <1a ≥1) · amputación proximal a tobillo/muñeca · extremidad aplastada, degloved o destrozada · parálisis o déficit motor/sensitivo de extremidad (sospecha de lesión medular) · quemaduras grado >II con extensión ≥15% (≥10% en <10a, >50a o embarazada) · quemaduras grado III >5% · quemadura completa de cara o cuello'},
+  {type:'decision', text:'¿Tiene mecanismo lesional de riesgo?', yes:'Sí → Prioridad 2', no:'No'},
+  {type:'info', text:'Mecanismo de riesgo: caídas (adultos >6m, niños >2-3x su altura, en general >3m) · colisión de vehículo con intrusión >30cm (acompañante) o >45cm, eyección parcial/completa, muerte de un ocupante o telemetría con velocidad >60 km/h · atropello con desplazamiento o impacto >30 km/h · accidente de moto/bici a velocidad significativa · sospecha de maltrato en <3 años · objeto que cae desde altura · armas blancas o de fuego'},
+  {type:'decision', text:'¿Tiene antecedentes relevantes?', yes:'Sí → Prioridad 3', no:'No → sin activación'},
+  {type:'info', text:'Consideraciones especiales (Prioridad 3): embarazo avanzado (>20 semanas), anticoagulación o coagulopatía, diálisis o multipatología, <3 años o >65 años, criterio del profesional'},
+  {type:'action', text:'ACTIVAR CODI PPT según la prioridad más alta alcanzada, notificar a CECOS'},
+  {type:'info', text:'Destino: prioridades 0/1 → traslado preferentemente con USVA. Prioridades 2/3 sin criterios fisiológicos ni anatómicos → considerar USVB. Individualizar destino si inestabilidad hemodinámica'},
+  {type:'action', text:'Inmovilización espinal completa (trauma cerrado) si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse o <3a con mecanismo de riesgo + hipotensión mantenida. Trauma penetrante: inmovilizar solo si sospecha de déficit neurológico'},
+  {type:'info', text:'Escalas: Glasgow adulto/pediátrico (leve 14-15, moderado 9-13, grave <8) · RTS adulto (<12 → centro de trauma especializado) · Índice de Trauma Pediátrico ITP (<8 → centro de trauma especializado)'}
+], src:'Codi PPT — SEM Catalunya, Grup de Treball de Trauma, revisión diciembre 2017'},
+
+{id:'codi-sepsia', title:'Codi Sèpsia', sub:'NEWS ≥7 + sospecha de infección — activación y objetivos de la 1ª hora', badge:'red', tag:'Crítico', rank:4, codigo:true,
+  folleto:'codigos/C04._Codi_sèpsia.pdf', steps:[
+  {type:'action', text:'Calcular escala NEWS (frecuencia respiratoria, SpO₂, TAS, frecuencia cardíaca, nivel de consciencia, temperatura)'},
+  {type:'decision', text:'¿Riesgo vital (vía aérea comprometida; FR>30 o <8; TAS<90 o >220; FC<40 o >131; somnolencia/estupor/coma/convulsiones) o NEWS ≥7?', yes:'Sí', no:'No → traslado sin activación'},
+  {type:'decision', branch:'yes', text:'¿Sospecha de infección o factores de riesgo de infección?', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'ACTIVAR CODI SÈPSIA'},
+  {type:'action', branch:'no', text:'Traslado a urgencias con alerta de paciente crítico (sin activar código)'},
+  {type:'info', text:'Sospecha de infección: fiebre (o sensación de haberla tenido), hipotermia no accidental o temperatura normal + ≥1 de: tos/expectoración, molestias urinarias, dolor abdominal/diarrea/vómitos, cefalea/alteración del estado mental, dolor/inflamación de una extremidad, úlceras o heridas supurativas, catéter central o sonda vesical con signos de infección — o deterioro general sin causa que lo explique'},
+  {type:'info', text:'Factores de riesgo de infección: diabetes, corticoides/inmunosupresores crónicos, inmunosupresión (esplenectomía, VIH, hemodiálisis), neoplasia activa o quimioterapia, infección reciente o en tratamiento antibiótico, cirugía/endoscopia en el último mes, heridas quirúrgicas/úlceras/catéter central/sonda vesical, >70 años con dependencia o en residencia (valorar el estado basal antes de activar)'},
+  {type:'action', text:'Objetivos de la primera hora: cristaloides 20-30 ml/kg (pediatría 20-60 ml/kg o más, vigilar sobrecarga) → cultivos + antibiótico <1h + drenaje precoz del foco <12h → monitorización continua (FR, FC, TA media, relleno capilar, EtCO₂)'},
+  {type:'info', text:'Objetivos: TA media 65-70 mmHg · EtCO₂ >25 (35-45) · SpO₂ >90% · glucemia <180 mg/dl'},
+  {type:'action', text:'Fluidos: descargas de 500 ml de cristaloides balanceados si NEWS≥7 y EtCO₂<25/shock index>0,8 (evitar coloides). Noradrenalina en perfusión continua (máx 1 mcg/kg/min) si no responde a fluidos, objetivo TA media ≥65-70. Analgesia: fentanilo 50 mcg + paracetamol 1g IV si dolor. Insulina rápida 10 UI SC si hiperglucemia, mantener ~180 mg/dl evitando hipoglucemia'},
+  {type:'info', text:'Comunicación a CECOS — metodología IDEAS: Identificación del paciente, sospecha Diagnóstica, Estado (escala NEWS), Actuación realizada, alerta/activación del Codi Sèpsia'}
+], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021'},
+
+{id:'codi-risc-suicidi', title:'Codi Risc Suïcidi', sub:'Cribado MINI y estratificación del riesgo suicida', badge:'amber', tag:'Urgente', rank:5, codigo:true,
+  folleto:'codigos/C05.Codi_risc_suïcidi.pdf', steps:[
+  {type:'action', text:'Ante sospecha de riesgo de suicidio, aplicar el cribado MINI (mini-entrevista neuropsiquiátrica) sobre el último mes'},
+  {type:'info', text:'Puntuación MINI si la respuesta es SÍ: ¿ha pensado que estaría mejor muerto/a? 1p · ¿ha querido hacerse daño? 2p · ¿ha pensado en el suicidio? 6p · ¿ha planeado cómo hacerlo? 10p · ¿lo ha intentado recientemente? 10p · ¿lo ha intentado alguna vez en la vida? 4p'},
+  {type:'decision', text:'Puntuación total o tentativa de suicidio', yes:'≥10 puntos o tentativa → riesgo ALTO', no:'1-5 riesgo BAJO · 6-9 riesgo MEDIO'},
+  {type:'action', branch:'yes', text:'ACTIVAR CODI RISC SUÏCIDI: activación de recursos, valoración del estado del paciente + contención, traslado a hospital de referencia CRS'},
+  {type:'action', branch:'no', text:'Consejo telefónico con acompañamiento continuado + información de dispositivos de la red (Atención Primaria, Salud Mental)'},
+  {type:'info', text:'Excepcionalmente, la comorbilidad y los factores de riesgo presentes en un paciente de riesgo medio pueden justificar subir el nivel de sospecha a riesgo alto'},
+  {type:'info', text:'Factores de riesgo: depresión mayor · diagnóstico psiquiátrico (trastorno depresivo, psicótico, bipolar, límite de la personalidad, conducta alimentaria) · impulsividad/agresividad/agitación/consciencia alterada · consumo excesivo o dependencia de alcohol u otras sustancias · enfermedades orgánicas graves · género hombre, >65 años o adolescente · problemas sociales · eventos vitales estresantes <3 meses (laboral, pareja, económico, familiar) · acceso a armas/tóxicos/medios letales o situaciones de violencia · antecedentes familiares de 1er grado de suicidio consumado'},
+  {type:'info', text:'Seguimiento posterior al alta hospitalaria (061/Salut Respon, a los 30 días): ¿recibió llamada del CSM? ¿tiene visita confirmada? ¿se encuentra mejor? ¿ha sido visitado en su CSM?'}
+], src:'Codi Risc Suïcidi — SEM Catalunya, Grup de Treball en malalties mentals, v.01 junio 2024'}
 
 ];
