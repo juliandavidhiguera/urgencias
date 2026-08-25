@@ -498,20 +498,20 @@ body {
   overflow: hidden;
   margin-bottom: 12px;
 }
-.protocol-card > summary, .scale-card > summary, .databox > summary {
+.protocol-card > summary, .scale-card > summary, .databox > summary, .card > summary {
   cursor: pointer;
   list-style: none;
 }
-.protocol-card > summary::-webkit-details-marker, .scale-card > summary::-webkit-details-marker, .databox > summary::-webkit-details-marker { display: none; }
-.protocol-card > summary::after, .scale-card > summary::after, .databox > summary::after {
+.protocol-card > summary::-webkit-details-marker, .scale-card > summary::-webkit-details-marker, .databox > summary::-webkit-details-marker, .card > summary::-webkit-details-marker { display: none; }
+.protocol-card > summary::after, .scale-card > summary::after, .databox > summary::after, .card > summary::after {
   content: '▾';
   color: var(--text2);
   font-size: 12px;
   margin-left: 8px;
   flex-shrink: 0;
 }
-.protocol-card[open] > summary::after, .scale-card[open] > summary::after, .databox[open] > summary::after { content: '▴'; }
-.protocol-card > summary:hover, .scale-card > summary:hover, .databox > summary:hover { background: var(--bg3); }
+.protocol-card[open] > summary::after, .scale-card[open] > summary::after, .databox[open] > summary::after, .card[open] > summary::after { content: '▴'; }
+.protocol-card > summary:hover, .scale-card > summary:hover, .databox > summary:hover, .card > summary:hover { background: var(--bg3); }
 .protocol-step {
   padding: 8px 14px;
   border-bottom: 1px solid var(--bg3);
@@ -733,6 +733,7 @@ body {
 <div class="nav" role="tablist" aria-label="Secciones" onkeydown="onNavKeydown(event)">
   <button class="nav-btn active" id="navbtn-cheatsheets" role="tab" aria-selected="true" aria-controls="tab-cheatsheets" tabindex="0" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
   <button class="nav-btn" id="navbtn-escalas" role="tab" aria-selected="false" aria-controls="tab-escalas" tabindex="-1" onclick="showTab('escalas', this)">📊 Escalas</button>
+  <button class="nav-btn" id="navbtn-formulas" role="tab" aria-selected="false" aria-controls="tab-formulas" tabindex="-1" onclick="showTab('formulas', this)">🧮 Fórmulas</button>
   <button class="nav-btn" id="navbtn-protocolos" role="tab" aria-selected="false" aria-controls="tab-protocolos" tabindex="-1" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
   <button class="nav-btn" id="navbtn-farmacos" role="tab" aria-selected="false" aria-controls="tab-farmacos" tabindex="-1" onclick="showTab('farmacos', this)">💊 Fármacos</button>
   <button class="nav-btn" id="navbtn-perfusiones" role="tab" aria-selected="false" aria-controls="tab-perfusiones" tabindex="-1" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
@@ -833,6 +834,11 @@ body {
 
 <div id="all-scales"></div>
 </div><!-- end tab-escalas -->
+
+<!-- TAB FORMULAS -->
+<div id="tab-formulas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-formulas">
+<div id="all-formulas"></div>
+</div><!-- end tab-formulas -->
 
 <div id="tab-protocolos" class="tab-content" role="tabpanel" aria-labelledby="navbtn-protocolos"></div>
 
@@ -1016,6 +1022,7 @@ body {
 
 <script src="data/cheatsheets.js"></script>
 <script src="data/scales.js"></script>
+<script src="data/formulas.js"></script>
 <script src="data/protocols.js"></script>
 <script src="data/drugs.js"></script>
 <script src="data/infusions.js"></script>
@@ -1038,6 +1045,7 @@ function toggleFav(type, id) {
   localStorage.setItem('urg-favs', JSON.stringify(favs));
   if (type === 'cheatsheet') renderCheatsheets();
   else if (type === 'scale') renderScales();
+  else if (type === 'formula') renderFormulas();
   else if (type === 'protocol') renderProtocols();
   else renderDrugs();
 }
@@ -1069,20 +1077,20 @@ function renderCheatsheets() {
     });
     return '<div class="section-title">' + sec.icon + ' ' + name + '</div>' +
       '<div class="grid">' + items.map(function(ch) {
-        return '<div class="card">' +
-          '<div class="card-header">' +
+        return '<details class="card">' +
+          '<summary class="card-header">' +
             '<span class="badge badge-' + ch.badge + '">' + ch.badgeLabel + '</span>' +
             '<span class="card-title">' + ch.title + '</span>' +
             '<button class="fav-btn' + (favs['cheatsheet:' + ch.id] ? ' fav-active' : '') +
               '" onclick="event.stopPropagation();toggleFav(\'cheatsheet\',\'' + ch.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['cheatsheet:' + ch.id] ? 'true' : 'false') + '">★</button>' +
-          '</div>' +
+          '</summary>' +
           '<div class="card-body">' +
             '<div class="code" id="' + ch.id + '">' + ch.html + '</div>' +
             '<div class="btn-row"><button class="btn btn-copy" onclick="copyCard(\'' + ch.id + '\')">📋 Copiar</button></div>' +
             // Fuera del div que copia el boton: la fuente no debe colarse en la nota clinica.
             (ch.src ? '<div class="scale-src">Fuente: ' + ch.src + '</div>' : '') +
           '</div>' +
-        '</div>';
+        '</details>';
       }).join('') + '</div>';
   }).join('');
 }
@@ -1157,6 +1165,7 @@ function globalSearch(q) {
     const activeName = activeBtn ? activeBtn.textContent.toLowerCase() : 'cheatsheets';
     const tabId = activeName.includes('cheatsheet') ? 'tab-cheatsheets'
                : activeName.includes('escala') ? 'tab-escalas'
+               : activeName.includes('fórmula') ? 'tab-formulas'
                : activeName.includes('protocolo') ? 'tab-protocolos'
                : activeName.includes('perfusión') ? 'tab-perfusiones'
                : activeName.includes('intubación') ? 'tab-intubacion'
@@ -1366,16 +1375,17 @@ function _scaleCtrl(sc, it, i, pfx) {
   return '<input type="checkbox" id="' + id + '" onchange="onScaleChange(\'' + sc.id + '\',\'' + pfx + '\')"><span class="scale-pts">+' + it.p + '</span>';
 }
 
-function renderOneScale(sc, favs, pfx) {
+function renderOneScale(sc, favs, pfx, kind) {
   pfx = pfx || '';
+  kind = kind || 'scale';
   const uid = pfx + sc.id;
   return '<details class="scale-card">' +
       '<summary class="scale-header"><div>' +
         '<div class="scale-title">' + sc.title + '</div>' +
         '<div class="scale-subtitle">' + sc.sub + '</div>' +
       '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span>' +
-      '<button class="fav-btn' + (favs['scale:' + sc.id] ? ' fav-active' : '') +
-        '" onclick="event.stopPropagation();toggleFav(\'scale\',\'' + sc.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['scale:' + sc.id] ? 'true' : 'false') + '">★</button>' +
+      '<button class="fav-btn' + (favs[kind + ':' + sc.id] ? ' fav-active' : '') +
+        '" onclick="event.stopPropagation();toggleFav(\'' + kind + '\',\'' + sc.id + '\')" aria-label="Favorito" aria-pressed="' + (favs[kind + ':' + sc.id] ? 'true' : 'false') + '">★</button>' +
       '</summary>' +
       '<div class="scale-body">' +
         sc.items.map((it, i) =>
@@ -1413,6 +1423,27 @@ function _scaleGroupFor(sc) {
   return SCALE_GROUPS.find(g => g.tags.includes(sc.tag)) || { name: 'Otras', icon: '📋' };
 }
 
+const FORMULA_GROUPS = [
+  { name: 'Hemodinámica', icon: '🫀', tags: ['Hemodinámica'] },
+  { name: 'Electrolitos y ácido-base', icon: '🧪', tags: ['Electrolitos'] },
+  { name: 'Gasometría y compensación', icon: '🩸', tags: ['Gasometría'] },
+  { name: 'Ventilación mecánica', icon: '🫁', tags: ['Ventilación'] },
+  { name: 'Hemodinámica invasiva (UCI)', icon: '📈', tags: ['UCI'] },
+  { name: 'Quemados y líquidos', icon: '🔥', tags: ['Líquidos'] },
+  { name: 'Infusiones y dosis', icon: '💉', tags: ['Infusión'] },
+  { name: 'Pediatría', icon: '👶', tags: ['Pediatría'] },
+  { name: 'Toxicología', icon: '☠️', tags: ['Tóxicos'] },
+  { name: 'Antropometría', icon: '⚖️', tags: ['Antropometría'] }
+];
+
+function _formulaGroupFor(f) {
+  return FORMULA_GROUPS.find(g => g.tags.includes(f.tag)) || { name: 'Otras', icon: '📋' };
+}
+
+function _findScaleOrFormula(id) {
+  return SCALES.find(x => x.id === id) || FORMULAS.find(x => x.id === id);
+}
+
 function renderScales() {
   const favs = getFavs();
   const recent = getRecent();
@@ -1439,6 +1470,32 @@ function renderScales() {
   SCALES.forEach(sc => calcScale(sc.id));
 }
 
+function renderFormulas() {
+  const favs = getFavs();
+  const recent = getRecent();
+  const recentFormulas = recent.map(rid => FORMULAS.find(x => x.id === rid)).filter(Boolean);
+  const recentHtml = recentFormulas.length ?
+    '<div class="section-title">🕐 Usadas recientemente</div><div class="scales-grid">' +
+    recentFormulas.map(f => renderOneScale(f, favs, 'recent-', 'formula')).join('') + '</div>' : '';
+  const byGroup = {};
+  FORMULAS.forEach(f => {
+    const g = _formulaGroupFor(f);
+    if (!byGroup[g.name]) byGroup[g.name] = { icon: g.icon, items: [] };
+    byGroup[g.name].items.push(f);
+  });
+  const groupsHtml = FORMULA_GROUPS.concat([{ name: 'Otras', icon: '📋' }])
+    .filter(g => byGroup[g.name])
+    .map(g => {
+      const items = byGroup[g.name].items.slice()
+        .sort((a, b) => (favs['formula:' + b.id] || 0) - (favs['formula:' + a.id] || 0));
+      return '<div class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</div><div class="scales-grid">' +
+        items.map(f => renderOneScale(f, favs, '', 'formula')).join('') + '</div>';
+    }).join('');
+  document.getElementById('all-formulas').innerHTML = recentHtml + groupsHtml;
+  recentFormulas.forEach(f => calcScale(f.id, 'recent-'));
+  FORMULAS.forEach(f => calcScale(f.id));
+}
+
 /* Wrapper used by scale input handlers: registers real usage in "recientes" then recalculates. */
 function onScaleChange(id, pfx) {
   trackRecent(id);
@@ -1448,7 +1505,7 @@ function onScaleChange(id, pfx) {
 function calcScale(id, pfx) {
   pfx = pfx || '';
   const uid = pfx + id;
-  const sc = SCALES.find(x => x.id === id);
+  const sc = _findScaleOrFormula(id);
   const pts = sc.items.map((it, i) => {
     const el = document.getElementById(uid + '_' + i);
     if (it.t === 'sel') return parseFloat(el.value);
@@ -1481,7 +1538,7 @@ function calcScale(id, pfx) {
 function resetGeneric(id, pfx) {
   pfx = pfx || '';
   const uid = pfx + id;
-  const sc = SCALES.find(x => x.id === id);
+  const sc = _findScaleOrFormula(id);
   sc.items.forEach((it, i) => {
     const el = document.getElementById(uid + '_' + i);
     if (it.t === 'sel') el.selectedIndex = 0;
@@ -1494,7 +1551,7 @@ function resetGeneric(id, pfx) {
 function copyScaleResult(id, pfx) {
   pfx = pfx || '';
   const uid = pfx + id;
-  const sc = SCALES.find(x => x.id === id);
+  const sc = _findScaleOrFormula(id);
   const num = document.getElementById(uid + '-num').textContent;
   const risk = document.getElementById(uid + '-risk').textContent;
   const detail = document.getElementById(uid + '-detail').textContent;
@@ -2117,6 +2174,7 @@ function renderBibliografia() {
 /* El <script> se carga al final del <body>: ejecución directa. */
 renderCheatsheets();
 renderScales();
+renderFormulas();
 renderProtocols();
 renderDrugs();
 calcSCA();
