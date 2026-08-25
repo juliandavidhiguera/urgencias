@@ -432,6 +432,15 @@ body {
   margin-bottom: 5px;
 }
 .ficha-section-text { font-size: 13.5px; color: var(--text); line-height: 1.55; white-space: pre-line; }
+.galeria-modal { max-width: 1040px; }
+.galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; padding: 6px 0 4px; align-items: start; }
+.galeria-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 0; }
+.galeria-item img { display: block; width: 100%; height: auto; }
+.galeria-item figcaption { padding: 8px 10px; font-size: 12.5px; font-weight: 600; color: var(--text); text-align: center; }
+.galeria-detail { padding: 0 12px 12px; }
+.galeria-detail .ficha-section { padding: 8px 0; }
+.galeria-detail .ficha-section-text { font-size: 12.5px; }
+@media (max-width: 600px) { .galeria-grid { grid-template-columns: 1fr; } }
 .ficha-section.ficha-riesgo {
   background: var(--red-bg);
   border: 1px solid var(--red);
@@ -1472,6 +1481,7 @@ function renderProtocols() {
           }).join('') +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
           (p.folleto ? '<div class="btn-row" style="padding:10px 0 0"><button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button></div>' : '') +
+          (p.galeria ? '<div class="btn-row" style="padding:6px 0 0"><button class="btn" onclick="event.stopPropagation();openGaleria(\'' + p.id + '\')">🫀 Ver patrones IAM nuevos (OMI)</button></div>' : '') +
         '</div>' +
       '</details>'
     ).join('');
@@ -1962,12 +1972,42 @@ function _fichaHTML(f) {
 function showFicha(file) {
   const f = (window.FICHAS || []).find(x => x.file === file);
   if (!f) { console.warn('Ficha no encontrada:', file); return; }
-  document.getElementById('ficha-modal').innerHTML = _fichaHTML(f);
+  const modal = document.getElementById('ficha-modal');
+  modal.classList.remove('galeria-modal');
+  modal.innerHTML = _fichaHTML(f);
   document.getElementById('ficha-overlay').style.display = 'flex';
 }
 
 function closeFicha() {
   document.getElementById('ficha-overlay').style.display = 'none';
+}
+
+function openGaleria(protocolId) {
+  const p = (window.PROTOCOLS || []).find(x => x.id === protocolId);
+  if (!p || !p.galeria) { console.warn('Galería no encontrada:', protocolId); return; }
+  const g = p.galeria;
+  const html = '<div class="ficha-head"><div>' +
+      '<div class="ficha-name">' + g.titulo + '</div>' +
+      '<div class="ficha-subtitulo">' + g.nota + '</div>' +
+    '</div><button class="ficha-close" onclick="closeFicha()" aria-label="Cerrar">✕</button></div>' +
+    '<div class="ficha-body"><div class="galeria-grid">' +
+      g.items.map(it =>
+        '<figure class="galeria-item">' +
+          '<img src="' + encodeURI(g.dir + it.file) + '" alt="' + it.label + '" loading="lazy">' +
+          '<figcaption>' + it.label + '</figcaption>' +
+          '<div class="galeria-detail">' +
+            (it.criterios ? _fichaSection('Criterios ECG', it.criterios) : '') +
+            (it.arteria ? _fichaSection('Arteria / anatomía asociada', it.arteria) : '') +
+            (it.significado ? _fichaSection('Significado clínico', it.significado, /[Dd]iscrepancia/.test(it.significado) ? 'ficha-adverso' : '') : '') +
+            (it.fuente ? '<div class="scale-src">Fuente: ' + it.fuente + '</div>' : '') +
+          '</div>' +
+        '</figure>'
+      ).join('') +
+    '</div></div>';
+  const modal = document.getElementById('ficha-modal');
+  modal.classList.add('galeria-modal');
+  modal.innerHTML = html;
+  document.getElementById('ficha-overlay').style.display = 'flex';
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFicha(); });
