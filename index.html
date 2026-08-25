@@ -482,20 +482,20 @@ body {
   overflow: hidden;
   margin-bottom: 12px;
 }
-.protocol-card > summary {
+.protocol-card > summary, .scale-card > summary, .databox > summary {
   cursor: pointer;
   list-style: none;
 }
-.protocol-card > summary::-webkit-details-marker { display: none; }
-.protocol-card > summary::after {
+.protocol-card > summary::-webkit-details-marker, .scale-card > summary::-webkit-details-marker, .databox > summary::-webkit-details-marker { display: none; }
+.protocol-card > summary::after, .scale-card > summary::after, .databox > summary::after {
   content: '▾';
   color: var(--text2);
   font-size: 12px;
   margin-left: 8px;
   flex-shrink: 0;
 }
-.protocol-card[open] > summary::after { content: '▴'; }
-.protocol-card > summary:hover { background: var(--bg3); }
+.protocol-card[open] > summary::after, .scale-card[open] > summary::after, .databox[open] > summary::after { content: '▴'; }
+.protocol-card > summary:hover, .scale-card > summary:hover, .databox > summary:hover { background: var(--bg3); }
 .protocol-step {
   padding: 8px 14px;
   border-bottom: 1px solid var(--bg3);
@@ -732,14 +732,14 @@ body {
 
 <div class="section-title">🫀 Box SCA — entrada única de datos → GRACE · TIMI · CRUSADE</div>
 
-<div class="databox">
-  <div class="databox-header">
+<details class="databox">
+  <summary class="databox-header">
     <div>
       <div class="scale-title">Síndrome coronario agudo — calculadora integrada</div>
       <div class="scale-subtitle">Un solo juego de datos alimenta los 4 scores · ESC 2023 NSTE-ACS / ESC 2023 STEMI</div>
     </div>
     <span class="badge badge-red">SCA</span>
-  </div>
+  </summary>
 
   <div class="subhead">Datos del paciente</div>
   <div class="fields">
@@ -808,7 +808,7 @@ body {
     <button class="btn btn-copy" onclick="copySCA()">📋 Copiar informe SCA</button>
     <button class="reset-btn" style="margin-top:0" onclick="resetSCA()">↺ Reset</button>
   </div>
-</div>
+</details>
 
 <div class="scales-grid" id="all-scales"></div>
 </div><!-- end tab-escalas -->
@@ -1306,14 +1306,14 @@ function _scaleCtrl(sc, it, i, pfx) {
 function renderOneScale(sc, favs, pfx) {
   pfx = pfx || '';
   const uid = pfx + sc.id;
-  return '<div class="scale-card">' +
-      '<div class="scale-header"><div>' +
+  return '<details class="scale-card">' +
+      '<summary class="scale-header"><div>' +
         '<div class="scale-title">' + sc.title + '</div>' +
         '<div class="scale-subtitle">' + sc.sub + '</div>' +
       '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span>' +
       '<button class="fav-btn' + (favs['scale:' + sc.id] ? ' fav-active' : '') +
         '" onclick="event.stopPropagation();toggleFav(\'scale\',\'' + sc.id + '\')" aria-label="Favorito">★</button>' +
-      '</div>' +
+      '</summary>' +
       '<div class="scale-body">' +
         sc.items.map((it, i) =>
           '<div class="scale-item"><span class="scale-label">' + it.l + '</span>' +
@@ -1327,7 +1327,7 @@ function renderOneScale(sc, favs, pfx) {
         '<button class="reset-btn" onclick="resetGeneric(\'' + sc.id + '\',\'' + pfx + '\')">↺ Reset</button>' +
         '<button class="btn btn-copy" onclick="copyScaleResult(\'' + sc.id + '\',\'' + pfx + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
         (sc.src ? '<div class="scale-src">Fuente: ' + sc.src + '</div>' : '') +
-      '</div></div>';
+      '</div></details>';
 }
 
 const SCALE_GROUPS = [
