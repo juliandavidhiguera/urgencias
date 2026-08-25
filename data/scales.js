@@ -541,6 +541,25 @@ window.SCALES = [
   {t:'sel', l:'Expresión facial', o:[['Sonriente o inexpresivo (0)',0],['Triste, atemorizado, ceño fruncido (1)',1],['Muecas de dolor (2)',2]]},
   {t:'sel', l:'Lenguaje corporal', o:[['Relajado (0)',0],['Tenso, movimientos ansiosos de ida y vuelta (1)',1],['Rígido, puños cerrados, se aleja o empuja (2)',2]]},
   {t:'sel', l:'Consolabilidad', o:[['No necesita ser consolado (0)',0],['Se distrae o tranquiliza con la voz o el tacto (1)',1],['Imposible de consolar, distraer o tranquilizar (2)',2]]}],
-  interp:function(s){return s===0?['low','0/10','Sin dolor evidente']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}}
+  interp:function(s){return s===0?['low','0/10','Sin dolor evidente']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}},
+
+{id:'paquetes-año', src:'Definición estándar de consumo acumulado de tabaco · umbral de cribado USPSTF 2021 (≥20 paq-año) · PMID 33687470', title:'Índice paquetes-año', sub:'Tabaquismo acumulado — riesgo de EPOC y cáncer de pulmón', badge:'amber', tag:'Respiratorio', max:100, agg:'custom', items:[
+  {t:'num', l:'Cigarrillos fumados al día', u:'cig/día', f:function(v){return 0}},
+  {t:'num', l:'Años fumando', u:'años', f:function(v){return 0}}],
+  calcCustom:function(vals){return Math.round((vals[0]/20)*vals[1]*10)/10},
+  interp:function(s){return s<10?['low',s+' paq-año','Riesgo bajo']:s<=20?['mid',s+' paq-año','Riesgo moderado']:['high',s+' paq-año','Riesgo alto — criterio habitual para iniciar cribado/revisión preventiva (EPOC, cáncer de pulmón)']}},
+
+{id:'ube', src:'Fórmula estándar de Unidad de Bebida Estándar (UBE) · PNSD/SEMFYC — densidad del etanol 0,8 g/mL', title:'Unidades de Bebida Estándar (UBE)', sub:'Gramos de alcohol y UBEs a partir de volumen y graduación', badge:'blue', tag:'Tóxicos', max:10, agg:'custom', items:[
+  {t:'num', l:'Volumen (mL)', u:'mL', f:function(v){return 0}},
+  {t:'num', l:'Graduación (%)', u:'%', f:function(v){return 0}}],
+  calcCustom:function(vals){return Math.round(((vals[0] * vals[1] * 0.8) / 100 / 10) * 100) / 100},
+  interp:function(s){return ['low', s + ' UBE', _fmt(s * 10, 1) + ' g de alcohol']},
+  info: '<strong>Tabla de equivalencias rápidas</strong><table><tr><th>Bebida</th><th>Volumen</th><th>Graduación</th><th>UBEs</th><th>Gramos</th></tr>' +
+    '<tr><td>Cerveza (caña/quinto)</td><td>200 mL</td><td>5%</td><td>1</td><td>8–10 g</td></tr>' +
+    '<tr><td>Vino / cava (1 copa)</td><td>100 mL</td><td>12–13%</td><td>1</td><td>10 g</td></tr>' +
+    '<tr><td>Chupito / carajillo</td><td>25 mL</td><td>40%</td><td>1</td><td>8–10 g</td></tr>' +
+    '<tr><td>Cerveza (tercio/lata)</td><td>330 mL</td><td>5%</td><td>1,5</td><td>13,2 g</td></tr>' +
+    '<tr><td>Combinado/cubata</td><td>50 mL destilado</td><td>40%</td><td>2</td><td>16–20 g</td></tr>' +
+    '<tr><td>Copa de licor (whisky/ron)</td><td>50 mL</td><td>40%</td><td>2</td><td>16–20 g</td></tr></table>'}
 
 ];

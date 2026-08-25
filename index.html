@@ -231,6 +231,10 @@ body {
 .scale-title { font-size: 13px; font-weight: 600; }
 .scale-subtitle { font-size: 11px; color: var(--text2); }
 .scale-src { font-size: 10px; color: var(--text2); margin-top: 10px; opacity: .75; }
+.scale-note { margin: 6px 0; font-size: 11px; color: var(--text2); overflow-x: auto; }
+.scale-note table { width: 100%; min-width: 420px; border-collapse: collapse; margin-top: 4px; }
+.scale-note th, .scale-note td { padding: 4px 6px; border-bottom: 1px solid var(--bg3); text-align: left; white-space: nowrap; }
+.scale-note th { color: var(--text2); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; }
 
 .scale-body { padding: 12px 14px; }
 
@@ -1314,6 +1318,7 @@ function renderOneScale(sc, favs, pfx) {
         sc.items.map((it, i) =>
           '<div class="scale-item"><span class="scale-label">' + it.l + '</span>' +
           '<div class="scale-input">' + _scaleCtrl(sc, it, i, pfx) + '</div></div>').join('') +
+        (sc.info ? '<div class="scale-note">' + sc.info + '</div>' : '') +
         '<div class="score-display">' +
           '<div><div class="score-num" id="' + uid + '-num">0</div><div class="score-detail">puntos</div></div>' +
           '<div style="text-align:right"><div class="score-risk" id="' + uid + '-risk">—</div>' +
@@ -1335,6 +1340,7 @@ const SCALE_GROUPS = [
   { name: 'Sepsis e infección', icon: '🦠', tags: ['Sepsis', 'Infección', 'Meningitis'] },
   { name: 'Abdomen y digestivo', icon: '🩺', tags: ['Abdomen agudo', 'Digestivo', 'Pancreatitis', 'HDA'] },
   { name: 'Renal y metabólico', icon: '🧪', tags: ['AKI'] },
+  { name: 'Tóxicos y consumo de sustancias', icon: '🍺', tags: ['Tóxicos'] },
   { name: 'UCI, sedación y delirium', icon: '🏥', tags: ['UCI', 'Delirium'] },
   { name: 'Geriatría, caídas y dolor', icon: '👴', tags: ['Geriatría', 'Caídas', 'Dolor geriátrico'] },
   { name: 'Pediatría y neonatología', icon: '👶', tags: ['Pediatría', 'Dolor pediátrico', 'Neonatología'] }
