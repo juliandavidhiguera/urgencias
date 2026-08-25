@@ -126,6 +126,7 @@ body {
   min-width: 44px;
 }
 .nav-btn:hover, .nav-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+.nav.searching .nav-btn.active { background: var(--bg3); color: var(--text2); border-color: var(--border); }
 
 .nav .filter-input {
   font-size: 12px;
@@ -315,7 +316,8 @@ body {
   background: var(--bg3);
 }
 .drug-weight-bar label { font-size: 12px; color: var(--text2); }
-.drug-alerts .scale-pts { color: var(--red); }
+.scale-item.drug-alerts { flex-direction: column; align-items: flex-start; gap: 2px; }
+.drug-alerts .scale-pts { color: var(--red); white-space: normal; line-height: 1.4; text-align: left; }
 
 /* PERFUSION IV — texto más grande y oscuro para mejor lectura, y estados de rango */
 #tab-perfusiones .field label { font-size: 11px; color: var(--text); font-weight: 600; }
@@ -718,26 +720,26 @@ body {
   <button class="btn theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
 </div>
 
-<div class="nav">
-  <button class="nav-btn active" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
-  <button class="nav-btn" onclick="showTab('escalas', this)">📊 Escalas</button>
-  <button class="nav-btn" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
-  <button class="nav-btn" onclick="showTab('farmacos', this)">💊 Fármacos</button>
-  <button class="nav-btn" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
-  <button class="nav-btn" onclick="showTab('intubacion', this)">🫁 Intubación</button>
-  <button class="nav-btn" onclick="showTab('fichas', this)">📋 Fichas</button>
-  <button class="nav-btn" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
+<div class="nav" role="tablist" aria-label="Secciones">
+  <button class="nav-btn active" id="navbtn-cheatsheets" role="tab" aria-selected="true" aria-controls="tab-cheatsheets" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
+  <button class="nav-btn" id="navbtn-escalas" role="tab" aria-selected="false" aria-controls="tab-escalas" onclick="showTab('escalas', this)">📊 Escalas</button>
+  <button class="nav-btn" id="navbtn-protocolos" role="tab" aria-selected="false" aria-controls="tab-protocolos" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
+  <button class="nav-btn" id="navbtn-farmacos" role="tab" aria-selected="false" aria-controls="tab-farmacos" onclick="showTab('farmacos', this)">💊 Fármacos</button>
+  <button class="nav-btn" id="navbtn-perfusiones" role="tab" aria-selected="false" aria-controls="tab-perfusiones" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
+  <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" onclick="showTab('intubacion', this)">🫁 Intubación</button>
+  <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" onclick="showTab('fichas', this)">📋 Fichas</button>
+  <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
 </div>
 
 <div class="main">
 
 <!-- TAB CHEATSHEETS -->
-<div id="tab-cheatsheets" class="tab-content active"></div><!-- end tab-cheatsheets -->
+<div id="tab-cheatsheets" class="tab-content active" role="tabpanel" aria-labelledby="navbtn-cheatsheets"></div><!-- end tab-cheatsheets -->
 
 
 <!-- TAB ESCALAS -->
-<div id="tab-escalas" class="tab-content">
+<div id="tab-escalas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-escalas">
 
 <div class="section-title">🫀 Box SCA — entrada única de datos → GRACE · TIMI · CRUSADE</div>
 
@@ -752,16 +754,16 @@ body {
 
   <div class="subhead">Datos del paciente</div>
   <div class="fields">
-    <div class="field"><label>Edad (años)</label><input type="number" id="sca-edad" min="0" max="120" oninput="calcSCA()"></div>
-    <div class="field"><label>Sexo</label><select id="sca-sexo" onchange="calcSCA()"><option value="m">Varón</option><option value="f">Mujer</option></select></div>
-    <div class="field"><label>Peso (kg)</label><input type="number" id="sca-peso" min="20" max="250" oninput="calcSCA()"></div>
-    <div class="field"><label>FC (lpm)</label><input type="number" id="sca-fc" min="0" max="300" oninput="calcSCA()"></div>
-    <div class="field"><label>PAS (mmHg)</label><input type="number" id="sca-pas" min="0" max="300" oninput="calcSCA()"></div>
-    <div class="field"><label>Creatinina (mg/dL)</label><input type="number" id="sca-cr" step="0.01" min="0" max="20" oninput="calcSCA()"></div>
-    <div class="field"><label>Hematocrito (%)</label><input type="number" id="sca-hto" step="0.1" min="10" max="60" oninput="calcSCA()"></div>
-    <div class="field"><label>Killip</label><select id="sca-killip" onchange="calcSCA()"><option value="1">I — sin IC</option><option value="2">II — crepitantes/S3</option><option value="3">III — EAP</option><option value="4">IV — shock</option></select></div>
-    <div class="field"><label>Dolor: inicio (h)</label><input type="number" id="sca-tdolor" step="0.5" min="0" max="72" oninput="calcSCA()"></div>
-    <div class="field"><label>Angina 24 h (nº episodios)</label><input type="number" id="sca-angina" min="0" max="20" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-edad">Edad (años)</label><input type="number" id="sca-edad" min="0" max="120" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-sexo">Sexo</label><select id="sca-sexo" onchange="calcSCA()"><option value="m">Varón</option><option value="f">Mujer</option></select></div>
+    <div class="field"><label for="sca-peso">Peso (kg)</label><input type="number" id="sca-peso" min="20" max="250" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-fc">FC (lpm)</label><input type="number" id="sca-fc" min="0" max="300" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-pas">PAS (mmHg)</label><input type="number" id="sca-pas" min="0" max="300" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-cr">Creatinina (mg/dL)</label><input type="number" id="sca-cr" step="0.01" min="0" max="20" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-hto">Hematocrito (%)</label><input type="number" id="sca-hto" step="0.1" min="10" max="60" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-killip">Killip</label><select id="sca-killip" onchange="calcSCA()"><option value="1">I — sin IC</option><option value="2">II — crepitantes/S3</option><option value="3">III — EAP</option><option value="4">IV — shock</option></select></div>
+    <div class="field"><label for="sca-tdolor">Dolor: inicio (h)</label><input type="number" id="sca-tdolor" step="0.5" min="0" max="72" oninput="calcSCA()"></div>
+    <div class="field"><label for="sca-angina">Angina 24 h (nº episodios)</label><input type="number" id="sca-angina" min="0" max="20" oninput="calcSCA()"></div>
   </div>
 
   <div class="subhead">Presentación · ECG · biomarcadores</div>
@@ -819,15 +821,15 @@ body {
   </div>
 </details>
 
-<div class="scales-grid" id="all-scales"></div>
+<div id="all-scales"></div>
 </div><!-- end tab-escalas -->
 
-<div id="tab-protocolos" class="tab-content"></div>
+<div id="tab-protocolos" class="tab-content" role="tabpanel" aria-labelledby="navbtn-protocolos"></div>
 
-<div id="tab-farmacos" class="tab-content"></div>
+<div id="tab-farmacos" class="tab-content" role="tabpanel" aria-labelledby="navbtn-farmacos"></div>
 
 <!-- TAB PERFUSIONES -->
-<div id="tab-perfusiones" class="tab-content">
+<div id="tab-perfusiones" class="tab-content" role="tabpanel" aria-labelledby="navbtn-perfusiones">
 
 <div class="section-title">💧 Perfusión IV — dilución + dosis/peso → mL/h</div>
 
@@ -842,13 +844,13 @@ body {
 
   <div class="subhead">Paciente y fármaco</div>
   <div class="fields">
-    <div class="field"><label>Peso (kg)</label><input type="number" id="inf-peso" min="1" max="300" value="70" oninput="updateInfusionPeso()"></div>
-    <div class="field"><label>Medicamento</label><select id="inf-farmaco" onchange="selectInfusionDrug()"></select></div>
-    <div class="field"><label>Nombre (si "Otro")</label><input type="text" id="inf-nombre" placeholder="p.ej. Labetalol" oninput="calcInfusion()"></div>
-    <div class="field"><label>Cantidad fármaco (mg o UI)</label><input type="number" id="inf-mg" step="0.001" min="0" oninput="calcInfusion()"></div>
-    <div class="field"><label>Volumen dilución (mL)</label><input type="number" id="inf-vol" step="1" min="1" oninput="calcInfusion()"></div>
-    <div class="field"><label>Dosis prescrita</label><input type="number" id="inf-dosis" step="0.001" min="0" oninput="calcInfusion()"></div>
-    <div class="field"><label>Unidad de dosis</label>
+    <div class="field"><label for="inf-peso">Peso (kg)</label><input type="number" id="inf-peso" min="1" max="300" value="70" oninput="updateInfusionPeso()"></div>
+    <div class="field"><label for="inf-farmaco">Medicamento</label><select id="inf-farmaco" onchange="selectInfusionDrug()"></select></div>
+    <div class="field"><label for="inf-nombre">Nombre (si "Otro")</label><input type="text" id="inf-nombre" placeholder="p.ej. Labetalol" oninput="calcInfusion()"></div>
+    <div class="field"><label for="inf-mg">Cantidad fármaco (mg o UI)</label><input type="number" id="inf-mg" step="0.001" min="0" oninput="calcInfusion()"></div>
+    <div class="field"><label for="inf-vol">Volumen dilución (mL)</label><input type="number" id="inf-vol" step="1" min="1" oninput="calcInfusion()"></div>
+    <div class="field"><label for="inf-dosis">Dosis prescrita</label><input type="number" id="inf-dosis" step="0.001" min="0" oninput="calcInfusion()"></div>
+    <div class="field"><label for="inf-unidad">Unidad de dosis</label>
       <select id="inf-unidad" onchange="calcInfusion()">
         <option value="mcg/kg/min">mcg/kg/min</option>
         <option value="mcg/kg/h">mcg/kg/h</option>
@@ -895,7 +897,7 @@ body {
 </div><!-- end tab-perfusiones -->
 
 <!-- TAB INTUBACIÓN -->
-<div id="tab-intubacion" class="tab-content">
+<div id="tab-intubacion" class="tab-content" role="tabpanel" aria-labelledby="navbtn-intubacion">
 <div class="section-title">🫁 Lista de verificación de intubación (SIR)</div>
 
 <div class="databox">
@@ -909,16 +911,16 @@ body {
 
   <div class="subhead">Paciente y estado</div>
   <div class="fields">
-    <div class="field"><label>Peso real (kg)</label><input type="number" id="itb-peso" min="1" max="300" oninput="calcIntubacion()"></div>
-    <div class="field"><label>Talla (cm)</label><input type="number" id="itb-talla" min="50" max="230" oninput="calcIntubacion()"></div>
-    <div class="field"><label>Sexo</label><select id="itb-sexo" onchange="calcIntubacion()"><option value="m">Varón</option><option value="f">Mujer</option></select></div>
-    <div class="field"><label>Estado hemodinámico</label>
+    <div class="field"><label for="itb-peso">Peso real (kg)</label><input type="number" id="itb-peso" min="1" max="300" oninput="calcIntubacion()"></div>
+    <div class="field"><label for="itb-talla">Talla (cm)</label><input type="number" id="itb-talla" min="50" max="230" oninput="calcIntubacion()"></div>
+    <div class="field"><label for="itb-sexo">Sexo</label><select id="itb-sexo" onchange="calcIntubacion()"><option value="m">Varón</option><option value="f">Mujer</option></select></div>
+    <div class="field"><label for="itb-estado">Estado hemodinámico</label>
       <select id="itb-estado" onchange="calcIntubacion()">
         <option value="estable">Estable</option>
         <option value="inestable">Inestable</option>
       </select>
     </div>
-    <div class="field"><label>Escenario clínico</label>
+    <div class="field"><label for="itb-escenario">Escenario clínico</label>
       <select id="itb-escenario" onchange="calcIntubacion()">
         <option value="">— Ninguno / general —</option>
         <option value="tce_htic">TCE / hipertensión intracraneal</option>
@@ -928,11 +930,11 @@ body {
         <option value="shock">Shock</option>
       </select>
     </div>
-    <div class="field"><label>Vía aérea difícil prevista</label>
+    <div class="field"><label for="itb-via-dificil">Vía aérea difícil prevista</label>
       <select id="itb-via-dificil"><option value="no">No</option><option value="si">Sí — activar algoritmo</option></select>
     </div>
-    <div class="field"><label>Nº de tubo endotraqueal (mm)</label><input type="text" id="itb-tet-num" placeholder="p.ej. 7,5"></div>
-    <div class="field"><label>Profundidad del tubo (cm, comisura)</label><input type="text" id="itb-tet-prof" placeholder="p.ej. 22"></div>
+    <div class="field"><label for="itb-tet-num">Nº de tubo endotraqueal (mm)</label><input type="text" id="itb-tet-num" placeholder="p.ej. 7,5"></div>
+    <div class="field"><label for="itb-tet-prof">Profundidad del tubo (cm, comisura)</label><input type="text" id="itb-tet-prof" placeholder="p.ej. 22"></div>
   </div>
 
   <div class="tile-aux" id="itb-peso-ideal">Peso ideal: — (solo para volumen tidal protector, no para dosis de fármacos)</div>
@@ -946,15 +948,15 @@ body {
 
   <div class="subhead">Parámetros de ventilador mecánico</div>
   <div class="fields">
-    <div class="field"><label>Modo</label>
+    <div class="field"><label for="itb-vent-modo">Modo</label>
       <select id="itb-vent-modo"><option>Volumen control (VCV)</option><option>Presión control (PCV)</option><option>Presión soporte (PSV)</option></select>
     </div>
-    <div class="field"><label>Volumen tidal (mL)</label><input type="number" id="itb-vent-vt" min="0" step="10"></div>
-    <div class="field"><label>FiO₂ (%)</label><input type="number" id="itb-vent-fio2" min="21" max="100" value="100"></div>
-    <div class="field"><label>PEEP (cmH₂O)</label><input type="number" id="itb-vent-peep" min="0" max="20" value="5"></div>
-    <div class="field"><label>Frecuencia respiratoria (rpm)</label><input type="number" id="itb-vent-fr" min="0" max="60" value="14"></div>
-    <div class="field"><label>Relación I:E</label><input type="text" id="itb-vent-ie" placeholder="1:2"></div>
-    <div class="field"><label>Presión meseta / pico (cmH₂O)</label><input type="text" id="itb-vent-presion" placeholder="p.ej. 18/24"></div>
+    <div class="field"><label for="itb-vent-vt">Volumen tidal (mL)</label><input type="number" id="itb-vent-vt" min="0" step="10"></div>
+    <div class="field"><label for="itb-vent-fio2">FiO₂ (%)</label><input type="number" id="itb-vent-fio2" min="21" max="100" value="100"></div>
+    <div class="field"><label for="itb-vent-peep">PEEP (cmH₂O)</label><input type="number" id="itb-vent-peep" min="0" max="20" value="5"></div>
+    <div class="field"><label for="itb-vent-fr">Frecuencia respiratoria (rpm)</label><input type="number" id="itb-vent-fr" min="0" max="60" value="14"></div>
+    <div class="field"><label for="itb-vent-ie">Relación I:E</label><input type="text" id="itb-vent-ie" placeholder="1:2"></div>
+    <div class="field"><label for="itb-vent-presion">Presión meseta / pico (cmH₂O)</label><input type="text" id="itb-vent-presion" placeholder="p.ej. 18/24"></div>
   </div>
   <div class="tile-aux" id="itb-vent-sugerencia">Volumen tidal protector sugerido (6–8 mL/kg de peso ideal): —</div>
 
@@ -963,7 +965,7 @@ body {
 
   <div class="subhead">Observaciones</div>
   <div class="fields" style="grid-template-columns:1fr">
-    <div class="field"><textarea id="itb-obs" rows="3" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px;font-family:inherit" placeholder="Observaciones adicionales, dificultades, número de intentos..."></textarea></div>
+    <div class="field"><textarea id="itb-obs" rows="3" aria-label="Observaciones" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px;font-family:inherit" placeholder="Observaciones adicionales, dificultades, número de intentos..."></textarea></div>
   </div>
 
   <div class="btn-row" style="padding: 0 14px 14px;">
@@ -976,11 +978,11 @@ body {
 </div><!-- end tab-intubacion -->
 
 <!-- TAB FICHAS -->
-<div id="tab-fichas" class="tab-content">
+<div id="tab-fichas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-fichas">
 <div class="section-title">📋 Fichas técnicas de medicamentos</div>
 <div class="fields" style="padding:0 0 14px">
   <div class="field" style="grid-column: 1 / -1; max-width:320px">
-    <label>Buscar medicamento</label>
+    <label for="fichas-buscar">Buscar medicamento</label>
     <input type="search" id="fichas-buscar" placeholder="p.ej. adrenalina…" oninput="renderFichaList(this.value)">
   </div>
 </div>
@@ -988,7 +990,7 @@ body {
 </div><!-- end tab-fichas -->
 
 <!-- TAB BIBLIOGRAFÍA -->
-<div id="tab-bibliografia" class="tab-content">
+<div id="tab-bibliografia" class="tab-content" role="tabpanel" aria-labelledby="navbtn-bibliografia">
 <div class="section-title">📚 Bibliografía — verificación clínica de las fichas (Vera + Perplexity)</div>
 <div class="tile-aux" style="margin-bottom:12px">Registro de la última verificación por lote. Al pedir una actualización, revisar primero las <strong>guías base</strong> de cada lote: si ya existe una versión más reciente, focalizar la nueva consulta solo en lo que cambió esa guía.</div>
 <div id="bibliografia-list"></div>
@@ -1000,7 +1002,7 @@ body {
   <div class="ficha-modal" id="ficha-modal"></div>
 </div>
 
-<div class="toast" id="toast">✓ Copiado al portapapeles</div>
+<div class="toast" id="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
 
 <script src="data/cheatsheets.js"></script>
 <script src="data/scales.js"></script>
@@ -1099,13 +1101,16 @@ function toggleTheme() {
 
 function showTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  window.scrollTo(0, 0);
 }
 
 function globalSearch(q) {
   const t = q.trim().toLowerCase();
+  document.querySelector('.nav').classList.toggle('searching', !!t);
   if (!t) {
     // Restore normal tab state
     document.querySelectorAll('.tab-content').forEach(tab => {
@@ -1474,11 +1479,11 @@ function renderProtocols() {
           '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito">★</button>' +
         '</summary>' +
         '<div class="scale-body">' +
-          p.steps.map((s, i) => {
-            const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (i + 1);
+          (() => { let n = 0; return p.steps.map(s => {
+            const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (++n);
             const cls = s.type === 'decision' ? ' step-decision' : s.type === 'info' ? ' step-info' : '';
             return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
-          }).join('') +
+          }).join(''); })() +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
           (p.folleto ? '<div class="btn-row" style="padding:10px 0 0"><button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button></div>' : '') +
           (p.galeria ? '<div class="btn-row" style="padding:6px 0 0"><button class="btn" onclick="event.stopPropagation();openGaleria(\'' + p.id + '\')">🫀 Ver patrones IAM nuevos (OMI)</button></div>' : '') +
