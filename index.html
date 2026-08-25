@@ -335,6 +335,27 @@ body {
 }
 .btn:disabled, .btn-copy:disabled { opacity: .4; cursor: not-allowed; }
 
+/* INTUBACIÓN — checklist de eventos con hora + calculadora de dosis por grupo */
+#tab-intubacion .event-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; padding: 7px 14px; border-bottom: 1px solid var(--bg3);
+}
+#tab-intubacion .event-row:last-child { border-bottom: none; }
+#tab-intubacion .event-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); flex: 1; min-width: 220px; }
+#tab-intubacion .event-label input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer; }
+#tab-intubacion .event-time { display: flex; align-items: center; gap: 6px; }
+#tab-intubacion .event-time input[type=time] { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; }
+#tab-intubacion .btn-now { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+#tab-intubacion .btn-now:hover { border-color: var(--blue); color: var(--blue); }
+#tab-intubacion .drug-row { padding: 8px 14px; border-bottom: 1px solid var(--bg3); }
+#tab-intubacion .drug-row:last-child { border-bottom: none; }
+#tab-intubacion .drug-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#tab-intubacion .drug-dose { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--text); }
+#tab-intubacion .drug-note { font-size: 11.5px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+#tab-intubacion .drug-flag { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+#tab-intubacion .drug-flag.pref-inestable { background: var(--red-bg); color: var(--red); }
+#tab-intubacion .drug-flag.pref-estable { background: var(--blue-bg); color: var(--blue); }
+
 /* FICHA TÉCNICA — modal de medicamento */
 .ficha-overlay {
   position: fixed;
@@ -690,6 +711,7 @@ body {
   <button class="nav-btn" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
   <button class="nav-btn" onclick="showTab('farmacos', this)">💊 Fármacos</button>
   <button class="nav-btn" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
+  <button class="nav-btn" onclick="showTab('intubacion', this)">🫁 Intubación</button>
   <button class="nav-btn" onclick="showTab('fichas', this)">📋 Fichas</button>
   <button class="nav-btn" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
@@ -859,6 +881,87 @@ body {
 
 </div><!-- end tab-perfusiones -->
 
+<!-- TAB INTUBACIÓN -->
+<div id="tab-intubacion" class="tab-content">
+<div class="section-title">🫁 Lista de verificación de intubación (SIR)</div>
+
+<div class="databox">
+  <div class="databox-header">
+    <div>
+      <div class="scale-title">Secuencia de intubación rápida — checklist</div>
+      <div class="scale-subtitle">Peso real para fármacos · peso ideal solo para volumen tidal protector</div>
+    </div>
+    <span class="badge badge-red">Vía aérea</span>
+  </div>
+
+  <div class="subhead">Paciente y estado</div>
+  <div class="fields">
+    <div class="field"><label>Peso real (kg)</label><input type="number" id="itb-peso" min="1" max="300" oninput="calcIntubacion()"></div>
+    <div class="field"><label>Talla (cm)</label><input type="number" id="itb-talla" min="50" max="230" oninput="calcIntubacion()"></div>
+    <div class="field"><label>Sexo</label><select id="itb-sexo" onchange="calcIntubacion()"><option value="m">Varón</option><option value="f">Mujer</option></select></div>
+    <div class="field"><label>Estado hemodinámico</label>
+      <select id="itb-estado" onchange="calcIntubacion()">
+        <option value="estable">Estable</option>
+        <option value="inestable">Inestable</option>
+      </select>
+    </div>
+    <div class="field"><label>Escenario clínico</label>
+      <select id="itb-escenario" onchange="calcIntubacion()">
+        <option value="">— Ninguno / general —</option>
+        <option value="tce_htic">TCE / hipertensión intracraneal</option>
+        <option value="status_epileptico">Estatus epiléptico</option>
+        <option value="broncoespasmo">Broncoespasmo severo</option>
+        <option value="cardiovascular">Enfermedad cardiovascular</option>
+        <option value="shock">Shock</option>
+      </select>
+    </div>
+    <div class="field"><label>Vía aérea difícil prevista</label>
+      <select id="itb-via-dificil"><option value="no">No</option><option value="si">Sí — activar algoritmo</option></select>
+    </div>
+    <div class="field"><label>Nº de tubo endotraqueal (mm)</label><input type="text" id="itb-tet-num" placeholder="p.ej. 7,5"></div>
+    <div class="field"><label>Profundidad del tubo (cm, comisura)</label><input type="text" id="itb-tet-prof" placeholder="p.ej. 22"></div>
+  </div>
+
+  <div class="tile-aux" id="itb-peso-ideal">Peso ideal: — (solo para volumen tidal protector, no para dosis de fármacos)</div>
+  <div class="tile-aux" id="itb-escenario-nota" style="display:none"></div>
+
+  <div class="subhead">Checklist de eventos — hora de cada paso</div>
+  <div id="itb-eventos"></div>
+
+  <div class="subhead">Medicación — dosis calculada sobre peso real</div>
+  <div id="itb-farmacos"></div>
+
+  <div class="subhead">Parámetros de ventilador mecánico</div>
+  <div class="fields">
+    <div class="field"><label>Modo</label>
+      <select id="itb-vent-modo"><option>Volumen control (VCV)</option><option>Presión control (PCV)</option><option>Presión soporte (PSV)</option></select>
+    </div>
+    <div class="field"><label>Volumen tidal (mL)</label><input type="number" id="itb-vent-vt" min="0" step="10"></div>
+    <div class="field"><label>FiO₂ (%)</label><input type="number" id="itb-vent-fio2" min="21" max="100" value="100"></div>
+    <div class="field"><label>PEEP (cmH₂O)</label><input type="number" id="itb-vent-peep" min="0" max="20" value="5"></div>
+    <div class="field"><label>Frecuencia respiratoria (rpm)</label><input type="number" id="itb-vent-fr" min="0" max="60" value="14"></div>
+    <div class="field"><label>Relación I:E</label><input type="text" id="itb-vent-ie" placeholder="1:2"></div>
+    <div class="field"><label>Presión meseta / pico (cmH₂O)</label><input type="text" id="itb-vent-presion" placeholder="p.ej. 18/24"></div>
+  </div>
+  <div class="tile-aux" id="itb-vent-sugerencia">Volumen tidal protector sugerido (6–8 mL/kg de peso ideal): —</div>
+
+  <div class="subhead">Complicaciones observadas</div>
+  <div class="chk-grid" id="itb-complicaciones"></div>
+
+  <div class="subhead">Observaciones</div>
+  <div class="fields" style="grid-template-columns:1fr">
+    <div class="field"><textarea id="itb-obs" rows="3" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px;font-family:inherit" placeholder="Observaciones adicionales, dificultades, número de intentos..."></textarea></div>
+  </div>
+
+  <div class="btn-row" style="padding: 0 14px 14px;">
+    <button class="btn btn-copy" onclick="copyIntubacionReport()">📋 Copiar informe</button>
+    <button class="btn" onclick="printIntubacionReport()">🖨️ Imprimir / Guardar PDF</button>
+    <button class="reset-btn" style="margin-top:0" onclick="resetIntubacion()">↺ Reset</button>
+  </div>
+</div>
+
+</div><!-- end tab-intubacion -->
+
 <!-- TAB FICHAS -->
 <div id="tab-fichas" class="tab-content">
 <div class="section-title">📋 Fichas técnicas de medicamentos</div>
@@ -891,6 +994,7 @@ body {
 <script src="data/protocols.js"></script>
 <script src="data/drugs.js"></script>
 <script src="data/infusions.js"></script>
+<script src="data/intubacion.js"></script>
 <script src="data/fichas.js"></script>
 <script src="data/bibliografia.js"></script>
 <script>
@@ -1002,6 +1106,7 @@ function globalSearch(q) {
                : activeName.includes('escala') ? 'tab-escalas'
                : activeName.includes('protocolo') ? 'tab-protocolos'
                : activeName.includes('perfusión') ? 'tab-perfusiones'
+               : activeName.includes('intubación') ? 'tab-intubacion'
                : activeName.includes('bibliografía') ? 'tab-bibliografia'
                : activeName.includes('ficha') ? 'tab-fichas'
                : 'tab-farmacos';
@@ -1600,6 +1705,217 @@ function resetInfusion() {
 }
 
 /* ==================================================================
+   INTUBACIÓN — checklist SIR: eventos con hora, dosis por peso real,
+   volumen tidal por peso ideal, informe copiable/imprimible
+   ================================================================== */
+function _itbNow() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function stampIntubacionTime(id) {
+  document.getElementById(id).value = _itbNow();
+}
+
+function renderIntubacionEventos() {
+  document.getElementById('itb-eventos').innerHTML = INTUBACION_STEPS.map(s =>
+    '<div class="event-row">' +
+      '<label class="event-label"><input type="checkbox" id="itb-ev-' + s.id + '-chk">' + s.label + '</label>' +
+      '<div class="event-time">' +
+        '<input type="time" id="itb-ev-' + s.id + '-hora">' +
+        '<button class="btn-now" onclick="stampIntubacionTime(\'itb-ev-' + s.id + '-hora\')">Ahora</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function renderIntubacionFarmacos() {
+  const grupos = ['Premedicación', 'Inducción', 'Relajante muscular'];
+  document.getElementById('itb-farmacos').innerHTML = grupos.map(g => {
+    const drugs = INTUBACION_FARMACOS.filter(d => d.grupo === g);
+    return '<div class="subhead" style="padding-top:4px">' + g + '</div>' +
+      drugs.map(d => {
+        return '<div class="drug-row">' +
+          '<div class="drug-head">' +
+            '<label class="event-label" style="min-width:180px"><input type="checkbox" id="itb-fx-' + d.id + '-chk" onchange="calcIntubacion()">' + d.nombre + ' <span id="itb-fx-' + d.id + '-rec"></span></label>' +
+            '<div class="event-time">' +
+              '<span class="drug-dose" id="itb-fx-' + d.id + '-dosis">—</span>' +
+              '<input type="time" id="itb-fx-' + d.id + '-hora">' +
+              '<button class="btn-now" onclick="stampIntubacionTime(\'itb-fx-' + d.id + '-hora\')">Ahora</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="drug-note">' + d.nombre + ' ' + d.doseMin + (d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit +
+            (d.doseMinAbs ? ' (mínimo ' + d.doseMinAbs + ' mg)' : '') +
+            (d.doseInestable ? ' · ' + d.doseInestable : '') + ' — ' + d.nota + '</div>' +
+        '</div>';
+      }).join('');
+  }).join('');
+}
+
+function renderIntubacionComplicaciones() {
+  document.getElementById('itb-complicaciones').innerHTML = INTUBACION_COMPLICACIONES.map((c, i) =>
+    '<label class="chk"><input type="checkbox" id="itb-comp-' + i + '">' + c + '</label>'
+  ).join('');
+}
+
+function _itbPesoIdeal() {
+  const talla = parseFloat(document.getElementById('itb-talla').value);
+  const sexo = document.getElementById('itb-sexo').value;
+  if (!talla || talla <= 0) return null;
+  const base = 0.9055 * (talla - 152.4);
+  return sexo === 'f' ? 45.5 + base : 50 + base;
+}
+
+function _itbRecomendacion() {
+  const escenarioId = document.getElementById('itb-escenario').value;
+  const estado = document.getElementById('itb-estado').value;
+  if (!escenarioId) return null;
+  const esc = INTUBACION_ESCENARIOS.find(e => e.id === escenarioId);
+  if (!esc) return null;
+  const ids = estado === 'inestable' ? esc.inestable : esc.estable;
+  const nota = estado === 'inestable' ? esc.notaInestable : esc.notaEstable;
+  return { escenario: esc, ids: ids || [], nota: nota || '' };
+}
+
+function calcIntubacion() {
+  const peso = parseFloat(document.getElementById('itb-peso').value);
+  INTUBACION_FARMACOS.forEach(d => {
+    const el = document.getElementById('itb-fx-' + d.id + '-dosis');
+    if (!peso || peso <= 0) { el.textContent = '—'; return; }
+    const min = d.doseMin * peso, max = d.doseMax * peso;
+    let mgMin = min, mgMax = max, unit = d.unit.split('/')[0];
+    if (d.doseMinAbs) mgMin = Math.max(mgMin, d.doseMinAbs);
+    el.textContent = (mgMin === mgMax ? _fmt(mgMin, 2) : _fmt(mgMin, 2) + '–' + _fmt(mgMax, 2)) + ' ' + unit;
+  });
+
+  const rec = _itbRecomendacion();
+  const recIds = rec ? rec.ids : [];
+  INTUBACION_FARMACOS.forEach(d => {
+    const recEl = document.getElementById('itb-fx-' + d.id + '-rec');
+    recEl.innerHTML = recIds.includes(d.id) ? '<span class="drug-flag pref-inestable">✓ recomendado en este escenario</span>' : '';
+  });
+  const notaEl = document.getElementById('itb-escenario-nota');
+  if (rec) {
+    const estadoLabel = document.getElementById('itb-estado').value === 'inestable' ? 'inestable' : 'estable';
+    notaEl.style.display = '';
+    notaEl.innerHTML = '<strong>' + rec.escenario.label + ' (' + estadoLabel + '):</strong> ' +
+      (recIds.length ? 'preferir ' + recIds.map(id => (INTUBACION_FARMACOS.find(f => f.id === id) || {}).nombre).join(', ') : 'sin agente preferente específico') +
+      (rec.nota ? ' — ' + rec.nota : '');
+  } else {
+    notaEl.style.display = 'none';
+    notaEl.innerHTML = '';
+  }
+
+  const pi = _itbPesoIdeal();
+  const piEl = document.getElementById('itb-peso-ideal');
+  if (pi) {
+    piEl.textContent = 'Peso ideal: ' + _fmt(pi, 1) + ' kg (solo para volumen tidal protector, no para dosis de fármacos)';
+    const vtMin = 6 * pi, vtMax = 8 * pi;
+    document.getElementById('itb-vent-sugerencia').textContent =
+      'Volumen tidal protector sugerido (6–8 mL/kg de peso ideal): ' + _fmt(vtMin, 0) + '–' + _fmt(vtMax, 0) + ' mL';
+  } else {
+    piEl.textContent = 'Peso ideal: — (solo para volumen tidal protector, no para dosis de fármacos)';
+    document.getElementById('itb-vent-sugerencia').textContent = 'Volumen tidal protector sugerido (6–8 mL/kg de peso ideal): —';
+  }
+}
+
+function _itbEventosTexto() {
+  return INTUBACION_STEPS.map(s => {
+    const chk = document.getElementById('itb-ev-' + s.id + '-chk').checked;
+    const hora = document.getElementById('itb-ev-' + s.id + '-hora').value;
+    return (chk ? '☑' : '☐') + ' ' + s.label + (hora ? ' — ' + hora : '');
+  }).join('\n');
+}
+
+function _itbFarmacosTexto() {
+  const admin = INTUBACION_FARMACOS.filter(d => document.getElementById('itb-fx-' + d.id + '-chk').checked);
+  if (!admin.length) return '(ninguno marcado como administrado)';
+  return admin.map(d => {
+    const dosis = document.getElementById('itb-fx-' + d.id + '-dosis').textContent;
+    const hora = document.getElementById('itb-fx-' + d.id + '-hora').value;
+    return '- ' + d.nombre + ': ' + dosis + (hora ? ' — ' + hora : '');
+  }).join('\n');
+}
+
+function _itbComplicacionesTexto() {
+  const marcadas = INTUBACION_COMPLICACIONES.filter((c, i) => document.getElementById('itb-comp-' + i).checked);
+  return marcadas.length ? marcadas.join(', ') : 'Ninguna';
+}
+
+function _itbReportText() {
+  const peso = document.getElementById('itb-peso').value || '—';
+  const talla = document.getElementById('itb-talla').value || '—';
+  const pi = _itbPesoIdeal();
+  const estado = document.getElementById('itb-estado').value === 'inestable' ? 'Inestable' : 'Estable';
+  const escenarioSel = document.getElementById('itb-escenario');
+  const escenarioTexto = escenarioSel.value ? escenarioSel.options[escenarioSel.selectedIndex].text : 'Ninguno / general';
+  const viaDificil = document.getElementById('itb-via-dificil').value === 'si' ? 'Sí — algoritmo de vía aérea difícil activado' : 'No prevista';
+  const tetNum = document.getElementById('itb-tet-num').value || '—';
+  const tetProf = document.getElementById('itb-tet-prof').value || '—';
+  const obs = document.getElementById('itb-obs').value || '(sin observaciones)';
+  return `LISTA DE VERIFICACIÓN DE INTUBACIÓN — SECUENCIA DE INTUBACIÓN RÁPIDA
+Peso real: ${peso} kg · Talla: ${talla} cm · Peso ideal: ${pi ? _fmt(pi, 1) + ' kg' : '—'}
+Estado hemodinámico: ${estado} · Escenario clínico: ${escenarioTexto}
+Vía aérea difícil prevista: ${viaDificil}
+Tubo endotraqueal: nº ${tetNum} mm · profundidad ${tetProf} cm
+
+--- CHECKLIST DE EVENTOS ---
+${_itbEventosTexto()}
+
+--- MEDICACIÓN ADMINISTRADA (dosis sobre peso real) ---
+${_itbFarmacosTexto()}
+
+--- VENTILADOR MECÁNICO ---
+Modo: ${document.getElementById('itb-vent-modo').value}
+Volumen tidal: ${document.getElementById('itb-vent-vt').value || '—'} mL (sugerido 6–8 mL/kg peso ideal)
+FiO₂: ${document.getElementById('itb-vent-fio2').value || '—'}% · PEEP: ${document.getElementById('itb-vent-peep').value || '—'} cmH₂O · FR: ${document.getElementById('itb-vent-fr').value || '—'} rpm
+Relación I:E: ${document.getElementById('itb-vent-ie').value || '—'} · Presión meseta/pico: ${document.getElementById('itb-vent-presion').value || '—'}
+
+--- COMPLICACIONES ---
+${_itbComplicacionesTexto()}
+
+--- OBSERVACIONES ---
+${obs}`;
+}
+
+function copyIntubacionReport() {
+  navigator.clipboard.writeText(_itbReportText()).then(showToast);
+}
+
+function printIntubacionReport() {
+  const w = window.open('', '_blank');
+  const html = '<pre style="font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;padding:24px;color:#111">' +
+    _itbReportText().replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre>';
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Informe de intubación</title></head><body>' + html + '</body></html>');
+  w.document.close();
+  w.focus();
+  w.print();
+}
+
+function resetIntubacion() {
+  renderIntubacionEventos();
+  renderIntubacionFarmacos();
+  renderIntubacionComplicaciones();
+  document.getElementById('itb-peso').value = '';
+  document.getElementById('itb-talla').value = '';
+  document.getElementById('itb-sexo').selectedIndex = 0;
+  document.getElementById('itb-estado').selectedIndex = 0;
+  document.getElementById('itb-escenario').selectedIndex = 0;
+  document.getElementById('itb-via-dificil').selectedIndex = 0;
+  document.getElementById('itb-tet-num').value = '';
+  document.getElementById('itb-tet-prof').value = '';
+  document.getElementById('itb-vent-modo').selectedIndex = 0;
+  document.getElementById('itb-vent-vt').value = '';
+  document.getElementById('itb-vent-fio2').value = '100';
+  document.getElementById('itb-vent-peep').value = '5';
+  document.getElementById('itb-vent-fr').value = '14';
+  document.getElementById('itb-vent-ie').value = '';
+  document.getElementById('itb-vent-presion').value = '';
+  document.getElementById('itb-obs').value = '';
+  calcIntubacion();
+}
+
+/* ==================================================================
    FICHAS TÉCNICAS — modal de medicamento
    ================================================================== */
 function _fichaSection(title, text, cls) {
@@ -1709,6 +2025,10 @@ renderInfusionSelect();
 selectInfusionDrug();
 renderInfusionGrid();
 renderFichaList('');
+renderIntubacionEventos();
+renderIntubacionFarmacos();
+renderIntubacionComplicaciones();
+calcIntubacion();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
