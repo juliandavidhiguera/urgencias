@@ -1638,6 +1638,7 @@ function renderDrugs() {
             (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
             (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
             (d.src ? '<div class="scale-src">Fuente: ' + d.src + '</div>' : '') +
+            (d.ficha ? '<div class="btn-row"><button class="btn btn-copy" onclick="showFicha(\'' + d.ficha + '\')">📄 Ver ficha</button></div>' : '') +
           '</div></div>';
       }).join('');
     }).join('') +

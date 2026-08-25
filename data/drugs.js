@@ -2,7 +2,10 @@
    DRUGS — fármacos de urgencias con calculadora de dosis por peso
    Referencia: guías SEM Gencat / protocolos estándar de urgencias
    Formato: { group, badge, tag, drugs: [{ name, dilution, doseRange,
-             doseCalc(peso) -> {min,max,unit}, extra(peso) -> string, alerts[] }] }
+             doseCalc(peso) -> {min,max,unit}, extra(peso) -> string,
+             alerts[], ficha }] }
+   ficha: nombre del archivo en medicamentos/ con la ficha oficial del
+   fármaco (campo "file" en data/fichas.js) — omitido si no existe ficha.
    ================================================================== */
 window.DRUGS = [
 
@@ -18,7 +21,8 @@ window.DRUGS = [
         unit: 'mL/h'
       };
     },
-    alerts: ['Vía central de elección', 'Si se usa periférica de forma temporal: vena gruesa y proximal, comprobar reflujo y vigilar el punto de punción', 'Extravasación: riesgo de necrosis. Infiltrar fentolamina 5–10 mg en 10–15 mL de SSF cuanto antes', 'Monitorizar TA, preferiblemente invasiva'], src: 'ASHP Drug Compendium (Norepinephrine)'
+    alerts: ['Vía central de elección', 'Si se usa periférica de forma temporal: vena gruesa y proximal, comprobar reflujo y vigilar el punto de punción', 'Extravasación: riesgo de necrosis. Infiltrar fentolamina 5–10 mg en 10–15 mL de SSF cuanto antes', 'Monitorizar TA, preferiblemente invasiva'], src: 'ASHP Drug Compendium (Norepinephrine)',
+    ficha: 'Noradrenalina.md'
   },
   {
     name: 'Dopamina',
@@ -42,7 +46,8 @@ window.DRUGS = [
         max: (20 * peso * 60 / 1000).toFixed(1),
         unit: 'mL/h'
       };
-    }
+    },
+    ficha: 'Dobutamina.md'
   }
 ]},
 
@@ -57,7 +62,13 @@ window.DRUGS = [
         max: (0.1 * peso).toFixed(1),
         unit: 'mg (bolo)'
       };
-    }
+    },
+    extra: function(peso) {
+      var min = (0.02 * peso / 0.3).toFixed(1);
+      var max = (0.1 * peso / 0.3).toFixed(1);
+      return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 0,3 mg/mL)';
+    },
+    ficha: 'Midazolam.md'
   },
   {
     name: 'Fentanilo',
@@ -69,7 +80,13 @@ window.DRUGS = [
         max: (2 * peso).toFixed(1),
         unit: 'µg (bolo)'
       };
-    }
+    },
+    extra: function(peso) {
+      var min = (0.5 * peso / 10).toFixed(1);
+      var max = (3 * peso / 10).toFixed(1);
+      return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 10 µg/mL)';
+    },
+    ficha: 'Fentanil.md'
   },
   {
     name: 'Ketamina',
@@ -81,7 +98,8 @@ window.DRUGS = [
         max: (2 * peso).toFixed(1),
         unit: 'mg (dosis disociativa)'
       };
-    }
+    },
+    ficha: 'Ketamina.md'
   },
   {
     name: 'Propofol',
@@ -93,7 +111,13 @@ window.DRUGS = [
         max: (2.5 * peso).toFixed(1),
         unit: 'mg (inducción)'
       };
-    }
+    },
+    extra: function(peso) {
+      var min = (4 * peso / 10).toFixed(1);
+      var max = (12 * peso / 10).toFixed(1);
+      return 'Mantenimiento: ' + min + '–' + max + ' mL/h (dilución 10 mg/mL)';
+    },
+    ficha: 'Propofol.md'
   }
 ]},
 
@@ -102,17 +126,20 @@ window.DRUGS = [
     name: 'Amiodarona',
     dilution: 'Carga: 300 mg en 100 mL SG5% en 20–60 min',
     doseRange: 'Carga 300 mg · Mantenimiento 900 mg/24h',
-    alerts: ['Hipotensión en bolo rápido', 'NO diluir en suero salino: usar glucosado al 5%', 'Flebitis frecuente: preferir vía central; evitar perfusión periférica >24 h', 'Evitar en FA preexcitada / WPW'], src: 'ESC 2024 FA · PMID 39210723 · AHA ALS 2025 · PMID 41122884'
+    alerts: ['Hipotensión en bolo rápido', 'NO diluir en suero salino: usar glucosado al 5%', 'Flebitis frecuente: preferir vía central; evitar perfusión periférica >24 h', 'Evitar en FA preexcitada / WPW'], src: 'ESC 2024 FA · PMID 39210723 · AHA ALS 2025 · PMID 41122884',
+    ficha: 'Amiodarona.md'
   },
   {
     name: 'Adenosina',
     dilution: 'IV rápido en bolo, seguido de flush de SSF',
-    doseRange: '6 mg → 12 mg → 12 mg (dosis fija, sin ajuste por peso)', alerts: ['CONTRAINDICADA en asma o broncoespasmo grave', 'Produce pausa sinusal o asistolia transitoria: monitorización ECG y desfibrilador a mano', 'Por vía central el efecto es mucho mayor: empezar por 1–3 mg', 'El dipiridamol potencia su efecto; las metilxantinas lo antagonizan'], src: 'AHA ALS 2025 · PMID 41122884 · EHRA 2025 · PMID 40165484'
+    doseRange: '6 mg → 12 mg → 12 mg (dosis fija, sin ajuste por peso)', alerts: ['CONTRAINDICADA en asma o broncoespasmo grave', 'Produce pausa sinusal o asistolia transitoria: monitorización ECG y desfibrilador a mano', 'Por vía central el efecto es mucho mayor: empezar por 1–3 mg', 'El dipiridamol potencia su efecto; las metilxantinas lo antagonizan'], src: 'AHA ALS 2025 · PMID 41122884 · EHRA 2025 · PMID 40165484',
+    ficha: 'Adenosina.md'
   },
   {
     name: 'Verapamilo',
     dilution: 'IV directo o diluido',
-    doseRange: '2.5–5 mg IV en 2 min, repetir 5–10 mg a los 15 min si es necesario', alerts: ['CONTRAINDICADO en FA preexcitada / WPW: acelera la vía accesoria y puede precipitar FV', 'Contraindicado si FEVI ≤40% o IC sintomática', 'No administrar próximo a betabloqueante IV: bradicardia grave, bloqueo AV e hipotensión'], src: 'ESC 2024 FA · PMID 39210723 · AHA ALS 2025 · PMID 41122884'
+    doseRange: '2.5–5 mg IV en 2 min, repetir 5–10 mg a los 15 min si es necesario', alerts: ['CONTRAINDICADO en FA preexcitada / WPW: acelera la vía accesoria y puede precipitar FV', 'Contraindicado si FEVI ≤40% o IC sintomática', 'No administrar próximo a betabloqueante IV: bradicardia grave, bloqueo AV e hipotensión'], src: 'ESC 2024 FA · PMID 39210723 · AHA ALS 2025 · PMID 41122884',
+    ficha: 'Verapamil.md'
   },
   {
     name: 'Flecainida',
@@ -121,7 +148,8 @@ window.DRUGS = [
     doseCalc: function(peso) {
       var d = Math.min(2 * peso, 150).toFixed(1);
       return { min: d, max: d, unit: 'mg' };
-    }
+    },
+    ficha: 'Flecaïnida.md'
   }
 ]},
 
@@ -133,12 +161,14 @@ window.DRUGS = [
     doseCalc: function(peso) {
       var d = Math.min(0.01 * peso, 0.5).toFixed(2);
       return { min: d, max: d, unit: 'mg IM (anafilaxia)' };
-    }
+    },
+    ficha: 'Adrenalina.md'
   },
   {
     name: 'Atropina',
     dilution: 'IV directo',
-    doseRange: 'Bradicardia: 0.5 mg IV cada 3–5 min (máx 3 mg) · Organofosforados: 2–4 mg IV', alerts: ['Dosis <0,5 mg pueden producir bradicardia paradójica', 'En bloqueo AV de alto grado o infranodal suele ser ineficaz: preparar marcapasos']
+    doseRange: 'Bradicardia: 0.5 mg IV cada 3–5 min (máx 3 mg) · Organofosforados: 2–4 mg IV', alerts: ['Dosis <0,5 mg pueden producir bradicardia paradójica', 'En bloqueo AV de alto grado o infranodal suele ser ineficaz: preparar marcapasos'],
+    ficha: 'Atropina.md'
   },
   {
     name: 'Bicarbonato sódico 1M',
@@ -147,7 +177,8 @@ window.DRUGS = [
     doseCalc: function(peso) {
       var d = (peso * 1).toFixed(1);
       return { min: d, max: d, unit: 'mL' };
-    }
+    },
+    ficha: 'Bicarbonat sòdic.md'
   },
   {
     name: 'Gluconato cálcico 10%',
@@ -157,7 +188,8 @@ window.DRUGS = [
              '30 mL de gluconato equivalen en calcio elemental a 10 mL de cloruro: NO son intercambiables mL a mL',
              'PRECIPITA con el bicarbonato: líneas separadas o lavado abundante entre ambos',
              'Repetir a los 5 min si persisten los cambios en el ECG'],
-    src: 'ERC 2025 Executive Summary · PMID 41117573 · Bianchi 2019 · PMID 31119681'
+    src: 'ERC 2025 Executive Summary · PMID 41117573 · Bianchi 2019 · PMID 31119681',
+    ficha: 'Gluconat de calci.md'
   },
   {
     name: 'Cloruro cálcico 10%',
@@ -183,7 +215,8 @@ window.DRUGS = [
     extra: function(peso) {
       var mlh = (18 * peso / 100).toFixed(1);
       return 'Perfusión: ' + mlh + ' mL/h (18 UI/kg/h, conc. 100 UI/mL)';
-    }
+    },
+    ficha: 'Heparina sòdica.md'
   },
   {
     name: 'Enoxaparina',
@@ -192,7 +225,8 @@ window.DRUGS = [
     doseCalc: function(peso) {
       var d = (1 * peso).toFixed(1);
       return { min: d, max: d, unit: 'mg/12h (terapéutica)' };
-    }
+    },
+    ficha: 'Enoxaparina.md'
   }
 ]},
 
@@ -215,12 +249,14 @@ window.DRUGS = [
   {
     name: 'Flumazenilo',
     dilution: 'IV directo',
-    doseRange: '0.2 mg IV, repetir 0.1 mg cada 60 s (máx 1 mg)', alerts: ['NO usar de rutina en coma o intoxicación no filiada', 'CONTRAINDICADO si hay sospecha de coingesta de antidepresivos tricíclicos u otro proconvulsivante', 'En consumidores crónicos de benzodiacepinas puede precipitar abstinencia aguda y convulsiones', 'Vida media más corta que muchas benzodiacepinas: vigilar resedación'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · Penninga 2015, metaanalisis · PMID 26096314'
+    doseRange: '0.2 mg IV, repetir 0.1 mg cada 60 s (máx 1 mg)', alerts: ['NO usar de rutina en coma o intoxicación no filiada', 'CONTRAINDICADO si hay sospecha de coingesta de antidepresivos tricíclicos u otro proconvulsivante', 'En consumidores crónicos de benzodiacepinas puede precipitar abstinencia aguda y convulsiones', 'Vida media más corta que muchas benzodiacepinas: vigilar resedación'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · Penninga 2015, metaanalisis · PMID 26096314',
+    ficha: 'Flumazenil.md'
   },
   {
     name: 'Naloxona',
     dilution: 'IV directo o IM/SC/intranasal',
-    doseRange: '0.4–2 mg IV, repetir cada 2–3 min', alerts: ['Titular a la dosis mínima que revierta la depresión respiratoria, no buscar despertar completo', 'Puede precipitar abstinencia aguda en dependientes de opioides', 'Vida media más corta que muchos opioides: vigilar resedación y valorar perfusión si precisa bolos repetidos'], src: 'AHA 2023 toxicologia · PMID 37721023 · ASHP Drug Compendium (Naloxone)'
+    doseRange: '0.4–2 mg IV, repetir cada 2–3 min', alerts: ['Titular a la dosis mínima que revierta la depresión respiratoria, no buscar despertar completo', 'Puede precipitar abstinencia aguda en dependientes de opioides', 'Vida media más corta que muchos opioides: vigilar resedación y valorar perfusión si precisa bolos repetidos'], src: 'AHA 2023 toxicologia · PMID 37721023 · ASHP Drug Compendium (Naloxone)',
+    ficha: 'Naloxona.md'
   },
   {
     name: 'N-acetilcisteína',
@@ -235,6 +271,111 @@ window.DRUGS = [
       var f3 = (100 * peso).toFixed(0);
       return 'Fase 2: ' + f2 + ' mg (4h) · Fase 3: ' + f3 + ' mg (16h)';
     }
+  }
+,
+  {
+    name: 'Hidroxocobalamina',
+    dilution: 'Reconstituir 5 g en 200 mL de SF 0,9%',
+    doseRange: '5 g IV en 15 min (70 mg/kg); repetible una 2ª dosis de 5 g si persiste la inestabilidad',
+    doseCalc: function(peso) {
+      var d = (70 * peso / 1000).toFixed(1);
+      return { min: d, max: d, unit: 'g (70 mg/kg)' };
+    },
+    alerts: ['Antídoto de elección en inhalación de humo de incendio con hollín en boca o nariz, alteración de consciencia o lactato ≥ 8 mmol/L: no esperar a confirmar el cianuro', 'Tiñe de rojo piel, mucosas y orina durante días', 'Interfiere con las determinaciones colorimétricas (co-oximetría, creatinina, bilirrubina) y con la detección de fugas en hemodiálisis: extraer analítica ANTES de administrarla'],
+    ficha: 'Hidroxocobalamina.md'
+  },
+  {
+    name: 'Fomepizol',
+    dilution: 'Diluir en 100 mL de SF 0,9%, pasar en 30 min',
+    doseRange: 'Carga 15 mg/kg IV · después 10 mg/kg/12 h (4 dosis) · después 15 mg/kg/12 h · durante hemodiálisis, cada 4 h',
+    doseCalc: function(peso) {
+      var d = (15 * peso).toFixed(0);
+      return { min: d, max: d, unit: 'mg (dosis de carga)' };
+    },
+    alerts: ['Indicado en intoxicación por metanol y etilenglicol: bloquea la alcohol-deshidrogenasa', 'No sustituye a la hemodiálisis si hay acidosis grave, alteración visual, coma o fracaso renal', 'Alternativa si no se dispone: etanol IV con control estricto de la alcoholemia']
+  },
+  {
+    name: 'Glucagón (intoxicación por betabloqueantes)',
+    dilution: 'Reconstituir con su disolvente; perfusión en SG5%',
+    doseRange: 'Bolo 3–5 mg IV (50–150 microgramos/kg) en 1–2 min, repetible a los 10 min · perfusión 2–5 mg/h',
+    doseCalc: function(peso) {
+      var min = (0.05 * peso).toFixed(1);
+      var max = (0.15 * peso).toFixed(1);
+      return { min: min, max: max, unit: 'mg (bolo, 50–150 mcg/kg)' };
+    },
+    alerts: ['Vómitos casi constantes: proteger la vía aérea antes del bolo', 'Hiperglucemia e hipopotasemia frecuentes', 'Si no responde, escalar a insulina a dosis altas euglucémica'],
+    ficha: 'Glucagó.md'
+  },
+  {
+    name: 'Insulina a dosis altas euglucémica (HIE)',
+    dilution: 'Insulina rápida en SF 0,9% (1 UI/mL) + glucosa concentrada en vía aparte',
+    doseRange: 'Bolo 1 UI/kg IV + perfusión 1 UI/kg/h, escalable cada 10–15 min hasta 10 UI/kg/h según respuesta hemodinámica',
+    doseCalc: function(peso) {
+      var d = (1 * peso).toFixed(0);
+      return { min: d, max: d, unit: 'UI (bolo) y UI/h (inicio)' };
+    },
+    extra: function(peso) {
+      var mx = (10 * peso).toFixed(0);
+      return 'Techo de escalada: ' + mx + ' UI/h (10 UI/kg/h)';
+    },
+    alerts: ['Indicación: intoxicación por calcioantagonistas y betabloqueantes con shock refractario', 'Añadir glucosa 25 g IV si glucemia < 250 mg/dL y perfusión de glucosa continua', 'Controlar glucemia cada 30 min y potasio cada hora (hipopotasemia por redistribución)', 'El efecto inotrópico tarda 15–45 min: no suspender de forma precoz por falta de respuesta inmediata'],
+    src: 'Krenz 2018, revision de HIE en calcioantagonistas y betabloqueantes · PMID 30141827',
+    ficha: 'Insulina.md'
+  },
+  {
+    name: 'Azul de metileno',
+    dilution: 'IV lento en 5 min, diluido en SG5%',
+    doseRange: '1–2 mg/kg IV en 5 min, repetible a los 30–60 min (máx acumulado 7 mg/kg)',
+    doseCalc: function(peso) {
+      var min = (1 * peso).toFixed(0);
+      var max = (2 * peso).toFixed(0);
+      return { min: min, max: max, unit: 'mg' };
+    },
+    alerts: ['Indicación: metahemoglobinemia sintomática o metaHb > 20–30%', 'La pulsioximetría convencional no detecta la metahemoglobinemia: usar co-oximetría', 'Contraindicado o ineficaz en déficit de G6PD (riesgo de hemólisis): valorar azul de toluidina, vitamina C o exanguinotransfusión', 'Riesgo de síndrome serotoninérgico si el paciente toma ISRS o IMAO']
+  },
+  {
+    name: 'Piridoxina (vitamina B6)',
+    dilution: 'Diluir en 100 mL de SF 0,9%',
+    doseRange: '1 g IV por cada gramo de isoniazida ingerido · si la dosis es desconocida: 5 g IV empíricos',
+    alerts: ['Indicación: convulsiones por isoniazida o por setas del género Gyromitra que no ceden con benzodiazepinas', 'Administrar junto a la benzodiazepina, no en su lugar', 'Repetible si persisten las convulsiones']
+  },
+  {
+    name: 'Emulsión lipídica 20%',
+    dilution: 'Vía IV exclusiva, sin mezclar con otros fármacos',
+    doseRange: 'Bolo 1,5 mL/kg en 2–3 min + perfusión 0,25 mL/kg/min durante 20 min · repetir el bolo hasta 2 veces si persiste la parada',
+    doseCalc: function(peso) {
+      var d = (1.5 * peso).toFixed(0);
+      return { min: d, max: d, unit: 'mL (bolo de emulsión al 20%)' };
+    },
+    extra: function(peso) {
+      var perf = (0.25 * peso).toFixed(1);
+      return 'Perfusión: ' + perf + ' mL/min (0,25 mL/kg/min)';
+    },
+    alerts: ['Indicación principal: toxicidad sistémica por anestésicos locales (bupivacaína); rescate en otros tóxicos muy lipófilos con parada o shock refractario', 'Interfiere con muchas determinaciones analíticas por lipemia', 'Máximo recomendado 12 mL/kg acumulados']
+  },
+  {
+    name: 'Anticuerpos Fab antidigoxina',
+    dilution: 'Reconstituir y diluir en SF 0,9%, pasar en 30 min',
+    doseRange: 'Intoxicación aguda con parada o arritmia grave: 10–20 viales empíricos · intoxicación crónica: 1–2 viales · por digoxinemia: nº viales = (digoxinemia ng/mL × peso kg) / 100',
+    doseCalc: function(peso) {
+      var v = (2 * peso / 100).toFixed(1);
+      return { min: v, max: v, unit: 'viales por cada 2 ng/mL de digoxinemia' };
+    },
+    alerts: ['Indicaciones: arritmia ventricular, bradiarritmia refractaria a atropina, K⁺ > 5 mEq/L en intoxicación aguda', 'Tras administrarlos, la digoxinemia total deja de ser interpretable', 'Vigilar hipopotasemia y descompensación de la insuficiencia cardíaca de base']
+  },
+  {
+    name: 'Pralidoxima',
+    dilution: 'Diluir en 100 mL de SF 0,9%',
+    doseRange: 'Carga 30 mg/kg IV en 30 min · después perfusión 8 mg/kg/h',
+    doseCalc: function(peso) {
+      var d = (30 * peso).toFixed(0);
+      return { min: d, max: d, unit: 'mg (dosis de carga)' };
+    },
+    extra: function(peso) {
+      var p = (8 * peso).toFixed(0);
+      return 'Perfusión: ' + p + ' mg/h (8 mg/kg/h)';
+    },
+    alerts: ['Solo en organofosforados, NO en carbamatos', 'Reactiva la acetilcolinesterasa: eficaz sobre todo en las primeras 24–48 h, antes del envejecimiento de la enzima', 'NUNCA sustituye a la atropina: es complementaria, y la atropina es la que salva la vida']
   }
 ]}
 
