@@ -34,6 +34,10 @@
   --key-color: #0550ae;
   --mono: 'Courier New', monospace;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --z-nav: 10;
+  --z-header: 11;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -95,7 +99,7 @@ body {
   gap: 12px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-header);
 }
 
 .header h1 { font-size: 16px; font-weight: 600; color: var(--text); }
@@ -110,7 +114,7 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 57px;
-  z-index: 99;
+  z-index: var(--z-nav);
 }
 
 .nav-btn {
@@ -368,7 +372,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.55);
-  z-index: 500;
+  z-index: var(--z-modal);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -554,11 +558,12 @@ body {
   border-radius: 6px;
   padding: 8px 16px;
   font-size: 12px;
-  z-index: 999;
+  z-index: var(--z-toast);
   opacity: 0;
   transition: opacity 0.2s;
 }
 .toast.show { opacity: 1; }
+.toast.toast-error { background: var(--red-bg); color: var(--red); border-color: var(--red); }
 
 .sep { height: 1px; background: var(--border); margin: 20px 0; }
 
@@ -721,15 +726,15 @@ body {
   <button class="btn theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
 </div>
 
-<div class="nav" role="tablist" aria-label="Secciones">
-  <button class="nav-btn active" id="navbtn-cheatsheets" role="tab" aria-selected="true" aria-controls="tab-cheatsheets" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
-  <button class="nav-btn" id="navbtn-escalas" role="tab" aria-selected="false" aria-controls="tab-escalas" onclick="showTab('escalas', this)">📊 Escalas</button>
-  <button class="nav-btn" id="navbtn-protocolos" role="tab" aria-selected="false" aria-controls="tab-protocolos" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
-  <button class="nav-btn" id="navbtn-farmacos" role="tab" aria-selected="false" aria-controls="tab-farmacos" onclick="showTab('farmacos', this)">💊 Fármacos</button>
-  <button class="nav-btn" id="navbtn-perfusiones" role="tab" aria-selected="false" aria-controls="tab-perfusiones" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
-  <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" onclick="showTab('intubacion', this)">🫁 Intubación</button>
-  <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" onclick="showTab('fichas', this)">📋 Fichas</button>
-  <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
+<div class="nav" role="tablist" aria-label="Secciones" onkeydown="onNavKeydown(event)">
+  <button class="nav-btn active" id="navbtn-cheatsheets" role="tab" aria-selected="true" aria-controls="tab-cheatsheets" tabindex="0" onclick="showTab('cheatsheets', this)">📋 Cheatsheets</button>
+  <button class="nav-btn" id="navbtn-escalas" role="tab" aria-selected="false" aria-controls="tab-escalas" tabindex="-1" onclick="showTab('escalas', this)">📊 Escalas</button>
+  <button class="nav-btn" id="navbtn-protocolos" role="tab" aria-selected="false" aria-controls="tab-protocolos" tabindex="-1" onclick="showTab('protocolos', this)">🔀 Protocolos</button>
+  <button class="nav-btn" id="navbtn-farmacos" role="tab" aria-selected="false" aria-controls="tab-farmacos" tabindex="-1" onclick="showTab('farmacos', this)">💊 Fármacos</button>
+  <button class="nav-btn" id="navbtn-perfusiones" role="tab" aria-selected="false" aria-controls="tab-perfusiones" tabindex="-1" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
+  <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" tabindex="-1" onclick="showTab('intubacion', this)">🫁 Intubación</button>
+  <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" tabindex="-1" onclick="showTab('fichas', this)">📋 Fichas</button>
+  <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" tabindex="-1" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
 </div>
 
@@ -1065,7 +1070,7 @@ function renderCheatsheets() {
             '<span class="badge badge-' + ch.badge + '">' + ch.badgeLabel + '</span>' +
             '<span class="card-title">' + ch.title + '</span>' +
             '<button class="fav-btn' + (favs['cheatsheet:' + ch.id] ? ' fav-active' : '') +
-              '" onclick="event.stopPropagation();toggleFav(\'cheatsheet\',\'' + ch.id + '\')" aria-label="Favorito">★</button>' +
+              '" onclick="event.stopPropagation();toggleFav(\'cheatsheet\',\'' + ch.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['cheatsheet:' + ch.id] ? 'true' : 'false') + '">★</button>' +
           '</div>' +
           '<div class="card-body">' +
             '<div class="code" id="' + ch.id + '">' + ch.html + '</div>' +
@@ -1108,7 +1113,7 @@ function showTab(name, btn) {
     t.style.display = '';
     t.querySelectorAll(SEARCH_ITEM_SELECTOR).forEach(c => c.style.display = '');
   });
-  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); b.setAttribute('tabindex', '-1'); });
   const nav = document.querySelector('.nav');
   nav.classList.remove('searching');
   const searchInput = nav.querySelector('.filter-input');
@@ -1116,7 +1121,22 @@ function showTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
+  btn.setAttribute('tabindex', '0');
   window.scrollTo(0, 0);
+}
+
+function onNavKeydown(e) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const tabs = [...document.querySelectorAll('.nav-btn[role="tab"]')];
+  const i = tabs.indexOf(document.activeElement);
+  if (i === -1) return;
+  e.preventDefault();
+  const next = e.key === 'ArrowRight' ? tabs[(i + 1) % tabs.length]
+    : e.key === 'ArrowLeft' ? tabs[(i - 1 + tabs.length) % tabs.length]
+    : e.key === 'Home' ? tabs[0]
+    : tabs[tabs.length - 1];
+  next.focus();
+  next.click();
 }
 
 function globalSearch(q) {
@@ -1166,13 +1186,20 @@ function globalSearch(q) {
 function copyCard(id) {
   const el = document.getElementById(id);
   const text = el.innerText || el.textContent;
-  navigator.clipboard.writeText(text).then(() => showToast());
+  navigator.clipboard.writeText(text).then(() => showToast()).catch(showCopyError);
 }
 
-function showToast() {
+function showToast(msg, isError) {
   const t = document.getElementById('toast');
+  t.textContent = msg || '✓ Copiado al portapapeles';
+  t.classList.toggle('toast-error', !!isError);
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function showCopyError(err) {
+  console.warn('No se pudo copiar al portapapeles:', err);
+  showToast('⚠ No se pudo copiar — revisa los permisos del portapapeles', true);
 }
 
 /* ==================================================================
@@ -1319,7 +1346,7 @@ TIMI SCASEST: ${t('timin-num')} — ${t('timin-risk')} (${t('timin-detail')})
 TIMI SCACEST: ${t('timis-num')} — ${t('timis-risk')} (${t('timis-detail')})
 CRUSADE: ${t('crusade-num')} — ${t('crusade-risk')} (${t('crusade-detail')})
 ${t('sca-aux')}`;
-  navigator.clipboard.writeText(txt).then(showToast);
+  navigator.clipboard.writeText(txt).then(showToast).catch(showCopyError);
 }
 
 function _scaleCtrl(sc, it, i, pfx) {
@@ -1344,7 +1371,7 @@ function renderOneScale(sc, favs, pfx) {
         '<div class="scale-subtitle">' + sc.sub + '</div>' +
       '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span>' +
       '<button class="fav-btn' + (favs['scale:' + sc.id] ? ' fav-active' : '') +
-        '" onclick="event.stopPropagation();toggleFav(\'scale\',\'' + sc.id + '\')" aria-label="Favorito">★</button>' +
+        '" onclick="event.stopPropagation();toggleFav(\'scale\',\'' + sc.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['scale:' + sc.id] ? 'true' : 'false') + '">★</button>' +
       '</summary>' +
       '<div class="scale-body">' +
         sc.items.map((it, i) =>
@@ -1475,7 +1502,7 @@ function copyScaleResult(id, pfx) {
     const orig = btn.textContent;
     btn.textContent = '✓ Copiado';
     setTimeout(() => btn.textContent = orig, 1500);
-  });
+  }).catch(showCopyError);
 }
 
 function renderProtocols() {
@@ -1494,7 +1521,7 @@ function renderProtocols() {
           '<div class="scale-subtitle">' + p.sub + '</div>' +
         '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span>' +
         '<button class="fav-btn' + (favs['protocol:' + p.id] ? ' fav-active' : '') +
-          '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito">★</button>' +
+          '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['protocol:' + p.id] ? 'true' : 'false') + '">★</button>' +
         '</summary>' +
         '<div class="scale-body">' +
           (() => { let n = 0; return p.steps.map(s => {
@@ -1542,7 +1569,7 @@ function renderDrugs() {
             '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
           '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span>' +
           '<button class="fav-btn' + (favs['drug:' + favId] ? ' fav-active' : '') +
-            '" onclick="event.stopPropagation();toggleFav(\'drug\',\'' + favId + '\')" aria-label="Favorito">★</button>' +
+            '" onclick="event.stopPropagation();toggleFav(\'drug\',\'' + favId + '\')" aria-label="Favorito" aria-pressed="' + (favs['drug:' + favId] ? 'true' : 'false') + '">★</button>' +
           '</div>' +
           '<div class="scale-body">' +
             '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
@@ -1732,7 +1759,7 @@ Peso: ${peso} kg
 Dilución: ${mg} ${u} en ${vol} mL → ${conc} ${u}/mL
 Dosis: ${dosis} ${unit}
 Resultado: ${mlh} mL/h`;
-  navigator.clipboard.writeText(txt).then(showToast);
+  navigator.clipboard.writeText(txt).then(showToast).catch(showCopyError);
 }
 
 function resetInfusion() {
@@ -1918,7 +1945,7 @@ ${obs}`;
 }
 
 function copyIntubacionReport() {
-  navigator.clipboard.writeText(_itbReportText()).then(showToast);
+  navigator.clipboard.writeText(_itbReportText()).then(showToast).catch(showCopyError);
 }
 
 function printIntubacionReport() {
