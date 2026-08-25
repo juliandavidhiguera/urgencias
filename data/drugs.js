@@ -255,7 +255,7 @@ window.DRUGS = [
   {
     name: 'Naloxona',
     dilution: 'IV directo o IM/SC/intranasal',
-    doseRange: '0.4–2 mg IV, repetir cada 2–3 min', alerts: ['Titular a la dosis mínima que revierta la depresión respiratoria, no buscar despertar completo', 'Puede precipitar abstinencia aguda en dependientes de opioides', 'Vida media más corta que muchos opioides: vigilar resedación y valorar perfusión si precisa bolos repetidos'], src: 'AHA 2023 toxicologia · PMID 37721023 · ASHP Drug Compendium (Naloxone)',
+    doseRange: 'Titulación 0.04 mg IV doblando cada 2–3 min (evita abstinencia) · Apnea/near-arrest: 0.2–2 mg IV', alerts: ['Titular a la dosis mínima que revierta la depresión respiratoria, no buscar despertar completo', 'Puede precipitar abstinencia aguda en dependientes de opioides', 'Vida media más corta que muchos opioides: vigilar resedación y valorar perfusión si precisa bolos repetidos'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · J Emerg Med 2023 · PMID 37652808',
     ficha: 'Naloxona.md'
   },
   {
@@ -297,13 +297,14 @@ window.DRUGS = [
   {
     name: 'Glucagón (intoxicación por betabloqueantes)',
     dilution: 'Reconstituir con su disolvente; perfusión en SG5%',
-    doseRange: 'Bolo 3–5 mg IV (50–150 microgramos/kg) en 1–2 min, repetible a los 10 min · perfusión 2–5 mg/h',
+    doseRange: 'Bolo 2–10 mg IV (50–150 microgramos/kg) en 1–2 min, repetible · perfusión hasta 15 mg/h si responde',
     doseCalc: function(peso) {
       var min = (0.05 * peso).toFixed(1);
       var max = (0.15 * peso).toFixed(1);
       return { min: min, max: max, unit: 'mg (bolo, 50–150 mcg/kg)' };
     },
     alerts: ['Vómitos casi constantes: proteger la vía aérea antes del bolo', 'Hiperglucemia e hipopotasemia frecuentes', 'Si no responde, escalar a insulina a dosis altas euglucémica'],
+    src: 'AHA 2025 Special Circumstances · PMID 41122889',
     ficha: 'Glucagó.md'
   },
   {
