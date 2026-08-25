@@ -397,14 +397,24 @@ window.CHEATSHEETS = [
 <span class="key">Glasgow:</span> _ /15 · agitación S·N · convulsiones S·N
 <span class="key">Tóxico:</span> fármaco/alcohol/droga/cáustico/CO/_
 <span class="key">Vía:</span> oral/inhalada/IV/transdérmica
-<span class="key">Analítica:</span> paracetamol _ · etanol _ · Na _ · K _
-          pH _ · Lac _ · CO-Hb _ · metHb _
-          osmolalidad _ · gap osmolar _
-<span class="key">ECG:</span> QTc _ · QRS _ · alteraciones _
+<span class="key">Toxíndrome:</span> anticolinérgico/colinérgico/simpaticomimético
+          opioide/sedante-hipnótico/serotoninérgico/no filiado
+<span class="key">Piel:</span> seca·húmeda · <span class="key">R. intestinales:</span> ↑·N·abolidos
+<span class="key">Clonus:</span> inducible·espontáneo·ocular · hiperreflexia MMII S·N
+<span class="key">Fasciculaciones/broncorrea:</span> S·N
+<span class="key">Analítica:</span> paracetamol _ · salicilatos _ · etanol _ · Na _ · K _
+          pH _ · HCO₃ _ · Lac _ · anion gap _ · gap osmolar _
+          CO-Hb _ · metHb _ (co-oximetría, NO pulsioximetría)
+          Cr _ · GOT/GPT _ · CK _ · test gestación _
+<span class="key">ECG:</span> QRS _ ms (>100 → bicarbonato) · QTc _ ms (>500 → torsade)
+     R en aVR _ mm · alteraciones _
 <span class="key">Intencionalidad:</span> accidental/voluntaria · psiquiátrico previo S·N
-<span class="key">Vómitos inducidos:</span> S·N · carbón activado S·N
-<span class="alert">⚠ Contactar toxicología: 91 562 04 20 (España)</span>
-<span class="note">→ Escalas: PSS (Poisoning Severity Score) · Glasgow</span>`
+<span class="key">Descontaminación:</span> carbón activado S·N (hora _) · IIT S·N
+<span class="key">Antídoto administrado:</span> _ · dosis _ · hora _
+<span class="alert">⚠ Contactar toxicología: 91 562 04 20 (España, 24 h)
+⚠ Glucemia capilar SIEMPRE · paracetamolemia en toda ingesta voluntaria</span>
+<span class="note">→ Protocolo: Intoxicación aguda y toxíndromes (pestaña Protocolos)
+→ Escalas: PSS (Poisoning Severity Score) · Glasgow</span>`
   },
   {
     id: 'c18',
