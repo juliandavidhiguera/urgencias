@@ -1220,6 +1220,25 @@ function renderOneScale(sc, favs, pfx) {
       '</div></div>';
 }
 
+const SCALE_GROUPS = [
+  { name: 'Triaje y deterioro clínico', icon: '🚨', tags: ['Triaje'] },
+  { name: 'Cardiovascular', icon: '🫀', tags: ['SCA', 'FA', 'IC'] },
+  { name: 'Neurológico', icon: '🧠', tags: ['Ictus', 'AIT/Ictus', 'Neuro'] },
+  { name: 'Respiratorio', icon: '🫁', tags: ['Respiratorio', 'Neumonía', 'EPOC'] },
+  { name: 'TEP y TVP', icon: '🩸', tags: ['TEP', 'TVP'] },
+  { name: 'Trauma', icon: '🦴', tags: ['Trauma'] },
+  { name: 'Sepsis e infección', icon: '🦠', tags: ['Sepsis', 'Infección', 'Meningitis'] },
+  { name: 'Abdomen y digestivo', icon: '🩺', tags: ['Abdomen agudo', 'Digestivo', 'Pancreatitis', 'HDA'] },
+  { name: 'Renal y metabólico', icon: '🧪', tags: ['AKI'] },
+  { name: 'UCI, sedación y delirium', icon: '🏥', tags: ['UCI', 'Delirium'] },
+  { name: 'Geriatría, caídas y dolor', icon: '👴', tags: ['Geriatría', 'Caídas', 'Dolor geriátrico'] },
+  { name: 'Pediatría y neonatología', icon: '👶', tags: ['Pediatría', 'Dolor pediátrico', 'Neonatología'] }
+];
+
+function _scaleGroupFor(sc) {
+  return SCALE_GROUPS.find(g => g.tags.includes(sc.tag)) || { name: 'Otras', icon: '📋' };
+}
+
 function renderScales() {
   const favs = getFavs();
   const recent = getRecent();
@@ -1227,9 +1246,21 @@ function renderScales() {
   const recentHtml = recentScales.length ?
     '<div class="section-title">🕐 Usadas recientemente</div><div class="scales-grid">' +
     recentScales.map(sc => renderOneScale(sc, favs, 'recent-')).join('') + '</div>' : '';
-  const sortedScales = SCALES.slice().sort((a, b) => (favs['scale:' + b.id] || 0) - (favs['scale:' + a.id] || 0));
-  document.getElementById('all-scales').innerHTML = recentHtml +
-    sortedScales.map(sc => renderOneScale(sc, favs)).join('');
+  const byGroup = {};
+  SCALES.forEach(sc => {
+    const g = _scaleGroupFor(sc);
+    if (!byGroup[g.name]) byGroup[g.name] = { icon: g.icon, items: [] };
+    byGroup[g.name].items.push(sc);
+  });
+  const groupsHtml = SCALE_GROUPS.concat([{ name: 'Otras', icon: '📋' }])
+    .filter(g => byGroup[g.name])
+    .map(g => {
+      const items = byGroup[g.name].items.slice()
+        .sort((a, b) => (favs['scale:' + b.id] || 0) - (favs['scale:' + a.id] || 0));
+      return '<div class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</div><div class="scales-grid">' +
+        items.map(sc => renderOneScale(sc, favs)).join('') + '</div>';
+    }).join('');
+  document.getElementById('all-scales').innerHTML = recentHtml + groupsHtml;
   recentScales.forEach(sc => calcScale(sc.id, 'recent-'));
   SCALES.forEach(sc => calcScale(sc.id));
 }

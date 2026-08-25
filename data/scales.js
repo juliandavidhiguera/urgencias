@@ -374,6 +374,173 @@ window.SCALES = [
 
 {id:'mmrc', src:'Escala MRC · validacion Mahler 1988 · PMID 3342669', title:'mMRC', sub:'Disnea — grado funcional (0–4)', badge:'blue', tag:'Respiratorio', max:4, items:[
   {t:'sel', l:'Grado de disnea', o:[['0 — Solo con ejercicio intenso (0)',0],['1 — Al caminar deprisa o subir cuesta ligera (1)',1],['2 — Camina más lento que personas de su edad (2)',2],['3 — Para tras ~100 m o pocos min en llano (3)',3],['4 — Disnea al vestirse / no sale de casa (4)',4]]}],
-  interp:function(s){return s<=1?['low','Grado '+s,'Limitación leve — actividad física normal']:s===2?['mid','Grado 2','Limitación moderada — valorar rehabilitación pulmonar']:['high','Grado '+s,'Limitación grave — rehabilitación + optimizar tratamiento broncodilatador']}}
+  interp:function(s){return s<=1?['low','Grado '+s,'Limitación leve — actividad física normal']:s===2?['mid','Grado 2','Limitación moderada — valorar rehabilitación pulmonar']:['high','Grado '+s,'Limitación grave — rehabilitación + optimizar tratamiento broncodilatador']}},
+
+// ── 16 escalas nuevas (Codis SEM, trauma, geriatría, pediatría) ────
+
+{id:'killip', src:'Killip y Kimball 1967 · Am J Cardiol · PMID 6059183', title:'Killip-Kimball', sub:'IAM — insuficiencia cardiaca al ingreso (clase I–IV)', badge:'red', tag:'SCA', max:4, items:[
+  {t:'sel', l:'Clase clínica', o:[['I — Sin signos de insuficiencia cardiaca (1)',1],['II — Estertores <50% campos, S3, ingurgitación yugular (2)',2],['III — Edema agudo de pulmón (3)',3],['IV — Shock cardiogénico (4)',4]]}],
+  interp:function(s){var d={1:['low','Killip I','Sin insuficiencia cardiaca — mortalidad hospitalaria ~6%'],2:['mid','Killip II','IC leve-moderada — mortalidad ~17%'],3:['high','Killip III','Edema agudo de pulmón — mortalidad ~38%'],4:['high','Killip IV','Shock cardiogénico — mortalidad ~81%']};return d[s]}},
+
+{id:'race', src:'Pérez de la Ossa 2014 · Stroke · PMID 24281224', title:'RACE', sub:'Ictus prehospitalario — predicción de oclusión de gran vaso', badge:'red', tag:'Ictus', max:9, items:[
+  {t:'sel', l:'Paresia facial', o:[['Ausente o leve (0)',0],['Moderada (1)',1],['Severa/parálisis completa (2)',2]]},
+  {t:'sel', l:'Paresia braquial', o:[['Normal o claudica leve (0)',0],['Cae antes de 10 s sin llegar a la cama (1)',1],['No vence gravedad / sin movimiento (2)',2]]},
+  {t:'sel', l:'Paresia crural', o:[['Normal o claudica leve (0)',0],['Cae antes de 5 s sin llegar a la cama (1)',1],['No vence gravedad / sin movimiento (2)',2]]},
+  {t:'chk', l:'Desviación oculocefálica forzada y mantenida', p:1},
+  {t:'sel', l:'Afasia (si hemiparesia derecha) o agnosia/negligencia (si hemiparesia izquierda)', o:[['Ausente (0)',0],['Moderada (1)',1],['Severa (2)',2]]}],
+  interp:function(s){return s>=5?['high',s+' pts','Alta probabilidad de oclusión de gran vaso (S 85%, E 68%) — activar código ictus a centro con trombectomía']:['low',s+' pts','Baja probabilidad de oclusión de gran vaso — traslado según protocolo territorial']}},
+
+{id:'rts', src:'Champion 1989 · J Trauma · PMID 2657085', title:'Revised Trauma Score', sub:'Trauma — índice fisiológico pronóstico', badge:'red', tag:'Trauma', max:7.84, agg:'custom', items:[
+  {t:'sel', l:'Escala de Glasgow (codificado)', o:[['13–15 (4)',4],['9–12 (3)',3],['6–8 (2)',2],['4–5 (1)',1],['3 (0)',0]]},
+  {t:'sel', l:'Presión arterial sistólica (mmHg)', o:[['>89 (4)',4],['76–89 (3)',3],['50–75 (2)',2],['1–49 (1)',1],['0 — sin pulso (0)',0]]},
+  {t:'sel', l:'Frecuencia respiratoria (rpm)', o:[['10–29 (4)',4],['>29 (3)',3],['6–9 (2)',2],['1–5 (1)',1],['0 — apnea (0)',0]]}],
+  calcCustom:function(vals){return Math.round((0.9368*vals[0]+0.7326*vals[1]+0.2908*vals[2])*100)/100},
+  interp:function(s){return s<4?['high',s+' pts','Trauma grave — mortalidad elevada, activar equipo de trauma']:s<6?['mid',s+' pts','Trauma moderado-grave — reevaluación estrecha']:['low',s+' pts','Trauma leve-moderado (máximo 7,84)']}},
+
+{id:'tash', src:'Yücel 2006 · J Trauma · PMID 16766965', title:'TASH', sub:'Trauma — predicción de transfusión masiva', badge:'red', tag:'Trauma', max:28, items:[
+  {t:'sel', l:'Hemoglobina (g/dL)', o:[['≥12 (0)',0],['11–11,9 (2)',2],['10–10,9 (3)',3],['9–9,9 (4)',4],['7–8,9 (6)',6],['<7 (8)',8]]},
+  {t:'sel', l:'Presión arterial sistólica (mmHg)', o:[['≥120 (0)',0],['100–119 (1)',1],['<100 (4)',4]]},
+  {t:'sel', l:'Exceso de bases (mmol/L)', o:[['≥−2 (0)',0],['−2 a −5,9 (1)',1],['−6 a −9,9 (3)',3],['<−10 (4)',4]]},
+  {t:'chk', l:'Frecuencia cardiaca >120 lpm', p:2},
+  {t:'chk', l:'Líquido libre intraabdominal (FAST/TC)', p:3},
+  {t:'sel', l:'Fractura compleja de huesos largos y/o pelvis', o:[['Ausente (0)',0],['AIS 3–4 (3)',3],['AIS 5 (6)',6]]},
+  {t:'chk', l:'Sexo masculino', p:1}],
+  interp:function(s){return s>16?['high',s+' pts','Probabilidad de transfusión masiva >90% — activar protocolo']:s>=10?['mid',s+' pts','Riesgo intermedio — vigilancia estrecha y reserva de hemoderivados']:['low',s+' pts','Riesgo bajo de transfusión masiva']}},
+
+{id:'hestia', src:'Zondag 2011 · PMID 21883874 · recopilado en ACEP Clinical Policy 2018 · PMID 29681319', title:'Criterios de Hestia', sub:'TEP — elegibilidad para tratamiento ambulatorio (todo "No" = alta precoz)', badge:'blue', tag:'TEP', max:1, agg:'max', items:[
+  {t:'chk', l:'Inestabilidad hemodinámica', p:1},
+  {t:'chk', l:'Necesidad de trombolisis o embolectomía', p:1},
+  {t:'chk', l:'Sangrado activo o alto riesgo de sangrado', p:1},
+  {t:'chk', l:'Necesidad de O₂ >24 h para SpO₂ >90%', p:1},
+  {t:'chk', l:'TEP diagnosticado durante tratamiento anticoagulante', p:1},
+  {t:'chk', l:'Dolor severo que requiere analgesia IV >24 h', p:1},
+  {t:'chk', l:'Motivo médico o social para ingreso >24 h (infección, neoplasia, sin apoyo social)', p:1},
+  {t:'chk', l:'Aclaramiento de creatinina <30 mL/min', p:1},
+  {t:'chk', l:'Insuficiencia hepática grave', p:1},
+  {t:'chk', l:'Embarazo', p:1},
+  {t:'chk', l:'Antecedente documentado de trombocitopenia inducida por heparina', p:1}],
+  interp:function(s){return s===0?['low','Negativo','Todos los criterios negativos — candidato a tratamiento ambulatorio']:['high','Positivo','≥1 criterio positivo — requiere ingreso hospitalario']}},
+
+{id:'wellstvp', src:'Wells 1995 · Lancet · PMID 7752753', title:'Wells — TVP', sub:'Probabilidad pre-test de trombosis venosa profunda', badge:'red', tag:'TVP', max:8, items:[
+  {t:'chk', l:'Cáncer activo (tratamiento actual, en los 6 meses previos, o paliativo)', p:1},
+  {t:'chk', l:'Parálisis, paresia o inmovilización con escayola de una extremidad inferior', p:1},
+  {t:'chk', l:'Encamado >3 días o cirugía mayor en las últimas 4 semanas', p:1},
+  {t:'chk', l:'Dolor localizado en el trayecto del sistema venoso profundo', p:1},
+  {t:'chk', l:'Edema de toda la pierna', p:1},
+  {t:'chk', l:'Edema de pantorrilla >3 cm respecto a la pierna asintomática (10 cm bajo tuberosidad tibial)', p:1},
+  {t:'chk', l:'Edema con fóvea limitado a la pierna sintomática', p:1},
+  {t:'chk', l:'Venas colaterales superficiales no varicosas', p:1},
+  {t:'chk', l:'Diagnóstico alternativo al menos tan probable como TVP', p:-2}],
+  interp:function(s){return s<=0?['low',s+' pts','Probabilidad baja — dímero-D; si negativo, descarta TVP']:s<=2?['mid',s+' pts','Probabilidad moderada — dímero-D + ecografía si positivo']:['high',s+' pts','Probabilidad alta — ecografía Doppler venosa directa']}},
+
+{id:'gcsped', src:'Reilly 1988 · Childs Nerv Syst · PMID 3383772', title:'Glasgow pediátrico', sub:'Nivel de conciencia en lactantes y niños pequeños (3–15)', badge:'red', tag:'Neuro', max:15, items:[
+  {t:'sel', l:'Apertura ocular', o:[['Espontánea (4)',4],['Al habla (3)',3],['Al dolor (2)',2],['Ausente (1)',1]]},
+  {t:'sel', l:'Respuesta verbal', o:[['Arrulla, balbucea, sonríe, sigue objetos (5)',5],['Llanto irritable, consolable (4)',4],['Llanto persistente al dolor, inconsolable (3)',3],['Quejido/gemido al dolor (2)',2],['Ausente (1)',1]]},
+  {t:'sel', l:'Respuesta motora', o:[['Movimientos espontáneos normales (6)',6],['Retirada al tacto (5)',5],['Retirada al dolor (4)',4],['Flexión anormal al dolor — decorticación (3)',3],['Extensión anormal al dolor — descerebración (2)',2],['Ausente (1)',1]]}],
+  interp:function(s){return s>=14?['low',s+'/15','TCE leve']:s>=9?['mid',s+'/15','TCE moderado — TC craneal + observación']:['high',s+'/15','TCE grave — asegurar vía aérea si ≤8']}},
+
+{id:'cfs', src:'Rockwood 2005 · CMAJ · PMID 16129869', title:'Clinical Frailty Scale (Rockwood)', sub:'Fragilidad clínica global (1–9)', badge:'blue', tag:'Geriatría', max:9, items:[
+  {t:'sel', l:'Grado', o:[
+    ['1 — Muy en forma: robusto, activo, enérgico',1],
+    ['2 — En forma: sin síntomas activos, activo ocasionalmente',2],
+    ['3 — Se maneja bien: síntomas controlados además de ejercicio ocasional',3],
+    ['4 — Vulnerable: no depende de otros pero los síntomas limitan la actividad',4],
+    ['5 — Fragilidad leve: necesita ayuda en actividades instrumentales (finanzas, transporte, tareas pesadas)',5],
+    ['6 — Fragilidad moderada: necesita ayuda en actividades básicas externas y en el hogar',6],
+    ['7 — Fragilidad grave: dependiente para el autocuidado, estable, riesgo de muerte bajo (<6 meses)',7],
+    ['8 — Fragilidad muy grave: completamente dependiente, se acerca al final de la vida',8],
+    ['9 — Enfermedad terminal: esperanza de vida <6 meses, por lo demás sin fragilidad grave',9]]}],
+  interp:function(s){return s<=3?['low','CFS '+s,'No frágil — pronóstico funcional favorable']:s===4?['mid','CFS 4','Vulnerable/pre-fragilidad — vigilar cambios funcionales']:s<=6?['mid','CFS '+s,'Fragilidad leve-moderada — alto riesgo de delirium, caídas e ingreso prolongado; valorar VIG']:['high','CFS '+s,'Fragilidad grave o final de la vida — revisar objetivos terapéuticos']}},
+
+{id:'fragilvig', src:'Amblàs-Novellas 2018 · BMC Geriatrics · PMID 29373968 (índice); bandas de gravedad: mismo grupo, BMJ Open 2021 · PMID 33883149', title:'Índex Fràgil-VIG', sub:'Índice de fragilidad por acumulación de déficits (25 ítems) — cribado SEM Catalunya', badge:'blue', tag:'Geriatría', max:1, agg:'custom', items:[
+  {t:'sel', l:'Actividades básicas de la vida diaria (Barthel o similar)', o:[['Independiente (0)',0],['Ayuda parcial (0,5)',0.5],['Dependiente total (1)',1]]},
+  {t:'sel', l:'Uso del dinero (manejo de finanzas)', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
+  {t:'sel', l:'Uso del teléfono', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
+  {t:'sel', l:'Responsabilidad sobre la medicación', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
+  {t:'sel', l:'Movilidad habitual (bastón, andador, silla de ruedas)', o:[['Normal (0)',0],['Limitación moderada (0,5)',0.5],['Inmovilidad severa (1)',1]]},
+  {t:'sel', l:'Pérdida de peso involuntaria reciente', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Anorexia o falta de apetito persistente', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Deterioro cognitivo (memoria/orientación)', o:[['Ausente (0)',0],['Leve/moderado (0,5)',0.5],['Severo/demencia (1)',1]]},
+  {t:'sel', l:'Trastorno del ánimo (depresión/ansiedad)', o:[['Ausente (0)',0],['Controlado con fármacos (0,5)',0.5],['Síntomas graves/activos (1)',1]]},
+  {t:'sel', l:'Delirium o síndrome confusional reciente', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Dolor de difícil control', o:[['No (0)',0],['Moderado (0,5)',0.5],['Severo/mal controlado (1)',1]]},
+  {t:'sel', l:'Disnea (reposo o mínimos esfuerzos)', o:[['No (0)',0],['Con esfuerzos moderados (0,5)',0.5],['Con mínimos esfuerzos o en reposo (1)',1]]},
+  {t:'sel', l:'Caídas de repetición (>2 en el último año)', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Incontinencia urinaria o fecal', o:[['No (0)',0],['Ocasional/urinaria (0,5)',0.5],['Doble incontinencia o total (1)',1]]},
+  {t:'sel', l:'Úlceras por presión', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Insomnio crónico / trastorno del sueño', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Red social insuficiente o claudicación del cuidador', o:[['Buena red (0)',0],['Soporte justo (0,5)',0.5],['Riesgo social/cuidador claudicado (1)',1]]},
+  {t:'sel', l:'Insuficiencia cardiaca', o:[['Ausente (0)',0],['Leve/moderada (0,5)',0.5],['Avanzada/NYHA III-IV (1)',1]]},
+  {t:'sel', l:'Enfermedad respiratoria crónica (EPOC, etc.)', o:[['Ausente (0)',0],['Estable (0,5)',0.5],['Avanzada/oxigenoterapia (1)',1]]},
+  {t:'sel', l:'Enfermedad renal crónica', o:[['Ausente o leve (0)',0],['Moderada (0,5)',0.5],['Avanzada/diálisis (1)',1]]},
+  {t:'sel', l:'Enfermedad neurológica (ictus crónico, Parkinson, etc.)', o:[['Ausente (0)',0],['Secuelas leves (0,5)',0.5],['Secuelas graves (1)',1]]},
+  {t:'sel', l:'Enfermedad hepática crónica', o:[['Ausente (0)',0],['Cirrosis compensada (0,5)',0.5],['Avanzada/insuficiencia hepática (1)',1]]},
+  {t:'sel', l:'Enfermedad vascular periférica o arterial grave', o:[['Ausente (0)',0],['Moderada (0,5)',0.5],['Avanzada o isquemia (1)',1]]},
+  {t:'sel', l:'Neoplasia (cáncer activo)', o:[['No (0)',0],['En tratamiento o controlado (0,5)',0.5],['Avanzado/metástasis/paliativo (1)',1]]},
+  {t:'sel', l:'Pluripatología (>5 enfermedades activas no listadas antes)', o:[['No (0)',0],['Sí (1)',1]]}],
+  calcCustom:function(vals){return Math.round((vals.reduce(function(a,b){return a+b},0)/25)*100)/100},
+  interp:function(s){
+    if(s<=0.15)return['low','Índice '+s.toFixed(2),'Banda 0–0,15 — sin fragilidad significativa'];
+    if(s<=0.25)return['low','Índice '+s.toFixed(2),'Banda 0,16–0,25 — fragilidad leve o ausente (umbral operativo habitual: frágil si ≥0,20)'];
+    if(s<=0.35)return['mid','Índice '+s.toFixed(2),'Banda 0,26–0,35 — fragilidad leve, valorar VIG'];
+    if(s<=0.45)return['mid','Índice '+s.toFixed(2),'Banda 0,36–0,45 — fragilidad moderada, VIG recomendada'];
+    if(s<=0.55)return['high','Índice '+s.toFixed(2),'Banda 0,46–0,55 — fragilidad moderada-avanzada, VIG y valorar objetivos de cuidado'];
+    return['high','Índice '+s.toFixed(2),'Banda 0,56–1 — fragilidad avanzada, muy prevalente al final de la vida — valorar enfoque paliativo'];
+  }},
+
+{id:'nyha', src:'New York Heart Association · Nomenclature and Criteria for Diagnosis, 9.ª ed. 1994', title:'NYHA', sub:'Insuficiencia cardiaca — clase funcional (I–IV)', badge:'blue', tag:'IC', max:4, items:[
+  {t:'sel', l:'Clase funcional', o:[['I — Sin limitación de la actividad física (1)',1],['II — Limitación leve; síntomas con actividad ordinaria (2)',2],['III — Limitación marcada; síntomas con actividad menor que la ordinaria (3)',3],['IV — Síntomas en reposo o con cualquier actividad (4)',4]]}],
+  interp:function(s){var d={1:['low','NYHA I','Sin limitación de la actividad física'],2:['low','NYHA II','Limitación leve — síntomas con actividad ordinaria'],3:['mid','NYHA III','Limitación marcada — síntomas con actividad menor que la ordinaria'],4:['high','NYHA IV','Síntomas en reposo — optimizar tratamiento y valorar ingreso']};return d[s]}},
+
+{id:'alvarado', src:'Alvarado 1986 · Ann Emerg Med · PMID 3963537', title:'Alvarado', sub:'Apendicitis aguda — probabilidad clínica', badge:'amber', tag:'Abdomen agudo', max:10, items:[
+  {t:'chk', l:'Migración del dolor a fosa ilíaca derecha', p:1},
+  {t:'chk', l:'Anorexia', p:1},
+  {t:'chk', l:'Náuseas o vómitos', p:1},
+  {t:'chk', l:'Dolor a la palpación en fosa ilíaca derecha', p:2},
+  {t:'chk', l:'Signo de rebote (Blumberg)', p:1},
+  {t:'chk', l:'Febrícula (≥37,3 °C)', p:1},
+  {t:'chk', l:'Leucocitosis (>10.000/µL)', p:2},
+  {t:'chk', l:'Desviación izquierda (neutrofilia >75%)', p:1}],
+  interp:function(s){return s<=4?['low',s+' pts','Baja probabilidad — considerar otras causas']:s<=6?['mid',s+' pts','Probabilidad intermedia — observación y pruebas de imagen (eco/TC)']:['high',s+' pts','Alta probabilidad — valorar cirugía']}},
+
+{id:'centor', src:'Centor 1981 · PMID 6763125 · modificación por edad de McIsaac 1998 · PMID 9475915', title:'Centor (modificado)', sub:'Faringoamigdalitis — probabilidad de infección estreptocócica', badge:'blue', tag:'Infección', max:5, items:[
+  {t:'chk', l:'Fiebre >38 °C', p:1},
+  {t:'chk', l:'Ausencia de tos', p:1},
+  {t:'chk', l:'Adenopatía cervical anterior dolorosa', p:1},
+  {t:'chk', l:'Exudado o hipertrofia amigdalar', p:1},
+  {t:'sel', l:'Edad', o:[['3–14 años (+1)',1],['15–44 años (0)',0],['≥45 años (−1)',-1]]}],
+  interp:function(s){return s<=1?['low',s+' pts','Riesgo bajo (~1–10%) — no antibiótico ni cultivo']:s<=3?['mid',s+' pts','Riesgo intermedio (~11–35%) — test rápido de estreptococo; antibiótico si positivo']:['high',s+' pts','Riesgo alto (~51–53%) — considerar antibiótico empírico o test rápido']}},
+
+{id:'apgar', src:'Apgar 1953 · Curr Res Anesth Analg', title:'APGAR', sub:'Neonato — adaptación a la vida extrauterina (1 y 5 min)', badge:'blue', tag:'Neonatología', max:10, items:[
+  {t:'sel', l:'Frecuencia cardiaca', o:[['Ausente (0)',0],['<100 lpm (1)',1],['≥100 lpm (2)',2]]},
+  {t:'sel', l:'Esfuerzo respiratorio', o:[['Ausente (0)',0],['Lento/irregular, llanto débil (1)',1],['Bueno, llanto vigoroso (2)',2]]},
+  {t:'sel', l:'Tono muscular', o:[['Flácido (0)',0],['Alguna flexión de extremidades (1)',1],['Movimiento activo (2)',2]]},
+  {t:'sel', l:'Irritabilidad refleja', o:[['Sin respuesta (0)',0],['Muecas (1)',1],['Tos, estornudo o llanto vigoroso (2)',2]]},
+  {t:'sel', l:'Color', o:[['Cianosis o palidez central (0)',0],['Cuerpo rosado, extremidades cianóticas (1)',1],['Totalmente rosado (2)',2]]}],
+  interp:function(s){return s>=7?['low',s+'/10','Normal — cuidados de rutina']:s>=4?['mid',s+'/10','Depresión moderada — estimulación y reanimación básica']:['high',s+'/10','Depresión severa — reanimación neonatal avanzada inmediata']}},
+
+{id:'flacc', src:'Merkel 1997 · Pediatr Nurs · PMID 9220806', title:'FLACC', sub:'Dolor pediátrico 2 meses–7 años (no verbal)', badge:'blue', tag:'Dolor pediátrico', max:10, items:[
+  {t:'sel', l:'Cara', o:[['Sin expresión particular o sonrisa (0)',0],['Muecas o ceño fruncido ocasional, retraído (1)',1],['Temblor de mentón frecuente, mandíbula apretada (2)',2]]},
+  {t:'sel', l:'Piernas', o:[['Posición normal o relajadas (0)',0],['Inquietas, tensas (1)',1],['Pataleo o piernas encogidas (2)',2]]},
+  {t:'sel', l:'Actividad', o:[['Quieto, se mueve con normalidad (0)',0],['Se retuerce, cambia de posición (1)',1],['Arqueado, rígido o con sacudidas (2)',2]]},
+  {t:'sel', l:'Llanto', o:[['Sin llanto (0)',0],['Quejidos o lloriqueos ocasionales (1)',1],['Llanto constante, gritos o sollozos (2)',2]]},
+  {t:'sel', l:'Consolabilidad', o:[['Contento y relajado (0)',0],['Se tranquiliza con contacto o distracción (1)',1],['Difícil de consolar (2)',2]]}],
+  interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}},
+
+{id:'westley', src:'Westley 1978 · Am J Dis Child · PMID 645693', title:'Westley', sub:'Crup / laringotraqueítis — gravedad', badge:'amber', tag:'Pediatría', max:17, items:[
+  {t:'sel', l:'Estridor', o:[['Ausente (0)',0],['Con agitación (1)',1],['En reposo (2)',2]]},
+  {t:'sel', l:'Tiraje', o:[['Ausente (0)',0],['Leve (1)',1],['Moderado (2)',2],['Grave (3)',3]]},
+  {t:'sel', l:'Entrada de aire', o:[['Normal (0)',0],['Disminuida (1)',1],['Muy disminuida (2)',2]]},
+  {t:'sel', l:'Cianosis', o:[['Ausente (0)',0],['Con agitación (4)',4],['En reposo (5)',5]]},
+  {t:'sel', l:'Nivel de conciencia', o:[['Normal (0)',0],['Alterado (5)',5]]}],
+  interp:function(s){return s<=2?['low',s+' pts','Leve — dexametasona oral, alta con normas']:s<=7?['mid',s+' pts','Moderado — dexametasona + observación estrecha']:s<=11?['high',s+' pts','Grave — adrenalina nebulizada + dexametasona, preparar vía aérea']:['high',s+' pts','Fallo respiratorio inminente — manejo avanzado de la vía aérea']}},
+
+{id:'painad', src:'Warden 2003 · J Am Med Dir Assoc · PMID 12807591', title:'PAINAD', sub:'Dolor en demencia avanzada (no verbal)', badge:'blue', tag:'Dolor geriátrico', max:10, items:[
+  {t:'sel', l:'Respiración (independiente de la vocalización)', o:[['Normal (0)',0],['Respiración ruidosa ocasional / hiperventilación breve (1)',1],['Respiración ruidosa dificultosa / hiperventilación prolongada / Cheyne-Stokes (2)',2]]},
+  {t:'sel', l:'Vocalización negativa', o:[['Ninguna (0)',0],['Gemido o quejido ocasional; habla en tono bajo o desaprobación (1)',1],['Llanto repetido y angustioso; gemidos en voz alta (2)',2]]},
+  {t:'sel', l:'Expresión facial', o:[['Sonriente o inexpresivo (0)',0],['Triste, atemorizado, ceño fruncido (1)',1],['Muecas de dolor (2)',2]]},
+  {t:'sel', l:'Lenguaje corporal', o:[['Relajado (0)',0],['Tenso, movimientos ansiosos de ida y vuelta (1)',1],['Rígido, puños cerrados, se aleja o empuja (2)',2]]},
+  {t:'sel', l:'Consolabilidad', o:[['No necesita ser consolado (0)',0],['Se distrae o tranquiliza con la voz o el tacto (1)',1],['Imposible de consolar, distraer o tranquilizar (2)',2]]}],
+  interp:function(s){return s===0?['low','0/10','Sin dolor evidente']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}}
 
 ];
