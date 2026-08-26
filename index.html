@@ -2049,10 +2049,10 @@ function _itbFarmacosTexto() {
   const admin = INTUBACION_FARMACOS.filter(d => document.getElementById('itb-fx-' + d.id + '-chk').checked);
   if (!admin.length) return '(ninguno marcado como administrado)';
   return admin.map(d => {
-    const dosis = document.getElementById('itb-fx-' + d.id + '-dosis').textContent;
     const real = document.getElementById('itb-fx-' + d.id + '-real').value.trim();
+    const dosis = real || document.getElementById('itb-fx-' + d.id + '-dosis').textContent;
     const hora = document.getElementById('itb-fx-' + d.id + '-hora').value;
-    return '- ' + d.nombre + ': calculada ' + dosis + (real ? ' · administrada ' + real : '') + (hora ? ' — ' + hora : '');
+    return '- ' + d.nombre + ': ' + dosis + (hora ? ' — ' + hora : '');
   }).join('\n');
 }
 
@@ -2067,10 +2067,10 @@ function _itbMantenimientoTexto() {
     const el = document.getElementById(_itbMantId(nombre));
     if (!el) return;
     const real = document.getElementById(_itbMantId(nombre) + '-real').value.trim();
+    const dosis = real || el.textContent;
     const hora = document.getElementById(_itbMantId(nombre) + '-hora').value;
-    if (el.textContent === '—' && !real && !hora) return;
-    lineas.push('- ' + nombre + ' (' + cat.categoria + '): calculada ' + el.textContent +
-      (real ? ' · administrada ' + real : '') + (hora ? ' — ' + hora : ''));
+    if (dosis === '—' && !hora) return;
+    lineas.push('- ' + nombre + ' (' + cat.categoria + '): ' + dosis + (hora ? ' — ' + hora : ''));
   }));
   return lineas.length ? lineas.join('\n') : '(sin perfusiones de mantenimiento calculadas)';
 }
