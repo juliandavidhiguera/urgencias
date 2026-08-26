@@ -1944,7 +1944,12 @@ function renderIntubacionMantenimiento() {
       return '<div class="drug-row">' +
         '<div class="drug-head">' +
           '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
-          '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
+          '<div class="event-time">' +
+            '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
+            '<input type="text" class="drug-real-input" id="' + _itbMantId(d.name) + '-real" placeholder="mL/h dado">' +
+            '<input type="time" id="' + _itbMantId(d.name) + '-hora">' +
+            '<button class="btn-now" onclick="stampIntubacionTime(\'' + _itbMantId(d.name) + '-hora\')">Ahora</button>' +
+          '</div>' +
         '</div>' +
         '<div class="drug-note">Dilución ' + d.mg + ' ' + (d.unitLabel || 'mg') + ' en ' + d.vol + ' mL · rango ' + d.doseMin +
           (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</div>' +
@@ -2060,7 +2065,12 @@ function _itbMantenimientoTexto() {
   const lineas = [];
   INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => {
     const el = document.getElementById(_itbMantId(nombre));
-    if (el && el.textContent !== '—') lineas.push('- ' + nombre + ' (' + cat.categoria + '): ' + el.textContent);
+    if (!el) return;
+    const real = document.getElementById(_itbMantId(nombre) + '-real').value.trim();
+    const hora = document.getElementById(_itbMantId(nombre) + '-hora').value;
+    if (el.textContent === '—' && !real && !hora) return;
+    lineas.push('- ' + nombre + ' (' + cat.categoria + '): calculada ' + el.textContent +
+      (real ? ' · administrada ' + real : '') + (hora ? ' — ' + hora : ''));
   }));
   return lineas.length ? lineas.join('\n') : '(sin perfusiones de mantenimiento calculadas)';
 }
