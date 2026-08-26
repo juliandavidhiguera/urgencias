@@ -965,6 +965,10 @@ body {
   <div id="itb-farmacos"></div>
 
   <div class="subhead">Mantenimiento — perfusiones postintubación (peso real)</div>
+  <div style="display:flex;gap:8px;align-items:center;padding:6px 14px;flex-wrap:wrap">
+    <select id="itb-mant-add-select" style="flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px"></select>
+    <button class="btn btn-copy" onclick="addIntubacionMantExtra()">+ Añadir medicamento (bomba)</button>
+  </div>
   <div id="itb-mantenimiento"></div>
 
   <div class="subhead">Evolución</div>
@@ -1935,34 +1939,77 @@ function renderIntubacionComplicaciones() {
 
 function _itbMantId(nombre) { return 'itb-mant-' + nombre.replace(/[^a-zA-Z0-9]/g, ''); }
 
+let itbMantExtra = [];
+
+function _itbMantFixedNames() {
+  const names = [];
+  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(n => names.push(n)));
+  return names;
+}
+
+function _itbMantDrugRowHtml(d, removable) {
+  return '<div class="drug-row">' +
+    '<div class="drug-head">' +
+      '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
+      '<div class="event-time">' +
+        '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
+        '<input type="text" class="drug-real-input" id="' + _itbMantId(d.name) + '-real" placeholder="mL/h dado">' +
+        '<input type="time" id="' + _itbMantId(d.name) + '-hora">' +
+        '<button class="btn-now" onclick="stampIntubacionTime(\'' + _itbMantId(d.name) + '-hora\')">Ahora</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="drug-note">Dilución ' + d.mg + ' ' + (d.unitLabel || 'mg') + ' en ' + d.vol + ' mL · rango ' + d.doseMin +
+      (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</div>' +
+    '<div class="btn-row">' +
+      '<button class="btn btn-copy" onclick="goToInfusion(\'' + d.name + '\',\'itb-peso\')">💧 Abrir en Perfusión IV</button>' +
+      (removable ? '<button class="btn" onclick="removeIntubacionMantExtra(\'' + d.name + '\')">✕ Quitar</button>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+function renderIntubacionMantAddSelect() {
+  const excluidos = _itbMantFixedNames().concat(itbMantExtra);
+  const opts = INFUSIONS.filter(d => !excluidos.includes(d.name));
+  document.getElementById('itb-mant-add-select').innerHTML =
+    '<option value="">Seleccionar medicamento (inotrópicos, vasopresores...)</option>' +
+    opts.map(d => '<option value="' + d.name + '">' + d.name + ' — ' + d.group + '</option>').join('');
+}
+
+function addIntubacionMantExtra() {
+  const sel = document.getElementById('itb-mant-add-select');
+  if (!sel.value) return;
+  itbMantExtra.push(sel.value);
+  renderIntubacionMantenimiento();
+}
+
+function removeIntubacionMantExtra(nombre) {
+  itbMantExtra = itbMantExtra.filter(n => n !== nombre);
+  renderIntubacionMantenimiento();
+}
+
 function renderIntubacionMantenimiento() {
-  document.getElementById('itb-mantenimiento').innerHTML = INTUBACION_MANTENIMIENTO.map(cat =>
+  const fijo = INTUBACION_MANTENIMIENTO.map(cat =>
     '<div class="subhead" style="padding-top:4px">' + cat.categoria + '</div>' +
     cat.nombres.map(nombre => {
       const d = INFUSIONS.find(x => x.name === nombre);
-      if (!d) return '';
-      return '<div class="drug-row">' +
-        '<div class="drug-head">' +
-          '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
-          '<div class="event-time">' +
-            '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
-            '<input type="text" class="drug-real-input" id="' + _itbMantId(d.name) + '-real" placeholder="mL/h dado">' +
-            '<input type="time" id="' + _itbMantId(d.name) + '-hora">' +
-            '<button class="btn-now" onclick="stampIntubacionTime(\'' + _itbMantId(d.name) + '-hora\')">Ahora</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="drug-note">Dilución ' + d.mg + ' ' + (d.unitLabel || 'mg') + ' en ' + d.vol + ' mL · rango ' + d.doseMin +
-          (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</div>' +
-        '<div class="btn-row"><button class="btn btn-copy" onclick="goToInfusion(\'' + d.name + '\',\'itb-peso\')">💧 Abrir en Perfusión IV</button></div>' +
-      '</div>';
+      return d ? _itbMantDrugRowHtml(d, false) : '';
     }).join('')
   ).join('');
+  const extra = itbMantExtra.length ?
+    '<div class="subhead" style="padding-top:4px">Añadidos (no forman parte de la SIR)</div>' +
+    itbMantExtra.map(nombre => {
+      const d = INFUSIONS.find(x => x.name === nombre);
+      return d ? _itbMantDrugRowHtml(d, true) : '';
+    }).join('')
+    : '';
+  document.getElementById('itb-mantenimiento').innerHTML = fijo + extra;
+  renderIntubacionMantAddSelect();
   calcIntubacionMantenimiento();
 }
 
 function calcIntubacionMantenimiento() {
   const peso = _n('itb-peso');
-  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => {
+  _itbMantFixedNames().concat(itbMantExtra).forEach(nombre => {
     const d = INFUSIONS.find(x => x.name === nombre);
     if (!d) return;
     const el = document.getElementById(_itbMantId(d.name));
@@ -1972,7 +2019,7 @@ function calcIntubacionMantenimiento() {
     const min = _infuMLH(d.doseMin, d.unit, peso, conc);
     const max = d.doseMax != null ? _infuMLH(d.doseMax, d.unit, peso, conc) : null;
     el.textContent = min == null ? '—' : (max == null || max === min ? _fmt(min, 2) : _fmt(min, 2) + '–' + _fmt(max, 2)) + ' mL/h';
-  }));
+  });
 }
 
 function _itbPesoIdeal() {
@@ -2063,15 +2110,17 @@ function _itbComplicacionesTexto() {
 
 function _itbMantenimientoTexto() {
   const lineas = [];
-  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => {
+  const push = (nombre, categoria) => {
     const el = document.getElementById(_itbMantId(nombre));
     if (!el) return;
     const real = document.getElementById(_itbMantId(nombre) + '-real').value.trim();
     const dosis = real || el.textContent;
     const hora = document.getElementById(_itbMantId(nombre) + '-hora').value;
     if (dosis === '—' && !hora) return;
-    lineas.push('- ' + nombre + ' (' + cat.categoria + '): ' + dosis + (hora ? ' — ' + hora : ''));
-  }));
+    lineas.push('- ' + nombre + ' (' + categoria + '): ' + dosis + (hora ? ' — ' + hora : ''));
+  };
+  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => push(nombre, cat.categoria)));
+  itbMantExtra.forEach(nombre => push(nombre, 'añadido'));
   return lineas.length ? lineas.join('\n') : '(sin perfusiones de mantenimiento calculadas)';
 }
 
@@ -2133,6 +2182,7 @@ function printIntubacionReport() {
 }
 
 function resetIntubacion() {
+  itbMantExtra = [];
   renderIntubacionEventos();
   renderIntubacionFarmacos();
   renderIntubacionComplicaciones();
