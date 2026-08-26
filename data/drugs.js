@@ -137,7 +137,7 @@ window.DRUGS = [
   {
     name: 'Adenosina',
     dilution: 'IV rápido en bolo, seguido de flush de SSF',
-    doseRange: '6 mg → 12 mg → 12 mg (dosis fija, sin ajuste por peso)', alerts: ['CONTRAINDICADA en asma o broncoespasmo grave', 'Produce pausa sinusal o asistolia transitoria: monitorización ECG y desfibrilador a mano', 'Por vía central el efecto es mucho mayor: empezar por 1–3 mg', 'El dipiridamol potencia su efecto; las metilxantinas lo antagonizan'], src: 'AHA ALS 2025 · PMID 41122884 · EHRA 2025 · PMID 40165484',
+    doseRange: '6 mg → 12 mg → considerar 18 mg (dosis fija, sin ajuste por peso)', alerts: ['CONTRAINDICADA en asma o broncoespasmo grave', 'Produce pausa sinusal o asistolia transitoria: monitorización ECG y desfibrilador a mano', 'Por vía central el efecto es mucho mayor: empezar por 1–3 mg', 'El dipiridamol potencia su efecto; las metilxantinas lo antagonizan'], src: 'ERC ALS 2025 · PMID 41117572 · AHA ALS 2025 · PMID 41122884',
     ficha: 'Adenosina.md'
   },
   {
@@ -178,7 +178,7 @@ window.DRUGS = [
   {
     name: 'Bicarbonato sódico 1M',
     dilution: '1M = 1 mEq/mL',
-    doseRange: '1 mEq/kg IV', alerts: ['PRECIPITA con el calcio: no administrar por la misma línea ni en Y', 'Extravasación: riesgo de necrosis tisular'],
+    doseRange: '1 mEq/kg IV', alerts: ['PRECIPITA con el calcio: no administrar por la misma línea ni en Y', 'Extravasación: riesgo de necrosis tisular', 'NO es de uso rutinario en hiperkalemia con cambios ECG sin parada: no ha demostrado bajar el potasio y no sustituye al calcio IV. Reservar para parada por hiperkalemia (50 mmol) o acidosis metabólica significativa'], src: 'ILCOR ALS 2025 · PMID 41122842 · Resuscitation 2025 (RS/MA) · PMID 39761907',
     doseCalc: function(peso) {
       var d = (peso * 1).toFixed(1);
       return { min: d, max: d, unit: 'mL' };
@@ -272,7 +272,7 @@ window.DRUGS = [
   {
     name: 'N-acetilcisteína',
     dilution: 'Diluir en SG5%',
-    doseRange: 'Fase 1: 150 mg/kg en 200 mL en 1h · Fase 2: 50 mg/kg en 500 mL en 4h · Fase 3: 100 mg/kg en 1000 mL en 16h', alerts: ['Reacciones anafilactoides durante la infusión, más frecuentes en la primera fase y en asmáticos', 'Ante rash, broncoespasmo o hipotensión: parar o enlentecer la infusión y tratar; reanudar más lento'],
+    doseRange: 'Fase 1: 150 mg/kg en 200 mL en 1h · Fase 2: 50 mg/kg en 500 mL en 4h · Fase 3: 100 mg/kg en 1000 mL en 16h', alerts: ['Reacciones anafilactoides durante la infusión, más frecuentes en la primera fase y en asmáticos', 'Ante rash, broncoespasmo o hipotensión: parar o enlentecer la infusión y tratar; reanudar más lento', 'Alternativa cada vez más usada (misma dosis total, menos reacciones, no inferior): 2 bolsas — 200 mg/kg en 4h + 100 mg/kg en 16h'],
     doseCalc: function(peso) {
       var d = (150 * peso).toFixed(0);
       return { min: d, max: d, unit: 'mg (fase 1, 200 mL en 1h)' };
@@ -281,7 +281,8 @@ window.DRUGS = [
       var f2 = (50 * peso).toFixed(0);
       var f3 = (100 * peso).toFixed(0);
       return 'Fase 2: ' + f2 + ' mg (4h) · Fase 3: ' + f3 + ' mg (16h)';
-    }
+    },
+    src: 'Prescott 3 bolsas (clásico) · MJA 2019 (2 bolsas AU/NZ) · PMID 31786822 · meta-análisis 2025 · PMID 40013897'
   }
 ]},
 
@@ -401,16 +402,67 @@ window.DRUGS = [
   {
     name: 'Pralidoxima',
     dilution: 'Diluir en 100 mL de SF 0,9%',
-    doseRange: 'Carga 30 mg/kg IV en 30 min · después perfusión 8 mg/kg/h',
+    doseRange: 'Régimen OMS/peso: carga 30 mg/kg IV en 30 min + perfusión 8 mg/kg/h · Alternativa AHA 2025 (dosis fija): 2 g IV en 15–30 min (sin bolo) o 0,6 g IM (hasta 3 dosis), con perfusión posterior si está indicada',
     doseCalc: function(peso) {
       var d = (30 * peso).toFixed(0);
-      return { min: d, max: d, unit: 'mg (dosis de carga)' };
+      return { min: d, max: d, unit: 'mg (dosis de carga, régimen por peso)' };
     },
     extra: function(peso) {
       var p = (8 * peso).toFixed(0);
-      return 'Perfusión: ' + p + ' mg/h (8 mg/kg/h)';
+      return 'Perfusión (régimen por peso): ' + p + ' mg/h (8 mg/kg/h)';
     },
-    alerts: ['Solo en organofosforados, NO en carbamatos', 'Reactiva la acetilcolinesterasa: eficaz sobre todo en las primeras 24–48 h, antes del envejecimiento de la enzima', 'NUNCA sustituye a la atropina: es complementaria, y la atropina es la que salva la vida']
+    alerts: ['Solo en organofosforados, NO en carbamatos', 'Reactiva la acetilcolinesterasa: eficaz sobre todo en las primeras 24–48 h, antes del envejecimiento de la enzima', 'NUNCA sustituye a la atropina: es complementaria, y la atropina es la que salva la vida', 'El único ECA que comparó el régimen OMS (30 mg/kg + 8 mg/kg/h) contra placebo no respaldó su beneficio (Cochrane); la AHA 2025 no lo cita como dosis de referencia y da la alternativa de dosis fija'],
+    src: 'AHA 2025 Special Circumstances · PMID 41122889 · Cochrane 2011 · PMID 21328273'
+  }
+]},
+
+{group: 'Antídotos — Anticoagulantes orales', badge: 'blue', tag: 'Antídotos', drugs: [
+  {
+    name: 'Vitamina K (fitomenadiona)',
+    dilution: 'IV lento, diluida',
+    doseRange: '10 mg IV lento (no exceder 1 mg/min) — hemorragia grave por dicumarínicos (warfarina/acenocumarol)',
+    alerts: ['Administrar SIEMPRE junto al complejo protrombínico: evita el "rebote" del INR cuando pasa el efecto transitorio del PCC', 'Infusión rápida: riesgo de reacciones anafilactoides', 'No revierte anticoagulantes de acción directa (dabigatrán, apixabán, rivaroxabán)'],
+    src: 'ACC Expert Consensus 2020 · PMID 32680646'
+  },
+  {
+    name: 'Complejo protrombínico (PCC 4 factores)',
+    dilution: 'Reconstituir según ficha técnica',
+    doseRange: 'Según peso e INR — hemorragia grave por dicumarínicos: INR 2–<4: 25 UI/kg · INR 4–6: 35 UI/kg · INR >6: 50 UI/kg (máx 5000 UI, peso capado a 100 kg)',
+    doseCalc: function(peso) {
+      var pesoCap = Math.min(peso, 100);
+      var d = Math.min(25 * pesoCap, 5000).toFixed(0);
+      return { min: d, max: d, unit: 'UI (si INR 2–<4)' };
+    },
+    extra: function(peso) {
+      var pesoCap = Math.min(peso, 100);
+      var d4 = Math.min(35 * pesoCap, 5000).toFixed(0);
+      var d6 = Math.min(50 * pesoCap, 5000).toFixed(0);
+      return 'INR 4–6: ' + d4 + ' UI · INR >6: ' + d6 + ' UI';
+    },
+    alerts: ['Asociar SIEMPRE vitamina K IV', 'Riesgo trombótico: valorar en cardiopatía isquémica/tromboembolismo reciente'],
+    src: 'ACC Expert Consensus 2020 · PMID 32680646'
+  },
+  {
+    name: 'Idarucizumab',
+    dilution: '2 viales de 2,5 g/50 mL, listos para usar',
+    doseRange: '5 g IV total (2 dosis de 2,5 g separadas ≤15 min, o en bolo) — reversión de dabigatrán. Puede repetirse otra dosis de 5 g si persiste el sangrado',
+    alerts: ['Indicación: hemorragia grave o cirugía urgente en paciente anticoagulado con dabigatrán', 'No revierte otros anticoagulantes (AVK, anti-Xa)'],
+    src: 'ACC Expert Consensus 2020 · PMID 32680646'
+  },
+  {
+    name: 'Andexanet alfa',
+    dilution: 'Bolo + perfusión de 120 min, según ficha técnica',
+    doseRange: 'Dosis baja: bolo 400 mg + perfusión 4 mg/min×120 min (total 480 mg) · Dosis alta: bolo 800 mg + perfusión 8 mg/min×120 min (total 960 mg) — reversión de apixabán/rivaroxabán',
+    alerts: ['Dosis baja si última toma ≥8 h, o apixabán ≤5 mg / rivaroxabán ≤10 mg con toma <8 h o desconocida', 'Dosis alta si apixabán >5 mg / rivaroxabán >10 mg con toma <8 h o desconocida', 'Si no está disponible: valorar PCC 4 factores (p.ej. 2000 UI fijas) en hemorragia grave por anti-Xa', 'No indicado para edoxabán ni HBPM']
+  }
+]},
+
+{group: 'Antídotos — Sulfonilureas', badge: 'blue', tag: 'Antídotos', drugs: [
+  {
+    name: 'Octreótido',
+    dilution: 'SC o IV directo',
+    doseRange: '50–100 mcg SC o IV, repetir cada 6–12 h según recurrencia · alternativa: perfusión IV 25–50 mcg/h — hipoglucemia recurrente por sulfonilureas pese a dextrosa',
+    alerts: ['Evidencia insuficiente / recomendación de experto: no se encontró una guía con dosis específica para esta indicación', 'No sustituye a la monitorización de glucemia ni a la dextrosa IV — reduce la hipoglucemia de rebote al frenar la secreción de insulina inducida por la sulfonilurea']
   }
 ]}
 
