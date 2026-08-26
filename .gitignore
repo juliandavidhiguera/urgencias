@@ -5,3 +5,7 @@
 
 # Directorio de trabajo de gstack, local de cada maquina.
 .gstack/
+
+# Directorio de trabajo de la skill impeccable (notas de critica + token de
+# sesion del servidor de vista previa en vivo), local de cada maquina.
+.impeccable/
