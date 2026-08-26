@@ -90,7 +90,7 @@ window.SCALES = [
   {t:'sel', l:'C — Clínica: hemiparesia unilateral', o:[['Sin déficit motor (0)',0],['Alteración habla sin déficit motor (1)',1],['Hemiparesia unilateral (2)',2]]},
   {t:'sel', l:'D — Duración síntomas', o:[['<10 minutos (0)',0],['10–59 minutos (1)',1],['≥60 minutos (2)',2]]},
   {t:'chk', l:'D2 — Diabetes mellitus', p:1}],
-  interp:function(s){return s<=3?['low','Riesgo bajo','Riesgo ictus 2d: ~1%']:s<=5?['mid','Riesgo moderado','Riesgo ictus 2d: ~4%']:['high','Riesgo alto','Riesgo ictus 2d: ~8% — hospitalizar']}},
+  interp:function(s){return s<=3?['low','Riesgo bajo','Riesgo ictus 2d: ~1% — AAS en monoterapia; ambulatorio con estudio precoz']:s<=5?['mid','Riesgo moderado','Riesgo ictus 2d: ~4% — DAPT (AAS+clopidogrel) 21 días (CHANCE/POINT); hospitalización']:['high','Riesgo alto','Riesgo ictus 2d: ~8% — DAPT (AAS+clopidogrel) 21 días + unidad de ictus; estudio urgente de carótidas (CEA si estenosis sintomática 70-99%)']}},
 
 // ── 11 escalas adicionales (previamente EXTRA_SCALES) ──────────────
 
@@ -542,6 +542,19 @@ window.SCALES = [
   {t:'sel', l:'Lenguaje corporal', o:[['Relajado (0)',0],['Tenso, movimientos ansiosos de ida y vuelta (1)',1],['Rígido, puños cerrados, se aleja o empuja (2)',2]]},
   {t:'sel', l:'Consolabilidad', o:[['No necesita ser consolado (0)',0],['Se distrae o tranquiliza con la voz o el tacto (1)',1],['Imposible de consolar, distraer o tranquilizar (2)',2]]}],
   interp:function(s){return s===0?['low','0/10','Sin dolor evidente']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}},
+
+{id:'3dplus', src:'García-Pérez 2023 (J Clin Med) · PMID 37892606', title:'3D / 3D+', sub:'Cribado geriátrico en urgencias — fragilidad basal + impacto agudo', badge:'blue', tag:'Geriatría', max:3, items:[
+  {t:'sel', l:'Nivel funcional basal (3D) — situación 2-4 semanas previas', o:[['3D 0 — Independiente (ABVD), sin deterioro cognitivo (0)',0],['3D 1 — Ayuda instrumental o supervisión, deterioro leve (0)',0],['3D 2 — No sale solo, vida casa-sillón, deterioro moderado (0)',0],['3D 3 — Dependiente total (cama-sillón), deterioro severo (0)',0]]},
+  {t:'chk', l:'Pérdida de autonomía aguda (declive brusco para caminar o el autocuidado en los últimos días)', p:1},
+  {t:'chk', l:'Síndrome confusional / delirium de inicio reciente', p:1},
+  {t:'chk', l:'Sospecha de efecto adverso o reacción a medicación (RAM) como causa de la consulta', p:1}],
+  interp:function(s){return s===0?['low','Estable','Mantiene su nivel funcional basal pese al motivo de consulta']:['high','Alterado (3D+)','Alta complejidad: valorar ingreso o derivación a recurso intermedio de cuidados']},
+  info: '<strong>Nivel funcional basal (3D)</strong><table><tr><th>Nivel</th><th>Criterio funcional</th><th>Deterioro cognitivo</th></tr>' +
+    '<tr><td>3D 0</td><td>Independiente (ABVD)</td><td>Sin deterioro</td></tr>' +
+    '<tr><td>3D 1</td><td>Ayuda instrumental o supervisión</td><td>Leve (olvidos)</td></tr>' +
+    '<tr><td>3D 2</td><td>No sale solo, vida casa-sillón</td><td>Moderado</td></tr>' +
+    '<tr><td>3D 3</td><td>Dependiente total (cama-sillón)</td><td>Severo</td></tr></table>' +
+    '<p style="margin-top:8px">3D = fragilidad basal premórbida; 3D+ = impacto agudo del episodio actual. Cualquier dominio agudo alterado marca alta complejidad. Delirium + declive funcional predicen mortalidad a 30 días con AUC 0,80 (García-Pérez 2023, n=278, ≥75 años en urgencias). Implementación en 66.422 episodios asociada a −5 puntos porcentuales de ingresos y menos revisitas a 30 días (García-Pérez, Emergencias 2026 · PMID 42345984).</p>'},
 
 {id:'paquetes-año', src:'Definición estándar de consumo acumulado de tabaco · umbral de cribado USPSTF 2021 (≥20 paq-año) · PMID 33687470', title:'Índice paquetes-año', sub:'Tabaquismo acumulado — riesgo de EPOC y cáncer de pulmón', badge:'amber', tag:'Respiratorio', max:100, agg:'custom', items:[
   {t:'num', l:'Cigarrillos fumados al día', u:'cig/día', f:function(v){return 0}},
