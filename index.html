@@ -2043,9 +2043,24 @@ function _itbRecomendacion() {
   return { escenario: esc, ids: ids || [], nota: nota || '' };
 }
 
+const ITB_GRUPO_STEP = { 'Premedicación': 'premedicacion', 'Inducción': 'induccion', 'Relajante muscular': 'paralisis' };
+
+function _itbSyncEventosConFarmacos() {
+  const grupoAdministrado = {};
+  INTUBACION_FARMACOS.forEach(d => {
+    const chk = document.getElementById('itb-fx-' + d.id + '-chk');
+    if (chk && chk.checked) grupoAdministrado[d.grupo] = true;
+  });
+  Object.keys(ITB_GRUPO_STEP).forEach(grupo => {
+    const el = document.getElementById('itb-ev-' + ITB_GRUPO_STEP[grupo] + '-chk');
+    if (el) el.checked = !!grupoAdministrado[grupo];
+  });
+}
+
 function calcIntubacion() {
   const peso = parseFloat(document.getElementById('itb-peso').value);
   calcIntubacionMantenimiento();
+  _itbSyncEventosConFarmacos();
   INTUBACION_FARMACOS.forEach(d => {
     const el = document.getElementById('itb-fx-' + d.id + '-dosis');
     if (!peso || peso <= 0) { el.textContent = '—'; return; }
