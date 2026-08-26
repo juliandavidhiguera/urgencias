@@ -80,3 +80,12 @@ window.INTUBACION_COMPLICACIONES = [
   'Hipotensión', 'Hipoxemia', 'Bradicardia', 'Intubación esofágica/selectiva',
   'Aspiración', 'Laringoespasmo/broncoespasmo', 'Trauma dental/vía aérea', 'Barotrauma/neumotórax'
 ];
+
+/* Mantenimiento postintubación — perfusiones continuas de sedación,
+   analgesia y relajación. Los nombres referencian window.INFUSIONS
+   (data/infusions.js), que ya tiene dilución y rango de cada una. */
+window.INTUBACION_MANTENIMIENTO = [
+  { categoria: 'Sedación / anestesia', nombres: ['Propofol', 'Midazolam'] },
+  { categoria: 'Analgesia', nombres: ['Fentanilo', 'Morfina'] },
+  { categoria: 'Relajación muscular', nombres: ['Rocuronio (mantenimiento)'] }
+];

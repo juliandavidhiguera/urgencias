@@ -6,6 +6,10 @@
              alerts[], ficha }] }
    ficha: nombre del archivo en medicamentos/ con la ficha oficial del
    fármaco (campo "file" en data/fichas.js) — omitido si no existe ficha.
+   infusionRef: nombre exacto en window.INFUSIONS (data/infusions.js) —
+   muestra un botón que abre la calculadora de Perfusión IV con ese
+   fármaco ya seleccionado. Omitido si el fármaco no se da en perfusión
+   o no tiene una entrada equivalente en INFUSIONS.
    ================================================================== */
 window.DRUGS = [
 
@@ -22,7 +26,7 @@ window.DRUGS = [
       };
     },
     alerts: ['Vía central de elección', 'Si se usa periférica de forma temporal: vena gruesa y proximal, comprobar reflujo y vigilar el punto de punción', 'Extravasación: riesgo de necrosis. Infiltrar fentolamina 5–10 mg en 10–15 mL de SSF cuanto antes', 'Monitorizar TA, preferiblemente invasiva'], src: 'ASHP Drug Compendium (Norepinephrine)',
-    ficha: 'Noradrenalina.md'
+    ficha: 'Noradrenalina.md', infusionRef: 'Noradrenalina'
   },
   {
     name: 'Dopamina',
@@ -34,7 +38,8 @@ window.DRUGS = [
         max: (20 * peso * 60 / 800).toFixed(1),
         unit: 'mL/h'
       };
-    }
+    },
+    infusionRef: 'Dopamina'
   },
   {
     name: 'Dobutamina',
@@ -47,7 +52,7 @@ window.DRUGS = [
         unit: 'mL/h'
       };
     },
-    ficha: 'Dobutamina.md'
+    ficha: 'Dobutamina.md', infusionRef: 'Dobutamina'
   }
 ]},
 
@@ -68,7 +73,7 @@ window.DRUGS = [
       var max = (0.1 * peso / 0.3).toFixed(1);
       return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 0,3 mg/mL)';
     },
-    ficha: 'Midazolam.md'
+    ficha: 'Midazolam.md', infusionRef: 'Midazolam'
   },
   {
     name: 'Fentanilo',
@@ -86,7 +91,7 @@ window.DRUGS = [
       var max = (3 * peso / 10).toFixed(1);
       return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 10 µg/mL)';
     },
-    ficha: 'Fentanil.md'
+    ficha: 'Fentanil.md', infusionRef: 'Fentanilo'
   },
   {
     name: 'Ketamina',
@@ -117,7 +122,7 @@ window.DRUGS = [
       var max = (12 * peso / 10).toFixed(1);
       return 'Mantenimiento: ' + min + '–' + max + ' mL/h (dilución 10 mg/mL)';
     },
-    ficha: 'Propofol.md'
+    ficha: 'Propofol.md', infusionRef: 'Propofol'
   }
 ]},
 
@@ -127,7 +132,7 @@ window.DRUGS = [
     dilution: 'Carga: 300 mg en 100 mL SG5% en 20–60 min',
     doseRange: 'Carga 300 mg · Mantenimiento 900 mg/24h',
     alerts: ['Hipotensión en bolo rápido', 'NO diluir en suero salino: usar glucosado al 5%', 'Flebitis frecuente: preferir vía central; evitar perfusión periférica >24 h', 'Evitar en FA preexcitada / WPW'], src: 'ESC 2024 FA · PMID 39210723 · AHA ALS 2025 · PMID 41122884',
-    ficha: 'Amiodarona.md'
+    ficha: 'Amiodarona.md', infusionRef: 'Amiodarona (mantenimiento)'
   },
   {
     name: 'Adenosina',
@@ -162,7 +167,7 @@ window.DRUGS = [
       var d = Math.min(0.01 * peso, 0.5).toFixed(2);
       return { min: d, max: d, unit: 'mg IM (anafilaxia)' };
     },
-    ficha: 'Adrenalina.md'
+    ficha: 'Adrenalina.md', infusionRef: 'Adrenalina (perfusión)'
   },
   {
     name: 'Atropina',
@@ -230,7 +235,7 @@ window.DRUGS = [
   }
 ]},
 
-{group: 'Otros', badge: 'blue', tag: 'Antídotos', drugs: [
+{group: 'Fibrinolíticos', badge: 'red', tag: 'IAM/Ictus', drugs: [
   {
     name: 'Alteplasa (rtPA)',
     dilution: 'Reconstituir según ficha técnica',
@@ -245,7 +250,10 @@ window.DRUGS = [
       return 'IAM: 15 mg bolo + ' + f1 + ' mg (30 min) + ' + f2 + ' mg (60 min)';
     },
     alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM y de ictus son distintas: no intercambiarlas']
-  },
+  }
+]},
+
+{group: 'Antídotos — Opioides y benzodiazepinas', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Flumazenilo',
     dilution: 'IV directo',
@@ -257,7 +265,10 @@ window.DRUGS = [
     dilution: 'IV directo o IM/SC/intranasal',
     doseRange: 'Titulación 0.04 mg IV doblando cada 2–3 min (evita abstinencia) · Apnea/near-arrest: 0.2–2 mg IV', alerts: ['Titular a la dosis mínima que revierta la depresión respiratoria, no buscar despertar completo', 'Puede precipitar abstinencia aguda en dependientes de opioides', 'Vida media más corta que muchos opioides: vigilar resedación y valorar perfusión si precisa bolos repetidos'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · J Emerg Med 2023 · PMID 37652808',
     ficha: 'Naloxona.md'
-  },
+  }
+]},
+
+{group: 'Antídotos — Paracetamol', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'N-acetilcisteína',
     dilution: 'Diluir en SG5%',
@@ -272,7 +283,9 @@ window.DRUGS = [
       return 'Fase 2: ' + f2 + ' mg (4h) · Fase 3: ' + f3 + ' mg (16h)';
     }
   }
-,
+]},
+
+{group: 'Antídotos — Cianuro y humo de incendio', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Hidroxocobalamina',
     dilution: 'Reconstituir 5 g en 200 mL de SF 0,9%',
@@ -283,7 +296,10 @@ window.DRUGS = [
     },
     alerts: ['Antídoto de elección en inhalación de humo de incendio con hollín en boca o nariz, alteración de consciencia o lactato ≥ 8 mmol/L: no esperar a confirmar el cianuro', 'Tiñe de rojo piel, mucosas y orina durante días', 'Interfiere con las determinaciones colorimétricas (co-oximetría, creatinina, bilirrubina) y con la detección de fugas en hemodiálisis: extraer analítica ANTES de administrarla'],
     ficha: 'Hidroxocobalamina.md'
-  },
+  }
+]},
+
+{group: 'Antídotos — Alcoholes tóxicos', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Fomepizol',
     dilution: 'Diluir en 100 mL de SF 0,9%, pasar en 30 min',
@@ -293,7 +309,10 @@ window.DRUGS = [
       return { min: d, max: d, unit: 'mg (dosis de carga)' };
     },
     alerts: ['Indicado en intoxicación por metanol y etilenglicol: bloquea la alcohol-deshidrogenasa', 'No sustituye a la hemodiálisis si hay acidosis grave, alteración visual, coma o fracaso renal', 'Alternativa si no se dispone: etanol IV con control estricto de la alcoholemia']
-  },
+  }
+]},
+
+{group: 'Antídotos — Betabloqueantes y calcioantagonistas', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Glucagón (intoxicación por betabloqueantes)',
     dilution: 'Reconstituir con su disolvente; perfusión en SG5%',
@@ -322,7 +341,10 @@ window.DRUGS = [
     alerts: ['Indicación: intoxicación por calcioantagonistas y betabloqueantes con shock refractario', 'Añadir glucosa 25 g IV si glucemia < 250 mg/dL y perfusión de glucosa continua', 'Controlar glucemia cada 30 min y potasio cada hora (hipopotasemia por redistribución)', 'El efecto inotrópico tarda 15–45 min: no suspender de forma precoz por falta de respuesta inmediata'],
     src: 'Krenz 2018, revision de HIE en calcioantagonistas y betabloqueantes · PMID 30141827',
     ficha: 'Insulina.md'
-  },
+  }
+]},
+
+{group: 'Antídotos — Metahemoglobinemia', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Azul de metileno',
     dilution: 'IV lento en 5 min, diluido en SG5%',
@@ -333,13 +355,19 @@ window.DRUGS = [
       return { min: min, max: max, unit: 'mg' };
     },
     alerts: ['Indicación: metahemoglobinemia sintomática o metaHb > 20–30%', 'La pulsioximetría convencional no detecta la metahemoglobinemia: usar co-oximetría', 'Contraindicado o ineficaz en déficit de G6PD (riesgo de hemólisis): valorar azul de toluidina, vitamina C o exanguinotransfusión', 'Riesgo de síndrome serotoninérgico si el paciente toma ISRS o IMAO']
-  },
+  }
+]},
+
+{group: 'Antídotos — Isoniazida', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Piridoxina (vitamina B6)',
     dilution: 'Diluir en 100 mL de SF 0,9%',
     doseRange: '1 g IV por cada gramo de isoniazida ingerido · si la dosis es desconocida: 5 g IV empíricos',
     alerts: ['Indicación: convulsiones por isoniazida o por setas del género Gyromitra que no ceden con benzodiazepinas', 'Administrar junto a la benzodiazepina, no en su lugar', 'Repetible si persisten las convulsiones']
-  },
+  }
+]},
+
+{group: 'Antídotos — Anestésicos locales', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Emulsión lipídica 20%',
     dilution: 'Vía IV exclusiva, sin mezclar con otros fármacos',
@@ -353,7 +381,10 @@ window.DRUGS = [
       return 'Perfusión: ' + perf + ' mL/min (0,25 mL/kg/min)';
     },
     alerts: ['Indicación principal: toxicidad sistémica por anestésicos locales (bupivacaína); rescate en otros tóxicos muy lipófilos con parada o shock refractario', 'Interfiere con muchas determinaciones analíticas por lipemia', 'Máximo recomendado 12 mL/kg acumulados']
-  },
+  }
+]},
+
+{group: 'Antídotos — Digoxina', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Anticuerpos Fab antidigoxina',
     dilution: 'Reconstituir y diluir en SF 0,9%, pasar en 30 min',
@@ -363,7 +394,10 @@ window.DRUGS = [
       return { min: v, max: v, unit: 'viales por cada 2 ng/mL de digoxinemia' };
     },
     alerts: ['Indicaciones: arritmia ventricular, bradiarritmia refractaria a atropina, K⁺ > 5 mEq/L en intoxicación aguda', 'Tras administrarlos, la digoxinemia total deja de ser interpretable', 'Vigilar hipopotasemia y descompensación de la insuficiencia cardíaca de base']
-  },
+  }
+]},
+
+{group: 'Antídotos — Organofosforados', badge: 'blue', tag: 'Antídotos', drugs: [
   {
     name: 'Pralidoxima',
     dilution: 'Diluir en 100 mL de SF 0,9%',

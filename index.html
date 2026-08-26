@@ -962,6 +962,14 @@ body {
   <div class="subhead">Medicación — dosis calculada sobre peso real</div>
   <div id="itb-farmacos"></div>
 
+  <div class="subhead">Mantenimiento — perfusiones postintubación (peso real)</div>
+  <div id="itb-mantenimiento"></div>
+
+  <div class="subhead">Evolución</div>
+  <div class="fields" style="grid-template-columns:1fr">
+    <div class="field"><textarea id="itb-evolucion" rows="4" aria-label="Evolución" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px;font-family:inherit" placeholder="Cambios de perfusión, reevaluaciones, eventos posteriores..."></textarea></div>
+  </div>
+
   <div class="subhead">Parámetros de ventilador mecánico</div>
   <div class="fields">
     <div class="field"><label for="itb-vent-modo">Modo</label>
@@ -1607,6 +1615,44 @@ function renderDrugs() {
   const favs = getFavs();
   const pesoEl = document.getElementById('farmacos-peso');
   const currentPeso = pesoEl ? pesoEl.value : '70';
+
+  function renderCard(d, g) {
+    const id = _drugId(d.name);
+    const favId = d.name.replace(/[^a-zA-Z0-9]/g, '');
+    return '<div class="scale-card drug-card">' +
+      '<div class="scale-header"><div>' +
+        '<div class="scale-title">' + d.name + '</div>' +
+        '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
+      '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span>' +
+      '<button class="fav-btn' + (favs['drug:' + favId] ? ' fav-active' : '') +
+        '" onclick="event.stopPropagation();toggleFav(\'drug\',\'' + favId + '\')" aria-label="Favorito" aria-pressed="' + (favs['drug:' + favId] ? 'true' : 'false') + '">★</button>' +
+      '</div>' +
+      '<div class="scale-body">' +
+        '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
+        (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
+        (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
+        (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
+        (d.src ? '<div class="scale-src">Fuente: ' + d.src + '</div>' : '') +
+        ((d.ficha || d.infusionRef) ? '<div class="btn-row">' +
+          (d.ficha ? '<button class="btn btn-copy" onclick="showFicha(\'' + d.ficha + '\')">📄 Ver ficha</button>' : '') +
+          (d.infusionRef ? '<button class="btn btn-copy" onclick="goToInfusion(\'' + d.infusionRef + '\',\'farmacos-peso\')">💧 Perfusión IV</button>' : '') +
+        '</div>' : '') +
+      '</div></div>';
+  }
+
+  function renderGroup(g) {
+    const drugsSorted = g.drugs.slice().sort((a, b) => {
+      const fa = favs['drug:' + a.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
+      const fb = favs['drug:' + b.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
+      return fb - fa;
+    });
+    return '<div class="section-title">' + g.group + '</div><div class="scales-grid">' +
+      drugsSorted.map(d => renderCard(d, g)).join('') + '</div>';
+  }
+
+  const medicamentos = DRUGS.filter(g => g.tag !== 'Antídotos');
+  const antidotos = DRUGS.filter(g => g.tag === 'Antídotos');
+
   container.innerHTML =
     '<div class="section-title">💉 Fármacos — calculadora por peso</div>' +
     '<div class="drug-weight-bar">' +
@@ -1614,35 +1660,11 @@ function renderDrugs() {
       '<input type="number" class="num-in" id="farmacos-peso" value="' + currentPeso + '" min="20" max="250" step="1" oninput="recalcDrugs(this.value)">' +
       '<span class="scale-pts">kg</span>' +
     '</div>' +
-    '<div class="scales-grid">' +
-    DRUGS.map(g => {
-      const drugsSorted = g.drugs.slice().sort((a, b) => {
-        const fa = favs['drug:' + a.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
-        const fb = favs['drug:' + b.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
-        return fb - fa;
-      });
-      return drugsSorted.map(d => {
-        const id = _drugId(d.name);
-        const favId = d.name.replace(/[^a-zA-Z0-9]/g, '');
-        return '<div class="scale-card drug-card">' +
-          '<div class="scale-header"><div>' +
-            '<div class="scale-title">' + d.name + '</div>' +
-            '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
-          '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span>' +
-          '<button class="fav-btn' + (favs['drug:' + favId] ? ' fav-active' : '') +
-            '" onclick="event.stopPropagation();toggleFav(\'drug\',\'' + favId + '\')" aria-label="Favorito" aria-pressed="' + (favs['drug:' + favId] ? 'true' : 'false') + '">★</button>' +
-          '</div>' +
-          '<div class="scale-body">' +
-            '<div class="scale-item"><span class="scale-label">Rango de dosis</span><span class="scale-pts">' + d.doseRange + '</span></div>' +
-            (d.doseCalc ? '<div class="scale-item"><span class="scale-label">Dosis calculada</span><span class="scale-pts" id="' + id + '-calc">—</span></div>' : '') +
-            (d.extra ? '<div class="scale-item"><span class="scale-label">Cálculo adicional</span><span class="scale-pts" id="' + id + '-extra">—</span></div>' : '') +
-            (d.alerts && d.alerts.length ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Alertas</span><span class="scale-pts">' + d.alerts.join(' · ') + '</span></div>' : '') +
-            (d.src ? '<div class="scale-src">Fuente: ' + d.src + '</div>' : '') +
-            (d.ficha ? '<div class="btn-row"><button class="btn btn-copy" onclick="showFicha(\'' + d.ficha + '\')">📄 Ver ficha</button></div>' : '') +
-          '</div></div>';
-      }).join('');
-    }).join('') +
-    '</div>';
+    '<div class="section-title">💊 Medicamentos</div>' +
+    medicamentos.map(renderGroup).join('') +
+    '<div class="section-title">☠️ Antídotos</div>' +
+    antidotos.map(renderGroup).join('');
+
   recalcDrugs(document.getElementById('farmacos-peso').value);
 }
 
@@ -1774,6 +1796,19 @@ function updateInfusionPeso() {
   renderInfusionGrid();
 }
 
+/* Salta a la calculadora de Perfusión IV con un fármaco ya seleccionado,
+   llamado desde Fármacos e Intubación (Mantenimiento). */
+function goToInfusion(name, pesoFieldId) {
+  showTab('perfusiones', document.getElementById('navbtn-perfusiones'));
+  const origenPeso = pesoFieldId ? document.getElementById(pesoFieldId) : null;
+  if (origenPeso && origenPeso.value) document.getElementById('inf-peso').value = origenPeso.value;
+  document.getElementById('inf-farmaco').value = name;
+  selectInfusionDrug();
+  updateInfusionPeso();
+  const box = document.querySelector('#tab-perfusiones .databox');
+  if (box) box.scrollIntoView({ behavior: 'smooth' });
+}
+
 function renderInfusionGrid() {
   const peso = _n('inf-peso') || 70;
   const grid = document.getElementById('infusion-ref-grid');
@@ -1886,6 +1921,43 @@ function renderIntubacionComplicaciones() {
   ).join('');
 }
 
+function _itbMantId(nombre) { return 'itb-mant-' + nombre.replace(/[^a-zA-Z0-9]/g, ''); }
+
+function renderIntubacionMantenimiento() {
+  document.getElementById('itb-mantenimiento').innerHTML = INTUBACION_MANTENIMIENTO.map(cat =>
+    '<div class="subhead" style="padding-top:4px">' + cat.categoria + '</div>' +
+    cat.nombres.map(nombre => {
+      const d = INFUSIONS.find(x => x.name === nombre);
+      if (!d) return '';
+      return '<div class="drug-row">' +
+        '<div class="drug-head">' +
+          '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
+          '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
+        '</div>' +
+        '<div class="drug-note">Dilución ' + d.mg + ' ' + (d.unitLabel || 'mg') + ' en ' + d.vol + ' mL · rango ' + d.doseMin +
+          (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</div>' +
+        '<div class="btn-row"><button class="btn btn-copy" onclick="goToInfusion(\'' + d.name + '\',\'itb-peso\')">💧 Abrir en Perfusión IV</button></div>' +
+      '</div>';
+    }).join('')
+  ).join('');
+  calcIntubacionMantenimiento();
+}
+
+function calcIntubacionMantenimiento() {
+  const peso = _n('itb-peso');
+  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => {
+    const d = INFUSIONS.find(x => x.name === nombre);
+    if (!d) return;
+    const el = document.getElementById(_itbMantId(d.name));
+    if (!el) return;
+    if (!peso) { el.textContent = '—'; return; }
+    const conc = d.mg / d.vol;
+    const min = _infuMLH(d.doseMin, d.unit, peso, conc);
+    const max = d.doseMax != null ? _infuMLH(d.doseMax, d.unit, peso, conc) : null;
+    el.textContent = min == null ? '—' : (max == null || max === min ? _fmt(min, 2) : _fmt(min, 2) + '–' + _fmt(max, 2)) + ' mL/h';
+  }));
+}
+
 function _itbPesoIdeal() {
   const talla = parseFloat(document.getElementById('itb-talla').value);
   const sexo = document.getElementById('itb-sexo').value;
@@ -1907,6 +1979,7 @@ function _itbRecomendacion() {
 
 function calcIntubacion() {
   const peso = parseFloat(document.getElementById('itb-peso').value);
+  calcIntubacionMantenimiento();
   INTUBACION_FARMACOS.forEach(d => {
     const el = document.getElementById('itb-fx-' + d.id + '-dosis');
     if (!peso || peso <= 0) { el.textContent = '—'; return; }
@@ -1970,6 +2043,15 @@ function _itbComplicacionesTexto() {
   return marcadas.length ? marcadas.join(', ') : 'Ninguna';
 }
 
+function _itbMantenimientoTexto() {
+  const lineas = [];
+  INTUBACION_MANTENIMIENTO.forEach(cat => cat.nombres.forEach(nombre => {
+    const el = document.getElementById(_itbMantId(nombre));
+    if (el && el.textContent !== '—') lineas.push('- ' + nombre + ' (' + cat.categoria + '): ' + el.textContent);
+  }));
+  return lineas.length ? lineas.join('\n') : '(sin perfusiones de mantenimiento calculadas)';
+}
+
 function _itbReportText() {
   const peso = document.getElementById('itb-peso').value || '—';
   const talla = document.getElementById('itb-talla').value || '—';
@@ -1981,6 +2063,7 @@ function _itbReportText() {
   const tetNum = document.getElementById('itb-tet-num').value || '—';
   const tetProf = document.getElementById('itb-tet-prof').value || '—';
   const obs = document.getElementById('itb-obs').value || '(sin observaciones)';
+  const evolucion = document.getElementById('itb-evolucion').value || '(sin cambios registrados)';
   return `LISTA DE VERIFICACIÓN DE INTUBACIÓN — SECUENCIA DE INTUBACIÓN RÁPIDA
 Peso real: ${peso} kg · Talla: ${talla} cm · Peso ideal: ${pi ? _fmt(pi, 1) + ' kg' : '—'}
 Estado hemodinámico: ${estado} · Escenario clínico: ${escenarioTexto}
@@ -1993,6 +2076,9 @@ ${_itbEventosTexto()}
 --- MEDICACIÓN ADMINISTRADA (dosis sobre peso real) ---
 ${_itbFarmacosTexto()}
 
+--- MANTENIMIENTO (perfusión, peso real) ---
+${_itbMantenimientoTexto()}
+
 --- VENTILADOR MECÁNICO ---
 Modo: ${document.getElementById('itb-vent-modo').value}
 Volumen tidal: ${document.getElementById('itb-vent-vt').value || '—'} mL (sugerido 6–8 mL/kg peso ideal)
@@ -2003,7 +2089,10 @@ Relación I:E: ${document.getElementById('itb-vent-ie').value || '—'} · Presi
 ${_itbComplicacionesTexto()}
 
 --- OBSERVACIONES ---
-${obs}`;
+${obs}
+
+--- EVOLUCIÓN ---
+${evolucion}`;
 }
 
 function copyIntubacionReport() {
@@ -2024,6 +2113,8 @@ function resetIntubacion() {
   renderIntubacionEventos();
   renderIntubacionFarmacos();
   renderIntubacionComplicaciones();
+  renderIntubacionMantenimiento();
+  document.getElementById('itb-evolucion').value = '';
   document.getElementById('itb-peso').value = '';
   document.getElementById('itb-talla').value = '';
   document.getElementById('itb-sexo').selectedIndex = 0;
@@ -2187,6 +2278,7 @@ renderFichaList('');
 renderIntubacionEventos();
 renderIntubacionFarmacos();
 renderIntubacionComplicaciones();
+renderIntubacionMantenimiento();
 calcIntubacion();
 
 if ('serviceWorker' in navigator) {
