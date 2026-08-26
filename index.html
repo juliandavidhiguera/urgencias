@@ -1574,10 +1574,19 @@ function copyScaleResult(id, pfx) {
   }).catch(showCopyError);
 }
 
+function _protocolTier(p) {
+  if (p.codigo) return 0;
+  if (p.tag === 'Crítico') return 1;
+  if (p.tag === 'Urgente') return 2;
+  return 3;
+}
+
 function renderProtocols() {
   const container = document.getElementById('tab-protocolos');
   const favs = getFavs();
   const sorted = PROTOCOLS.slice().sort((a, b) => {
+    const ta = _protocolTier(a), tb = _protocolTier(b);
+    if (ta !== tb) return ta - tb;
     const fa = favs['protocol:' + a.id] || 0, fb = favs['protocol:' + b.id] || 0;
     if (fa !== fb) return fb - fa;
     return (a.rank || 99) - (b.rank || 99);
