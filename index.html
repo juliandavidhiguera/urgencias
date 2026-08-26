@@ -366,6 +366,8 @@ body {
 #tab-intubacion .drug-flag { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
 #tab-intubacion .drug-flag.pref-inestable { background: var(--red-bg); color: var(--red); }
 #tab-intubacion .drug-flag.pref-estable { background: var(--blue-bg); color: var(--blue); }
+#tab-intubacion .drug-real-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; width: 92px; font-family: var(--mono); }
+#tab-intubacion .drug-real-input:not(:placeholder-shown) { border-color: var(--blue); }
 
 /* FICHA TÉCNICA — modal de medicamento */
 .ficha-overlay {
@@ -1912,6 +1914,7 @@ function renderIntubacionFarmacos() {
             '<label class="event-label" style="min-width:180px"><input type="checkbox" id="itb-fx-' + d.id + '-chk" onchange="calcIntubacion()">' + d.nombre + ' <span id="itb-fx-' + d.id + '-rec"></span></label>' +
             '<div class="event-time">' +
               '<span class="drug-dose" id="itb-fx-' + d.id + '-dosis">—</span>' +
+              '<input type="text" class="drug-real-input" id="itb-fx-' + d.id + '-real" placeholder="Dosis dada">' +
               '<input type="time" id="itb-fx-' + d.id + '-hora">' +
               '<button class="btn-now" onclick="stampIntubacionTime(\'itb-fx-' + d.id + '-hora\')">Ahora</button>' +
             '</div>' +
@@ -2042,8 +2045,9 @@ function _itbFarmacosTexto() {
   if (!admin.length) return '(ninguno marcado como administrado)';
   return admin.map(d => {
     const dosis = document.getElementById('itb-fx-' + d.id + '-dosis').textContent;
+    const real = document.getElementById('itb-fx-' + d.id + '-real').value.trim();
     const hora = document.getElementById('itb-fx-' + d.id + '-hora').value;
-    return '- ' + d.nombre + ': ' + dosis + (hora ? ' — ' + hora : '');
+    return '- ' + d.nombre + ': calculada ' + dosis + (real ? ' · administrada ' + real : '') + (hora ? ' — ' + hora : '');
   }).join('\n');
 }
 
