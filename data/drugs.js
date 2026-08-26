@@ -167,7 +167,7 @@ window.DRUGS = [
   {
     name: 'Atropina',
     dilution: 'IV directo',
-    doseRange: 'Bradicardia: 0.5 mg IV cada 3–5 min (máx 3 mg) · Organofosforados: 2–4 mg IV', alerts: ['Dosis <0,5 mg pueden producir bradicardia paradójica', 'En bloqueo AV de alto grado o infranodal suele ser ineficaz: preparar marcapasos'],
+    doseRange: 'Bradicardia: 0.5 mg IV cada 3–5 min (máx 3 mg) · Organofosforados: 1–2 mg IV doblando cada 5 min hasta secar secreciones (sin techo de dosis)', alerts: ['Dosis <0,5 mg pueden producir bradicardia paradójica', 'En bloqueo AV de alto grado o infranodal suele ser ineficaz: preparar marcapasos', 'En organofosforados NO hay techo de dosis: objetivo clínico (pecho seco), no una cifra fija'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · J Med Toxicol 2012 · PMID 22351300',
     ficha: 'Atropina.md'
   },
   {
@@ -249,7 +249,7 @@ window.DRUGS = [
   {
     name: 'Flumazenilo',
     dilution: 'IV directo',
-    doseRange: '0.2 mg IV, repetir 0.1 mg cada 60 s (máx 1 mg)', alerts: ['NO usar de rutina en coma o intoxicación no filiada', 'CONTRAINDICADO si hay sospecha de coingesta de antidepresivos tricíclicos u otro proconvulsivante', 'En consumidores crónicos de benzodiacepinas puede precipitar abstinencia aguda y convulsiones', 'Vida media más corta que muchas benzodiacepinas: vigilar resedación'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · Penninga 2015, metaanalisis · PMID 26096314',
+    doseRange: '0.2 mg IV, repetir hasta 0.3–0.5 mg/min si no responde (máx 3 mg acumulados) · Resedación: perfusión 0.1–0.5 mg/h', alerts: ['NO usar de rutina en coma o intoxicación no filiada', 'CONTRAINDICADO si hay sospecha de coingesta de antidepresivos tricíclicos u otro proconvulsivante', 'En consumidores crónicos de benzodiacepinas puede precipitar abstinencia aguda y convulsiones', 'Vida media más corta que muchas benzodiacepinas: vigilar resedación', 'El techo de 1 mg es para reversión de sedación consciente/anestesia, no para sobredosis (aquí hasta 3 mg)'], src: 'AHA 2025 Special Circumstances · PMID 41122889 · Penninga 2015, metaanalisis · PMID 26096314',
     ficha: 'Flumazenil.md'
   },
   {
