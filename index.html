@@ -1894,6 +1894,7 @@ function _itbNow() {
 
 function stampIntubacionTime(id) {
   document.getElementById(id).value = _itbNow();
+  calcIntubacion();
 }
 
 function renderIntubacionEventos() {
@@ -1920,7 +1921,7 @@ function renderIntubacionFarmacos() {
             '<div class="event-time">' +
               '<span class="drug-dose" id="itb-fx-' + d.id + '-dosis">—</span>' +
               '<input type="text" class="drug-real-input" id="itb-fx-' + d.id + '-real" placeholder="Dosis dada">' +
-              '<input type="time" id="itb-fx-' + d.id + '-hora">' +
+              '<input type="time" id="itb-fx-' + d.id + '-hora" onchange="calcIntubacion()">' +
               '<button class="btn-now" onclick="stampIntubacionTime(\'itb-fx-' + d.id + '-hora\')">Ahora</button>' +
             '</div>' +
           '</div>' +
@@ -2047,13 +2048,21 @@ const ITB_GRUPO_STEP = { 'Premedicación': 'premedicacion', 'Inducción': 'induc
 
 function _itbSyncEventosConFarmacos() {
   const grupoAdministrado = {};
+  const grupoHora = {};
   INTUBACION_FARMACOS.forEach(d => {
     const chk = document.getElementById('itb-fx-' + d.id + '-chk');
-    if (chk && chk.checked) grupoAdministrado[d.grupo] = true;
+    if (chk && chk.checked) {
+      grupoAdministrado[d.grupo] = true;
+      const hora = document.getElementById('itb-fx-' + d.id + '-hora').value;
+      if (hora) grupoHora[d.grupo] = hora;
+    }
   });
   Object.keys(ITB_GRUPO_STEP).forEach(grupo => {
-    const el = document.getElementById('itb-ev-' + ITB_GRUPO_STEP[grupo] + '-chk');
-    if (el) el.checked = !!grupoAdministrado[grupo];
+    const stepId = ITB_GRUPO_STEP[grupo];
+    const chkEl = document.getElementById('itb-ev-' + stepId + '-chk');
+    if (chkEl) chkEl.checked = !!grupoAdministrado[grupo];
+    const horaEl = document.getElementById('itb-ev-' + stepId + '-hora');
+    if (horaEl && grupoHora[grupo]) horaEl.value = grupoHora[grupo];
   });
 }
 
