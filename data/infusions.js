@@ -92,13 +92,18 @@ window.INFUSIONS = [
 
 {name: 'Insulina rápida', group: 'Metabólico', badge: 'blue',
   mg: 50, vol: 50, unit: 'UI/kg/h', doseMin: 0.05, doseMax: 0.1, unitLabel: 'UI',
-  diluyente: 'SF 0,9%', notas: 'Fase inicial 0,1 UI/kg/h en CAD/EHH; reducir a 0,05 UI/kg/h cuando la glucemia sea <250 mg/dl. Vigilar hipoglucemia y potasio seriados',
+  diluyente: 'SF 0,9%', notas: 'Fase inicial 0,1 UI/kg/h en CAD (o EHH con criterios mixtos de cetosis/acidosis); 0,05 UI/kg/h si EHH puro sin cetosis significativa. Reducir a 0,05 UI/kg/h y añadir dextrosa 5-10% cuando la glucemia sea <250 mg/dl. Vigilar hipoglucemia y potasio seriados',
   ficha: 'Insulina.md'},
 
 {name: 'Somatostatina', group: 'Otros', badge: 'blue',
   mg: 3, vol: 50, unit: 'mcg/kg/h', doseMin: 1.75, doseMax: 3.5,
   diluyente: 'SF 0,9% (NO diluir en SG 5%)', notas: 'Dosis de carga 250 mcg IV lenta en 3 min antes de la perfusión. Reducir la dosis si alteración de la función renal. Mantener 48-72h tras controlar la hemorragia digestiva (máx. 5 días). Requiere nevera',
   ficha: 'Somatostatina.md'},
+
+{name: 'Pantoprazol', group: 'Otros', badge: 'blue',
+  mg: 200, vol: 200, unit: 'mg/h', doseMin: 8, doseMax: null,
+  diluyente: 'SF 0,9% o SG 5%', notas: 'Precedido de bolo IV de 80 mg. Mantener 72h tras la hemostasia endoscópica en hemorragia digestiva alta de alto riesgo; alternativa intermitente: 40 mg IV/12h. Diluir el vial de 40 mg con 10 mL SF antes de añadirlo a la dilución de perfusión',
+  ficha: 'Pantoprazol.md'},
 
 {name: 'Rocuronio (mantenimiento)', group: 'Relajantes musculares', badge: 'blue',
   mg: 50, vol: 50, unit: 'mg/kg/h', doseMin: 0.3, doseMax: 0.6,
