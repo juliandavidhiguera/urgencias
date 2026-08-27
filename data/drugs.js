@@ -52,18 +52,13 @@ window.DRUGS = [
   {
     name: 'Fentanilo',
     dilution: '0.5 mg en 50 mL SSF = 10 µg/mL',
-    doseRange: 'Bolo 1–2 µg/kg · Perfusión 0.5–3 µg/kg/h', alerts: ['Depresión respiratoria', 'Rigidez torácica con bolos rápidos o dosis altas: puede impedir la ventilación'],
+    doseRange: 'Bolo 1–2 µg/kg · Perfusión 0.5–2 µg/kg/h', alerts: ['Depresión respiratoria', 'Rigidez torácica con bolos rápidos o dosis altas: puede impedir la ventilación'],
     doseCalc: function(peso) {
       return {
         min: (1 * peso).toFixed(1),
         max: (2 * peso).toFixed(1),
         unit: 'µg (bolo)'
       };
-    },
-    extra: function(peso) {
-      var min = (0.5 * peso / 10).toFixed(1);
-      var max = (3 * peso / 10).toFixed(1);
-      return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 10 µg/mL)';
     },
     ficha: 'Fentanil.md', infusionRef: 'Fentanilo'
   },

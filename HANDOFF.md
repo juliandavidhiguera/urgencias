@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-08-27 06:27 | **Sesion #:** 3 | **Rama:** main | **HEAD:** fd8437d
+**Ultima actualizacion:** 2026-08-27 | **Sesion #:** 3 | **Rama:** main | **HEAD:** c0e9a10 (pendiente commit de esta continuacion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -10,7 +10,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 |---|---|---|---|
 | Frontend | HTML/CSS/JS vanilla, sin build ni framework | - | `index.html` (2388 lineas, monolito con CSS+JS embebidos) |
 | Datos | Modulos JS `window.X = [...]` cargados como `<script>` | - | `data/{cheatsheets,scales,formulas,protocols,drugs,infusions,intubacion,fichas,bibliografia}.js` |
-| Offline | Service Worker cache-first | `CACHE = 'urg-v46'` | `sw.js` |
+| Offline | Service Worker cache-first | `CACHE = 'urg-v47'` | `sw.js` |
 | PWA | Manifest | - | `manifest.json`, `icon.svg` |
 | Hosting | Cloudflare Pages, deploy automatico en push a `main` | - | (integracion nativa GitHub, sin paso de build) |
 | CI | GitHub Action: purga cache de Cloudflare tras deploy | - | `.github/workflows/purge-cache.yml` (espera 90s, purga URLs fijas via `CF_URGENCIAS_PURGE_TOKEN`/`CF_ZONE_ID`) |
@@ -48,6 +48,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
+### Sesion 3 (continuacion) - 2026-08-27
+- Resuelto backlog #4 (BUG-5): techo de perfusion de Fentanilo. Consultado con skill `md-urg-hosp` (Vera + Perplexity): Vera cito 0.7-10 µg/kg/h (PMID 33170331) con "10" como techo mas citado en tablas de UCI pero sin techo universal; Perplexity confirmo variabilidad institucional real (protocolos 0.5-2 hasta 5-6 µg/kg/h) sin cambio de guia mayor. Ninguna fuente confirmaba 2.0 ni 3.0 como el techo unico — se le presento la discrepancia al usuario, quien eligio 2.0 µg/kg/h (mas conservador, coincide con `infusions.js`).
+- Modificado: `data/drugs.js` — Fentanilo: eliminado `extra()` (calculo de mL/h con techo 3.0, desalineado de `infusions.js` que usa 2.0); `doseRange` actualizado a "Perfusión 0.5–2 µg/kg/h". Mismo patron que BUG-2 (sesion 3 inicial).
+- Modificado: `sw.js` — `CACHE` de `urg-v46` a `urg-v47`.
+- Verificado en navegador local: card de Fentanilo muestra el rango actualizado, sin "Cálculo adicional" duplicado, sin errores de consola.
+- Decisiones tomadas: NO promediar ni elegir en silencio entre las dos cifras — se presento la evidencia (con discrepancia explicita entre Vera y Perplexity) y se dejo la decision clinica al usuario, siguiendo el protocolo de `md-urg-hosp`.
+
 ### Sesion 3 - 2026-08-27
 - Auditoria con 3 agentes en paralelo (`engineering-code-reviewer`, `testing-accessibility-auditor`, `engineering-frontend-developer`) sobre calidad de codigo, accesibilidad y performance de todo el proyecto.
 - Modificado: `data/drugs.js` — eliminado `doseCalc`/`extra` (calculo de mL/h) de Noradrenalina, Dopamina, Dobutamina y Midazolam; quedan solo con `doseRange` texto + `infusionRef` hacia `data/infusions.js` (unica fuente de verdad, ver seccion 2).
@@ -80,7 +87,6 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 1 | Bump manual de `CACHE` en `sw.js` en cada deploy que toque `index.html`/`data/*.js` (recordatorio operativo, no una tarea de codigo) | `sw.js` | P2 | - | N/A — disciplina de proceso, verificar en cada PR que toque esos archivos |
 | 2 | Sacar el boton de favorito (★) de dentro del `<summary>` en cards/escalas/protocolos/farmacos y reposicionarlo con CSS (hoy es control-dentro-de-control, ambiguo para lectores de pantalla) | `index.html` (CSS `.fav-btn`, todas las funciones `render*`) | P2 | - | Boton favorito fuera de `<summary>`, mismo aspecto visual en claro/oscuro, verificado en navegador |
 | 3 | Evaluar indice de busqueda separado (no depender de que cada tab este renderizada en el DOM) para poder diferir `data/fichas.js` (172 KB) y el render de tabs no visibles sin romper `globalSearch()` | `index.html` (`globalSearch`, `SEARCH_ITEM_SELECTOR`) | P3 | - | `fichas.js` carga diferido y las tabs no visitadas no se renderizan al inicio, `globalSearch` sigue encontrando resultados en todas las tabs sin abrirlas primero |
-| 4 | Revisar si el rango de dosis de Fentanilo difiere entre `drugs.js` (Perfusión 0.5–3 µg/kg/h) e `infusions.js` (doseMax 2.0) — la concentración coincide (10 µg/mL) pero el techo de dosis no; no confirmado como bug, requiere criterio clinico | `data/drugs.js`, `data/infusions.js` | P2 | Decision clinica del usuario | Confirmar cual techo es el correcto y unificar, o documentar por que difieren a proposito |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -88,6 +94,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~BUG-1~~ | ~~El tab Intubacion desaparecia por completo al usar la busqueda global~~ — CORREGIDO sesion 2 (2026-08-27) | - | `SEARCH_ITEM_SELECTOR` no incluia `.event-row`/`.drug-row` | Resuelto: selector ahora incluye ambas clases (`index.html:1135`) |
 | ~~BUG-2~~ | ~~Noradrenalina/Dopamina/Dobutamina/Midazolam calculaban mL/h distinto en Fármacos vs Perfusión IV (hasta 6x)~~ — CORREGIDO sesion 3 (2026-08-27) | - | `drugs.js` tenia su propia dilucion de referencia, distinta a `infusions.js` | Resuelto: `drugs.js` ya no calcula mL/h para esos 4 farmacos, `infusions.js` es la unica fuente (`fd8437d`) |
 | ~~BUG-3~~ | ~~Atropina mostraba rango invertido en intubacion pediatrica (ej. "0.10–0.06 mg")~~ — CORREGIDO sesion 3 (2026-08-27) | Peso <5 kg con Atropina en checklist de intubacion | `doseMinAbs` se aplicaba solo a `mgMin`, no a `mgMax` | Resuelto: floor aplicado a ambos (`index.html:2078`) |
+| ~~BUG-5~~ | ~~Fentanilo: techo de perfusion 3 µg/kg/h en drugs.js vs 2.0 en infusions.js~~ — RESUELTO sesion 3 continuacion (2026-08-27) | - | Mismo patron que BUG-2, no detectado en la primera pasada de auditoria | Consultado Vera+Perplexity (ninguna fuente confirmaba 3.0 ni 2.0 como techo unico; rango aceptado 0.5-10 segun protocolo). Usuario eligio 2.0 (mas conservador). `drugs.js` ya no calcula mL/h de Fentanilo, `infusions.js` (doseMax:2.0) es la unica fuente |
 | ~~BUG-4~~ | ~~PDF y fotos de patrones ECG de codigos de activacion no funcionaban offline~~ — CORREGIDO sesion 3 (2026-08-27) | Abrir "Ver folleto original" o "Ver patrones IAM" sin conexion, primera vez | No estaban en `ASSETS` de `sw.js` | Resuelto: precacheados, `CACHE` bumpeado a `urg-v46` |
 
 ## 8. ENTORNO Y COMANDOS
@@ -108,4 +115,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - `data/drugs.js` y `data/infusions.js` describen el MISMO farmaco con campos distintos (`dilution`/`doseRange` vs `mg`/`vol`/`doseMin`/`doseMax`) — si un farmaco esta en ambos archivos, NUNCA le agregues un `doseCalc`/`extra` en `drugs.js` que calcule mL/h con una dilucion propia: usa `infusionRef` + el boton "Perfusion IV" para remitir a `infusions.js` (ver seccion 2 y BUG-2).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Decidir con criterio clinico el techo de dosis de Fentanilo (backlog #4: 3 µg/kg/h en drugs.js vs 2.0 en infusions.js) y, si aplica, unificarlo igual que se hizo con los otros 4 farmacos en la sesion 3.
+Revisar el backlog (seccion 6: #1 disciplina de bump de CACHE, #2 boton favorito anidado en summary, #3 indice de busqueda separado) para la proxima tarea; no hay pendiente critico abierto.
