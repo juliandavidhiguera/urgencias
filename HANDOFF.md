@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-08-27 | **Sesion #:** 3 | **Rama:** main | **HEAD:** 22ef883
+**Ultima actualizacion:** 2026-08-27 10:53 | **Sesion #:** 3 | **Rama:** main | **HEAD:** 462b89a
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -54,6 +54,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Modificado: `sw.js` — `CACHE` de `urg-v46` a `urg-v47`.
 - Verificado en navegador local: card de Fentanilo muestra el rango actualizado, sin "Cálculo adicional" duplicado, sin errores de consola.
 - Decisiones tomadas: NO promediar ni elegir en silencio entre las dos cifras — se presento la evidencia (con discrepancia explicita entre Vera y Perplexity) y se dejo la decision clinica al usuario, siguiendo el protocolo de `md-urg-hosp`.
+- Verificacion final de cierre (post-revert de backlog #2): recorrido completo en navegador local sobre HEAD `462b89a` — favoritos y expandir tarjeta funcionan independiente, `label for` enfoca el control al hacer clic en el texto, galeria de patrones ECG abre con imagenes precacheadas, busqueda global sigue encontrando Intubacion (`display:block` confirmado por JS) y filtra Farmacos correctamente, Atropina a 3 kg muestra "0.1 mg", Fentanilo muestra "Perfusión 0.5–2 µg/kg/h" sin calculo duplicado, tema oscuro con buen contraste en Protocolos e Intubacion. Cero errores de consola en todo el recorrido. Working tree limpio, nada pendiente de commitear.
 
 ### Sesion 3 - 2026-08-27
 - Auditoria con 3 agentes en paralelo (`engineering-code-reviewer`, `testing-accessibility-auditor`, `engineering-frontend-developer`) sobre calidad de codigo, accesibilidad y performance de todo el proyecto.
