@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-08-27 | **Sesion #:** 1 | **Rama:** main | **HEAD:** 7631aa7
+**Ultima actualizacion:** 2026-08-27 | **Sesion #:** 2 | **Rama:** main | **HEAD:** 3e73c6e
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -47,6 +47,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
+### Sesion 2 - 2026-08-27
+- Modificado: `index.html:1135` — `SEARCH_ITEM_SELECTOR` ahora incluye `.event-row, .drug-row` (filas del tab Intubacion).
+- Modificado: `sw.js` — `CACHE` de `urg-v44` a `urg-v45` (obligatorio por el cambio en `index.html`, ver seccion 9).
+- Commits: `3e73c6e` fix(busqueda): incluir Intubacion en el selector de busqueda global
+- Decisiones tomadas: fix minimo de una linea, sin tocar el resto del selector ni la logica de `globalSearch()`.
+- Descartado y por que: no se toco el hallazgo de estilo (uso de rayas) que senalo el hook de `impeccable` al editar — es preexistente en el archivo, sin relacion con este cambio.
+
 ### Sesion 1 - 2026-08-27
 - Anadido: `HANDOFF.md` (Modo A, primera vez que existe en este repo).
 - Anadido: `.claude/agents/*.md` (9 agentes curados: `agents-orchestrator`, `engineering-code-reviewer`, `engineering-git-workflow-master`, `engineering-minimal-change-engineer`, `engineering-rapid-prototyper`, `engineering-technical-writer`, `engineering-frontend-developer`, `testing-accessibility-auditor`, `healthcare-clinical-evidence-agent`) via `/curar-agentes`, copiados desde la biblioteca en `~/git/nuevo-proyecto`.
@@ -58,13 +65,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 6. PENDIENTE - BACKLOG PRIORIZADO
 | # | Tarea | Archivos | Prioridad | Bloqueado por | Criterio de hecho |
 |---|---|---|---|---|---|
-| 1 | Agregar `.event-row, .drug-row` a `SEARCH_ITEM_SELECTOR` para que la busqueda global cubra el tab Intubacion | `index.html:1135` | P1 | - | Buscar el nombre de un farmaco que solo existe en Intubacion desde la caja "Buscar en todo…" y verificar que el tab aparece |
-| 2 | Bump manual de `CACHE` en `sw.js` en cada deploy que toque `index.html`/`data/*.js` (recordatorio operativo, no una tarea de codigo) | `sw.js` | P2 | - | N/A — disciplina de proceso, verificar en cada PR que toque esos archivos |
+| 1 | Bump manual de `CACHE` en `sw.js` en cada deploy que toque `index.html`/`data/*.js` (recordatorio operativo, no una tarea de codigo) | `sw.js` | P2 | - | N/A — disciplina de proceso, verificar en cada PR que toque esos archivos |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
 |---|---|---|---|---|
-| BUG-1 | El tab Intubacion desaparece por completo al usar la busqueda global | Escribir cualquier texto en "Buscar en todo…" mientras se esta en o se busca contenido de Intubacion | `SEARCH_ITEM_SELECTOR` (`index.html:1135`) no incluye `.event-row`/`.drug-row`, las clases reales de las filas de Intubacion (`index.html:1902,1918,1953`) — `hasVisible` queda `false` y el tab se oculta | Medio: un farmaco o paso documentado solo en Intubacion es invisible a la busqueda global, aunque siga accesible navegando el tab manualmente |
+| ~~BUG-1~~ | ~~El tab Intubacion desaparecia por completo al usar la busqueda global~~ — CORREGIDO sesion 2 (2026-08-27), commit pendiente | - | `SEARCH_ITEM_SELECTOR` no incluia `.event-row`/`.drug-row` | Resuelto: selector ahora incluye ambas clases (`index.html:1135`), `sw.js` bumpeado a `urg-v45` |
 
 ## 8. ENTORNO Y COMANDOS
 - Sin instalacion: es HTML/CSS/JS estatico, se abre `index.html` directo o se sirve con cualquier servidor estatico.
@@ -82,4 +88,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - `scripts/merge_fichas.js` espera exactamente 75 entradas (`if (merged.length !== 75) console.error('WARNING...')`) — si se agrega o quita una ficha, ese numero hardcodeado tambien hay que actualizarlo.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Corregir BUG-1: agregar `.event-row, .drug-row` a `SEARCH_ITEM_SELECTOR` en `index.html:1135` y verificar manualmente que la busqueda global ya no oculta el tab Intubacion.
+Verificar manualmente en navegador (no hecho esta sesion, solo lectura de codigo) que la busqueda global ya no oculta el tab Intubacion, y revisar el backlog (seccion 6) para la proxima tarea.
