@@ -652,7 +652,8 @@ body {
   width: 100%;
   min-height: 40px;
 }
-.field input:focus, .field select:focus { outline: none; border-color: var(--blue); }
+.field input:focus, .field select:focus { border-color: var(--blue); }
+.field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 .field input.missing { border-color: var(--amber); }
 
 .chk-grid {
@@ -700,7 +701,8 @@ body {
   font-size: 13px;
   font-family: var(--sans);
 }
-.filter-input:focus { outline: none; border-color: var(--blue); }
+.filter-input:focus { border-color: var(--blue); }
+.filter-input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 
 .theme-toggle {
   margin-left: auto;
@@ -743,7 +745,7 @@ body {
   <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" tabindex="-1" onclick="showTab('intubacion', this)">🫁 Intubación</button>
   <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" tabindex="-1" onclick="showTab('fichas', this)">📋 Fichas</button>
   <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" tabindex="-1" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
-  <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" oninput="globalSearch(this.value)" style="margin-left:auto;max-width:240px">
+  <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" aria-label="Buscar en todo" oninput="debouncedGlobalSearch(this.value)" style="margin-left:auto;max-width:240px">
 </div>
 
 <div class="main">
@@ -755,12 +757,12 @@ body {
 <!-- TAB ESCALAS -->
 <div id="tab-escalas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-escalas">
 
-<div class="section-title">🫀 Box SCA — entrada única de datos → GRACE · TIMI · CRUSADE</div>
+<h2 class="section-title">🫀 Box SCA — entrada única de datos → GRACE · TIMI · CRUSADE</h2>
 
 <details class="databox">
   <summary class="databox-header">
     <div>
-      <div class="scale-title">Síndrome coronario agudo — calculadora integrada</div>
+      <h3 class="scale-title">Síndrome coronario agudo — calculadora integrada</h3>
       <div class="scale-subtitle">Un solo juego de datos alimenta los 4 scores · ESC 2023 NSTE-ACS / ESC 2023 STEMI</div>
     </div>
     <span class="badge badge-red">SCA</span>
@@ -801,7 +803,7 @@ body {
     <label class="chk"><input type="checkbox" id="sca-aas" onchange="calcSCA()">AAS en los 7 días previos</label>
   </div>
 
-  <div class="tiles">
+  <div class="tiles" aria-live="polite">
     <div class="tile">
       <div class="tile-name">GRACE — muerte intrahospitalaria</div>
       <div class="tile-num" id="grace-num">—</div>
@@ -850,12 +852,12 @@ body {
 <!-- TAB PERFUSIONES -->
 <div id="tab-perfusiones" class="tab-content" role="tabpanel" aria-labelledby="navbtn-perfusiones">
 
-<div class="section-title">💧 Perfusión IV — dilución + dosis/peso → mL/h</div>
+<h2 class="section-title">💧 Perfusión IV — dilución + dosis/peso → mL/h</h2>
 
 <div class="databox">
   <div class="databox-header">
     <div>
-      <div class="scale-title">Calculadora de perfusión IV</div>
+      <h3 class="scale-title">Calculadora de perfusión IV</h3>
       <div class="scale-subtitle">Peso, cantidad diluida y dosis prescrita → concentración y mL/h</div>
     </div>
     <span class="badge badge-blue">BIC</span>
@@ -884,7 +886,7 @@ body {
     </div>
   </div>
 
-  <div class="tiles">
+  <div class="tiles" aria-live="polite">
     <div class="tile">
       <div class="tile-name">Concentración de la dilución</div>
       <div class="tile-num" id="inf-conc">—</div>
@@ -898,10 +900,10 @@ body {
     </div>
   </div>
 
-  <div class="inf-warning-banner" id="inf-warning" style="display:none"></div>
+  <div class="inf-warning-banner" id="inf-warning" role="alert" aria-live="assertive" style="display:none"></div>
 
   <div class="tile-aux" id="inf-range"><strong>Rango terapéutico:</strong> —</div>
-  <div class="tile-aux" id="inf-alert" style="color:var(--red)"></div>
+  <div class="tile-aux" id="inf-alert" aria-live="polite" style="color:var(--red)"></div>
 
   <div class="btn-row" style="padding: 0 14px 14px;">
     <button class="btn btn-copy" id="inf-copy-btn" onclick="copyInfusion()">📋 Copiar resultado</button>
@@ -910,19 +912,19 @@ body {
   </div>
 </div>
 
-<div class="section-title">Referencia — dilución habitual y mL/h según el peso indicado arriba</div>
+<h2 class="section-title">Referencia — dilución habitual y mL/h según el peso indicado arriba</h2>
 <div class="scales-grid" id="infusion-ref-grid"></div>
 
 </div><!-- end tab-perfusiones -->
 
 <!-- TAB INTUBACIÓN -->
 <div id="tab-intubacion" class="tab-content" role="tabpanel" aria-labelledby="navbtn-intubacion">
-<div class="section-title">🫁 Lista de verificación de intubación (SIR)</div>
+<h2 class="section-title">🫁 Lista de verificación de intubación (SIR)</h2>
 
 <div class="databox">
   <div class="databox-header">
     <div>
-      <div class="scale-title">Secuencia de intubación rápida — checklist</div>
+      <h3 class="scale-title">Secuencia de intubación rápida — checklist</h3>
       <div class="scale-subtitle">Peso real para fármacos · peso ideal solo para volumen tidal protector</div>
     </div>
     <span class="badge badge-red">Vía aérea</span>
@@ -1010,7 +1012,7 @@ body {
 
 <!-- TAB FICHAS -->
 <div id="tab-fichas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-fichas">
-<div class="section-title">📋 Fichas técnicas de medicamentos</div>
+<h2 class="section-title">📋 Fichas técnicas de medicamentos</h2>
 <div class="fields" style="padding:0 0 14px">
   <div class="field" style="grid-column: 1 / -1; max-width:320px">
     <label for="fichas-buscar">Buscar medicamento</label>
@@ -1022,7 +1024,7 @@ body {
 
 <!-- TAB BIBLIOGRAFÍA -->
 <div id="tab-bibliografia" class="tab-content" role="tabpanel" aria-labelledby="navbtn-bibliografia">
-<div class="section-title">📚 Bibliografía — verificación clínica de las fichas (Vera + Perplexity)</div>
+<h2 class="section-title">📚 Bibliografía — verificación clínica de las fichas (Vera + Perplexity)</h2>
 <div class="tile-aux" style="margin-bottom:12px">Registro de la última verificación por lote. Al pedir una actualización, revisar primero las <strong>guías base</strong> de cada lote: si ya existe una versión más reciente, focalizar la nueva consulta solo en lo que cambió esa guía.</div>
 <div id="bibliografia-list"></div>
 </div><!-- end tab-bibliografia -->
@@ -1030,7 +1032,7 @@ body {
 </div><!-- main -->
 
 <div class="ficha-overlay" id="ficha-overlay" style="display:none" onclick="if(event.target===this) closeFicha()">
-  <div class="ficha-modal" id="ficha-modal"></div>
+  <div class="ficha-modal" id="ficha-modal" role="dialog" aria-modal="true" aria-labelledby="ficha-modal-title" tabindex="-1"></div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
@@ -1090,12 +1092,12 @@ function renderCheatsheets() {
     var items = sec.items.slice().sort(function(a, b) {
       return (favs['cheatsheet:' + b.id] || 0) - (favs['cheatsheet:' + a.id] || 0);
     });
-    return '<div class="section-title">' + sec.icon + ' ' + name + '</div>' +
+    return '<h2 class="section-title">' + sec.icon + ' ' + name + '</h2>' +
       '<div class="grid">' + items.map(function(ch) {
         return '<details class="card">' +
           '<summary class="card-header">' +
             '<span class="badge badge-' + ch.badge + '">' + ch.badgeLabel + '</span>' +
-            '<span class="card-title">' + ch.title + '</span>' +
+            '<span class="card-title" role="heading" aria-level="3">' + ch.title + '</span>' +
             '<button class="fav-btn' + (favs['cheatsheet:' + ch.id] ? ' fav-active' : '') +
               '" onclick="event.stopPropagation();toggleFav(\'cheatsheet\',\'' + ch.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['cheatsheet:' + ch.id] ? 'true' : 'false') + '">★</button>' +
           '</summary>' +
@@ -1164,6 +1166,12 @@ function onNavKeydown(e) {
     : tabs[tabs.length - 1];
   next.focus();
   next.click();
+}
+
+let _globalSearchDebounce;
+function debouncedGlobalSearch(q) {
+  clearTimeout(_globalSearchDebounce);
+  _globalSearchDebounce = setTimeout(() => globalSearch(q), 130);
 }
 
 function globalSearch(q) {
@@ -1396,18 +1404,20 @@ function renderOneScale(sc, favs, pfx, kind) {
   const uid = pfx + sc.id;
   return '<details class="scale-card">' +
       '<summary class="scale-header"><div>' +
-        '<div class="scale-title">' + sc.title + '</div>' +
+        '<h3 class="scale-title">' + sc.title + '</h3>' +
         '<div class="scale-subtitle">' + sc.sub + '</div>' +
       '</div><span class="badge badge-' + sc.badge + '">' + sc.tag + '</span>' +
       '<button class="fav-btn' + (favs[kind + ':' + sc.id] ? ' fav-active' : '') +
         '" onclick="event.stopPropagation();toggleFav(\'' + kind + '\',\'' + sc.id + '\')" aria-label="Favorito" aria-pressed="' + (favs[kind + ':' + sc.id] ? 'true' : 'false') + '">★</button>' +
       '</summary>' +
       '<div class="scale-body">' +
-        sc.items.map((it, i) =>
-          '<div class="scale-item"><span class="scale-label">' + it.l + '</span>' +
-          '<div class="scale-input">' + _scaleCtrl(sc, it, i, pfx) + '</div></div>').join('') +
+        sc.items.map((it, i) => {
+          const ctrlId = pfx + sc.id + '_' + i;
+          return '<div class="scale-item"><label class="scale-label" for="' + ctrlId + '">' + it.l + '</label>' +
+          '<div class="scale-input">' + _scaleCtrl(sc, it, i, pfx) + '</div></div>';
+        }).join('') +
         (sc.info ? '<div class="scale-note">' + sc.info + '</div>' : '') +
-        '<div class="score-display">' +
+        '<div class="score-display" aria-live="polite">' +
           '<div><div class="score-num" id="' + uid + '-num">0</div><div class="score-detail">puntos</div></div>' +
           '<div style="text-align:right"><div class="score-risk" id="' + uid + '-risk">—</div>' +
           '<div class="score-detail" id="' + uid + '-detail">—</div></div>' +
@@ -1464,7 +1474,7 @@ function renderScales() {
   const recent = getRecent();
   const recentScales = recent.map(rid => SCALES.find(x => x.id === rid)).filter(Boolean);
   const recentHtml = recentScales.length ?
-    '<div class="section-title">🕐 Usadas recientemente</div><div class="scales-grid">' +
+    '<h2 class="section-title">🕐 Usadas recientemente</h2><div class="scales-grid">' +
     recentScales.map(sc => renderOneScale(sc, favs, 'recent-')).join('') + '</div>' : '';
   const byGroup = {};
   SCALES.forEach(sc => {
@@ -1477,7 +1487,7 @@ function renderScales() {
     .map(g => {
       const items = byGroup[g.name].items.slice()
         .sort((a, b) => (favs['scale:' + b.id] || 0) - (favs['scale:' + a.id] || 0));
-      return '<div class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</div><div class="scales-grid">' +
+      return '<h2 class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</h2><div class="scales-grid">' +
         items.map(sc => renderOneScale(sc, favs)).join('') + '</div>';
     }).join('');
   document.getElementById('all-scales').innerHTML = recentHtml + groupsHtml;
@@ -1490,7 +1500,7 @@ function renderFormulas() {
   const recent = getRecent();
   const recentFormulas = recent.map(rid => FORMULAS.find(x => x.id === rid)).filter(Boolean);
   const recentHtml = recentFormulas.length ?
-    '<div class="section-title">🕐 Usadas recientemente</div><div class="scales-grid">' +
+    '<h2 class="section-title">🕐 Usadas recientemente</h2><div class="scales-grid">' +
     recentFormulas.map(f => renderOneScale(f, favs, 'recent-', 'formula')).join('') + '</div>' : '';
   const byGroup = {};
   FORMULAS.forEach(f => {
@@ -1503,7 +1513,7 @@ function renderFormulas() {
     .map(g => {
       const items = byGroup[g.name].items.slice()
         .sort((a, b) => (favs['formula:' + b.id] || 0) - (favs['formula:' + a.id] || 0));
-      return '<div class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</div><div class="scales-grid">' +
+      return '<h2 class="section-title">' + byGroup[g.name].icon + ' ' + g.name + '</h2><div class="scales-grid">' +
         items.map(f => renderOneScale(f, favs, '', 'formula')).join('') + '</div>';
     }).join('');
   document.getElementById('all-formulas').innerHTML = recentHtml + groupsHtml;
@@ -1598,11 +1608,11 @@ function renderProtocols() {
     if (fa !== fb) return fb - fa;
     return (a.rank || 99) - (b.rank || 99);
   });
-  container.innerHTML = '<div class="section-title">🔀 Protocolos de actuación — códigos de activación primero, luego por relevancia clínica</div>' +
+  container.innerHTML = '<h2 class="section-title">🔀 Protocolos de actuación — códigos de activación primero, luego por relevancia clínica</h2>' +
     sorted.map(p =>
       '<details class="protocol-card">' +
         '<summary class="scale-header"><div>' +
-          '<div class="scale-title">' + (p.codigo ? '🚨 ' : '') + p.title + '</div>' +
+          '<h3 class="scale-title">' + (p.codigo ? '🚨 ' : '') + p.title + '</h3>' +
           '<div class="scale-subtitle">' + p.sub + '</div>' +
         '</div><span class="badge badge-' + p.badge + '">' + p.tag + '</span>' +
         '<button class="fav-btn' + (favs['protocol:' + p.id] ? ' fav-active' : '') +
@@ -1637,7 +1647,7 @@ function renderDrugs() {
     const favId = d.name.replace(/[^a-zA-Z0-9]/g, '');
     return '<div class="scale-card drug-card">' +
       '<div class="scale-header"><div>' +
-        '<div class="scale-title">' + d.name + '</div>' +
+        '<h3 class="scale-title">' + d.name + '</h3>' +
         '<div class="scale-subtitle">' + g.group + ' · ' + d.dilution + '</div>' +
       '</div><span class="badge badge-' + g.badge + '">' + g.tag + '</span>' +
       '<button class="fav-btn' + (favs['drug:' + favId] ? ' fav-active' : '') +
@@ -1662,7 +1672,7 @@ function renderDrugs() {
       const fb = favs['drug:' + b.name.replace(/[^a-zA-Z0-9]/g, '')] || 0;
       return fb - fa;
     });
-    return '<div class="section-title">' + g.group + '</div><div class="scales-grid">' +
+    return '<h2 class="section-title">' + g.group + '</h2><div class="scales-grid">' +
       drugsSorted.map(d => renderCard(d, g)).join('') + '</div>';
   }
 
@@ -1670,15 +1680,15 @@ function renderDrugs() {
   const antidotos = DRUGS.filter(g => g.tag === 'Antídotos');
 
   container.innerHTML =
-    '<div class="section-title">💉 Fármacos — calculadora por peso</div>' +
+    '<h2 class="section-title">💉 Fármacos — calculadora por peso</h2>' +
     '<div class="drug-weight-bar">' +
       '<label for="farmacos-peso">Peso del paciente</label>' +
       '<input type="number" class="num-in" id="farmacos-peso" value="' + currentPeso + '" min="20" max="250" step="1" oninput="recalcDrugs(this.value)">' +
       '<span class="scale-pts">kg</span>' +
     '</div>' +
-    '<div class="section-title">💊 Medicamentos</div>' +
+    '<h2 class="section-title">💊 Medicamentos</h2>' +
     medicamentos.map(renderGroup).join('') +
-    '<div class="section-title">☠️ Antídotos</div>' +
+    '<h2 class="section-title">☠️ Antídotos</h2>' +
     antidotos.map(renderGroup).join('');
 
   recalcDrugs(document.getElementById('farmacos-peso').value);
@@ -1837,7 +1847,7 @@ function renderInfusionGrid() {
       (mlhMax == null || mlhMax === mlhMin ? _fmt(mlhMin, 2) : _fmt(mlhMin, 2) + '–' + _fmt(mlhMax, 2));
     return '<div class="scale-card">' +
       '<div class="scale-header"><div>' +
-        '<div class="scale-title">' + d.name + '</div>' +
+        '<h3 class="scale-title">' + d.name + '</h3>' +
         '<div class="scale-subtitle">' + d.group + '</div>' +
       '</div><span class="badge badge-' + d.badge + '">' + d.unit + '</span>' +
       '</div>' +
@@ -1919,10 +1929,10 @@ function renderIntubacionFarmacos() {
           '<div class="drug-head">' +
             '<label class="event-label" style="min-width:180px"><input type="checkbox" id="itb-fx-' + d.id + '-chk" onchange="calcIntubacion()">' + d.nombre + ' <span id="itb-fx-' + d.id + '-rec"></span></label>' +
             '<div class="event-time">' +
-              '<span class="drug-dose" id="itb-fx-' + d.id + '-dosis">—</span>' +
-              '<input type="text" class="drug-real-input" id="itb-fx-' + d.id + '-real" placeholder="Dosis dada">' +
-              '<input type="time" id="itb-fx-' + d.id + '-hora" onchange="calcIntubacion()">' +
-              '<button class="btn-now" onclick="stampIntubacionTime(\'itb-fx-' + d.id + '-hora\')">Ahora</button>' +
+              '<span class="drug-dose" id="itb-fx-' + d.id + '-dosis" aria-live="polite">—</span>' +
+              '<input type="text" class="drug-real-input" id="itb-fx-' + d.id + '-real" placeholder="Dosis dada" aria-label="Dosis dada de ' + d.nombre + '">' +
+              '<input type="time" id="itb-fx-' + d.id + '-hora" aria-label="Hora de administración de ' + d.nombre + '" onchange="calcIntubacion()">' +
+              '<button class="btn-now" aria-label="Marcar hora actual de ' + d.nombre + '" onclick="stampIntubacionTime(\'itb-fx-' + d.id + '-hora\')">Ahora</button>' +
             '</div>' +
           '</div>' +
           '<div class="drug-note">' + d.nombre + ' ' + d.doseMin + (d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit +
@@ -1954,15 +1964,15 @@ function _itbMantDrugRowHtml(d, removable) {
     '<div class="drug-head">' +
       '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
       '<div class="event-time">' +
-        '<span class="drug-dose" id="' + _itbMantId(d.name) + '">—</span>' +
-        '<input type="text" class="drug-real-input" id="' + _itbMantId(d.name) + '-real" placeholder="mL/h dado">' +
-        '<input type="time" id="' + _itbMantId(d.name) + '-hora">' +
-        '<button class="btn-now" onclick="stampIntubacionTime(\'' + _itbMantId(d.name) + '-hora\')">Ahora</button>' +
+        '<span class="drug-dose" id="' + _itbMantId(d.name) + '" aria-live="polite">—</span>' +
+        '<input type="text" class="drug-real-input" id="' + _itbMantId(d.name) + '-real" placeholder="mL/h dado" aria-label="mL/h dado de ' + d.name + '">' +
+        '<input type="time" id="' + _itbMantId(d.name) + '-hora" aria-label="Hora de administración de ' + d.name + '">' +
+        '<button class="btn-now" aria-label="Marcar hora actual de ' + d.name + '" onclick="stampIntubacionTime(\'' + _itbMantId(d.name) + '-hora\')">Ahora</button>' +
       '</div>' +
     '</div>' +
     '<div class="drug-note">Dilución ' +
-      '<input type="number" class="dilution-input" id="' + _itbMantId(d.name) + '-mg" value="' + d.mg + '" min="0" step="any" oninput="calcIntubacionMantenimiento()"> ' + (d.unitLabel || 'mg') +
-      ' en <input type="number" class="dilution-input" id="' + _itbMantId(d.name) + '-vol" value="' + d.vol + '" min="1" step="any" oninput="calcIntubacionMantenimiento()"> mL' +
+      '<input type="number" class="dilution-input" id="' + _itbMantId(d.name) + '-mg" value="' + d.mg + '" min="0" step="any" aria-label="Cantidad de ' + d.name + ' en la dilución" oninput="calcIntubacionMantenimiento()"> ' + (d.unitLabel || 'mg') +
+      ' en <input type="number" class="dilution-input" id="' + _itbMantId(d.name) + '-vol" value="' + d.vol + '" min="1" step="any" aria-label="Volumen de la dilución de ' + d.name + '" oninput="calcIntubacionMantenimiento()"> mL' +
       ' · rango ' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</div>' +
     (removable ? '<div class="btn-row"><button class="btn" onclick="removeIntubacionMantExtra(\'' + d.name + '\')">✕ Quitar</button></div>' : '') +
   '</div>';
@@ -2075,7 +2085,7 @@ function calcIntubacion() {
     if (!peso || peso <= 0) { el.textContent = '—'; return; }
     const min = d.doseMin * peso, max = d.doseMax * peso;
     let mgMin = min, mgMax = max, unit = d.unit.split('/')[0];
-    if (d.doseMinAbs) mgMin = Math.max(mgMin, d.doseMinAbs);
+    if (d.doseMinAbs) { mgMin = Math.max(mgMin, d.doseMinAbs); mgMax = Math.max(mgMax, d.doseMinAbs); }
     el.textContent = (mgMin === mgMax ? _fmt(mgMin, 2) : _fmt(mgMin, 2) + '–' + _fmt(mgMax, 2)) + ' ' + unit;
   });
 
@@ -2244,7 +2254,7 @@ function _fichaSection(title, text, cls) {
 
 function _fichaHTML(f) {
   let html = '<div class="ficha-head"><div>' +
-      '<div class="ficha-name">' + f.nombre + '</div>' +
+      '<div class="ficha-name" id="ficha-modal-title">' + f.nombre + '</div>' +
       (f.subtitulo ? '<div class="ficha-subtitulo">' + f.subtitulo + '</div>' : '') +
     '</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' +
       (f.altoRiesgo ? '<span class="badge badge-red">Alto riesgo</span>' : '') +
@@ -2271,25 +2281,32 @@ function _fichaHTML(f) {
   return html;
 }
 
+let _fichaTriggerEl = null;
+
 function showFicha(file) {
   const f = (window.FICHAS || []).find(x => x.file === file);
   if (!f) { console.warn('Ficha no encontrada:', file); return; }
+  _fichaTriggerEl = document.activeElement;
   const modal = document.getElementById('ficha-modal');
   modal.classList.remove('galeria-modal');
   modal.innerHTML = _fichaHTML(f);
   document.getElementById('ficha-overlay').style.display = 'flex';
+  modal.focus();
 }
 
 function closeFicha() {
   document.getElementById('ficha-overlay').style.display = 'none';
+  if (_fichaTriggerEl && document.body.contains(_fichaTriggerEl)) _fichaTriggerEl.focus();
+  _fichaTriggerEl = null;
 }
 
 function openGaleria(protocolId) {
   const p = (window.PROTOCOLS || []).find(x => x.id === protocolId);
   if (!p || !p.galeria) { console.warn('Galería no encontrada:', protocolId); return; }
+  _fichaTriggerEl = document.activeElement;
   const g = p.galeria;
   const html = '<div class="ficha-head"><div>' +
-      '<div class="ficha-name">' + g.titulo + '</div>' +
+      '<div class="ficha-name" id="ficha-modal-title">' + g.titulo + '</div>' +
       '<div class="ficha-subtitulo">' + g.nota + '</div>' +
     '</div><button class="ficha-close" onclick="closeFicha()" aria-label="Cerrar">✕</button></div>' +
     '<div class="ficha-body"><div class="galeria-grid">' +
@@ -2310,9 +2327,21 @@ function openGaleria(protocolId) {
   modal.classList.add('galeria-modal');
   modal.innerHTML = html;
   document.getElementById('ficha-overlay').style.display = 'flex';
+  modal.focus();
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFicha(); });
+document.addEventListener('keydown', e => {
+  const overlay = document.getElementById('ficha-overlay');
+  if (overlay.style.display === 'none') return;
+  if (e.key === 'Escape') { closeFicha(); return; }
+  if (e.key !== 'Tab') return;
+  const modal = document.getElementById('ficha-modal');
+  const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
 
 function renderFichaList(filter) {
   const container = document.getElementById('fichas-list');
@@ -2348,7 +2377,7 @@ function renderBibliografia() {
     ).join('<br><br>');
     return '<details class="protocol-card">' +
       '<summary class="scale-header"><div>' +
-        '<div class="scale-title">' + b.tema + '</div>' +
+        '<h3 class="scale-title">' + b.tema + '</h3>' +
         '<div class="scale-subtitle">Verificado: ' + b.fecha + ' · ' + b.farmacos.length + ' fármacos</div>' +
       '</div></summary>' +
       '<div class="scale-body">' +

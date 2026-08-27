@@ -18,13 +18,6 @@ window.DRUGS = [
     name: 'Noradrenalina',
     dilution: '4 mg (4 amp) en 250 mL SG5% = 16 µg/mL',
     doseRange: '0.05–1 µg/kg/min',
-    doseCalc: function(peso) {
-      return {
-        min: (0.05 * peso * 60 / 16).toFixed(1),
-        max: (1 * peso * 60 / 16).toFixed(1),
-        unit: 'mL/h'
-      };
-    },
     alerts: ['Vía central de elección', 'Si se usa periférica de forma temporal: vena gruesa y proximal, comprobar reflujo y vigilar el punto de punción', 'Extravasación: riesgo de necrosis. Infiltrar fentolamina 5–10 mg en 10–15 mL de SSF cuanto antes', 'Monitorizar TA, preferiblemente invasiva'], src: 'ASHP Drug Compendium (Norepinephrine)',
     ficha: 'Noradrenalina.md', infusionRef: 'Noradrenalina'
   },
@@ -32,26 +25,12 @@ window.DRUGS = [
     name: 'Dopamina',
     dilution: '200 mg en 250 mL SG5% = 800 µg/mL',
     doseRange: '2–20 µg/kg/min', alerts: ['Extravasación: riesgo de necrosis. Infiltrar fentolamina cuanto antes', 'Taquiarritmias, más frecuentes que con noradrenalina'],
-    doseCalc: function(peso) {
-      return {
-        min: (2 * peso * 60 / 800).toFixed(1),
-        max: (20 * peso * 60 / 800).toFixed(1),
-        unit: 'mL/h'
-      };
-    },
     infusionRef: 'Dopamina'
   },
   {
     name: 'Dobutamina',
     dilution: '250 mg en 250 mL SG5% = 1000 µg/mL',
     doseRange: '2.5–20 µg/kg/min', alerts: ['Puede bajar la TA por vasodilatación: no usar como vasopresor', 'Taquicardia y arritmias'],
-    doseCalc: function(peso) {
-      return {
-        min: (2.5 * peso * 60 / 1000).toFixed(1),
-        max: (20 * peso * 60 / 1000).toFixed(1),
-        unit: 'mL/h'
-      };
-    },
     ficha: 'Dobutamina.md', infusionRef: 'Dobutamina'
   }
 ]},
@@ -67,11 +46,6 @@ window.DRUGS = [
         max: (0.1 * peso).toFixed(1),
         unit: 'mg (bolo)'
       };
-    },
-    extra: function(peso) {
-      var min = (0.02 * peso / 0.3).toFixed(1);
-      var max = (0.1 * peso / 0.3).toFixed(1);
-      return 'Perfusión: ' + min + '–' + max + ' mL/h (dilución 0,3 mg/mL)';
     },
     ficha: 'Midazolam.md', infusionRef: 'Midazolam'
   },
