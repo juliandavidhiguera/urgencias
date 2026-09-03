@@ -539,10 +539,15 @@ body {
   line-height: 1.45;
 }
 .ficha-calc-perf .btn { margin-top: 8px; width: 100%; }
-/* Pantallas estrechas: la calculadora pasa arriba, a lo ancho */
+/* Pantallas estrechas: la calculadora pasa arriba, a lo ancho. Deja de ser
+   sticky: en columna competiría con la cabecera sticky de la ficha (ambas
+   en top:0) y esta última, con z-index mayor, tapaba el campo de peso. */
 @media (max-width: 1080px) {
-  .ficha-overlay { flex-direction: column; align-items: center; }
-  .ficha-calc-panel { width: 100%; max-width: 720px; order: -1; }
+  /* justify-content pasa a ser el eje VERTICAL al cambiar a columna: con
+     'center' el contenido más alto que la pantalla se desborda hacia arriba,
+     fuera del alcance del scroll (la calculadora quedaba inaccesible). */
+  .ficha-overlay { flex-direction: column; align-items: center; justify-content: flex-start; }
+  .ficha-calc-panel { width: 100%; max-width: 720px; order: -1; position: static; }
 }
 .ficha-list-btn {
   display: block;
@@ -3055,8 +3060,10 @@ function showFicha(file) {
   panel.style.display = panelHTML ? '' : 'none';
   const overlay = document.getElementById('ficha-overlay');
   overlay.style.display = 'flex';
+  /* preventScroll: al enfocar, el navegador desplazaría el modal a la vista
+     y en pantalla estrecha (panel encima) se saltaría la calculadora. */
+  modal.focus({ preventScroll: true });
   overlay.scrollTop = 0; // sin esto, la ficha nueva hereda el scroll de la anterior
-  modal.focus();
   renderFichaCalc();
 }
 
@@ -3100,8 +3107,8 @@ function openGaleria(protocolId) {
   panel.innerHTML = '';
   const overlay = document.getElementById('ficha-overlay');
   overlay.style.display = 'flex';
+  modal.focus({ preventScroll: true });
   overlay.scrollTop = 0;
-  modal.focus();
 }
 
 document.addEventListener('keydown', e => {
