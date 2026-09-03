@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-09-03 | **Sesion #:** 4 (continuacion 3) | **Rama:** main | **HEAD:** 7e936c1 (sin commitear cambios de sesion 4)
+**Ultima actualizacion:** 2026-09-03 | **Sesion #:** 4 (continuacion 3) | **Rama:** main | **HEAD:** 799e3d4
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -59,7 +59,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Corregido (fix de raiz): `index.html` (`#tab-pcr`) — nueva `_pcrSyncEventosConFarmacos()` (mismo patron que `_itbSyncEventosConFarmacos()` de Intubacion) llamada dentro de `calcPcr()`: al marcar la fila de Adrenalina como administrada, sincroniza automaticamente el checkbox y la hora del evento "Primera dosis de adrenalina" en el checklist. Mapa `PCR_FARMACO_EVENTO_SYNC = { adrenalina: 'primera_adrenalina' }` (unico farmaco con evento equivalente; amiodarona/lidocaina no tienen fila de checklist propia).
 - Modificado: `sw.js` — `CACHE` de `urg-v50` a `urg-v51`.
 - Verificado en navegador local (servidor estatico + Claude in Chrome, sin errores de consola): se simulo el flujo real (hora puesta con "Ahora" SIN marcar checkbox en Inicio de RCP y Primera desfibrilacion; Adrenalina marcada solo en su fila de farmaco) y los 3 hitos aparecieron correctamente en la cronologia de `registro-utstein.html` tras abrir el traspaso, con los minutos transcurridos calculados bien (0 min, 36 min, 0 min).
-- Nada commiteado aun.
+- Commits: `799e3d4` feat(pcr): agregar tab de PCR (algoritmo ALS/ACLS) y registro Utstein — bundle de toda la sesion 4 (feature inicial + 3 rondas de fixes). Pusheado a `origin/main` a peticion del usuario; deploy automatico de Cloudflare Pages + purga de cache en curso.
 
 ### Sesion 4 (continuacion 2) - 2026-09-03
 - Usuario pidio poder registrar, por cada descarga de desfibrilacion: la energia administrada (J) y si hubo desfibrilacion doble simultanea (dos desfibriladores a la vez) en FV/TV sin pulso refractaria.
@@ -172,4 +172,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - El navegador puede tener un Service Worker previo activo en `localhost` sirviendo una version cacheada vieja de `index.html` incluso tras editar el codigo — para verificar cambios en local hay que recargar la pestaña DOS veces (la primera activa el SW nuevo via `skipWaiting`/`clients.claim()`, la segunda ya sirve el contenido actualizado) o purgar el cache manualmente.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Hacer un recorrido clinico completo del tab PCR con un caso simulado extremo a extremo, incluyendo el traspaso a `registro-utstein.html` (backlog #4), antes de darlo por listo para uso real; decidir con el usuario si se commitea/pushea lo de sesion 4 (`data/pcr.js`, `registro-utstein.html`, `index.html`, `sw.js` — sin commitear al cierre de esta sesion).
+Commiteado y pusheado (`799e3d4`). Hacer un recorrido clinico completo del tab PCR con un caso simulado extremo a extremo, incluyendo el traspaso a `registro-utstein.html` (backlog #4), antes de darlo por listo para uso real en un codigo.
