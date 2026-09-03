@@ -743,6 +743,7 @@ body {
   <button class="nav-btn" id="navbtn-farmacos" role="tab" aria-selected="false" aria-controls="tab-farmacos" tabindex="-1" onclick="showTab('farmacos', this)">💊 Fármacos</button>
   <button class="nav-btn" id="navbtn-perfusiones" role="tab" aria-selected="false" aria-controls="tab-perfusiones" tabindex="-1" onclick="showTab('perfusiones', this)">💧 Perfusión IV</button>
   <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" tabindex="-1" onclick="showTab('intubacion', this)">🫁 Intubación</button>
+  <button class="nav-btn" id="navbtn-pcr" role="tab" aria-selected="false" aria-controls="tab-pcr" tabindex="-1" onclick="showTab('pcr', this)">🫀 PCR</button>
   <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" tabindex="-1" onclick="showTab('fichas', this)">📋 Fichas</button>
   <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" tabindex="-1" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" aria-label="Buscar en todo" oninput="debouncedGlobalSearch(this.value)" style="margin-left:auto;max-width:240px">
@@ -1010,6 +1011,83 @@ body {
 
 </div><!-- end tab-intubacion -->
 
+<!-- TAB PCR -->
+<div id="tab-pcr" class="tab-content" role="tabpanel" aria-labelledby="navbtn-pcr">
+<h2 class="section-title">🫀 Paro cardio-respiratorio (PCR) — soporte vital avanzado</h2>
+
+<div class="databox">
+  <div class="databox-header">
+    <div>
+      <h3 class="scale-title">Algoritmo ALS intrahospitalario — adulto</h3>
+      <div class="scale-subtitle">Vía aérea avanzada sin fármacos de secuencia de intubación rápida (paciente en PCR)</div>
+    </div>
+    <span class="badge badge-red">Emergencia</span>
+  </div>
+
+  <div class="subhead">Datos del evento</div>
+  <div class="fields">
+    <div class="field"><label for="pcr-presenciado">Paro presenciado</label>
+      <select id="pcr-presenciado"><option value="">— Sin especificar —</option><option value="si">Sí</option><option value="no">No</option></select>
+    </div>
+    <div class="field"><label for="pcr-monitorizado">Monitorizado</label>
+      <select id="pcr-monitorizado"><option value="">— Sin especificar —</option><option value="si">Sí</option><option value="no">No</option></select>
+    </div>
+    <div class="field"><label for="pcr-ritmo">Ritmo actual</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <select id="pcr-ritmo" onchange="calcPcr()">
+          <option value="">— Seleccionar ritmo —</option>
+          <option value="no_desfibrilable">No desfibrilable (Asistolia / AESP)</option>
+          <option value="desfibrilable">Desfibrilable (FV / TV sin pulso)</option>
+        </select>
+        <button class="btn-now" onclick="registrarCambioRitmo()">+ Registrar cambio</button>
+      </div>
+    </div>
+    <div class="field"><label for="pcr-ciclos">Ciclos de RCP completados (2 min)</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="number" id="pcr-ciclos" min="0" value="0" style="width:70px" oninput="calcPcr()">
+        <button class="btn-now" onclick="document.getElementById('pcr-ciclos').value=(parseInt(document.getElementById('pcr-ciclos').value)||0)+1;calcPcr()">+1 ciclo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile-aux" id="pcr-recomendacion">Selecciona el ritmo para ver la recomendación de fármacos del ciclo actual.</div>
+  <div class="tile-aux" id="pcr-energia"></div>
+  <div class="tile-aux" id="pcr-calidad"></div>
+
+  <div class="subhead">Cambios de ritmo registrados — el ritmo cambia la conducta y la medicación indicada</div>
+  <div id="pcr-ritmo-log"></div>
+
+  <div class="subhead">Desfibrilaciones administradas — energía, hora y doble simultánea si aplica</div>
+  <div class="btn-row" style="padding:0 14px 8px"><button class="btn btn-copy" onclick="registrarDescarga()">+ Registrar descarga</button></div>
+  <div id="pcr-descargas-log"></div>
+
+  <div class="subhead">Checklist de eventos — hora de cada paso</div>
+  <div id="pcr-eventos"></div>
+
+  <div class="subhead">Medicación del paro (dosis fija de adulto)</div>
+  <div id="pcr-farmacos"></div>
+
+  <div class="subhead">Causas reversibles (4H / 4T)</div>
+  <div class="chk-grid" id="pcr-causas"></div>
+
+  <div class="subhead">Cuidados post-RCE (retorno de circulación espontánea)</div>
+  <div class="chk-grid" id="pcr-postrosc"></div>
+
+  <div class="subhead">Observaciones</div>
+  <div class="fields" style="grid-template-columns:1fr">
+    <div class="field"><textarea id="pcr-obs" rows="3" aria-label="Observaciones" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;font-size:13px;font-family:inherit" placeholder="Evolución, incidencias, decisiones del equipo..."></textarea></div>
+  </div>
+
+  <div class="btn-row" style="padding: 0 14px 14px;">
+    <button class="btn btn-copy" onclick="copyPcrReport()">📋 Copiar informe</button>
+    <button class="btn" onclick="printPcrReport()">🖨️ Imprimir / Guardar PDF</button>
+    <button class="btn" onclick="abrirRegistroUtstein()">📄 Registro Utstein (con los datos de este evento)</button>
+    <button class="reset-btn" style="margin-top:0" onclick="resetPcr()">↺ Reset</button>
+  </div>
+</div>
+
+</div><!-- end tab-pcr -->
+
 <!-- TAB FICHAS -->
 <div id="tab-fichas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-fichas">
 <h2 class="section-title">📋 Fichas técnicas de medicamentos</h2>
@@ -1044,6 +1122,7 @@ body {
 <script src="data/drugs.js"></script>
 <script src="data/infusions.js"></script>
 <script src="data/intubacion.js"></script>
+<script src="data/pcr.js"></script>
 <script src="data/fichas.js"></script>
 <script src="data/bibliografia.js"></script>
 <script>
@@ -1192,6 +1271,7 @@ function globalSearch(q) {
                : activeName.includes('protocolo') ? 'tab-protocolos'
                : activeName.includes('perfusión') ? 'tab-perfusiones'
                : activeName.includes('intubación') ? 'tab-intubacion'
+               : activeName.includes('pcr') ? 'tab-pcr'
                : activeName.includes('bibliografía') ? 'tab-bibliografia'
                : activeName.includes('ficha') ? 'tab-fichas'
                : 'tab-farmacos';
@@ -2244,6 +2324,347 @@ function resetIntubacion() {
 }
 
 /* ==================================================================
+   PCR — algoritmo de soporte vital avanzado (ALS/ACLS)
+   ================================================================== */
+function _pcrNow() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function stampPcrTime(id) {
+  document.getElementById(id).value = _pcrNow();
+  calcPcr();
+}
+
+const PCR_RITMO_LABELS = { no_desfibrilable: 'No desfibrilable (Asistolia / AESP)', desfibrilable: 'Desfibrilable (FV / TV sin pulso)' };
+let pcrRitmoLog = [];
+
+function _pcrRitmoActual() {
+  return pcrRitmoLog.length ? pcrRitmoLog[pcrRitmoLog.length - 1].ritmo : document.getElementById('pcr-ritmo').value;
+}
+
+function registrarCambioRitmo() {
+  const ritmo = document.getElementById('pcr-ritmo').value;
+  if (!ritmo) return;
+  pcrRitmoLog.push({ ritmo, hora: _pcrNow() });
+  renderPcrRitmoLog();
+  calcPcr();
+}
+
+function removePcrRitmoLog(idx) {
+  pcrRitmoLog.splice(idx, 1);
+  renderPcrRitmoLog();
+  calcPcr();
+}
+
+function updatePcrRitmoLogHora(idx, hora) {
+  pcrRitmoLog[idx].hora = hora;
+  calcPcr();
+}
+
+function renderPcrRitmoLog() {
+  const el = document.getElementById('pcr-ritmo-log');
+  if (!pcrRitmoLog.length) {
+    el.innerHTML = '<div class="tile-aux">Sin cambios de ritmo registrados. Selecciona el ritmo arriba y pulsa «+ Registrar cambio».</div>';
+    return;
+  }
+  el.innerHTML = pcrRitmoLog.map((r, i) =>
+    '<div class="drug-row">' +
+      '<div class="drug-head">' +
+        '<span class="event-label" style="min-width:220px">' + (i + 1) + '. ' + PCR_RITMO_LABELS[r.ritmo] + '</span>' +
+        '<div class="event-time">' +
+          '<input type="time" value="' + r.hora + '" aria-label="Hora del cambio de ritmo ' + (i + 1) + '" onchange="updatePcrRitmoLogHora(' + i + ', this.value)">' +
+          '<button class="btn" onclick="removePcrRitmoLog(' + i + ')">✕ Quitar</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+let pcrDescargasLog = [];
+
+function registrarDescarga() {
+  pcrDescargasLog.push({ hora: _pcrNow(), energia: '', doble: false });
+  renderPcrDescargasLog();
+  calcPcr();
+}
+
+function removePcrDescarga(idx) {
+  pcrDescargasLog.splice(idx, 1);
+  renderPcrDescargasLog();
+  calcPcr();
+}
+
+function updatePcrDescargaHora(idx, hora) { pcrDescargasLog[idx].hora = hora; }
+function updatePcrDescargaEnergia(idx, energia) { pcrDescargasLog[idx].energia = energia; }
+function updatePcrDescargaDoble(idx, doble) { pcrDescargasLog[idx].doble = doble; renderPcrDescargasLog(); }
+
+function renderPcrDescargasLog() {
+  const el = document.getElementById('pcr-descargas-log');
+  if (!pcrDescargasLog.length) {
+    el.innerHTML = '<div class="tile-aux">Sin descargas registradas. Pulsa «+ Registrar descarga» tras cada choque.</div>';
+    return;
+  }
+  const refractaria = pcrDescargasLog.length >= 3;
+  el.innerHTML = pcrDescargasLog.map((r, i) =>
+    '<div class="drug-row">' +
+      '<div class="drug-head">' +
+        '<span class="event-label" style="min-width:110px">Descarga ' + (i + 1) + '</span>' +
+        '<div class="event-time">' +
+          '<input type="time" value="' + r.hora + '" aria-label="Hora de la descarga ' + (i + 1) + '" onchange="updatePcrDescargaHora(' + i + ', this.value)">' +
+          '<input type="number" class="drug-real-input" style="width:60px" min="0" placeholder="J" value="' + r.energia + '" aria-label="Energía administrada en la descarga ' + (i + 1) + '" oninput="updatePcrDescargaEnergia(' + i + ', this.value)">' +
+          '<label class="chk" style="white-space:nowrap"><input type="checkbox" ' + (r.doble ? 'checked' : '') + ' onchange="updatePcrDescargaDoble(' + i + ', this.checked)">Doble simultánea</label>' +
+          '<button class="btn" onclick="removePcrDescarga(' + i + ')">✕ Quitar</button>' +
+        '</div>' +
+      '</div>' +
+      (i === 2 && refractaria ? '<div class="drug-note">FV/TV refractaria (≥3 descargas): verificar posición/contacto de los parches y considerar cambiar el vector antes de escalar a medidas de rescate como la doble simultánea (utilidad no establecida de forma firme, ver nota de energía arriba).</div>' : '') +
+    '</div>'
+  ).join('');
+}
+
+function renderPcrEventos() {
+  document.getElementById('pcr-eventos').innerHTML = PCR_EVENTOS.map(s =>
+    '<div class="event-row">' +
+      '<label class="event-label"><input type="checkbox" id="pcr-ev-' + s.id + '-chk">' + s.label + '</label>' +
+      '<div class="event-time">' +
+        '<input type="time" id="pcr-ev-' + s.id + '-hora">' +
+        '<button class="btn-now" onclick="stampPcrTime(\'pcr-ev-' + s.id + '-hora\')">Ahora</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function renderPcrFarmacos() {
+  document.getElementById('pcr-farmacos').innerHTML = PCR_FARMACOS.map(d =>
+    '<div class="drug-row" id="pcr-fx-' + d.id + '-row">' +
+      '<div class="drug-head">' +
+        '<label class="event-label" style="min-width:180px"><input type="checkbox" id="pcr-fx-' + d.id + '-chk" onchange="calcPcr()">' + d.nombre + ' <span id="pcr-fx-' + d.id + '-rec"></span></label>' +
+        '<div class="event-time">' +
+          '<span class="drug-dose">' + d.dosis + '</span>' +
+          '<input type="time" id="pcr-fx-' + d.id + '-hora" aria-label="Hora de primera dosis de ' + d.nombre + '" onchange="calcPcr()">' +
+          '<button class="btn-now" aria-label="Marcar hora actual de ' + d.nombre + '" onclick="stampPcrTime(\'pcr-fx-' + d.id + '-hora\')">Ahora</button>' +
+          '<input type="number" class="drug-real-input" id="pcr-fx-' + d.id + '-total" min="0" placeholder="Total dosis" aria-label="Total de dosis administradas de ' + d.nombre + '" style="width:70px">' +
+        '</div>' +
+      '</div>' +
+      '<div class="drug-note">' + d.nota + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function renderPcrCausas() {
+  document.getElementById('pcr-causas').innerHTML = PCR_CAUSAS_REVERSIBLES.map((c, i) =>
+    '<label class="chk"><input type="checkbox" id="pcr-causa-' + i + '">' + c + '</label>'
+  ).join('');
+}
+
+function renderPcrPostRosc() {
+  document.getElementById('pcr-postrosc').innerHTML = PCR_POST_ROSC.map((c, i) =>
+    '<label class="chk"><input type="checkbox" id="pcr-rosc-' + i + '">' + c + '</label>'
+  ).join('');
+}
+
+/* La medicación se registra en 2 sitios (checklist de eventos y fila
+   del fármaco); mantenerlos sincronizados evita que el traspaso al
+   registro Utstein se quede sin la hora si el usuario solo marcó uno
+   de los dos (p.ej. solo la fila de Adrenalina, no el evento). */
+const PCR_FARMACO_EVENTO_SYNC = { adrenalina: 'primera_adrenalina' };
+
+function _pcrSyncEventosConFarmacos() {
+  Object.keys(PCR_FARMACO_EVENTO_SYNC).forEach(farmacoId => {
+    const chk = document.getElementById('pcr-fx-' + farmacoId + '-chk');
+    if (!chk || !chk.checked) return;
+    const hora = document.getElementById('pcr-fx-' + farmacoId + '-hora').value;
+    const stepId = PCR_FARMACO_EVENTO_SYNC[farmacoId];
+    const chkEl = document.getElementById('pcr-ev-' + stepId + '-chk');
+    if (chkEl) chkEl.checked = true;
+    const horaEl = document.getElementById('pcr-ev-' + stepId + '-hora');
+    if (horaEl && hora) horaEl.value = hora;
+  });
+}
+
+function calcPcr() {
+  const ritmo = _pcrRitmoActual();
+  const descargas = pcrDescargasLog.length;
+  _pcrSyncEventosConFarmacos();
+
+  document.getElementById('pcr-energia').textContent = 'Energía de desfibrilación: ' + PCR_ENERGIA_DESFIB;
+  document.getElementById('pcr-calidad').textContent = 'Calidad de RCP: ' + PCR_CALIDAD_RCP;
+
+  PCR_FARMACOS.forEach(d => {
+    /* La fila NUNCA se oculta: si el ritmo cambia, la medicación ya
+       administrada debe seguir visible en el registro. */
+    const recEl = document.getElementById('pcr-fx-' + d.id + '-rec');
+    const dado = document.getElementById('pcr-fx-' + d.id + '-chk').checked;
+    let due = false;
+    if (ritmo && d.ritmos.includes(ritmo)) {
+      if (d.id === 'adrenalina') {
+        due = ritmo === 'no_desfibrilable' ? !dado : (descargas >= 3);
+      } else {
+        due = descargas >= 3;
+      }
+    }
+    recEl.innerHTML = (due && !dado) ? '<span class="drug-flag pref-inestable">▶ administrar ahora</span>'
+      : (ritmo && !d.ritmos.includes(ritmo)) ? '<span class="drug-flag pref-estable">no aplica al ritmo actual</span>' : '';
+  });
+
+  const recEl = document.getElementById('pcr-recomendacion');
+  if (!ritmo) {
+    recEl.textContent = 'Selecciona el ritmo para ver la recomendación de fármacos del ciclo actual.';
+  } else if (ritmo === 'no_desfibrilable') {
+    recEl.innerHTML = '<strong>No desfibrilable (Asistolia/AESP):</strong> Adrenalina 1 mg IV/IO lo antes posible, luego cada 3–5 min (≈ cada 2 ciclos). Reevaluar ritmo cada 2 min.';
+  } else {
+    recEl.innerHTML = '<strong>Desfibrilable (FV/TV sin pulso):</strong> descarga → RCP 2 min → reevaluar ritmo. ' +
+      (descargas >= 5 ? 'Tras la 5ª descarga: 2ª dosis de amiodarona (150 mg) o lidocaína (50 mg), y adrenalina si corresponde por tiempo.'
+       : descargas >= 3 ? 'Tras la 3ª descarga: adrenalina 1 mg + amiodarona 300 mg (o lidocaína 100 mg si no hay amiodarona).'
+       : 'Adrenalina y antiarrítmico se inician tras la 3ª descarga si persiste el ritmo desfibrilable.');
+  }
+}
+
+function _pcrEventosTexto() {
+  return PCR_EVENTOS.map(s => {
+    const chk = document.getElementById('pcr-ev-' + s.id + '-chk').checked;
+    const hora = document.getElementById('pcr-ev-' + s.id + '-hora').value;
+    return (chk ? '☑' : '☐') + ' ' + s.label + (hora ? ' — ' + hora : '');
+  }).join('\n');
+}
+
+function _pcrFarmacosTexto() {
+  const admin = PCR_FARMACOS.filter(d => document.getElementById('pcr-fx-' + d.id + '-chk').checked);
+  if (!admin.length) return '(ninguno marcado como administrado)';
+  return admin.map(d => {
+    const hora = document.getElementById('pcr-fx-' + d.id + '-hora').value;
+    const total = document.getElementById('pcr-fx-' + d.id + '-total').value;
+    return '- ' + d.nombre + ' (' + d.dosis + '): 1ª dosis' + (hora ? ' — ' + hora : '') + (total ? ' · total dosis: ' + total : '');
+  }).join('\n');
+}
+
+function _pcrRitmoLogTexto() {
+  if (!pcrRitmoLog.length) return '(sin cambios de ritmo registrados)';
+  return pcrRitmoLog.map((r, i) => '- ' + (i + 1) + '. ' + PCR_RITMO_LABELS[r.ritmo] + ' — ' + r.hora).join('\n');
+}
+
+function _pcrDescargasLogTexto() {
+  if (!pcrDescargasLog.length) return '(sin descargas registradas)';
+  return pcrDescargasLog.map((r, i) => '- ' + (i + 1) + '. ' + r.hora + (r.energia ? ' — ' + r.energia + ' J' : '') + (r.doble ? ' — doble simultánea' : '')).join('\n');
+}
+
+function _pcrCausasTexto() {
+  const marcadas = PCR_CAUSAS_REVERSIBLES.filter((c, i) => document.getElementById('pcr-causa-' + i).checked);
+  return marcadas.length ? marcadas.join(', ') : 'Ninguna marcada';
+}
+
+function _pcrPostRoscTexto() {
+  const marcadas = PCR_POST_ROSC.filter((c, i) => document.getElementById('pcr-rosc-' + i).checked);
+  return marcadas.length ? marcadas.join(', ') : 'Ninguna marcada';
+}
+
+function _pcrReportText() {
+  const presenciado = document.getElementById('pcr-presenciado').value;
+  const monitorizado = document.getElementById('pcr-monitorizado').value;
+  const ritmoActual = _pcrRitmoActual();
+  const ritmoTexto = ritmoActual ? PCR_RITMO_LABELS[ritmoActual] : 'Sin especificar';
+  const ciclos = document.getElementById('pcr-ciclos').value || '0';
+  const obs = document.getElementById('pcr-obs').value || '(sin observaciones)';
+  return `REGISTRO DE PARO CARDIO-RESPIRATORIO — ALGORITMO ALS
+Paro presenciado: ${presenciado === 'si' ? 'Sí' : presenciado === 'no' ? 'No' : 'Sin especificar'} · Monitorizado: ${monitorizado === 'si' ? 'Sí' : monitorizado === 'no' ? 'No' : 'Sin especificar'}
+Ritmo actual: ${ritmoTexto} · Ciclos de RCP (2 min): ${ciclos} · Nº de desfibrilaciones: ${pcrDescargasLog.length}
+
+--- CAMBIOS DE RITMO REGISTRADOS ---
+${_pcrRitmoLogTexto()}
+
+--- DESFIBRILACIONES ---
+${_pcrDescargasLogTexto()}
+
+--- CHECKLIST DE EVENTOS ---
+${_pcrEventosTexto()}
+
+--- MEDICACIÓN ADMINISTRADA ---
+${_pcrFarmacosTexto()}
+
+--- CAUSAS REVERSIBLES (4H/4T) ---
+${_pcrCausasTexto()}
+
+--- CUIDADOS POST-RCE ---
+${_pcrPostRoscTexto()}
+
+--- OBSERVACIONES ---
+${obs}`;
+}
+
+function copyPcrReport() {
+  navigator.clipboard.writeText(_pcrReportText()).then(showToast).catch(showCopyError);
+}
+
+function printPcrReport() {
+  const w = window.open('', '_blank');
+  const html = '<pre style="font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;padding:24px;color:#111">' +
+    _pcrReportText().replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre>';
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Registro de PCR</title></head><body>' + html + '</body></html>');
+  w.document.close();
+  w.focus();
+  w.print();
+}
+
+function resetPcr() {
+  pcrRitmoLog = [];
+  pcrDescargasLog = [];
+  renderPcrEventos();
+  renderPcrFarmacos();
+  renderPcrCausas();
+  renderPcrPostRosc();
+  renderPcrRitmoLog();
+  renderPcrDescargasLog();
+  document.getElementById('pcr-presenciado').selectedIndex = 0;
+  document.getElementById('pcr-monitorizado').selectedIndex = 0;
+  document.getElementById('pcr-ritmo').selectedIndex = 0;
+  document.getElementById('pcr-ciclos').value = '0';
+  document.getElementById('pcr-obs').value = '';
+  calcPcr();
+}
+
+/* Traspaso puntual (no persistente) de los datos ya diligenciados en
+   este tab hacia registro-utstein.html: se escribe en sessionStorage
+   justo antes de abrir la pestaña nueva (misma origin, por lo que la
+   pestaña nueva hereda una copia), y registro-utstein.html la borra
+   tras aplicarla. No usa localStorage — nada queda guardado entre
+   sesiones ni tras cerrar la pestaña. */
+function pcrHandoffPayload() {
+  const eventos = {};
+  PCR_EVENTOS.forEach(s => {
+    eventos[s.id] = {
+      chk: document.getElementById('pcr-ev-' + s.id + '-chk').checked,
+      hora: document.getElementById('pcr-ev-' + s.id + '-hora').value
+    };
+  });
+  const farmacos = {};
+  PCR_FARMACOS.forEach(d => {
+    farmacos[d.id] = {
+      nombre: d.nombre,
+      chk: document.getElementById('pcr-fx-' + d.id + '-chk').checked,
+      hora: document.getElementById('pcr-fx-' + d.id + '-hora').value,
+      total: document.getElementById('pcr-fx-' + d.id + '-total').value
+    };
+  });
+  return {
+    presenciado: document.getElementById('pcr-presenciado').value,
+    monitorizado: document.getElementById('pcr-monitorizado').value,
+    ritmoLog: pcrRitmoLog.map(r => ({ ritmo: r.ritmo, label: PCR_RITMO_LABELS[r.ritmo], hora: r.hora })),
+    ciclos: document.getElementById('pcr-ciclos').value,
+    descargasLog: pcrDescargasLog.slice(),
+    eventos,
+    farmacos,
+    causas: PCR_CAUSAS_REVERSIBLES.filter((c, i) => document.getElementById('pcr-causa-' + i).checked),
+    postRosc: PCR_POST_ROSC.filter((c, i) => document.getElementById('pcr-rosc-' + i).checked),
+    obs: document.getElementById('pcr-obs').value
+  };
+}
+
+function abrirRegistroUtstein() {
+  try { sessionStorage.setItem('urg-pcr-handoff', JSON.stringify(pcrHandoffPayload())); } catch (e) {}
+  window.open('registro-utstein.html', '_blank');
+}
+
+/* ==================================================================
    FICHAS TÉCNICAS — modal de medicamento
    ================================================================== */
 function _fichaSection(title, text, cls) {
@@ -2408,6 +2829,13 @@ renderIntubacionFarmacos();
 renderIntubacionComplicaciones();
 renderIntubacionMantenimiento();
 calcIntubacion();
+renderPcrEventos();
+renderPcrFarmacos();
+renderPcrCausas();
+renderPcrPostRosc();
+renderPcrRitmoLog();
+renderPcrDescargasLog();
+calcPcr();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');

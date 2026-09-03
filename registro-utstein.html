@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro Utstein de Paro Cardio-Respiratorio</title>
+<style>
+  :root {
+    --text: #111; --text2: #555; --border: #999; --bg: #fff; --bg2: #f4f4f4;
+    --accent: #b91c1c; --accent-bg: #fdecec;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg2); color: var(--text); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .sheet { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 24px 28px 40px; }
+  h1 { font-size: 21px; margin: 0 0 2px; }
+  .subtitle { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .provenance { font-size: 10.5px; color: var(--text2); border-bottom: 2px solid var(--text); padding-bottom: 10px; margin-bottom: 14px; }
+  h2.sec { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; background: var(--bg2); padding: 5px 8px; margin: 18px 0 8px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 14px; margin-bottom: 8px; }
+  .f { display: flex; flex-direction: column; gap: 2px; }
+  .f label { font-size: 10.5px; color: var(--text2); }
+  .f input, .f select, .f textarea { border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; font-size: 12.5px; font-family: inherit; background: #fff; }
+  .chkgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 4px 12px; margin-bottom: 6px; }
+  .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .chk input { width: 14px; height: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 8px; }
+  th, td { border: 1px solid var(--border); padding: 4px; text-align: center; }
+  th { background: var(--bg2); font-weight: 600; }
+  td input[type=time], td input[type=text] { width: 100%; border: none; text-align: center; font-size: 11.5px; font-family: inherit; }
+  .note { font-size: 10.5px; color: var(--text2); font-style: italic; margin: 2px 0 6px; }
+  .tile { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 4px; padding: 6px 8px; font-size: 12px; margin-bottom: 10px; }
+  textarea { width: 100%; resize: vertical; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 4px; }
+  .actions button, .actions a.btn { border: 1px solid var(--text); background: #fff; color: var(--text); border-radius: 4px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .actions button:hover, .actions a.btn:hover { background: var(--bg2); }
+  @media print {
+    body { background: #fff; }
+    .sheet { max-width: none; padding: 0; }
+    .no-print { display: none !important; }
+    h2.sec { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <h1>Registro Utstein de Paro Cardio-Respiratorio Intrahospitalario</h1>
+  <div class="subtitle">Diligenciar durante y después del evento · adjuntar tira de registro ECG por separado</div>
+  <div class="provenance">Campos adaptados del Anexo N.I (registro institucional tipo MinSalud) y del Anexo IV, Hoja de Recogida de Datos y Seguimiento de la PCR (Hospital Clínic Barcelona), alineados a la plantilla de estilo Utstein. No se persiste ningún dato en este navegador: diligenciar, luego usar «Imprimir / Guardar PDF» o «Descargar registro (.txt)».</div>
+
+  <h2 class="sec">1. Datos identificativos</h2>
+  <div class="row">
+    <div class="f"><label for="ut-institucion">Institución</label><input id="ut-institucion"></div>
+    <div class="f"><label for="ut-cod-minsalud">Cód. MinSalud</label><input id="ut-cod-minsalud"></div>
+    <div class="f"><label for="ut-nombre">Nombre paciente</label><input id="ut-nombre"></div>
+    <div class="f"><label for="ut-hc">Historia clínica (H.C.)</label><input id="ut-hc"></div>
+    <div class="f"><label for="ut-fecha-nac">Fecha de nacimiento</label><input type="date" id="ut-fecha-nac" onchange="calcEdad()"></div>
+    <div class="f"><label for="ut-edad">Edad (calculada)</label><input id="ut-edad" readonly></div>
+    <div class="f"><label for="ut-sexo">Sexo</label><select id="ut-sexo"><option value="">—</option><option>Masculino</option><option>Femenino</option></select></div>
+    <div class="f"><label for="ut-peso">Peso (kg)</label><input type="number" id="ut-peso" min="0"></div>
+    <div class="f"><label for="ut-talla">Talla (cm)</label><input type="number" id="ut-talla" min="0"></div>
+    <div class="f"><label for="ut-fecha-evento">Fecha del evento</label><input type="date" id="ut-fecha-evento"></div>
+    <div class="f"><label for="ut-hora-evento">Hora del evento</label><input type="time" id="ut-hora-evento"></div>
+  </div>
+
+  <h2 class="sec">2. Ubicación del evento</h2>
+  <div class="chkgrid">
+    <label class="chk"><input type="checkbox" name="ut-ubic"> Servicio de Urgencias</label>
+    <label class="chk"><input type="checkbox" name="ut-ubic"> Sala de Cirugía</label>
+    <label class="chk"><input type="checkbox" name="ut-ubic"> U.C.I.</label>
+    <label class="chk"><input type="checkbox" name="ut-ubic"> Sala de Recuperación</label>
+    <label class="chk"><input type="checkbox" name="ut-ubic"> Servicio de Hospitalización</label>
+    <label class="chk"><input type="checkbox" name="ut-ubic"> Apoyo Diagnóstico</label>
+  </div>
+  <div class="f"><label for="ut-ubic-otra">Otra área</label><input id="ut-ubic-otra"></div>
+
+  <h2 class="sec">3. Testigo y contexto previo</h2>
+  <div class="row">
+    <div class="f"><label for="ut-testigo">Testigo de la PCR</label>
+      <select id="ut-testigo"><option value="">—</option><option>Familiar</option><option>Médico</option><option>Enfermera</option><option>Auxiliar</option><option>Nadie</option><option>Otro</option></select>
+    </div>
+    <div class="f"><label for="ut-enf-base">Enfermedad de base</label>
+      <select id="ut-enf-base"><option value="">—</option><option>Cardiópata</option><option>Respiratorio</option><option>Neurológico</option><option>Digestivo</option><option>Infeccioso</option><option>Otro</option></select>
+    </div>
+    <div class="f"><label for="ut-actividad-previa">Actividad física previa</label>
+      <select id="ut-actividad-previa"><option value="">—</option><option>Normal</option><option>Encamado &lt;50% tiempo</option><option>Encamado &gt;50% tiempo</option><option>Encamado 100% tiempo</option></select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Paro presenciado</label><select id="ut-presenciado"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+    <div class="f"><label>Monitorizado</label><select id="ut-monitorizado"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+  </div>
+
+  <h2 class="sec">4. Estado previo e intervenciones en el lugar</h2>
+  <div class="chkgrid">
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Inconsciente</label>
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Apnea</label>
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Sin pulso</label>
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Respirando</label>
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Consciente</label>
+    <label class="chk"><input type="checkbox" name="ut-estado-previo"> Con pulso</label>
+  </div>
+  <div class="note">Soporte vital avanzado en el lugar del evento:</div>
+  <div class="chkgrid">
+    <label class="chk"><input type="checkbox" name="ut-svaz"> Cardioversión / Desfibrilación</label>
+    <label class="chk"><input type="checkbox" name="ut-svaz"> Intubación orotraqueal</label>
+    <label class="chk"><input type="checkbox" name="ut-svaz"> Acceso IV</label>
+    <label class="chk"><input type="checkbox" name="ut-svaz"> Inotrópicos / antiarrítmicos</label>
+    <label class="chk"><input type="checkbox" name="ut-svaz"> Ventilación mecánica</label>
+  </div>
+
+  <h2 class="sec">5. Canulaciones (pre / post PCR)</h2>
+  <table>
+    <thead><tr><th>Vía</th><th>Pre-PCR</th><th>Post-PCR</th></tr></thead>
+    <tbody>
+      <tr><td style="text-align:left">Vía central</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">Vía periférica nº1</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">Vía periférica nº2</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">SNG</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">SVP</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">Lentillas nasales</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">Ventimask</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">Traqueostomía</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td style="text-align:left">IOT</td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec">6. Causa del evento</h2>
+  <div class="row">
+    <div class="f"><label>Causa de hospitalización</label>
+      <select id="ut-causa-hosp"><option value="">—</option><option>Cardíaca</option><option>Quirúrgico</option><option>Procedimiento diagnóstico</option><option>Trauma no quirúrgico</option><option>Trauma quirúrgico</option><option>Tratamiento médico no cardíaco</option><option>Otra</option></select>
+    </div>
+    <div class="f"><label>Fecha de hospitalización</label><input type="date" id="ut-fecha-hosp"></div>
+  </div>
+  <div class="note">Causa precipitante / desencadenante del paro (marcar la más probable):</div>
+  <div class="chkgrid">
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Arritmia</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Isquemia / IAM</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Metabólica</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Hipotensión / shock</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Depresión respiratoria / insuf. respiratoria</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Insuficiencia cardíaca</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Hemorragia</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Embolia pulmonar / TEP</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Tóxica</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Anafilaxia</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Desconocida</label>
+    <label class="chk"><input type="radio" name="ut-causa-paro"> Otra</label>
+  </div>
+  <div class="f"><label for="ut-causa-otra">Especificar «otra»</label><input id="ut-causa-otra"></div>
+
+  <h2 class="sec">7. Intento de resucitación</h2>
+  <div class="row">
+    <div class="f"><label>¿Se intentó la resucitación?</label><select id="ut-intento"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+  </div>
+  <div class="chkgrid">
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Vía aérea</label>
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Masaje</label>
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Desfibrilación</label>
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Encontrado muerto</label>
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Considerado no recuperable</label>
+    <label class="chk"><input type="checkbox" name="ut-intento-detalle"> Código de no reanimación</label>
+  </div>
+
+  <h2 class="sec">8. Primer ritmo observado / mecanismo de la parada</h2>
+  <div class="chkgrid">
+    <label class="chk"><input type="radio" name="ut-ritmo"> FV / TV sin pulso</label>
+    <label class="chk"><input type="radio" name="ut-ritmo"> Asistolia</label>
+    <label class="chk"><input type="radio" name="ut-ritmo"> AESP / disociación electromecánica</label>
+    <label class="chk"><input type="radio" name="ut-ritmo"> Bradicardia</label>
+    <label class="chk"><input type="radio" name="ut-ritmo"> Ritmo que perfunde</label>
+  </div>
+
+  <h2 class="sec">9. Personal que interviene y motivo del aviso</h2>
+  <div class="row">
+    <div class="f"><label for="ut-pers-enf">Enfermería</label><input id="ut-pers-enf"></div>
+    <div class="f"><label for="ut-pers-card">Cardiología</label><input id="ut-pers-card"></div>
+    <div class="f"><label for="ut-pers-anes">Anestesia</label><input id="ut-pers-anes"></div>
+    <div class="f"><label for="ut-pers-mi">Medicina interna</label><input id="ut-pers-mi"></div>
+    <div class="f"><label for="ut-pers-resp">Médico responsable (especialidad)</label><input id="ut-pers-resp"></div>
+    <div class="f"><label>Motivo del aviso</label>
+      <select id="ut-motivo-aviso"><option value="">—</option><option>Pre-PCR / crítico</option><option>PCR</option><option>P. respiratoria</option><option>Otra emergencia</option><option>Falsa alarma</option></select>
+    </div>
+  </div>
+
+  <h2 class="sec">10. Cronología del evento (referencia Utstein)</h2>
+  <div class="tile" id="ut-elapsed-tile">Introduce «Inicio RCP» para calcular los minutos transcurridos de cada hito.</div>
+  <table>
+    <thead><tr><th style="text-align:left">Hito</th><th>Hora</th><th>ND</th><th>Min. desde inicio RCP</th></tr></thead>
+    <tbody id="ut-timeline"></tbody>
+  </table>
+
+  <h2 class="sec">11. Maniobras, equipo y dispositivos</h2>
+  <div class="row">
+    <div class="f"><label for="ut-tiempo-maniobras">Tiempo de maniobras (min)</label><input type="number" id="ut-tiempo-maniobras" min="0"></div>
+    <div class="f"><label for="ut-tiempo-llegada">Tiempo de llegada del equipo (min)</label><input type="number" id="ut-tiempo-llegada" min="0"></div>
+    <div class="f"><label for="ut-num-equipo">Número de equipo</label><input id="ut-num-equipo"></div>
+    <div class="f"><label for="ut-num-desfib">Número de desfibrilaciones</label><input type="number" id="ut-num-desfib" min="0"></div>
+    <div class="f"><label>Resultado inicial</label><select id="ut-resultado-inicial"><option value="">—</option><option>Recuperación</option><option>Éxitus</option></select></div>
+  </div>
+  <div class="chkgrid">
+    <label class="chk"><input type="checkbox" name="ut-dispositivo"> Parches desfibrilador / marcapasos externo</label>
+    <label class="chk"><input type="checkbox" name="ut-dispositivo"> Lucas (compresor mecánico)</label>
+  </div>
+
+  <h2 class="sec">12. Medicación utilizada</h2>
+  <table>
+    <thead><tr><th style="text-align:left">Fármaco</th><th>Utilizado</th><th>Uds. cargadas</th><th>Uds. administradas</th></tr></thead>
+    <tbody id="ut-medicacion"></tbody>
+  </table>
+
+  <h2 class="sec">13. Tiempo de circulación espontánea post-RCP</h2>
+  <div class="chkgrid">
+    <label class="chk"><input type="radio" name="ut-tce"> &lt; 20 minutos</label>
+    <label class="chk"><input type="radio" name="ut-tce"> &lt; 24 horas</label>
+    <label class="chk"><input type="radio" name="ut-tce"> &gt; 24 horas</label>
+  </div>
+
+  <h2 class="sec">14. Desenlace</h2>
+  <div class="note">Causa de muerte (si aplica):</div>
+  <div class="chkgrid">
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> Súbita cardíaca</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> Trauma</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> IAM</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> ICC</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> ECV</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> Daño cerebral</label>
+    <label class="chk"><input type="radio" name="ut-causa-muerte"> Desconocido</label>
+  </div>
+  <div class="row">
+    <div class="f"><label>Confirmado por</label>
+      <select id="ut-confirmado-por"><option value="">—</option><option>Historia clínica</option><option>Certificado de defunción</option><option>Autopsia</option><option>Médico</option><option>Otro</option></select>
+    </div>
+    <div class="f"><label for="ut-muerte-fecha">Muerte intrahospitalaria: fecha</label><input type="date" id="ut-muerte-fecha"></div>
+    <div class="f"><label for="ut-muerte-hora">Muerte intrahospitalaria: hora (00:00 a 24:00)</label><input type="time" id="ut-muerte-hora"></div>
+    <div class="f"><label for="ut-egreso-fecha">Egreso vivo: fecha</label><input type="date" id="ut-egreso-fecha"></div>
+    <div class="f"><label>Estado funcional al egreso</label>
+      <select id="ut-estado-funcional"><option value="">—</option><option>Normal</option><option>No limitado</option><option>Limitado</option><option>Comatoso</option></select>
+    </div>
+  </div>
+
+  <h2 class="sec">15. Observaciones</h2>
+  <textarea id="ut-obs" rows="3" placeholder="Evolución, incidencias, decisiones del equipo..."></textarea>
+
+  <h2 class="sec">16. Diligenciamiento</h2>
+  <div class="row">
+    <div class="f"><label for="ut-diligencio">Formulario diligenciado por</label><input id="ut-diligencio"></div>
+    <div class="f"><label for="ut-cargo">Cargo</label><input id="ut-cargo"></div>
+  </div>
+  <div class="note">Tira de registro ECG: adjuntar por separado (impresión física o archivo escaneado). Este formulario no adjunta archivos.</div>
+
+  <div class="actions no-print">
+    <button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <button onclick="descargarRegistro()">⬇️ Descargar registro (.txt)</button>
+    <button onclick="if(confirm('¿Borrar todo el formulario?')) location.reload()">↺ Reset</button>
+  </div>
+</div>
+
+<script>
+const UT_TIMELINE = [
+  { id: 'llamada', label: 'Llamada de ayuda' },
+  { id: 'llegada_equipo', label: 'Llegada del equipo de RCP' },
+  { id: 'rcp_confirmado', label: 'RCP confirmado' },
+  { id: 'inicio_rcp', label: 'Inicio de RCP' },
+  { id: 'primera_desfib', label: 'Primera desfibrilación' },
+  { id: 'primer_manejo_via', label: 'Primer manejo avanzado de vía aérea' },
+  { id: 'primera_epinefrina', label: 'Primera dosis de epinefrina' },
+  { id: 'rce', label: 'RCE (retorno de circulación espontánea)' },
+  { id: 'suspension', label: 'Suspensión de RCP' }
+];
+
+const UT_MEDICACION = [
+  'Adrenalina', 'Amiodarona', 'Lidocaína', 'Atropina', 'Bicarbonato', 'Cloruro cálcico', 'Cloruro mórfico',
+  'Etomidato', 'Flumazenilo', 'Isoproterenol', 'Metilprednisolona', 'Midazolam', 'Naloxona',
+  'Propofol', 'Rocuronio', 'Sulfato de magnesio', 'Tiopental', 'Otro'
+];
+
+/* Mapa de eventos del tab PCR (data/pcr.js) a filas de esta cronología —
+   mismos hitos, ids distintos porque esta tabla respeta el nombre de
+   columna del formulario original (Anexo N.I). */
+const PCR_A_UT_EVENTO = {
+  activacion: 'llamada',
+  llegada_equipo: 'llegada_equipo',
+  inicio_rcp: 'inicio_rcp',
+  primera_desfibrilacion: 'primera_desfib',
+  via_aerea_avanzada: 'primer_manejo_via',
+  primera_adrenalina: 'primera_epinefrina',
+  rce: 'rce',
+  suspension: 'suspension'
+};
+
+function renderTimeline() {
+  document.getElementById('ut-timeline').innerHTML = UT_TIMELINE.map(e =>
+    '<tr>' +
+      '<td style="text-align:left">' + e.label + '</td>' +
+      '<td><input type="time" id="ut-tl-' + e.id + '" onchange="calcElapsed()"></td>' +
+      '<td><input type="checkbox" id="ut-tl-' + e.id + '-nd" title="No dato"></td>' +
+      '<td id="ut-tl-' + e.id + '-min">—</td>' +
+    '</tr>'
+  ).join('');
+}
+
+function renderMedicacion() {
+  document.getElementById('ut-medicacion').innerHTML = UT_MEDICACION.map((m, i) =>
+    '<tr>' +
+      '<td style="text-align:left">' + m + '</td>' +
+      '<td><input type="checkbox" id="ut-med-' + i + '-uso"></td>' +
+      '<td><input type="text" id="ut-med-' + i + '-carg" placeholder="—"></td>' +
+      '<td><input type="text" id="ut-med-' + i + '-admin" placeholder="—"></td>' +
+    '</tr>'
+  ).join('');
+}
+
+function calcEdad() {
+  const dobStr = document.getElementById('ut-fecha-nac').value;
+  const edadEl = document.getElementById('ut-edad');
+  if (!dobStr) { edadEl.value = ''; return; }
+  const dob = new Date(dobStr), now = new Date();
+  let years = now.getFullYear() - dob.getFullYear();
+  const m = now.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) years--;
+  edadEl.value = years + ' años';
+}
+
+function _timeToMin(t) {
+  if (!t) return null;
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function calcElapsed() {
+  const inicio = _timeToMin(document.getElementById('ut-tl-inicio_rcp').value);
+  UT_TIMELINE.forEach(e => {
+    const el = document.getElementById('ut-tl-' + e.id + '-min');
+    if (inicio == null) { el.textContent = '—'; return; }
+    const t = _timeToMin(document.getElementById('ut-tl-' + e.id).value);
+    if (t == null) { el.textContent = '—'; return; }
+    let diff = t - inicio;
+    if (diff < 0) diff += 24 * 60; // cruce de medianoche
+    el.textContent = (e.id === 'inicio_rcp' ? '0' : diff) + ' min';
+  });
+  document.getElementById('ut-elapsed-tile').textContent = inicio == null
+    ? 'Introduce «Inicio RCP» para calcular los minutos transcurridos de cada hito.'
+    : 'Minutos transcurridos calculados desde «Inicio de RCP».';
+}
+
+function _val(id) { const el = document.getElementById(id); return el ? (el.value || '') : ''; }
+function _chk(name) { return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked')).map(i => i.parentElement.textContent.trim()).join(', ') || '—'; }
+function _radio(name) { const el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.parentElement.textContent.trim() : '—'; }
+
+function generarTextoRegistro() {
+  const timeline = UT_TIMELINE.map(e => {
+    const h = _val('ut-tl-' + e.id);
+    const nd = document.getElementById('ut-tl-' + e.id + '-nd').checked;
+    const min = document.getElementById('ut-tl-' + e.id + '-min').textContent;
+    return '- ' + e.label + ': ' + (nd ? 'ND (no dato)' : (h || '—')) + (min !== '—' ? ' (' + min + ')' : '');
+  }).join('\n');
+
+  const medicacion = UT_MEDICACION.map((m, i) => {
+    const usado = document.getElementById('ut-med-' + i + '-uso').checked;
+    if (!usado) return null;
+    const carg = _val('ut-med-' + i + '-carg'), admin = _val('ut-med-' + i + '-admin');
+    return '- ' + m + (carg ? ' (cargadas: ' + carg + ')' : '') + (admin ? ' (administradas: ' + admin + ')' : '');
+  }).filter(Boolean).join('\n') || '(ninguna marcada)';
+
+  return `REGISTRO UTSTEIN DE PARO CARDIO-RESPIRATORIO INTRAHOSPITALARIO
+Institución: ${_val('ut-institucion')} · Cód. MinSalud: ${_val('ut-cod-minsalud')}
+Paciente: ${_val('ut-nombre')} · H.C.: ${_val('ut-hc')}
+Fecha nacimiento: ${_val('ut-fecha-nac')} · Edad: ${_val('ut-edad')} · Sexo: ${_val('ut-sexo')}
+Peso: ${_val('ut-peso')} kg · Talla: ${_val('ut-talla')} cm
+Fecha del evento: ${_val('ut-fecha-evento')} · Hora: ${_val('ut-hora-evento')}
+
+--- UBICACIÓN ---
+${_chk('ut-ubic')}${_val('ut-ubic-otra') ? ' · Otra: ' + _val('ut-ubic-otra') : ''}
+
+--- CONTEXTO PREVIO ---
+Testigo: ${_val('ut-testigo')} · Enfermedad de base: ${_val('ut-enf-base')} · Actividad previa: ${_val('ut-actividad-previa')}
+Presenciado: ${_val('ut-presenciado')} · Monitorizado: ${_val('ut-monitorizado')}
+
+--- ESTADO PREVIO / INTERVENCIONES EN EL LUGAR ---
+Estado previo: ${_chk('ut-estado-previo')}
+Soporte vital avanzado: ${_chk('ut-svaz')}
+
+--- CAUSA ---
+Causa de hospitalización: ${_val('ut-causa-hosp')} (${_val('ut-fecha-hosp')})
+Causa precipitante del paro: ${_radio('ut-causa-paro')}${_val('ut-causa-otra') ? ' (' + _val('ut-causa-otra') + ')' : ''}
+
+--- INTENTO DE RESUCITACIÓN ---
+¿Se intentó?: ${_val('ut-intento')}
+Detalle: ${_chk('ut-intento-detalle')}
+
+--- PRIMER RITMO OBSERVADO ---
+${_radio('ut-ritmo')}
+
+--- PERSONAL Y MOTIVO DEL AVISO ---
+Enfermería: ${_val('ut-pers-enf')} · Cardiología: ${_val('ut-pers-card')} · Anestesia: ${_val('ut-pers-anes')} · Medicina interna: ${_val('ut-pers-mi')} · Responsable: ${_val('ut-pers-resp')}
+Motivo del aviso: ${_val('ut-motivo-aviso')}
+
+--- CRONOLOGÍA (min desde inicio RCP) ---
+${timeline}
+
+--- MANIOBRAS Y EQUIPO ---
+Tiempo de maniobras: ${_val('ut-tiempo-maniobras')} min · Tiempo de llegada del equipo: ${_val('ut-tiempo-llegada')} min
+Número de equipo: ${_val('ut-num-equipo')} · Número de desfibrilaciones: ${_val('ut-num-desfib')}
+Resultado inicial: ${_val('ut-resultado-inicial')}
+Dispositivos: ${_chk('ut-dispositivo')}
+
+--- MEDICACIÓN UTILIZADA ---
+${medicacion}
+
+--- TIEMPO DE CIRCULACIÓN ESPONTÁNEA POST-RCP ---
+${_radio('ut-tce')}
+
+--- DESENLACE ---
+Causa de muerte: ${_radio('ut-causa-muerte')}
+Confirmado por: ${_val('ut-confirmado-por')}
+Muerte intrahospitalaria: ${_val('ut-muerte-fecha')} ${_val('ut-muerte-hora')}
+Egreso vivo: ${_val('ut-egreso-fecha')}
+Estado funcional al egreso: ${_val('ut-estado-funcional')}
+
+--- OBSERVACIONES ---
+${_val('ut-obs') || '(sin observaciones)'}
+
+--- DILIGENCIAMIENTO ---
+${_val('ut-diligencio')} (${_val('ut-cargo')})`;
+}
+
+function descargarRegistro() {
+  const texto = generarTextoRegistro();
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = _val('ut-fecha-evento') || new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'registro-utstein-' + fecha + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function _setValIf(id, val) { if (val) document.getElementById(id).value = val; }
+
+function aplicarDatosPcr(d) {
+  _setValIf('ut-presenciado', d.presenciado === 'si' ? 'Sí' : d.presenciado === 'no' ? 'No' : '');
+  _setValIf('ut-monitorizado', d.monitorizado === 'si' ? 'Sí' : d.monitorizado === 'no' ? 'No' : '');
+  if (d.descargasLog && d.descargasLog.length) _setValIf('ut-num-desfib', d.descargasLog.length);
+
+  if (d.eventos) {
+    if (d.eventos.reconocimiento && d.eventos.reconocimiento.chk) {
+      const chk = document.querySelector('input[name="ut-estado-previo"]');
+      if (chk) chk.checked = true; // "Inconsciente" es la primera opción del grupo
+    }
+    Object.keys(PCR_A_UT_EVENTO).forEach(pcrId => {
+      const ev = d.eventos[pcrId];
+      const utId = PCR_A_UT_EVENTO[pcrId];
+      /* Basta con que tenga hora: el checkbox del checklist y la hora
+         pueden diligenciarse por separado, no forzar ambos. */
+      if (ev && ev.hora) _setValIf('ut-tl-' + utId, ev.hora);
+    });
+    /* Respaldo: si "Primera dosis de adrenalina" no tiene hora en el
+       checklist de eventos pero sí se registró en la fila del fármaco. */
+    if ((!d.eventos.primera_adrenalina || !d.eventos.primera_adrenalina.hora) && d.farmacos && d.farmacos.adrenalina && d.farmacos.adrenalina.hora) {
+      _setValIf('ut-tl-primera_epinefrina', d.farmacos.adrenalina.hora);
+    }
+    calcElapsed();
+    if (d.eventos.rce && d.eventos.rce.chk) document.getElementById('ut-resultado-inicial').value = 'Recuperación';
+    else if (d.eventos.suspension && d.eventos.suspension.chk) document.getElementById('ut-resultado-inicial').value = 'Éxitus';
+  }
+
+  if (d.farmacos) {
+    Object.values(d.farmacos).forEach(f => {
+      if (!f.chk) return;
+      const idx = UT_MEDICACION.findIndex(m => f.nombre.toLowerCase().startsWith(m.toLowerCase()));
+      if (idx < 0) return;
+      document.getElementById('ut-med-' + idx + '-uso').checked = true;
+      document.getElementById('ut-med-' + idx + '-admin').value = f.total || ('1ª dosis' + (f.hora ? ' ' + f.hora : ''));
+    });
+  }
+
+  const obsPartes = [];
+  if (d.ritmoLog && d.ritmoLog.length) {
+    obsPartes.push('Cambios de ritmo registrados en el tab PCR:\n' + d.ritmoLog.map((r, i) => (i + 1) + '. ' + r.label + ' — ' + r.hora).join('\n'));
+  }
+  if (d.descargasLog && d.descargasLog.length) {
+    obsPartes.push('Desfibrilaciones registradas en el tab PCR:\n' + d.descargasLog.map((r, i) =>
+      (i + 1) + '. ' + r.hora + (r.energia ? ' — ' + r.energia + ' J' : '') + (r.doble ? ' — doble simultánea' : '')
+    ).join('\n'));
+  }
+  if (d.ciclos) obsPartes.push('Ciclos de RCP (2 min) completados: ' + d.ciclos);
+  if (d.causas && d.causas.length) obsPartes.push('Causas reversibles marcadas (4H/4T): ' + d.causas.join(', '));
+  if (d.postRosc && d.postRosc.length) obsPartes.push('Cuidados post-RCE marcados: ' + d.postRosc.join(', '));
+  if (d.obs) obsPartes.push('Observaciones del tab PCR: ' + d.obs);
+  if (obsPartes.length) document.getElementById('ut-obs').value = obsPartes.join('\n\n');
+
+  const banner = document.createElement('div');
+  banner.className = 'tile no-print';
+  banner.style.marginBottom = '10px';
+  banner.textContent = 'Datos cargados automáticamente desde el tab PCR de este evento. Completa el resto (datos identificativos, personal, desenlace) y revisa antes de imprimir o descargar.';
+  document.querySelector('.sheet').insertBefore(banner, document.querySelector('.sheet').children[3]);
+}
+
+renderTimeline();
+renderMedicacion();
+document.getElementById('ut-fecha-evento').value = new Date().toISOString().slice(0, 10);
+
+try {
+  const raw = sessionStorage.getItem('urg-pcr-handoff');
+  if (raw) {
+    aplicarDatosPcr(JSON.parse(raw));
+    sessionStorage.removeItem('urg-pcr-handoff');
+  }
+} catch (e) {}
+</script>
+</body>
+</html>

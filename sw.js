@@ -1,7 +1,7 @@
 // SUBIR ESTA VERSION EN CADA CAMBIO DE data/*.js O index.html.
 // El fetch es cache-first: sin bump, quien ya tenga la app instalada seguira
 // viendo el contenido clinico antiguo indefinidamente.
-const CACHE = 'urg-v47';
+const CACHE = 'urg-v51';
 const ASSETS = [
   '/',
   '/index.html',
@@ -12,10 +12,12 @@ const ASSETS = [
   '/data/drugs.js',
   '/data/infusions.js',
   '/data/intubacion.js',
+  '/data/pcr.js',
   '/data/fichas.js',
   '/data/bibliografia.js',
   '/manifest.json',
   '/icon.svg',
+  '/registro-utstein.html',
   '/codigos/C01._Codi_infart_agut_de_miocardi_(IAM).pdf',
   '/codigos/C02._Codi_ictus.pdf',
   '/codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf',
