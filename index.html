@@ -379,8 +379,11 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 24px 16px;
+  /* Sin hueco arriba: con padding/margen superior, el contenido de la
+     ficha se colaba por encima de la cabecera sticky al desplazar. */
+  padding: 0 16px 24px;
   overflow-y: auto;
+  gap: 14px;
 }
 .ficha-modal {
   background: var(--bg2);
@@ -388,7 +391,6 @@ body {
   border-radius: 10px;
   max-width: 720px;
   width: 100%;
-  margin-top: 20px;
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
 }
 .ficha-head {
@@ -477,6 +479,71 @@ body {
 .ficha-section.ficha-nota .ficha-section-title { color: var(--blue); }
 .ficha-src { font-size: 11px; color: var(--text2); margin-top: 8px; }
 .ficha-src a { color: var(--blue); }
+.ficha-top {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg2);
+  border-radius: 10px 10px 0 0;
+}
+.ficha-top .ficha-head { position: static; }
+
+/* Calculadora como ventana propia al costado de la ficha, no dentro de
+   ella: se queda fija mientras se lee la ficha completa. */
+.ficha-calc-panel {
+  width: 288px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+.ficha-calc-head {
+  padding: 10px 14px;
+  background: var(--blue-bg);
+  border-bottom: 1px solid var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+}
+.ficha-calc-farmaco {
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+}
+.ficha-calc-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+.ficha-calc-res {
+  font-family: var(--mono);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 8px 10px;
+  background: var(--bg3);
+  border-radius: 6px;
+}
+.ficha-calc-meta { font-size: 11.5px; color: var(--text2); line-height: 1.45; }
+.ficha-calc-aviso { font-size: 10.5px; color: var(--amber); line-height: 1.45; }
+.ficha-calc-perf {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  font-size: 11.5px;
+  color: var(--text2);
+  line-height: 1.45;
+}
+.ficha-calc-perf .btn { margin-top: 8px; width: 100%; }
+/* Pantallas estrechas: la calculadora pasa arriba, a lo ancho */
+@media (max-width: 1080px) {
+  .ficha-overlay { flex-direction: column; align-items: center; }
+  .ficha-calc-panel { width: 100%; max-width: 720px; order: -1; }
+}
 .ficha-list-btn {
   display: block;
   width: 100%;
@@ -1111,6 +1178,7 @@ body {
 
 <div class="ficha-overlay" id="ficha-overlay" style="display:none" onclick="if(event.target===this) closeFicha()">
   <div class="ficha-modal" id="ficha-modal" role="dialog" aria-modal="true" aria-labelledby="ficha-modal-title" tabindex="-1"></div>
+  <aside class="ficha-calc-panel" id="ficha-calc-panel" style="display:none" aria-label="Calculadora de dosis"></aside>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
@@ -2673,20 +2741,287 @@ function _fichaSection(title, text, cls) {
     '</div><div class="ficha-section-text">' + text.replace(/\n/g, '<br>') + '</div></div>';
 }
 
+/* ==================================================================
+   FICHAS — calculadora de dosis por peso, extraída del texto libre
+   de "Dosis / vía de administración" de la ficha activa.
+   Cada línea del texto que contenga un patrón "X(-Y) unidad/kg" se
+   convierte en una opción seleccionable (indicación + vía si se
+   detecta). NO es una fuente de dosis independiente: siempre muestra
+   la línea original para verificación manual antes de administrar.
+   ================================================================== */
+const FICHA_RUTA_PATRONES = [
+  [/\bi\.?v\.?\b|intravenos/i, 'IV'],
+  [/\bi\.?m\.?\b|intramuscular/i, 'IM'],
+  [/\bs\.?c\.?\b|subcut[aá]ne[ao]/i, 'SC'],
+  [/\bv\.?o\.?\b|v[ií]a oral|\boral\b/i, 'Oral'],
+  [/sublingual/i, 'Sublingual'],
+  [/rectal/i, 'Rectal'],
+  [/neb\.?\b|nebuliz/i, 'Nebulizada'],
+  [/\bi\.?o\.?\b|intra[oó]se[ao]/i, 'IO'],
+  [/t[oó]pic[ao]/i, 'Tópica'],
+  [/intranasal/i, 'Intranasal'],
+  [/perineural/i, 'Perineural']
+];
+
+/* Vía(s) de administración detectadas en la línea. */
+function _fichaDetectarRutas(linea) {
+  const rutas = [];
+  FICHA_RUTA_PATRONES.forEach(([re, label]) => { if (re.test(linea) && !rutas.includes(label)) rutas.push(label); });
+  return rutas;
+}
+
+/* La INDICACIÓN es el motivo clínico (sedación, convulsiones, analgesia…),
+   no la vía. Se toma el texto antes de los dos puntos y se descarta si en
+   realidad describe vía, forma de administración, población, banda de peso
+   o una instrucción — en esos casos la dosis es "general". */
+const RE_FICHA_NO_INDICACION = /^(?:(?:v[ií]a|por v[ií]a|bolo|perfusi[oó]n|infusi[oó]n|dosis|adulto|adultos|ni[nñ]os?|adolescentes?|lactantes?|neonatos?|pediatr[ií]a|mantenimiento|inducci[oó]n|inicial|carga|est[aá]ndar|estandarizad[oa]|continu[oa]|lent[oa]|r[aá]pid[oa]|[uú]nic[oa]|intravenosa|intramuscular|subcut[aá]nea|oral|sublingual|rectal|nebulizada|intra[oó]sea|intranasal|i\.?v\.?|i\.?m\.?|s\.?c\.?|v\.?o\.?|i\.?o\.?|iv|im|sc|vo|io)[\s.,/y+o-]*)+$/i;
+const RE_FICHA_BANDA_PESO = /^\d+(?:[.,]\d+)?\s*(?:[-–—]\s*\d+(?:[.,]\d+)?)?\s*kg$/i;
+const RE_FICHA_INSTRUCCION = /^(calcule|administre|diluya|valore|considere|repita|inicie|ajuste|prepare|reconstituya|use|utilice)\b/i;
+
+function _fichaExtraerIndicacion(linea) {
+  const t = linea.trim().replace(/^[•◦·*\-\s▪]+/, '');
+  const i = t.indexOf(':');
+  if (i === -1 || i > 70) return '';
+  const cand = t.slice(0, i).trim();
+  if (!cand || RE_FICHA_NO_INDICACION.test(cand) || RE_FICHA_BANDA_PESO.test(cand) || RE_FICHA_INSTRUCCION.test(cand)) return '';
+  return cand;
+}
+
+const RE_FICHA_DOSIS_KG = /(\d+(?:[.,]\d+)?)\s*(?:[-–—]\s*(\d+(?:[.,]\d+)?))?\s*(mg|mcg|microgramos|g|UI|ml|mEq|mmol)\s*\/\s*kg(?:\s*\/\s*(d[ií]a|h|hora|min|dosis))?/i;
+
+/* ------------------------------------------------------------------
+   Reparación de tablas aplanadas por la extracción del PDF original.
+   Varias fichas (Clonazepam, Midazolam, Propofol, Rocuronio,
+   Noradrenalina, Nitroglicerina, Isoprenalina, Somatostatina) traían la
+   tabla de perfusión convertida en una columna de números sueltos, que
+   se mostraba como basura al final de "Dosis / vía de administración".
+   Se limpia en el render (no en `data/fichas.js`, que se regenera desde
+   `medicamentos/*.md`). Las tablas markdown bien extraídas se conservan;
+   solo se repara la etiqueta de fila que quedó huérfana (Nitroprusiato).
+   ------------------------------------------------------------------ */
+const RE_FICHA_SOLO_NUM = /^\d+(?:[.,]\d+)?$/;
+const FICHA_VOCAB_TABLA = new Set([
+  'mg', 'mcg', 'microgramo', 'microgramos', 'ml', 'l', 'ui', 'meq', 'mmol',
+  'kg', 'h', 'hora', 'horas', 'min', 'dia', 'día', 'dosis', 'peso', 'pes', 'de'
+]);
+const FICHA_AVISO_TABLA = '(tabla de perfusión omitida: no se extrajo correctamente del PDF original — usar la pestaña Perfusión IV para el cálculo de mL/h)';
+
+function _fichaEsCeldaTabla(linea) {
+  const t = linea.trim();
+  if (!t || t.length > 34 || t.endsWith(':') || t.startsWith('|')) return false;
+  const tokens = t.toLowerCase().replace(/[()*]/g, ' ').split(/[\s/]+/).filter(Boolean);
+  if (!tokens.length) return false;
+  return tokens.every(tk => RE_FICHA_SOLO_NUM.test(tk) || FICHA_VOCAB_TABLA.has(tk));
+}
+
+function limpiarTablaAplanada(texto) {
+  if (!texto) return texto;
+  const L = texto.split('\n');
+  for (let i = 0; i < L.length - 1; i++) {
+    if (L[i] !== null && RE_FICHA_SOLO_NUM.test(L[i].trim()) && /^\s*\|\s*\|/.test(L[i + 1])) {
+      L[i + 1] = L[i + 1].replace(/^(\s*\|)\s*\|/, '$1 ' + L[i].trim() + ' |');
+      L[i] = null;
+    }
+  }
+  const L2 = L.filter(l => l !== null);
+  const reparado = L2.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  const celda = L2.map(_fichaEsCeldaTabla);
+  let inicio = -1;
+  for (let i = 0; i < L2.length; i++) {
+    if (!celda[i]) continue;
+    const resto = celda.slice(i);
+    const n = resto.filter(Boolean).length;
+    if (n >= 3 && n / resto.length >= 0.6) { inicio = i; break; }
+  }
+  if (inicio === -1) return reparado;
+  const out = [];
+  L2.forEach((l, i) => {
+    if (i < inicio || !celda[i]) out.push(l);
+    else if (i === inicio) out.push(FICHA_AVISO_TABLA);
+  });
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/* Una dosis con periodo /h, /min u /hora es una velocidad de perfusión
+   continua, no un bolo — igual que si el texto menciona explícitamente
+   "perfusión/infusión continua". Esas quedan fuera de la calculadora
+   de bolo: para eso ya existe la pestaña Perfusión IV. */
+function _fichaEsPerfusion(linea, periodo) {
+  return ['h', 'hora', 'min'].includes(periodo) || /perfusi[oó]n continua|infusi[oó]n continua/i.test(linea);
+}
+
+function parseDosisPorKg(texto) {
+  if (!texto) return [];
+  return texto.split('\n').reduce((opciones, linea) => {
+    const m = linea.match(RE_FICHA_DOSIS_KG);
+    if (!m) return opciones;
+    let label = linea.trim().replace(/^[•◦·*\-\s]+/, '');
+    if (label.length > 90) label = label.slice(0, 87) + '…';
+    const periodo = m[4] ? m[4].toLowerCase().replace('í', 'i') : '';
+    opciones.push({
+      min: parseFloat(m[1].replace(',', '.')),
+      max: m[2] ? parseFloat(m[2].replace(',', '.')) : null,
+      unidad: m[3],
+      periodo,
+      indicacion: _fichaExtraerIndicacion(linea),
+      rutas: _fichaDetectarRutas(linea),
+      esPerfusion: _fichaEsPerfusion(linea, periodo),
+      label,
+      raw: linea.trim()
+    });
+    return opciones;
+  }, []);
+}
+
+let _fichaCalcOpciones = [];       // solo bolo / dosis única (lo que calcula esta calculadora)
+let _fichaCalcOpcionesPerfusion = []; // dosis en perfusión continua detectadas (redirige a Perfusión IV)
+let _fichaCalcNombre = '';
+let _fichaCalcPesoUltimo = '';
+
+/* El nombre en INFUSIONS puede llevar sufijo ("Rocuronio (mantenimiento)"),
+   así que se busca coincidencia exacta y, si no, por prefijo. */
+function _fichaNombreEnInfusiones(nombre) {
+  const lista = window.INFUSIONS || [];
+  const exacto = lista.find(d => d.name === nombre);
+  if (exacto) return exacto.name;
+  const porPrefijo = lista.find(d => d.name.toLowerCase().startsWith(nombre.toLowerCase()));
+  return porPrefijo ? porPrefijo.name : null;
+}
+
+function irAPerfusion(nombre) {
+  const enInfusiones = _fichaNombreEnInfusiones(nombre);
+  closeFicha();
+  showTab('perfusiones', document.getElementById('navbtn-perfusiones'));
+  const sel = document.getElementById('inf-farmaco');
+  if (sel && enInfusiones) {
+    sel.value = enInfusiones;
+    selectInfusionDrug();
+  }
+}
+
+const FICHA_IND_GENERAL = 'Dosis general';
+
+/* Indicaciones únicas, en el orden en que aparecen en la ficha. */
+function _fichaIndicaciones() {
+  const vistas = [];
+  _fichaCalcOpciones.forEach(o => {
+    const ind = o.indicacion || FICHA_IND_GENERAL;
+    if (!vistas.includes(ind)) vistas.push(ind);
+  });
+  return vistas;
+}
+
+/* Vías disponibles para una indicación. Una misma línea puede valer para
+   varias vías con la misma dosis (p.ej. "IM o subcutánea"), y a la vez una
+   indicación puede tener dosis DISTINTAS según la vía (Ketamina: IV 0,25-0,5
+   vs IM/intranasal 2-4 mg/kg) — por eso cada vía apunta a su propia opción. */
+function _fichaViasDeIndicacion(ind) {
+  const vias = [];
+  _fichaCalcOpciones.forEach((o, idx) => {
+    if ((o.indicacion || FICHA_IND_GENERAL) !== ind) return;
+    const rutas = o.rutas.length ? o.rutas : ['(vía no especificada)'];
+    rutas.forEach(r => { if (!vias.some(v => v.via === r)) vias.push({ via: r, idx }); });
+  });
+  return vias;
+}
+
+function _fichaCalcPanelHTML(nombre, opcionesBolo, opcionesPerfusion) {
+  if (!opcionesBolo.length && !opcionesPerfusion.length) return '';
+  const enInfusiones = !!_fichaNombreEnInfusiones(nombre);
+  let html = '<div class="ficha-calc-head">🧮 Dosis en bolo / dosis única' +
+    '<div class="ficha-calc-farmaco">' + nombre + '</div></div>' +
+    '<div class="ficha-calc-body">';
+  if (opcionesBolo.length) {
+    html += '<div class="field"><label for="ficha-calc-peso">Peso real (kg)</label>' +
+        '<input type="number" id="ficha-calc-peso" min="0" step="any" oninput="calcFichaDosis()"></div>' +
+      '<div class="field" id="ficha-calc-ind-wrap" style="display:none"><label for="ficha-calc-indicacion">Indicación</label>' +
+        '<select id="ficha-calc-indicacion" onchange="onFichaIndicacionChange()"></select></div>' +
+      '<div class="field" id="ficha-calc-via-wrap" style="display:none"><label for="ficha-calc-via">Vía de administración</label>' +
+        '<select id="ficha-calc-via" onchange="calcFichaDosis()"></select></div>' +
+      '<div class="ficha-calc-res" id="ficha-calc-resultado" aria-live="polite">Introduce el peso</div>' +
+      '<div class="ficha-calc-meta" id="ficha-calc-contexto"></div>' +
+      '<div class="ficha-src" id="ficha-calc-fuente"></div>' +
+      '<div class="ficha-calc-aviso">⚠️ Dosis extraída del texto de esta ficha (peso real, no ideal). Verifícala contra "Dosis / vía de administración" antes de administrar.</div>';
+  } else {
+    html += '<div class="ficha-calc-meta">Esta ficha solo tiene dosis en perfusión continua — no hay bolo/dosis única que calcular.</div>';
+  }
+  if (opcionesPerfusion.length) {
+    html += '<div class="ficha-calc-perf">💧 También tiene dosis en <strong>perfusión continua</strong> (' + opcionesPerfusion.length + ').' +
+      (enInfusiones
+        ? '<button class="btn" onclick="irAPerfusion(\'' + nombre.replace(/'/g, "\\'") + '\')">Ir a Perfusión IV →</button>'
+        : '<div class="ficha-calc-meta">No disponible en la pestaña Perfusión IV: revisa el texto completo de la ficha.</div>') +
+    '</div>';
+  }
+  return html + '</div>';
+}
+
+function renderFichaCalc() {
+  const selInd = document.getElementById('ficha-calc-indicacion');
+  if (!selInd) return;
+  const inds = _fichaIndicaciones();
+  const wrapInd = document.getElementById('ficha-calc-ind-wrap');
+  // Con una sola indicación el selector no aporta: se oculta y se muestra en el contexto
+  wrapInd.style.display = inds.length > 1 ? '' : 'none';
+  selInd.innerHTML = inds.map(i => '<option value="' + i.replace(/"/g, '&quot;') + '">' + i + '</option>').join('');
+  const pesoEl = document.getElementById('ficha-calc-peso');
+  if (pesoEl && _fichaCalcPesoUltimo) pesoEl.value = _fichaCalcPesoUltimo;
+  onFichaIndicacionChange();
+}
+
+function onFichaIndicacionChange() {
+  const selInd = document.getElementById('ficha-calc-indicacion');
+  const selVia = document.getElementById('ficha-calc-via');
+  if (!selInd || !selVia) return;
+  const vias = _fichaViasDeIndicacion(selInd.value || _fichaIndicaciones()[0]);
+  document.getElementById('ficha-calc-via-wrap').style.display = vias.length > 1 ? '' : 'none';
+  selVia.innerHTML = vias.map(v => '<option value="' + v.idx + '">' + v.via + '</option>').join('');
+  calcFichaDosis();
+}
+
+function calcFichaDosis() {
+  const resEl = document.getElementById('ficha-calc-resultado');
+  if (!resEl || !_fichaCalcOpciones.length) return;
+  const pesoEl = document.getElementById('ficha-calc-peso');
+  const peso = parseFloat(pesoEl.value);
+  _fichaCalcPesoUltimo = pesoEl.value;
+  const selVia = document.getElementById('ficha-calc-via');
+  const idx = selVia && selVia.value !== '' ? parseInt(selVia.value) : 0;
+  const o = _fichaCalcOpciones[idx] || _fichaCalcOpciones[0];
+  const fuenteEl = document.getElementById('ficha-calc-fuente');
+  const ctxEl = document.getElementById('ficha-calc-contexto');
+  const via = selVia && selVia.selectedIndex >= 0 ? selVia.options[selVia.selectedIndex].text : (o.rutas[0] || '');
+  ctxEl.textContent = (o.indicacion || FICHA_IND_GENERAL) + (via ? ' · ' + via : '') +
+    ' · pauta ' + _fmt(o.min, 3) + (o.max != null && o.max !== o.min ? '–' + _fmt(o.max, 3) : '') + ' ' + o.unidad + '/kg';
+  if (!peso || peso <= 0) {
+    resEl.textContent = 'Introduce el peso';
+    fuenteEl.textContent = '';
+    return;
+  }
+  const dMin = o.min * peso;
+  const dMax = o.max != null ? o.max * peso : null;
+  const cifra = (dMax != null && dMax !== dMin) ? _fmt(dMin, 2) + '–' + _fmt(dMax, 2) : _fmt(dMin, 2);
+  resEl.textContent = cifra + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '');
+  fuenteEl.textContent = 'Texto original: "' + o.raw + '"';
+}
+
 function _fichaHTML(f) {
-  let html = '<div class="ficha-head"><div>' +
+  /* La calculadora NO va aquí: vive en #ficha-calc-panel, una ventana
+     aparte al costado de la ficha (ver _fichaCalcPanelHTML). */
+  let html = '<div class="ficha-top">' +
+    '<div class="ficha-head"><div>' +
       '<div class="ficha-name" id="ficha-modal-title">' + f.nombre + '</div>' +
       (f.subtitulo ? '<div class="ficha-subtitulo">' + f.subtitulo + '</div>' : '') +
     '</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' +
       (f.altoRiesgo ? '<span class="badge badge-red">Alto riesgo</span>' : '') +
       '<button class="ficha-close" onclick="closeFicha()" aria-label="Cerrar">✕</button>' +
-    '</div></div>';
+    '</div></div>' +
+  '</div>';
   html += '<div class="ficha-body">';
   if (f.alerta) html += '<div class="ficha-alerta">⚠️ ' + f.alerta + '</div>';
   html += _fichaSection('Presentación', f.presentacion);
   html += _fichaSection('Propiedades', f.propiedades);
   html += _fichaSection('Indicaciones', f.indicaciones);
-  html += _fichaSection('Dosis / vía de administración', f.dosis);
+  html += _fichaSection('Dosis / vía de administración', limpiarTablaAplanada(f.dosis));
   html += _fichaSection('Pediatría', f.pediatria, 'ficha-nota');
   html += _fichaSection('Contraindicaciones', f.contraindicaciones, 'ficha-riesgo');
   html += _fichaSection('Efectos secundarios', f.efectosSecundarios, 'ficha-adverso');
@@ -2708,15 +3043,28 @@ function showFicha(file) {
   const f = (window.FICHAS || []).find(x => x.file === file);
   if (!f) { console.warn('Ficha no encontrada:', file); return; }
   _fichaTriggerEl = document.activeElement;
+  const todas = parseDosisPorKg(limpiarTablaAplanada(f.dosis || ''));
+  _fichaCalcOpciones = todas.filter(o => !o.esPerfusion);
+  _fichaCalcOpcionesPerfusion = todas.filter(o => o.esPerfusion);
   const modal = document.getElementById('ficha-modal');
   modal.classList.remove('galeria-modal');
   modal.innerHTML = _fichaHTML(f);
-  document.getElementById('ficha-overlay').style.display = 'flex';
+  const panel = document.getElementById('ficha-calc-panel');
+  const panelHTML = _fichaCalcPanelHTML(f.nombre, _fichaCalcOpciones, _fichaCalcOpcionesPerfusion);
+  panel.innerHTML = panelHTML;
+  panel.style.display = panelHTML ? '' : 'none';
+  const overlay = document.getElementById('ficha-overlay');
+  overlay.style.display = 'flex';
+  overlay.scrollTop = 0; // sin esto, la ficha nueva hereda el scroll de la anterior
   modal.focus();
+  renderFichaCalc();
 }
 
 function closeFicha() {
   document.getElementById('ficha-overlay').style.display = 'none';
+  const panel = document.getElementById('ficha-calc-panel');
+  panel.style.display = 'none';
+  panel.innerHTML = '';
   if (_fichaTriggerEl && document.body.contains(_fichaTriggerEl)) _fichaTriggerEl.focus();
   _fichaTriggerEl = null;
 }
@@ -2747,7 +3095,12 @@ function openGaleria(protocolId) {
   const modal = document.getElementById('ficha-modal');
   modal.classList.add('galeria-modal');
   modal.innerHTML = html;
-  document.getElementById('ficha-overlay').style.display = 'flex';
+  const panel = document.getElementById('ficha-calc-panel'); // la galería no usa calculadora
+  panel.style.display = 'none';
+  panel.innerHTML = '';
+  const overlay = document.getElementById('ficha-overlay');
+  overlay.style.display = 'flex';
+  overlay.scrollTop = 0;
   modal.focus();
 }
 
@@ -2756,8 +3109,10 @@ document.addEventListener('keydown', e => {
   if (overlay.style.display === 'none') return;
   if (e.key === 'Escape') { closeFicha(); return; }
   if (e.key !== 'Tab') return;
-  const modal = document.getElementById('ficha-modal');
-  const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  /* El ciclo abarca ficha + panel de calculadora (son hermanos dentro del
+     overlay): si solo mirara el modal, los campos del panel quedarían
+     inalcanzables con teclado. */
+  const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
   if (!focusables.length) return;
   const first = focusables[0], last = focusables[focusables.length - 1];
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
