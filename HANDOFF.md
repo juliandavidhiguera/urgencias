@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-09-03 | **Sesion #:** 4 (continuacion 8) | **Rama:** main | **HEAD:** 312e684 (continuacion 8 pendiente de commit)
+**Ultima actualizacion:** 2026-09-04 | **Sesion #:** 4 (continuacion 9) | **Rama:** main | **HEAD:** 41c54a3 (continuacion 9 pendiente de commit)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -13,7 +13,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | Offline | Service Worker cache-first | `CACHE = 'urg-v47'` | `sw.js` |
 | PWA | Manifest | - | `manifest.json`, `icon.svg` |
 | Hosting | Cloudflare Pages, deploy automatico en push a `main` | - | (integracion nativa GitHub, sin paso de build) |
-| CI | GitHub Action: purga cache de Cloudflare tras deploy | - | `.github/workflows/purge-cache.yml` (espera 90s, purga URLs fijas via `CF_URGENCIAS_PURGE_TOKEN`/`CF_ZONE_ID`) |
+| CI | **Ninguno.** No hay GitHub Actions en el repo (ver decision de sesion 4 continuacion 9) | - | - |
 | Ingesta de fichas | Scripts Node puntuales (no pipeline automatizado) | - | `scripts/parse_fichas.js` (parsea `medicamentos/*.md`, extraido de PDF de Guies Cliniques catalanas), `scripts/merge_fichas.js` (75 fichas → `data/fichas.js`), `scripts/patch_fichas_verificacion.js` |
 
 **Decisiones cerradas (no re-discutir):**
@@ -38,7 +38,6 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `codigos/patrones iam nuevos/*.jpg` | Galeria de patrones ECG de oclusion coronaria (OMI) usada en tab codi-IAM | ESTABLE |
 | `medicamentos/*.md` (75 archivos) | Texto fuente en catalan extraido de PDF de Guies Cliniques — input de `parse_fichas.js` | ESTABLE (fuente, no se edita a mano salvo error de OCR) |
 | `sw.js` | Service worker cache-first, `CACHE='urg-v46'`, precachea tambien `codigos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` | ESTABLE — **recordar bump en cada cambio de datos/HTML** |
-| `.github/workflows/purge-cache.yml` | Purga Cloudflare tras cada push a main (espera 90s) | ESTABLE |
 | `Calculadora_Index_Fragil_VIG.md` | Plantilla original (catalan) del Index Fragil-VIG, trackeada como referencia | ESTABLE |
 
 ## 4. ESTADO ACTUAL - QUE FUNCIONA
@@ -50,6 +49,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - PCR (tab nuevo, sesion 4): verificado en navegador local (servidor estatico + Claude in Chrome, sin errores de consola) — seleccionar ritmo "desfibrilable" + 3 descargas marca adrenalina y amiodarona como "administrar ahora", checklist de eventos/informe copiable-imprimible/reset funcionan, `globalSearch()` encuentra filas del tab PCR sin cambios adicionales (ya cubierto por `.event-row, .drug-row` del selector existente).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 4 (continuacion 9) - 2026-09-04
+- Eliminado: `.github/workflows/purge-cache.yml`. Cierra BUG-6 y backlog #7 por decision explicita del usuario: se le presentaron las dos vias (crear un token de Cloudflare con permiso minimo `Zone · Cache Purge · Purge` y guardarlo como secret, o borrar el workflow) y eligio borrarlo — "con los 5 minutos me sirve", refiriendose al `Cache-Control: public, max-age=300` de `_headers`.
+- El repo se queda **sin CI ni GitHub Actions** (era el unico workflow; al borrarlo, git elimino tambien `.github/workflows/` y `.github/`). El deploy sigue igual: integracion nativa Cloudflare Pages ↔ GitHub en cada push a `main`, que no depende de Actions.
+- Consecuencia practica a recordar: tras un push, el contenido nuevo puede tardar hasta 5 min en llegar al usuario final. `_headers` es ahora la unica palanca sobre esa frescura.
+- Actualizadas todas las referencias obsoletas en este HANDOFF (secciones 2, 3, 6, 7 y 8), que daban el workflow por existente y "ESTABLE".
+- Decision NO tomada por el agente: no se toco `_headers` ni se bajo el `max-age`; el usuario dijo explicitamente que 5 min le sirven.
 
 ### Sesion 4 (continuacion 8) - 2026-09-03
 - Usuario pidio "verificar" lo que habia quedado sin comprobar de la continuacion 7: el layout responsive del panel de la calculadora en pantalla estrecha (<=1080px). **La verificacion encontro 3 bugs reales**; el commit `312e684` ya estaba pusheado con ellos.
@@ -190,7 +196,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 4 | Recorrido clinico completo del tab PCR con un caso simulado extremo a extremo (incl. "Copiar informe" e "Imprimir/Guardar PDF") antes de primer uso real en un codigo | `index.html` (`#tab-pcr`) | P1 | - | Simulacro completo confirmando que el informe generado es util y legible como registro de historia clinica |
 | 5 | Decidir si el tab PCR y `data/pcr.js` deben cubrir dosis pediatricas de paro (actualmente solo dosis fija de adulto) | `data/pcr.js` | P3 | Decision del usuario | Usuario confirma si el alcance pediatrico es necesario; si es asi, definir dosis por peso con Vera+Perplexity antes de implementar |
 | ~~6~~ | ~~Decidir si `registro-utstein.html` debe precargar datos ya diligenciados en el tab PCR~~ — RESUELTO sesion 4 continuacion (2026-09-03): usuario confirmo que debia prellenarse, implementado via traspaso `sessionStorage` (no `localStorage`) al abrir desde el boton del tab PCR | `index.html`, `registro-utstein.html` | - | - | Resuelto: `abrirRegistroUtstein()` + `aplicarDatosPcr()` |
-| 7 | Configurar en GitHub los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` (repo `juliandavidhiguera/urgencias` → Settings → Secrets and variables → Actions) — hoy no existe ninguno (`gh secret list` devuelve vacio), por eso la purga de cache de Cloudflare falla en cada push (ver BUG-6). Requiere que el usuario genere el API token en su cuenta de Cloudflare; el agente no debe manejar esa credencial | `.github/workflows/purge-cache.yml` (no se toca el workflow, falta configuracion externa) | P2 (no bloquea produccion gracias al `Cache-Control` de 5 min, pero deja la purga inoperante desde que se creo el workflow) | Accion del usuario (credencial de Cloudflare) | `gh secret list` muestra ambos secrets y la siguiente ejecucion de "Purgar caché de Cloudflare tras el deploy" termina en success |
+| ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -200,13 +206,14 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~BUG-3~~ | ~~Atropina mostraba rango invertido en intubacion pediatrica (ej. "0.10–0.06 mg")~~ — CORREGIDO sesion 3 (2026-08-27) | Peso <5 kg con Atropina en checklist de intubacion | `doseMinAbs` se aplicaba solo a `mgMin`, no a `mgMax` | Resuelto: floor aplicado a ambos (`index.html:2078`) |
 | ~~BUG-5~~ | ~~Fentanilo: techo de perfusion 3 µg/kg/h en drugs.js vs 2.0 en infusions.js~~ — RESUELTO sesion 3 continuacion (2026-08-27) | - | Mismo patron que BUG-2, no detectado en la primera pasada de auditoria | Consultado Vera+Perplexity (ninguna fuente confirmaba 3.0 ni 2.0 como techo unico; rango aceptado 0.5-10 segun protocolo). Usuario eligio 2.0 (mas conservador). `drugs.js` ya no calcula mL/h de Fentanilo, `infusions.js` (doseMax:2.0) es la unica fuente |
 | ~~BUG-4~~ | ~~PDF y fotos de patrones ECG de codigos de activacion no funcionaban offline~~ — CORREGIDO sesion 3 (2026-08-27) | Abrir "Ver folleto original" o "Ver patrones IAM" sin conexion, primera vez | No estaban en `ASSETS` de `sw.js` | Resuelto: precacheados, `CACHE` bumpeado a `urg-v46` |
-| BUG-6 | El workflow "Purgar caché de Cloudflare tras el deploy" falla en cada push (`exit 22` en el `curl -sf`) | Cualquier push a `main`; confirmado en `7e936c1` (2026-08-27), `799e3d4` y `9f6c67a` (2026-09-03) via `gh run list` | `gh secret list --json name` devuelve `[]` en el repo: los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` que referencia `.github/workflows/purge-cache.yml` nunca se configuraron, asi que `curl` recibe token y zone ID vacios | Bajo — no bloquea produccion: `Cache-Control` a 5 min (commit `14108b3`) refresca el contenido solo; confirmado en sesion 4 que produccion ya sirve `urg-v51` pese al fallo de purga. Ver backlog #7 para el fix (requiere que el usuario configure los secrets) |
+| ~~BUG-6~~ | ~~El workflow "Purgar caché de Cloudflare tras el deploy" falla en cada push (`exit 22` en el `curl -sf`)~~ — RESUELTO 2026-09-04 eliminando el workflow | Cualquier push a `main`; se dio en `7e936c1`, `799e3d4`, `9f6c67a`, `312e684` y `41c54a3` | `gh secret list` devolvia `[]`: los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` nunca se configuraron, asi que `curl` recibia token y zone ID vacios | Resuelto: el usuario opto por borrar el workflow en vez de crear el token de Cloudflare; los 5 min de `Cache-Control` (commit `14108b3`) le bastan. Si algun dia se quiere purga inmediata, hay que recrear el workflow Y crear el token (permiso minimo: Zone · Cache Purge · Purge, solo para la zona de `doctorhiguera.com`) |
 
 ## 8. ENTORNO Y COMANDOS
 - Sin instalacion: es HTML/CSS/JS estatico, se abre `index.html` directo o se sirve con cualquier servidor estatico.
 - Scripts de ingesta de fichas (uso puntual, no en cada sesion): `node scripts/parse_fichas.js` luego `node scripts/merge_fichas.js` (requieren los `scripts/fichas_es_batch*.json` y `medicamentos/*.md` presentes).
 - Deploy: automatico via integracion nativa Cloudflare Pages ↔ GitHub en cada push a `main`. No hay comando manual de deploy en este repo.
-- Purga de cache: automatica por GitHub Action tras push a main (usa secrets `CF_URGENCIAS_PURGE_TOKEN`, `CF_ZONE_ID` — nombres, no valores, configurados en GitHub).
+- Purga de cache: **ya no existe** (workflow eliminado 2026-09-04, ver BUG-6). El contenido nuevo tarda como mucho 5 min en llegar al usuario por el `Cache-Control: public, max-age=300` de `_headers`. Ese archivo es ahora la unica palanca sobre la frescura del contenido en produccion: si alguna vez hace falta que un cambio clinico llegue mas rapido, bajar ese `max-age` es mas simple que reintroducir la purga.
+- No hay CI, ni GitHub Actions, ni secrets configurados en el repo.
 - No hay variables de entorno locales, no hay `.env`.
 - No hay comando de test ni de build.
 
@@ -233,4 +240,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - En la calculadora, **indicacion y via son cosas distintas**: la indicacion es el motivo clinico (sedacion, convulsiones, TVP) y la via el modo de administracion (IV, IM, SC...). Una misma indicacion puede tener dosis DIFERENTES segun la via (Ketamina: IV 0,25-0,5 vs IM/intranasal 2-4 mg/kg), por eso cada via apunta a su propia opcion parseada y el selector de via no es decorativo: cambiarlo cambia el numero.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Responsive del panel verificado y corregido (continuacion 8). Confirmar en un movil/tablet real que el layout en columna se ve bien, ya que aqui solo se pudo forzar la media query, no el viewport. Ademas sigue pendiente: que el usuario configure los secrets de Cloudflare para la purga de cache (backlog #7, BUG-6), y el recorrido clinico completo del tab PCR con caso simulado (backlog #4).
+Confirmar en un movil/tablet real que el layout en columna del panel de la calculadora se ve bien (aqui solo se pudo forzar la media query, no el viewport). Despues, el recorrido clinico completo del tab PCR con un caso simulado antes de usarlo en un codigo real (backlog #4). Cerrados por decision del usuario: la purga de cache (BUG-6/backlog #7, workflow eliminado).
