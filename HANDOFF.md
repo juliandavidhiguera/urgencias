@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-09-03 | **Sesion #:** 4 (continuacion 3) | **Rama:** main | **HEAD:** 799e3d4
+**Ultima actualizacion:** 2026-09-03 | **Sesion #:** 4 (continuacion 4) | **Rama:** main | **HEAD:** 9f6c67a
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -50,6 +50,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - PCR (tab nuevo, sesion 4): verificado en navegador local (servidor estatico + Claude in Chrome, sin errores de consola) — seleccionar ritmo "desfibrilable" + 3 descargas marca adrenalina y amiodarona como "administrar ahora", checklist de eventos/informe copiable-imprimible/reset funcionan, `globalSearch()` encuentra filas del tab PCR sin cambios adicionales (ya cubierto por `.event-row, .drug-row` del selector existente).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 4 (continuacion 4) - 2026-09-03
+- Usuario pidio confirmar el deploy en Cloudflare Pages tras el push de los commits `799e3d4`/`9f6c67a`.
+- Verificado con `gh run list`: "pages build and deployment" del ultimo commit (`9f6c67a`) termino `success`. Confirmado ademas en produccion (`curl` a `https://urgencias.doctorhiguera.com`): `index.html` ya trae `navbtn-pcr`/`registrarDescarga`, `registro-utstein.html` responde 200, `sw.js` ya sirve `urg-v51`.
+- Hallazgo (bug pre-existente, no de esta sesion): el workflow "Purgar caché de Cloudflare tras el deploy" fallo (exit 22, curl -f sobre HTTP de error) tanto para `799e3d4` como para `9f6c67a`, y tambien habia fallado el 2026-08-27 para `7e936c1` (ver seccion 7 BUG-6). Causa raiz confirmada con `gh secret list --json name` sobre `juliandavidhiguera/urgencias`: devuelve `[]` — **no hay NINGUN secret configurado en el repo**, ni `CF_URGENCIAS_PURGE_TOKEN` ni `CF_ZONE_ID`, pese a que `.github/workflows/purge-cache.yml` los referencia. No es bloqueante para el usuario final: `Cache-Control` esta en 5 min (ver seccion 9), asi que el contenido se refresca solo aunque la purga falle; confirmado que ya sirve `urg-v51` en produccion pese al fallo de purga.
+- No se configuraron los secrets (requieren un API token de Cloudflare del usuario — credencial que no se debe manejar por el agente); se le indico al usuario donde agregarlos (GitHub → Settings → Secrets and variables → Actions del repo).
 
 ### Sesion 4 (continuacion 3) - 2026-09-03
 - Usuario reporto que los hitos de la tabla de cronologia del registro Utstein no se rellenaban automaticamente desde el tab PCR. Causa raiz identificada, dos bugs reales en `aplicarDatosPcr()`/estructura de datos, no uno solo:
@@ -138,6 +144,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 4 | Recorrido clinico completo del tab PCR con un caso simulado extremo a extremo (incl. "Copiar informe" e "Imprimir/Guardar PDF") antes de primer uso real en un codigo | `index.html` (`#tab-pcr`) | P1 | - | Simulacro completo confirmando que el informe generado es util y legible como registro de historia clinica |
 | 5 | Decidir si el tab PCR y `data/pcr.js` deben cubrir dosis pediatricas de paro (actualmente solo dosis fija de adulto) | `data/pcr.js` | P3 | Decision del usuario | Usuario confirma si el alcance pediatrico es necesario; si es asi, definir dosis por peso con Vera+Perplexity antes de implementar |
 | ~~6~~ | ~~Decidir si `registro-utstein.html` debe precargar datos ya diligenciados en el tab PCR~~ — RESUELTO sesion 4 continuacion (2026-09-03): usuario confirmo que debia prellenarse, implementado via traspaso `sessionStorage` (no `localStorage`) al abrir desde el boton del tab PCR | `index.html`, `registro-utstein.html` | - | - | Resuelto: `abrirRegistroUtstein()` + `aplicarDatosPcr()` |
+| 7 | Configurar en GitHub los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` (repo `juliandavidhiguera/urgencias` → Settings → Secrets and variables → Actions) — hoy no existe ninguno (`gh secret list` devuelve vacio), por eso la purga de cache de Cloudflare falla en cada push (ver BUG-6). Requiere que el usuario genere el API token en su cuenta de Cloudflare; el agente no debe manejar esa credencial | `.github/workflows/purge-cache.yml` (no se toca el workflow, falta configuracion externa) | P2 (no bloquea produccion gracias al `Cache-Control` de 5 min, pero deja la purga inoperante desde que se creo el workflow) | Accion del usuario (credencial de Cloudflare) | `gh secret list` muestra ambos secrets y la siguiente ejecucion de "Purgar caché de Cloudflare tras el deploy" termina en success |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -147,6 +154,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~BUG-3~~ | ~~Atropina mostraba rango invertido en intubacion pediatrica (ej. "0.10–0.06 mg")~~ — CORREGIDO sesion 3 (2026-08-27) | Peso <5 kg con Atropina en checklist de intubacion | `doseMinAbs` se aplicaba solo a `mgMin`, no a `mgMax` | Resuelto: floor aplicado a ambos (`index.html:2078`) |
 | ~~BUG-5~~ | ~~Fentanilo: techo de perfusion 3 µg/kg/h en drugs.js vs 2.0 en infusions.js~~ — RESUELTO sesion 3 continuacion (2026-08-27) | - | Mismo patron que BUG-2, no detectado en la primera pasada de auditoria | Consultado Vera+Perplexity (ninguna fuente confirmaba 3.0 ni 2.0 como techo unico; rango aceptado 0.5-10 segun protocolo). Usuario eligio 2.0 (mas conservador). `drugs.js` ya no calcula mL/h de Fentanilo, `infusions.js` (doseMax:2.0) es la unica fuente |
 | ~~BUG-4~~ | ~~PDF y fotos de patrones ECG de codigos de activacion no funcionaban offline~~ — CORREGIDO sesion 3 (2026-08-27) | Abrir "Ver folleto original" o "Ver patrones IAM" sin conexion, primera vez | No estaban en `ASSETS` de `sw.js` | Resuelto: precacheados, `CACHE` bumpeado a `urg-v46` |
+| BUG-6 | El workflow "Purgar caché de Cloudflare tras el deploy" falla en cada push (`exit 22` en el `curl -sf`) | Cualquier push a `main`; confirmado en `7e936c1` (2026-08-27), `799e3d4` y `9f6c67a` (2026-09-03) via `gh run list` | `gh secret list --json name` devuelve `[]` en el repo: los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` que referencia `.github/workflows/purge-cache.yml` nunca se configuraron, asi que `curl` recibe token y zone ID vacios | Bajo — no bloquea produccion: `Cache-Control` a 5 min (commit `14108b3`) refresca el contenido solo; confirmado en sesion 4 que produccion ya sirve `urg-v51` pese al fallo de purga. Ver backlog #7 para el fix (requiere que el usuario configure los secrets) |
 
 ## 8. ENTORNO Y COMANDOS
 - Sin instalacion: es HTML/CSS/JS estatico, se abre `index.html` directo o se sirve con cualquier servidor estatico.
@@ -172,4 +180,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - El navegador puede tener un Service Worker previo activo en `localhost` sirviendo una version cacheada vieja de `index.html` incluso tras editar el codigo — para verificar cambios en local hay que recargar la pestaña DOS veces (la primera activa el SW nuevo via `skipWaiting`/`clients.claim()`, la segunda ya sirve el contenido actualizado) o purgar el cache manualmente.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Commiteado y pusheado (`799e3d4`). Hacer un recorrido clinico completo del tab PCR con un caso simulado extremo a extremo, incluyendo el traspaso a `registro-utstein.html` (backlog #4), antes de darlo por listo para uso real en un codigo.
+Deploy confirmado en produccion (`urg-v51` sirviendo, ver seccion 5). Pendiente que el usuario configure los secrets de Cloudflare para la purga de cache (backlog #7, BUG-6). Luego, hacer un recorrido clinico completo del tab PCR con un caso simulado extremo a extremo, incluyendo el traspaso a `registro-utstein.html` (backlog #4), antes de darlo por listo para uso real en un codigo.
