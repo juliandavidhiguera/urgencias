@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-09-04 | **Sesion #:** 4 (continuacion 9) | **Rama:** main | **HEAD:** 41c54a3 (continuacion 9 pendiente de commit)
+**Ultima actualizacion:** 2026-09-16 | **Sesion #:** 4 (continuacion 10) | **Rama:** main | **HEAD:** 877d89b (pusheado y desplegado)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -47,8 +47,16 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Verificacion clinica de contenido con Vera (ver commits `59e4aa7`, `a6d8e14`, `f59c4f3`, `a38bbbb`, `28aa6c0`) — proceso manual, no automatizado.
 - No hay suite de tests ni CI de verificacion funcional: la unica verificacion es lectura de codigo y revision clinica manual.
 - PCR (tab nuevo, sesion 4): verificado en navegador local (servidor estatico + Claude in Chrome, sin errores de consola) — seleccionar ritmo "desfibrilable" + 3 descargas marca adrenalina y amiodarona como "administrar ahora", checklist de eventos/informe copiable-imprimible/reset funcionan, `globalSearch()` encuentra filas del tab PCR sin cambios adicionales (ya cubierto por `.event-row, .drug-row` del selector existente).
+- No indexable desde 2026-09-16: `X-Robots-Tag` en todas las respuestas (`_headers`), `meta robots` en las dos paginas y `robots.txt` que permite el rastreo — verificado en produccion (ver seccion 5).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 4 (continuacion 10) - 2026-09-16
+
+- **URG CLINICO fuera de los buscadores** (decision del usuario, backlog #20 del repo `site`): `_headers` añade `X-Robots-Tag: noindex, nofollow` a `/*`; `index.html` y `registro-utstein.html` llevan `<meta name="robots" content="noindex, nofollow">`; `robots.txt` nuevo que **permite** el rastreo a proposito.
+- Por que se permite el rastreo: bloquearlo en `robots.txt` impediria que Google leyera la orden de no indexar, y la direccion podria acabar indexada igual desde enlaces externos (misma trampa ya documentada en el HANDOFF de `site`, sesion 17).
+- Verificado en produccion tras el deploy (~170 s): `/robots.txt` se sirve como `text/plain` con `Allow: /`; la portada responde 200 con la cabecera y la etiqueta; `registro-utstein.html` redirige 308 a `/registro-utstein` y esa pagina final tambien responde 200 con ambas.
+- Commit: `877d89b`.
 
 ### Sesion 4 (continuacion 9) - 2026-09-04
 - Eliminado: `.github/workflows/purge-cache.yml`. Cierra BUG-6 y backlog #7 por decision explicita del usuario: se le presentaron las dos vias (crear un token de Cloudflare con permiso minimo `Zone · Cache Purge · Purge` y guardarlo como secret, o borrar el workflow) y eligio borrarlo — "con los 5 minutos me sirve", refiriendose al `Cache-Control: public, max-age=300` de `_headers`.
