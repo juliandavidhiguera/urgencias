@@ -1,0 +1,9 @@
+# URG CLÍNICO es una herramienta de consulta para la guardia, no una web
+# pública: no debe aparecer en buscadores.
+#
+# El rastreo se permite A PROPÓSITO. Bloquearlo aquí sería contraproducente:
+# Google no podría leer la orden de no indexar (la etiqueta <meta name="robots">
+# de cada página y la cabecera X-Robots-Tag de _headers) y podría acabar
+# indexando la dirección igualmente a partir de enlaces externos.
+User-agent: *
+Allow: /

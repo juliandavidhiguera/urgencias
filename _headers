@@ -1,2 +1,6 @@
+# URG CLÍNICO no debe salir en buscadores: X-Robots-Tag cubre todo lo que se
+# sirve, incluidas las páginas HTML y los ficheros de datos. El rastreo se
+# permite a propósito en robots.txt para que Google pueda leer esta orden.
 /*
   Cache-Control: public, max-age=300, must-revalidate
+  X-Robots-Tag: noindex, nofollow
