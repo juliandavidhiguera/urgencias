@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-09-16 | **Sesion #:** 4 (continuacion 10) | **Rama:** main | **HEAD:** 877d89b (pusheado y desplegado)
+**Ultima actualizacion:** 2026-09-22 | **Sesion #:** 4 (continuacion 11) | **Rama:** main | **HEAD:** 1d890f3 (pusheado y desplegado)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -48,8 +48,19 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - No hay suite de tests ni CI de verificacion funcional: la unica verificacion es lectura de codigo y revision clinica manual.
 - PCR (tab nuevo, sesion 4): verificado en navegador local (servidor estatico + Claude in Chrome, sin errores de consola) — seleccionar ritmo "desfibrilable" + 3 descargas marca adrenalina y amiodarona como "administrar ahora", checklist de eventos/informe copiable-imprimible/reset funcionan, `globalSearch()` encuentra filas del tab PCR sin cambios adicionales (ya cubierto por `.event-row, .drug-row` del selector existente).
 - No indexable desde 2026-09-16: `X-Robots-Tag` en todas las respuestas (`_headers`), `meta robots` en las dos paginas y `robots.txt` que permite el rastreo — verificado en produccion (ver seccion 5).
+- Cabeceras de seguridad desde 2026-09-22: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` en `/*` — verificado con `curl -I` en produccion (ver seccion 5). Sin CSP todavia (backlog #8).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 4 (continuacion 11) - 2026-09-22
+
+- **Cabeceras de seguridad** (disparado por el CSV de Cloudflare Security Insights del 2026-09-21, revisado en el repo `site`): `_headers` añade al bloque `/*` ya existente `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`.
+- Por que importaba: `curl -I` confirmo que este era el unico de los tres sitios del Dr. (`doctorhiguera.com`, `lpclinics.com`, este) que no enviaba NINGUNA cabecera de seguridad, y es el que maneja el material clinico. El `includeSubDomains` del apex `doctorhiguera.com` solo protege a quien ya visito el dominio padre en ese navegador: la **primera visita directa** a `urgencias.` (un marcador abierto en plena guardia) viajaba sin HSTS.
+- Comprobado ANTES de añadirlas que no rompen nada: `grep` de `getUserMedia|mediaDevices|geolocation|usb|requestPayment` sobre `index.html` y `registro-utstein.html` no devuelve nada (por eso `Permissions-Policy` es seguro), y ningun `iframe` de `site` apunta aqui (por eso `X-Frame-Options: SAMEORIGIN` es seguro).
+- Verificado en produccion tras el deploy: las 5 cabeceras nuevas salen y las 2 previas (`Cache-Control`, `X-Robots-Tag`) siguen intactas. Humo sobre `/`, `/registro-utstein`, `/sw.js`, `/manifest.json` y `/robots.txt`: los 5 en 200 con su `content-type` correcto.
+- **Descartado a proposito: CSP.** `index.html` son 147 KB con scripts inline; una CSP a ciegas romperia la PWA. Queda como backlog #8, no como olvido.
+- Sin bump de `CACHE` en `sw.js`: el cambio es solo de cabeceras HTTP, no toca `index.html` ni `data/*.js`, asi que la trampa de la seccion 9 no aplica.
+- Commit: `1d890f3`.
 
 ### Sesion 4 (continuacion 10) - 2026-09-16
 
@@ -204,6 +215,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 4 | Recorrido clinico completo del tab PCR con un caso simulado extremo a extremo (incl. "Copiar informe" e "Imprimir/Guardar PDF") antes de primer uso real en un codigo | `index.html` (`#tab-pcr`) | P1 | - | Simulacro completo confirmando que el informe generado es util y legible como registro de historia clinica |
 | 5 | Decidir si el tab PCR y `data/pcr.js` deben cubrir dosis pediatricas de paro (actualmente solo dosis fija de adulto) | `data/pcr.js` | P3 | Decision del usuario | Usuario confirma si el alcance pediatrico es necesario; si es asi, definir dosis por peso con Vera+Perplexity antes de implementar |
 | ~~6~~ | ~~Decidir si `registro-utstein.html` debe precargar datos ya diligenciados en el tab PCR~~ — RESUELTO sesion 4 continuacion (2026-09-03): usuario confirmo que debia prellenarse, implementado via traspaso `sessionStorage` (no `localStorage`) al abrir desde el boton del tab PCR | `index.html`, `registro-utstein.html` | - | - | Resuelto: `abrirRegistroUtstein()` + `aplicarDatosPcr()` |
+| 8 | Content-Security-Policy para URG CLINICO. Es la unica cabecera que quedo fuera en la continuacion 11, y a proposito: `index.html` son 147 KB con scripts y estilos inline, asi que exige inventariar cada bloque inline y decidir entre hashes, nonces o `'unsafe-inline'` acotado. Referencia de como quedo en los otros dos sitios: `site/public/_headers` y `lpclinics-site/public/_headers` | `_headers`, `index.html` | P2 | - | `curl -I` devuelve `Content-Security-Policy` y la PWA sigue funcionando entera (tabs, busqueda, fichas, PCR, registro Utstein, offline) sin errores de CSP en consola |
 | ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -248,4 +260,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - En la calculadora, **indicacion y via son cosas distintas**: la indicacion es el motivo clinico (sedacion, convulsiones, TVP) y la via el modo de administracion (IV, IM, SC...). Una misma indicacion puede tener dosis DIFERENTES segun la via (Ketamina: IV 0,25-0,5 vs IM/intranasal 2-4 mg/kg), por eso cada via apunta a su propia opcion parseada y el selector de via no es decorativo: cambiarlo cambia el numero.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Confirmar en un movil/tablet real que el layout en columna del panel de la calculadora se ve bien (aqui solo se pudo forzar la media query, no el viewport). Despues, el recorrido clinico completo del tab PCR con un caso simulado antes de usarlo en un codigo real (backlog #4). Cerrados por decision del usuario: la purga de cache (BUG-6/backlog #7, workflow eliminado).
+Confirmar en un movil/tablet real que el layout en columna del panel de la calculadora se ve bien (aqui solo se pudo forzar la media query, no el viewport). Despues, el recorrido clinico completo del tab PCR con un caso simulado antes de usarlo en un codigo real (backlog #4). Cerrados por decision del usuario: la purga de cache (BUG-6/backlog #7, workflow eliminado). Abierto en la continuacion 11: la CSP (backlog #8), unica cabecera que falta.
