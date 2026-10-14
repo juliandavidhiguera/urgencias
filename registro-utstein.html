@@ -446,6 +446,7 @@ function aplicarDatosPcr(d) {
   _setValIf('ut-presenciado', d.presenciado === 'si' ? 'Sí' : d.presenciado === 'no' ? 'No' : '');
   _setValIf('ut-monitorizado', d.monitorizado === 'si' ? 'Sí' : d.monitorizado === 'no' ? 'No' : '');
   if (d.descargasLog && d.descargasLog.length) _setValIf('ut-num-desfib', d.descargasLog.length);
+  if (d.modo === 'pediatrico') _setValIf('ut-peso', d.peso);
 
   if (d.eventos) {
     if (d.eventos.reconocimiento && d.eventos.reconocimiento.chk) {

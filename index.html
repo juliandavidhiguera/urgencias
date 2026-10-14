@@ -704,6 +704,7 @@ body {
   padding: 10px 14px 12px;
 }
 .field { display: flex; flex-direction: column; gap: 3px; }
+.pcr-ped-only[hidden] { display: none !important; }
 .field label {
   font-size: 10px;
   line-height: 1.2;
@@ -1091,11 +1092,31 @@ body {
 <div class="databox">
   <div class="databox-header">
     <div>
-      <h3 class="scale-title">Algoritmo ALS intrahospitalario — adulto</h3>
+      <h3 class="scale-title" id="pcr-titulo">Algoritmo ALS intrahospitalario — adulto</h3>
       <div class="scale-subtitle">Vía aérea avanzada sin fármacos de secuencia de intubación rápida (paciente en PCR)</div>
     </div>
     <span class="badge badge-red">Emergencia</span>
   </div>
+
+  <div class="subhead">Paciente — elegir al inicio del evento</div>
+  <div class="fields">
+    <div class="field"><label for="pcr-modo">Algoritmo</label>
+      <select id="pcr-modo" onchange="cambiarModoPcr()">
+        <option value="adulto">Adulto (ALS — dosis fija)</option>
+        <option value="pediatrico">Pediátrico (SVAP/EPALS — dosis por peso)</option>
+      </select>
+    </div>
+    <div class="field pcr-ped-only" hidden><label for="pcr-peso">Peso real (kg)</label>
+      <input type="number" id="pcr-peso" min="0.5" max="150" step="0.1" placeholder="kg" oninput="calcPcr()">
+    </div>
+    <div class="field pcr-ped-only" hidden><label for="pcr-edad">Edad (años, decimales para meses)</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="number" id="pcr-edad" min="0" max="18" step="0.1" style="width:70px" oninput="calcPcr()">
+        <button class="btn-now" onclick="estimarPesoPcr()" title="Solo si no hay báscula ni cinta de Broselow">Estimar peso</button>
+      </div>
+    </div>
+  </div>
+  <div class="tile-aux pcr-ped-only" id="pcr-ped-info" hidden></div>
 
   <div class="subhead">Datos del evento</div>
   <div class="fields">
@@ -1137,7 +1158,7 @@ body {
   <div class="subhead">Checklist de eventos — hora de cada paso</div>
   <div id="pcr-eventos"></div>
 
-  <div class="subhead">Medicación del paro (dosis fija de adulto)</div>
+  <div class="subhead" id="pcr-farmacos-titulo">Medicación del paro (dosis fija de adulto)</div>
   <div id="pcr-farmacos"></div>
 
   <div class="subhead">Causas reversibles (4H / 4T)</div>
@@ -2091,6 +2112,7 @@ function renderIntubacionFarmacos() {
           '</div>' +
           '<div class="drug-note">' + d.nombre + ' ' + d.doseMin + (d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit +
             (d.doseMinAbs ? ' (mínimo ' + d.doseMinAbs + ' mg)' : '') +
+            (d.doseMaxAbs ? ' (máximo ' + d.doseMaxAbs + ' mg)' : '') +
             (d.doseInestable ? ' · ' + d.doseInestable : '') + ' — ' + d.nota + '</div>' +
         '</div>';
       }).join('');
@@ -2240,6 +2262,7 @@ function calcIntubacion() {
     const min = d.doseMin * peso, max = d.doseMax * peso;
     let mgMin = min, mgMax = max, unit = d.unit.split('/')[0];
     if (d.doseMinAbs) { mgMin = Math.max(mgMin, d.doseMinAbs); mgMax = Math.max(mgMax, d.doseMinAbs); }
+    if (d.doseMaxAbs) { mgMin = Math.min(mgMin, d.doseMaxAbs); mgMax = Math.min(mgMax, d.doseMaxAbs); }
     el.textContent = (mgMin === mgMax ? _fmt(mgMin, 2) : _fmt(mgMin, 2) + '–' + _fmt(mgMax, 2)) + ' ' + unit;
   });
 
@@ -2508,31 +2531,73 @@ function renderPcrEventos() {
   ).join('');
 }
 
+/* ---- Modo adulto / pediátrico ------------------------------------
+   Los ids de fármaco son los mismos en ambos modos (adrenalina,
+   amiodarona, lidocaina): las filas, el checklist sincronizado y el
+   traspaso a registro-utstein no cambian. Solo cambian la dosis
+   mostrada, la energía, la calidad de RCP, 4H/4T y post-RCE. */
+function _pcrModo() { return document.getElementById('pcr-modo').value; }
+function _pcrEsPed() { return _pcrModo() === 'pediatrico'; }
+function _pcrPeso() { const v = parseFloat(document.getElementById('pcr-peso').value); return v > 0 ? v : 0; }
+function _pcrFarmacosLista() { return _pcrEsPed() ? PCR_FARMACOS_PED : PCR_FARMACOS; }
+function _pcrCausasLista() { return _pcrEsPed() ? PCR_CAUSAS_REVERSIBLES_PED : PCR_CAUSAS_REVERSIBLES; }
+function _pcrPostRoscLista() { return _pcrEsPed() ? PCR_POST_ROSC_PED : PCR_POST_ROSC; }
+function _pcrDosisTexto(d) {
+  if (!_pcrEsPed()) return d.dosis;
+  const p = _pcrPeso();
+  return p ? d.dosisPed(p) : '— introducir peso —';
+}
+
+function cambiarModoPcr() {
+  const ped = _pcrEsPed();
+  document.querySelectorAll('.pcr-ped-only').forEach(el => { el.hidden = !ped; });
+  document.getElementById('pcr-titulo').textContent = ped
+    ? 'Algoritmo SVAP (EPALS 2025) — pediátrico, dosis por peso'
+    : 'Algoritmo ALS intrahospitalario — adulto';
+  document.getElementById('pcr-farmacos-titulo').textContent = ped
+    ? 'Medicación del paro (por peso real — verificar antes de administrar)'
+    : 'Medicación del paro (dosis fija de adulto)';
+  /* Las listas 4H/4T y post-RCE tienen textos distintos por modo: se
+     regeneran (se pierden sus checks). Por eso el modo se elige al
+     inicio del evento. Los fármacos conservan su estado. */
+  renderPcrCausas();
+  renderPcrPostRosc();
+  calcPcr();
+}
+
+function estimarPesoPcr() {
+  const edad = parseFloat(document.getElementById('pcr-edad').value);
+  const p = PCR_PED_PESO_ESTIMADO(edad);
+  if (p === null) { document.getElementById('pcr-ped-info').textContent = 'Estimación por edad solo de 0 a 12 años: introduce el peso real.'; return; }
+  document.getElementById('pcr-peso').value = Math.round(p * 10) / 10;
+  calcPcr();
+}
+
 function renderPcrFarmacos() {
-  document.getElementById('pcr-farmacos').innerHTML = PCR_FARMACOS.map(d =>
+  document.getElementById('pcr-farmacos').innerHTML = _pcrFarmacosLista().map(d =>
     '<div class="drug-row" id="pcr-fx-' + d.id + '-row">' +
       '<div class="drug-head">' +
         '<label class="event-label" style="min-width:180px"><input type="checkbox" id="pcr-fx-' + d.id + '-chk" onchange="calcPcr()">' + d.nombre + ' <span id="pcr-fx-' + d.id + '-rec"></span></label>' +
         '<div class="event-time">' +
-          '<span class="drug-dose">' + d.dosis + '</span>' +
+          '<span class="drug-dose" id="pcr-fx-' + d.id + '-dosis" aria-live="polite">' + _pcrDosisTexto(d) + '</span>' +
           '<input type="time" id="pcr-fx-' + d.id + '-hora" aria-label="Hora de primera dosis de ' + d.nombre + '" onchange="calcPcr()">' +
           '<button class="btn-now" aria-label="Marcar hora actual de ' + d.nombre + '" onclick="stampPcrTime(\'pcr-fx-' + d.id + '-hora\')">Ahora</button>' +
           '<input type="number" class="drug-real-input" id="pcr-fx-' + d.id + '-total" min="0" placeholder="Total dosis" aria-label="Total de dosis administradas de ' + d.nombre + '" style="width:70px">' +
         '</div>' +
       '</div>' +
-      '<div class="drug-note">' + d.nota + '</div>' +
+      '<div class="drug-note" id="pcr-fx-' + d.id + '-nota">' + d.nota + '</div>' +
     '</div>'
   ).join('');
 }
 
 function renderPcrCausas() {
-  document.getElementById('pcr-causas').innerHTML = PCR_CAUSAS_REVERSIBLES.map((c, i) =>
+  document.getElementById('pcr-causas').innerHTML = _pcrCausasLista().map((c, i) =>
     '<label class="chk"><input type="checkbox" id="pcr-causa-' + i + '">' + c + '</label>'
   ).join('');
 }
 
 function renderPcrPostRosc() {
-  document.getElementById('pcr-postrosc').innerHTML = PCR_POST_ROSC.map((c, i) =>
+  document.getElementById('pcr-postrosc').innerHTML = _pcrPostRoscLista().map((c, i) =>
     '<label class="chk"><input type="checkbox" id="pcr-rosc-' + i + '">' + c + '</label>'
   ).join('');
 }
@@ -2561,10 +2626,23 @@ function calcPcr() {
   const descargas = pcrDescargasLog.length;
   _pcrSyncEventosConFarmacos();
 
-  document.getElementById('pcr-energia').textContent = 'Energía de desfibrilación: ' + PCR_ENERGIA_DESFIB;
-  document.getElementById('pcr-calidad').textContent = 'Calidad de RCP: ' + PCR_CALIDAD_RCP;
+  const ped = _pcrEsPed(), peso = _pcrPeso();
+  document.getElementById('pcr-energia').textContent = 'Energía de desfibrilación: ' + (ped ? PCR_ENERGIA_DESFIB_PED(peso) : PCR_ENERGIA_DESFIB);
+  document.getElementById('pcr-calidad').textContent = 'Calidad de RCP: ' + (ped ? PCR_CALIDAD_RCP_PED : PCR_CALIDAD_RCP);
+  if (ped) {
+    const edad = parseFloat(document.getElementById('pcr-edad').value);
+    let info = PCR_PED_RANGOS_NOTA;
+    if (edad >= 1) info = 'Tubo con balón ≈ ' + _pcrPedFmt(edad / 4 + 3.5, 1) + ' mm (±0,5) · profundidad oral ≈ ' + _pcrPedFmt(12 + edad / 2, 1) + ' cm, nasal ≈ ' + _pcrPedFmt(15 + edad / 2, 1) + ' cm · volemia ~80 mL/kg.';
+    if (peso) info = 'Bolo de volumen 10 mL/kg ≈ ' + _pcrPedFmt(Math.min(peso * 10, 500), 0) + ' mL · G10% 2 mL/kg ≈ ' + _pcrPedFmt(peso * 2, 1) + ' mL · ' + info;
+    if (peso >= 40) info = '⚠ Peso ≥40 kg: la mayoría de dosis alcanzan el máximo de adulto; valorar algoritmo adulto. ' + info;
+    document.getElementById('pcr-ped-info').textContent = info;
+  }
+  _pcrFarmacosLista().forEach(d => {
+    const dEl = document.getElementById('pcr-fx-' + d.id + '-dosis');
+    if (dEl) dEl.textContent = _pcrDosisTexto(d);
+  });
 
-  PCR_FARMACOS.forEach(d => {
+  _pcrFarmacosLista().forEach(d => {
     /* La fila NUNCA se oculta: si el ritmo cambia, la medicación ya
        administrada debe seguir visible en el registro. */
     const recEl = document.getElementById('pcr-fx-' + d.id + '-rec');
@@ -2584,6 +2662,20 @@ function calcPcr() {
   const recEl = document.getElementById('pcr-recomendacion');
   if (!ritmo) {
     recEl.textContent = 'Selecciona el ritmo para ver la recomendación de fármacos del ciclo actual.';
+  } else if (ped) {
+    const p = peso;
+    const adr = p ? _pcrPedFmt(Math.min(p * 0.01, 1), 2) + ' mg' : '10 mcg/kg';
+    const ami1 = p ? _pcrPedFmt(Math.min(p * 5, 300), 0) + ' mg' : '5 mg/kg (máx. 300)';
+    const ami2 = p ? _pcrPedFmt(Math.min(p * 5, 150), 0) + ' mg' : '5 mg/kg (máx. 150)';
+    if (ritmo === 'no_desfibrilable') {
+      recEl.innerHTML = '<strong>No desfibrilable (asistolia / AESP / bradicardia &lt;60 sin signos de vida):</strong> adrenalina ' + adr + ' IV/IO lo antes posible, luego cada 4 min (2 ciclos). Reevaluar ritmo cada 2 min. Buscar 4H/4T.';
+    } else {
+      recEl.innerHTML = '<strong>Desfibrilable (FV / TV sin pulso):</strong> descarga 4 J/kg → RCP 2 min → reevaluar. ' +
+        (descargas >= 5 ? 'Tras la 5ª descarga: amiodarona ' + ami2 + ' + escalar energía a 6–8 J/kg; adrenalina cada 4 min.'
+         : descargas >= 3 ? 'Tras la 3ª descarga: adrenalina ' + adr + ' + amiodarona ' + ami1 + ' (o lidocaína 1 mg/kg).'
+         : 'Adrenalina y amiodarona se inician tras la 3ª descarga si persiste el ritmo desfibrilable.');
+    }
+    if (!p) recEl.innerHTML += ' <em>Introduce el peso para ver dosis en mg.</em>';
   } else if (ritmo === 'no_desfibrilable') {
     recEl.innerHTML = '<strong>No desfibrilable (Asistolia/AESP):</strong> Adrenalina 1 mg IV/IO lo antes posible, luego cada 3–5 min (≈ cada 2 ciclos). Reevaluar ritmo cada 2 min.';
   } else {
@@ -2603,12 +2695,12 @@ function _pcrEventosTexto() {
 }
 
 function _pcrFarmacosTexto() {
-  const admin = PCR_FARMACOS.filter(d => document.getElementById('pcr-fx-' + d.id + '-chk').checked);
+  const admin = _pcrFarmacosLista().filter(d => document.getElementById('pcr-fx-' + d.id + '-chk').checked);
   if (!admin.length) return '(ninguno marcado como administrado)';
   return admin.map(d => {
     const hora = document.getElementById('pcr-fx-' + d.id + '-hora').value;
     const total = document.getElementById('pcr-fx-' + d.id + '-total').value;
-    return '- ' + d.nombre + ' (' + d.dosis + '): 1ª dosis' + (hora ? ' — ' + hora : '') + (total ? ' · total dosis: ' + total : '');
+    return '- ' + d.nombre + ' (' + _pcrDosisTexto(d) + '): 1ª dosis' + (hora ? ' — ' + hora : '') + (total ? ' · total dosis: ' + total : '');
   }).join('\n');
 }
 
@@ -2623,12 +2715,12 @@ function _pcrDescargasLogTexto() {
 }
 
 function _pcrCausasTexto() {
-  const marcadas = PCR_CAUSAS_REVERSIBLES.filter((c, i) => document.getElementById('pcr-causa-' + i).checked);
+  const marcadas = _pcrCausasLista().filter((c, i) => document.getElementById('pcr-causa-' + i).checked);
   return marcadas.length ? marcadas.join(', ') : 'Ninguna marcada';
 }
 
 function _pcrPostRoscTexto() {
-  const marcadas = PCR_POST_ROSC.filter((c, i) => document.getElementById('pcr-rosc-' + i).checked);
+  const marcadas = _pcrPostRoscLista().filter((c, i) => document.getElementById('pcr-rosc-' + i).checked);
   return marcadas.length ? marcadas.join(', ') : 'Ninguna marcada';
 }
 
@@ -2639,7 +2731,11 @@ function _pcrReportText() {
   const ritmoTexto = ritmoActual ? PCR_RITMO_LABELS[ritmoActual] : 'Sin especificar';
   const ciclos = document.getElementById('pcr-ciclos').value || '0';
   const obs = document.getElementById('pcr-obs').value || '(sin observaciones)';
-  return `REGISTRO DE PARO CARDIO-RESPIRATORIO — ALGORITMO ALS
+  const modoTexto = _pcrEsPed()
+    ? 'Pediátrico (SVAP/EPALS 2025) · Peso: ' + (_pcrPeso() ? _pcrPeso() + ' kg' : 'no registrado') + (document.getElementById('pcr-edad').value ? ' · Edad: ' + document.getElementById('pcr-edad').value + ' años' : '')
+    : 'Adulto (ALS)';
+  return `REGISTRO DE PARO CARDIO-RESPIRATORIO — ALGORITMO ${_pcrEsPed() ? 'SVAP PEDIÁTRICO' : 'ALS'}
+Algoritmo: ${modoTexto}
 Paro presenciado: ${presenciado === 'si' ? 'Sí' : presenciado === 'no' ? 'No' : 'Sin especificar'} · Monitorizado: ${monitorizado === 'si' ? 'Sí' : monitorizado === 'no' ? 'No' : 'Sin especificar'}
 Ritmo actual: ${ritmoTexto} · Ciclos de RCP (2 min): ${ciclos} · Nº de desfibrilaciones: ${pcrDescargasLog.length}
 
@@ -2682,6 +2778,12 @@ function printPcrReport() {
 function resetPcr() {
   pcrRitmoLog = [];
   pcrDescargasLog = [];
+  document.getElementById('pcr-modo').value = 'adulto';
+  document.getElementById('pcr-peso').value = '';
+  document.getElementById('pcr-edad').value = '';
+  document.querySelectorAll('.pcr-ped-only').forEach(el => { el.hidden = true; });
+  document.getElementById('pcr-titulo').textContent = 'Algoritmo ALS intrahospitalario — adulto';
+  document.getElementById('pcr-farmacos-titulo').textContent = 'Medicación del paro (dosis fija de adulto)';
   renderPcrEventos();
   renderPcrFarmacos();
   renderPcrCausas();
@@ -2711,7 +2813,7 @@ function pcrHandoffPayload() {
     };
   });
   const farmacos = {};
-  PCR_FARMACOS.forEach(d => {
+  _pcrFarmacosLista().forEach(d => {
     farmacos[d.id] = {
       nombre: d.nombre,
       chk: document.getElementById('pcr-fx-' + d.id + '-chk').checked,
@@ -2727,8 +2829,10 @@ function pcrHandoffPayload() {
     descargasLog: pcrDescargasLog.slice(),
     eventos,
     farmacos,
-    causas: PCR_CAUSAS_REVERSIBLES.filter((c, i) => document.getElementById('pcr-causa-' + i).checked),
-    postRosc: PCR_POST_ROSC.filter((c, i) => document.getElementById('pcr-rosc-' + i).checked),
+    causas: _pcrCausasLista().filter((c, i) => document.getElementById('pcr-causa-' + i).checked),
+    postRosc: _pcrPostRoscLista().filter((c, i) => document.getElementById('pcr-rosc-' + i).checked),
+    modo: _pcrModo(),
+    peso: _pcrPeso() || '',
     obs: document.getElementById('pcr-obs').value
   };
 }
