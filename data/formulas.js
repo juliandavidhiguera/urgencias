@@ -229,12 +229,18 @@ window.FORMULAS = [
   interp:function(s){return ['low',s+' mL','Volumen exacto a extraer/administrar']}},
 
 // ── Pediatría ────────────────────────────────────────────────
-{id:'f-peso-ped', src:'APLS por bandas de edad — PALS 2025 prioriza cinta de Broselow · PMID 41122862, PMID 28026862', title:'Peso Pediátrico Estimado', sub:'Solo si no hay cinta de Broselow/báscula disponible', badge:'amber', tag:'Pediatría', max:60, agg:'custom', items:[
-  {t:'num', l:'Edad en meses (ej. 30 meses = 2,5 años)', u:'meses', f:function(v){return 0}}],
+{id:'f-peso-ped', src:'APLS por bandas de edad · ERC/EPALS 2025: (edad+4)×2 · PALS 2025 prioriza cinta de Broselow · PMID 41122862, PMID 28026862', title:'Peso Pediátrico Estimado', sub:'Solo si no hay cinta de Broselow/báscula disponible', badge:'amber', tag:'Pediatría', max:60, agg:'custom', items:[
+  {t:'num', l:'Edad en meses (ej. 30 meses = 2,5 años)', u:'meses', f:function(v){return 0}},
+  {t:'sel', l:'Método', o:[['APLS por bandas',0],['ERC/EPALS 2025: 3-6-10 kg (0-6-12 m) · (edad+4)×2 de 1 a 12 años',1]]}],
   calcCustom:function(v){var m=v[0], a=m/12, p;
-    if (a<1) p = 0.5*m+4;
-    else if (a<=5) p = 2*a+8;
-    else p = 3*a+7;
+    if (v[1]===1) {
+      if (a<1) p = m<=6 ? 3+0.5*m : 6+(m-6)*(4/6);
+      else p = (a+4)*2;
+    } else {
+      if (a<1) p = 0.5*m+4;
+      else if (a<=5) p = 2*a+8;
+      else p = 3*a+7;
+    }
     return Math.round(p*10)/10;
   },
   interp:function(s){return ['low',s+' kg','Estimación de referencia — preferir cinta de Broselow o báscula siempre que sea posible']}},
@@ -253,13 +259,19 @@ window.FORMULAS = [
 {id:'f-tet-profundidad', src:'Regla práctica de profundidad de TET', title:'Profundidad de Inserción del TET', sub:'Diámetro interno × 3 — desde la comisura labial', badge:'blue', tag:'Pediatría', max:30, agg:'custom', items:[
   {t:'num', l:'Diámetro interno del tubo (mm)', u:'mm', f:function(v){return 0}}],
   calcCustom:function(v){return Math.round(v[0]*3*10)/10},
-  interp:function(s){return ['low',s+' cm','Fijar a esta distancia en la comisura labial']}},
+  interp:function(s){return ['low',s+' cm','Fijar a esta distancia en la comisura labial · alternativa ERC/EPALS 2025 por edad en la fórmula siguiente']}},
+
+{id:'f-tet-prof-edad', src:'ERC Paediatric Life Support 2025 (curso EPALS 2025)', title:'Profundidad del TET por edad (ERC)', sub:'Oral 12 + edad/2 · nasal 15 + edad/2 (niños >1 año)', badge:'blue', tag:'Pediatría', max:30, agg:'custom', items:[
+  {t:'num', l:'Edad (años)', u:'años', f:function(v){return 0}},
+  {t:'sel', l:'Vía', o:[['Oral (12 + edad/2)',12],['Nasal (15 + edad/2)',15]]}],
+  calcCustom:function(v){return Math.round((v[1]+v[0]/2)*10)/10},
+  interp:function(s){return ['low',s+' cm','Longitud más allá de labios/narina. No sustituye la confirmación clínica, capnográfica y radiológica']}},
 
 // ── Toxicología ────────────────────────────────────────────────
-{id:'f-naloxona', src:'Dosis estándar de naloxona', title:'Naloxona (antídoto de opioides)', sub:'Adultos: dosis fija · niños: por peso', badge:'red', tag:'Tóxicos', max:2, agg:'custom', items:[
+{id:'f-naloxona', src:'Dosis estándar de naloxona · pediatría: ERC PLS 2025 (curso EPALS 2025)', title:'Naloxona (antídoto de opioides)', sub:'Adultos: dosis fija · niños: por peso', badge:'red', tag:'Tóxicos', max:2, agg:'custom', items:[
   {t:'num', l:'Peso (kg) — dejar en 0 si es adulto con dosis fija', u:'kg', f:function(v){return 0}}],
-  calcCustom:function(v){return v[0]>0 ? Math.round(v[0]*0.01*100)/100 : 0},
-  interp:function(s){return s>0?['high',s+' mg','Pediátrico: 0,01 mg/kg IV (hasta 0,1 mg/kg en parada), repetir cada 2–3 min']:['high','—','Adultos: 0,4–2 mg IV, repetir cada 2–3 min']}},
+  calcCustom:function(v){return v[0]>0 ? Math.min(Math.round(v[0]*0.01*100)/100, 2) : 0},
+  interp:function(s){return s>0?['high',s+' mg (10 mcg/kg)','Pediátrico (ERC 2025): 10–40 mcg/kg IV/IO/IM/IN, máx. 2 mg — dosis baja si sobredosis analgésica (conservar analgesia), alta si ingesta accidental. Repetir cada 3 min. Perfusión 10–160 mcg/kg/h si opioide de acción larga. Cautela en consumo crónico (abstinencia)']:['high','—','Adultos: 0,4–2 mg IV, repetir cada 2–3 min']}},
 
 {id:'f-flumazenil', src:'Dosis estándar de flumazenil', title:'Flumazenil (antídoto de benzodiacepinas)', sub:'Precaución extrema en dependencia a BZD o epilepsia', badge:'red', tag:'Tóxicos', max:3, agg:'custom', items:[],
   calcCustom:function(){return 0},

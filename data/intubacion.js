@@ -7,6 +7,10 @@
      corregido a 1-2,5 mg/kg estable / 0,5-1 mg/kg inestable, según
      BJA TIVA 2025 (PMID 41238462) y meta-análisis de inducción en
      críticos (PMID 42121165).
+   - EPALS/ERC PLS 2025 (sesión 2026-10-14): presión cricoidea ya no
+     recomendada (solo desplazamiento laríngeo/BURP guiado por quien
+     intuba); atropina no rutinaria, 20 mcg/kg máx. 0,5 mg, sin la
+     antigua dosis mínima de 0,1 mg.
    - Ketamina en TCE: el documento original la contraindicaba en TCE
      grave-moderado; evidencia actual (Sciorilli 2026, PMID 41197253;
      guía de transferencia de paciente con daño cerebral, PMID 31788789)
@@ -20,7 +24,7 @@ window.INTUBACION_STEPS = [
   { id: 'premedicacion', label: 'Premedicación administrada' },
   { id: 'induccion', label: 'Inducción (hipnótico)' },
   { id: 'paralisis', label: 'Parálisis (relajante muscular)' },
-  { id: 'posicion', label: 'Posición + presión cricoidea (Sellick / BURP)' },
+  { id: 'posicion', label: 'Posición ± desplazamiento laríngeo (BURP) guiado por quien intuba — presión cricoidea (Sellick) no recomendada de rutina' },
   { id: 'laringoscopia', label: 'Laringoscopia' },
   { id: 'paso_tet', label: 'Paso del tubo endotraqueal' },
   { id: 'confirmacion', label: 'Confirmación (capnografía / auscultación)' },
@@ -34,8 +38,8 @@ window.INTUBACION_FARMACOS = [
     nota: 'Analgesia. Vagotónico si se asocia a propofol (valorar atropina). Reduce dosis de inductor.' },
   { id: 'lidocaina', grupo: 'Premedicación', nombre: 'Lidocaína', doseMin: 1.5, doseMax: 1.5, unit: 'mg/kg',
     nota: 'TCE con hipertensión intracraneal · crisis asmática/broncoespasmo severo' },
-  { id: 'atropina', grupo: 'Premedicación', nombre: 'Atropina', doseMin: 0.02, doseMax: 0.02, unit: 'mg/kg', doseMinAbs: 0.1,
-    nota: 'Niños <1 año, o <5 años si reciben succinilcolina · dosis mínima 0,1 mg' },
+  { id: 'atropina', grupo: 'Premedicación', nombre: 'Atropina', doseMin: 0.02, doseMax: 0.02, unit: 'mg/kg', doseMaxAbs: 0.5,
+    nota: 'NO rutinaria como premedicación (ERC PLS 2025): puede enmascarar la bradicardia por hipoxia. Valorar si bradicardia vagal o riesgo alto (succinilcolina en niño pequeño). 20 mcg/kg, máx. 0,5 mg/dosis, sin dosis mínima [EPALS 2025 — pendiente verificación Vera]' },
   { id: 'esmolol', grupo: 'Premedicación', nombre: 'Esmolol', doseMin: 0.2, doseMax: 0.5, unit: 'mg/kg',
     nota: 'Disección vascular, cardiopatía isquémica — atenúa descarga simpática' },
 
