@@ -347,29 +347,29 @@ body {
 }
 .btn:disabled, .btn-copy:disabled { opacity: .4; cursor: not-allowed; }
 
-/* INTUBACIÓN — checklist de eventos con hora + calculadora de dosis por grupo */
-#tab-intubacion .event-row {
+/* INTUBACIÓN + PCR (mismos componentes) — checklist de eventos con hora + calculadora de dosis por grupo */
+#tab-intubacion .event-row, #tab-pcr .event-row {
   display: flex; align-items: center; justify-content: space-between;
   gap: 10px; flex-wrap: wrap; padding: 7px 14px; border-bottom: 1px solid var(--bg3);
 }
-#tab-intubacion .event-row:last-child { border-bottom: none; }
-#tab-intubacion .event-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); flex: 1; min-width: 220px; }
-#tab-intubacion .event-label input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer; }
-#tab-intubacion .event-time { display: flex; align-items: center; gap: 6px; }
-#tab-intubacion .event-time input[type=time] { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; }
-#tab-intubacion .btn-now { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
-#tab-intubacion .btn-now:hover { border-color: var(--blue); color: var(--blue); }
-#tab-intubacion .drug-row { padding: 8px 14px; border-bottom: 1px solid var(--bg3); }
-#tab-intubacion .drug-row:last-child { border-bottom: none; }
-#tab-intubacion .drug-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-#tab-intubacion .drug-dose { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--text); }
-#tab-intubacion .drug-note { font-size: 11.5px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
-#tab-intubacion .drug-flag { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
-#tab-intubacion .drug-flag.pref-inestable { background: var(--red-bg); color: var(--red); }
-#tab-intubacion .drug-flag.pref-estable { background: var(--blue-bg); color: var(--blue); }
-#tab-intubacion .drug-real-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; width: 92px; font-family: var(--mono); }
-#tab-intubacion .drug-real-input:not(:placeholder-shown) { border-color: var(--blue); }
-#tab-intubacion .dilution-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 2px 4px; font-size: 11.5px; width: 60px; font-family: var(--mono); }
+#tab-intubacion .event-row:last-child, #tab-pcr .event-row:last-child { border-bottom: none; }
+#tab-intubacion .event-label, #tab-pcr .event-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); flex: 1; min-width: 220px; }
+#tab-intubacion .event-label input[type=checkbox], #tab-pcr .event-label input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer; }
+#tab-intubacion .event-time, #tab-pcr .event-time { display: flex; align-items: center; gap: 6px; }
+#tab-intubacion .event-time input[type=time], #tab-pcr .event-time input[type=time] { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; }
+#tab-intubacion .btn-now, #tab-pcr .btn-now { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+#tab-intubacion .btn-now:hover, #tab-pcr .btn-now:hover { border-color: var(--blue); color: var(--blue); }
+#tab-intubacion .drug-row, #tab-pcr .drug-row { padding: 8px 14px; border-bottom: 1px solid var(--bg3); }
+#tab-intubacion .drug-row:last-child, #tab-pcr .drug-row:last-child { border-bottom: none; }
+#tab-intubacion .drug-head, #tab-pcr .drug-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#tab-intubacion .drug-dose, #tab-pcr .drug-dose { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--text); }
+#tab-intubacion .drug-note, #tab-pcr .drug-note { font-size: 11.5px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+#tab-intubacion .drug-flag, #tab-pcr .drug-flag { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+#tab-intubacion .drug-flag.pref-inestable, #tab-pcr .drug-flag.pref-inestable { background: var(--red-bg); color: var(--red); }
+#tab-intubacion .drug-flag.pref-estable, #tab-pcr .drug-flag.pref-estable { background: var(--blue-bg); color: var(--blue); }
+#tab-intubacion .drug-real-input, #tab-pcr .drug-real-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; width: 92px; font-family: var(--mono); }
+#tab-intubacion .drug-real-input:not(:placeholder-shown), #tab-pcr .drug-real-input:not(:placeholder-shown) { border-color: var(--blue); }
+#tab-intubacion .dilution-input, #tab-pcr .dilution-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 2px 4px; font-size: 11.5px; width: 60px; font-family: var(--mono); }
 
 /* FICHA TÉCNICA — modal de medicamento */
 .ficha-overlay {
@@ -1102,14 +1102,14 @@ body {
   <div class="fields">
     <div class="field"><label for="pcr-modo">Algoritmo</label>
       <select id="pcr-modo" onchange="cambiarModoPcr()">
-        <option value="adulto">Adulto (ALS — dosis fija)</option>
-        <option value="pediatrico">Pediátrico (SVAP/EPALS — dosis por peso)</option>
+        <option value="adulto">Adulto (ALS)</option>
+        <option value="pediatrico">Pediátrico (SVAP)</option>
       </select>
     </div>
     <div class="field pcr-ped-only" hidden><label for="pcr-peso">Peso real (kg)</label>
       <input type="number" id="pcr-peso" min="0.5" max="150" step="0.1" placeholder="kg" oninput="calcPcr()">
     </div>
-    <div class="field pcr-ped-only" hidden><label for="pcr-edad">Edad (años, decimales para meses)</label>
+    <div class="field pcr-ped-only" hidden><label for="pcr-edad">Edad (años; 0,5 = 6 m)</label>
       <div style="display:flex;gap:6px;align-items:center">
         <input type="number" id="pcr-edad" min="0" max="18" step="0.1" style="width:70px" oninput="calcPcr()">
         <button class="btn-now" onclick="estimarPesoPcr()" title="Solo si no hay báscula ni cinta de Broselow">Estimar peso</button>
@@ -2559,7 +2559,21 @@ function cambiarModoPcr() {
     : 'Medicación del paro (dosis fija de adulto)';
   /* Las listas 4H/4T y post-RCE tienen textos distintos por modo: se
      regeneran (se pierden sus checks). Por eso el modo se elige al
-     inicio del evento. Los fármacos conservan su estado. */
+     inicio del evento. Los fármacos se regeneran (cambian dosis y nota)
+     pero conservan check, hora y total porque los ids coinciden. */
+  const estado = {};
+  ['adrenalina', 'amiodarona', 'lidocaina'].forEach(id => {
+    const c = document.getElementById('pcr-fx-' + id + '-chk');
+    if (c) estado[id] = { chk: c.checked, hora: document.getElementById('pcr-fx-' + id + '-hora').value, total: document.getElementById('pcr-fx-' + id + '-total').value };
+  });
+  renderPcrFarmacos();
+  Object.keys(estado).forEach(id => {
+    const c = document.getElementById('pcr-fx-' + id + '-chk');
+    if (!c) return;
+    c.checked = estado[id].chk;
+    document.getElementById('pcr-fx-' + id + '-hora').value = estado[id].hora;
+    document.getElementById('pcr-fx-' + id + '-total').value = estado[id].total;
+  });
   renderPcrCausas();
   renderPcrPostRosc();
   calcPcr();
