@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-14 | **Sesion #:** 5 | **Rama:** feat/pcr-pediatrico-epals2025 (pendiente de merge a main) | **HEAD:** ver `git log`
+**Ultima actualizacion:** 2026-10-15 | **Sesion #:** 6 | **Rama:** main (PR #1 de la sesion 5 ya mergeado) | **HEAD:** ver `git log`
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -10,7 +10,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 |---|---|---|---|
 | Frontend | HTML/CSS/JS vanilla, sin build ni framework | - | `index.html` (2388 lineas, monolito con CSS+JS embebidos) |
 | Datos | Modulos JS `window.X = [...]` cargados como `<script>` | - | `data/{cheatsheets,scales,formulas,protocols,drugs,infusions,intubacion,fichas,bibliografia}.js` |
-| Offline | Service Worker cache-first | `CACHE = 'urg-v47'` | `sw.js` |
+| Offline | Service Worker network-first (cache solo como respaldo sin conexion) | `CACHE = 'urg-v64'` | `sw.js` |
 | PWA | Manifest | - | `manifest.json`, `icon.svg` |
 | Hosting | Cloudflare Pages, deploy automatico en push a `main` | - | (integracion nativa GitHub, sin paso de build) |
 | CI | **Ninguno.** No hay GitHub Actions en el repo (ver decision de sesion 4 continuacion 9) | - | - |
@@ -19,7 +19,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 **Decisiones cerradas (no re-discutir):**
 - Sin backend, sin framework, sin build: todo el frontend vive en `index.html` + `data/*.js` cargados directo por `<script>`. Confirmado sin `fetch()`, sin `<form>`, sin secretos en codigo.
 - `localStorage` solo para `urg-favs`/`urg-recent`/`urg-theme` (favoritos, recientes, tema) — nunca dato de paciente.
-- Cache-first en `sw.js`: **cada cambio en `index.html` o `data/*.js` exige subir `CACHE` en `sw.js`** o los usuarios con la app instalada siguen viendo contenido clinico desactualizado indefinidamente (ver commit `14108b3`, que ademas bajo `Cache-Control` a 5 min y agrego la purga de Cloudflare como segunda red de seguridad).
+- `sw.js` es **network-first** desde `urg-v64` (sesion 6): con conexion siempre sirve lo publicado (`fetch` con `cache:'no-cache'`, revalida la cache HTTP) y actualiza la copia local; la cache solo responde sin conexion. Ya **no** hace falta subir `CACHE` en cada cambio de `index.html`/`data/*.js`.
 - Dosis de farmacos siempre con peso real; peso ideal solo para volumen tidal (ver memoria de usuario `peso_real_vs_ideal_dosis`).
 - `data/infusions.js` es la **unica fuente de verdad** para calculo de mL/h de perfusion IV. `data/drugs.js` no debe tener su propio `doseCalc`/`extra` que calcule mL/h para un farmaco que tambien este en `INFUSIONS` — solo `infusionRef` + boton "Perfusion IV". Motivo: sesion 3 encontro 4 farmacos (noradrenalina, dopamina, dobutamina, midazolam) con dos diluciones de referencia distintas en cada archivo, hasta 6x de discrepancia en mL/h para la misma dosis prescrita.
 
@@ -37,7 +37,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
 | `codigos/patrones iam nuevos/*.jpg` | Galeria de patrones ECG de oclusion coronaria (OMI) usada en tab codi-IAM | ESTABLE |
 | `medicamentos/*.md` (75 archivos) | Texto fuente en catalan extraido de PDF de Guies Cliniques — input de `parse_fichas.js` | ESTABLE (fuente, no se edita a mano salvo error de OCR) |
-| `sw.js` | Service worker cache-first, `CACHE='urg-v46'`, precachea tambien `codigos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` | ESTABLE — **recordar bump en cada cambio de datos/HTML** |
+| `sw.js` | Service worker network-first, `CACHE='urg-v64'`, precachea tambien `codigos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
 | `Calculadora_Index_Fragil_VIG.md` | Plantilla original (catalan) del Index Fragil-VIG, trackeada como referencia | ESTABLE |
 
 ## 4. ESTADO ACTUAL - QUE FUNCIONA
@@ -51,6 +51,14 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Cabeceras de seguridad desde 2026-09-22: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` en `/*` — verificado con `curl -I` en produccion (ver seccion 5). Sin CSP todavia (backlog #8).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 6 - 2026-10-15
+
+- **Service worker network-first** (commit `432050f`): tras el deploy del modo pediatrico el navegador del usuario seguia sirviendo la version vieja (cache-first + copia guardada de una version anterior); una pestana nueva sin cache si veia la nueva. `fetch` ahora va a red con `cache:'no-cache'`, guarda copia de cada respuesta `ok` same-origin y solo cae a la cache sin conexion (navegacion sin copia -> `/index.html`). Peticiones no-GET o de otro origen no se interceptan.
+- Transicion para quien tenia el SW viejo: `install` detecta si habia un SW activo y, tras `clients.claim()`, `activate` recarga las pestanas abiertas (`client.navigate`), asi el cambio se ve sin que el usuario borre datos del sitio. `skipWaiting` y la purga de caches antiguas se mantienen.
+- `CACHE` `urg-v63` -> `urg-v64` (necesario esta vez: cambia la logica de `sw.js`). `index.html` no se toca.
+- Verificado con Playwright contra servidor estatico local: con el SW viejo instalado, deploy de HTML+SW nuevos -> 1a carga vieja y auto-recarga a la nueva; siguiente cambio de HTML visible a la primera sin bump; offline sirve la ultima version vista; 0 errores de pagina. En produccion: `/sw.js` servido con el codigo nuevo.
+- Backlog #1 (bump manual) queda obsoleto; trampa de la seccion 9 reescrita.
 
 ### Sesion 5 - 2026-10-14
 
@@ -219,7 +227,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 6. PENDIENTE - BACKLOG PRIORIZADO
 | # | Tarea | Archivos | Prioridad | Bloqueado por | Criterio de hecho |
 |---|---|---|---|---|---|
-| 1 | Bump manual de `CACHE` en `sw.js` en cada deploy que toque `index.html`/`data/*.js` (recordatorio operativo, no una tarea de codigo) | `sw.js` | P2 | - | N/A — disciplina de proceso, verificar en cada PR que toque esos archivos |
+| ~~1~~ | ~~Bump manual de `CACHE` en `sw.js` en cada deploy que toque `index.html`/`data/*.js`~~ — OBSOLETO sesion 6 (2026-10-15): el SW pasa a network-first y el contenido nuevo llega a la primera sin bump | `sw.js` | - | - | Resuelto: commit `432050f` |
 | 2 | ~~Sacar el boton de favorito (★) de dentro del `<summary>`~~ — INTENTADO Y REVERTIDO sesion 3 (2026-08-27): Chrome envuelve internamente TODO hijo no-`<summary>` de un `<details>` en un `::details-content` que se colapsa/oculta cuando el details esta cerrado — un boton hermano de `<summary>` (fuera de el) solo es visible/clicable con la tarjeta expandida (confirmado con `card.open=true/false` + `offsetTop` via JS: 49px/invisible cuando cerrado vs 8px/visible cuando abierto). No hay forma de lograrlo sin abandonar `<details>` nativo por un disclosure widget custom (JS + aria-expanded) — cambio grande, no quirurgico. Mantener el boton dentro de `<summary>` es la opcion correcta dado este limite del navegador | `index.html` | P3 (bloqueado por limite de plataforma, no de codigo) | Reescribir cards/escalas/protocolos sin `<details>` nativo | Requiere decision del usuario: ¿vale la pena cambiar 4 templates a un disclosure widget custom por este unico hallazgo de accesibilidad medio? |
 | 3 | Evaluar indice de busqueda separado (no depender de que cada tab este renderizada en el DOM) para poder diferir `data/fichas.js` (172 KB) y el render de tabs no visibles sin romper `globalSearch()` — usuario confirmo sesion 3 dejarlo en espera: el ahorro de performance (~50-150ms) no justifica el riesgo de tocar `globalSearch()`, que ya tuvo 2 bugs reales (BUG-1, Fichas). No re-priorizar sin que el usuario reporte lentitud real | `index.html` (`globalSearch`, `SEARCH_ITEM_SELECTOR`) | P3 (en espera, decision explicita del usuario) | - | `fichas.js` carga diferido y las tabs no visitadas no se renderizan al inicio, `globalSearch` sigue encontrando resultados en todas las tabs sin abrirlas primero |
 | 4 | Recorrido clinico completo del tab PCR con un caso simulado extremo a extremo (incl. "Copiar informe" e "Imprimir/Guardar PDF") antes de primer uso real en un codigo | `index.html` (`#tab-pcr`) | P1 | - | Simulacro completo confirmando que el informe generado es util y legible como registro de historia clinica |
@@ -242,13 +250,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Sin instalacion: es HTML/CSS/JS estatico, se abre `index.html` directo o se sirve con cualquier servidor estatico.
 - Scripts de ingesta de fichas (uso puntual, no en cada sesion): `node scripts/parse_fichas.js` luego `node scripts/merge_fichas.js` (requieren los `scripts/fichas_es_batch*.json` y `medicamentos/*.md` presentes).
 - Deploy: automatico via integracion nativa Cloudflare Pages ↔ GitHub en cada push a `main`. No hay comando manual de deploy en este repo.
-- Purga de cache: **ya no existe** (workflow eliminado 2026-09-04, ver BUG-6). El contenido nuevo tarda como mucho 5 min en llegar al usuario por el `Cache-Control: public, max-age=300` de `_headers`. Ese archivo es ahora la unica palanca sobre la frescura del contenido en produccion: si alguna vez hace falta que un cambio clinico llegue mas rapido, bajar ese `max-age` es mas simple que reintroducir la purga.
+- Purga de cache: **ya no existe** (workflow eliminado 2026-09-04, ver BUG-6). `_headers` mantiene `Cache-Control: public, max-age=300`, pero desde la sesion 6 el service worker pide cada recurso con `cache:'no-cache'` (revalidacion contra el servidor), asi que con la app ya instalada el contenido nuevo se ve en la siguiente carga tras el deploy. Los 5 min de `max-age` solo afectan a navegadores sin SW activo.
 - No hay CI, ni GitHub Actions, ni secrets configurados en el repo.
 - No hay variables de entorno locales, no hay `.env`.
 - No hay comando de test ni de build.
 
 ## 9. TRAMPAS Y CONTEXTO NO OBVIO
-- **Nunca olvidar el bump de `CACHE` en `sw.js`** al tocar `index.html` o cualquier `data/*.js` — el service worker es cache-first puro (`caches.match(e.request).then(r => r || fetch(e.request))`), sin fallback de red-primero. Sin bump, usuarios con la app instalada quedan atascados en contenido clinico viejo hasta que limpien cache a mano.
+- **Service worker network-first** (desde sesion 6, commit `432050f`): ya no hay que subir `CACHE` al tocar `index.html` o `data/*.js`. Subirlo **solo** si se añade/quita un fichero de `ASSETS` (si no, el nuevo no queda disponible offline hasta que el usuario lo abra con conexion) o si se cambia la logica de `sw.js`. No volver a cache-first: fue la causa de que usuarios con la app instalada quedaran atascados en contenido clinico viejo hasta borrar datos del sitio a mano.
 - `medicamentos/*.md` son texto crudo extraido de PDF (catalan) — contienen caracteres de Private Use Area por glifos de fuente incrustada que `parse_fichas.js` limpia con una regex (`raw.replace(/[-]/g, '')`, linea ~24) — no editar esos `.md` a mano sin entender ese artefacto.
 - `.impeccable/`, `.wrangler/`, `.gstack/` estan en `.gitignore` — son directorios de trabajo local de las skills `impeccable`/`wrangler`/`gstack`, nunca se versionan. Las notas de critica de `/impeccable` en `.impeccable/critique/*.md` no sobreviven a un `git clone` fresco: si se necesita ese historial, extraer lo accionable a este HANDOFF (como se hizo con BUG-1) antes de que se pierda.
 - Contenido clinico verificado manualmente con Vera (herramienta de verificacion) en varias sesiones recientes (`59e4aa7`, `a6d8e14`, etc.) — no asumir que un farmaco/dosis nuevo esta verificado solo porque esta en el repo; revisar el mensaje del commit que lo introdujo.
@@ -260,7 +268,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - El tab PCR NO reutiliza los farmacos de `data/intubacion.js` para el paso "manejo avanzado de via aerea": la via aerea durante un PCR se coloca sin sedacion/paralisis (paciente ya inconsciente, sin reflejos) — aclaracion explicita del usuario en sesion 4, no asumir lo contrario en cambios futuros.
 - `registro-utstein.html` es un archivo standalone con su propio `<script>` (sin dependencia de `data/*.js` ni de las funciones de `index.html`) — precacheado en `sw.js` para que funcione offline, y NO forma parte de `tab-content` ni de `SEARCH_ITEM_SELECTOR`. Recibe los datos del evento actual del tab PCR via `sessionStorage` (clave `urg-pcr-handoff`, ver sesion 4 continuacion) en el momento de abrirse con `abrirRegistroUtstein()` — nunca via `localStorage` ni backend, y la clave se borra tras aplicarse. Si se abre directo (sin pasar por el boton del tab PCR) se muestra vacio, sin banner de aviso — comportamiento esperado.
 - El mapeo de eventos entre el tab PCR (`PCR_EVENTOS`, ids como `via_aerea_avanzada`) y la cronologia de `registro-utstein.html` (`UT_TIMELINE`, ids como `primer_manejo_via`) vive en `PCR_A_UT_EVENTO` (`registro-utstein.html`) — si se agrega o renombra un evento en `data/pcr.js`, actualizar ese mapa o el traspaso dejara ese hito sin prellenar.
-- El navegador puede tener un Service Worker previo activo en `localhost` sirviendo una version cacheada vieja de `index.html` incluso tras editar el codigo — para verificar cambios en local hay que recargar la pestaña DOS veces (la primera activa el SW nuevo via `skipWaiting`/`clients.claim()`, la segunda ya sirve el contenido actualizado) o purgar el cache manualmente.
+- Desde la sesion 6 el SW es network-first, asi que en `localhost` los cambios de `index.html`/`data/*.js` se ven con una recarga normal. Excepcion: si el navegador aun tiene un SW cache-first de antes de `urg-v64`, la primera carga sirve la version vieja y la pestaña se recarga sola en cuanto el SW nuevo se activa.
 - La calculadora de dosis por peso de Fichas (`parseDosisPorKg()`, `index.html`) NO es una fuente de dosis curada: extrae patrones `X/kg` del texto libre de `f.dosis` con regex, best-effort. Solo calcula **bolo / dosis unica**: toda opcion con periodo `/h`, `/hora`, `/min` o que mencione "perfusion/infusion continua" se marca `esPerfusion` y NO se calcula ahi — se remite a la pestaña Perfusion IV, unica fuente de verdad para mL/h (misma regla que BUG-2). Cubre 32/76 fichas con bolo y 16 con perfusion; el resto no muestra seccion. Si una ficha nueva con dosis por kg no aparece, revisar la linea contra `RE_FICHA_DOSIS_KG` antes de asumir un bug. NUNCA quitar la cita del texto original (`ficha-calc-fuente`): es la unica salvaguarda real de este parser.
 - **10 fichas traen tablas de perfusion APLANADAS por la extraccion del PDF** (columnas convertidas en lineas de numeros sueltos): Clonazepam, Isoprenalina, Midazolam, Nitroglicerina, Noradrenalina, Propofol, Rocuronio, Somatostatina (+ Nitroprusiato con etiquetas de fila desplazadas, y Plasmalyte en `presentacion`, que se deja intacta). Se limpian **en el render** con `limpiarTablaAplanada()` (`index.html`), NO en `data/fichas.js`: ese archivo se regenera desde `medicamentos/*.md` con `scripts/merge_fichas.js` y cualquier arreglo hecho ahi se perderia. Si se toca esa funcion, correr antes el control de seguridad que se uso al escribirla (ningun texto de prosa >30 chars ni fila markdown puede desaparecer de las 76 fichas): un corte ciego por "inicio de tabla" borra texto clinico real de Isoprenalina y la tabla buena de Nitroprusiato.
 - `.ficha-top` (cabecera de la ficha) es **sticky**, y por eso `.ficha-overlay` NO puede tener `padding-top` ni `.ficha-modal` `margin-top`: con ese hueco, el contenido del cuerpo se cuela por encima del nombre del farmaco al desplazar (bug corregido en la continuacion 6, confirmado midiendo `getBoundingClientRect`).
