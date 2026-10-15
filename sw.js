@@ -1,7 +1,8 @@
-// SUBIR ESTA VERSION EN CADA CAMBIO DE data/*.js O index.html.
-// El fetch es cache-first: sin bump, quien ya tenga la app instalada seguira
-// viendo el contenido clinico antiguo indefinidamente.
-const CACHE = 'urg-v63';
+// Estrategia NETWORK-FIRST: con conexion siempre se sirve la version publicada
+// (revalidando la cache HTTP) y se actualiza la copia local; la cache solo se usa
+// sin conexion. Ya no hace falta subir CACHE en cada cambio de data/*.js o
+// index.html; subirla solo si cambia la lista ASSETS o este fichero.
+const CACHE = 'urg-v64';
 const ASSETS = [
   '/',
   '/index.html',
@@ -36,7 +37,10 @@ const ASSETS = [
   '/codigos/patrones iam nuevos/nuevo bloqueo bifascicular.jpg'
 ];
 
+let hadPrevious = false;
+
 self.addEventListener('install', e => {
+  hadPrevious = !!(self.registration && self.registration.active);
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
@@ -46,12 +50,30 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
+    .then(() => self.clients.claim())
+    // Al relevar a un SW anterior, recargar las pestanas abiertas para que la
+    // version nueva se vea sin esperar a la siguiente visita.
+    .then(() => hadPrevious ? self.clients.matchAll({ type: 'window' }) : [])
+    .then(list => list.forEach(c => c.navigate(c.url).catch(() => {})))
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(req, { cache: 'no-cache' })
+      .then(res => {
+        if (res && res.ok && res.type === 'basic') {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() =>
+        caches.match(req, { ignoreSearch: true }).then(r =>
+          r || (req.mode === 'navigate' ? caches.match('/index.html') : Response.error())
+        )
+      )
   );
 });
