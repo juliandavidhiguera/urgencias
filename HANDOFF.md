@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-20 | **Sesion #:** 7 | **Rama:** main | **HEAD:** `e2c972c` (+ commit de este handoff)
+**Ultima actualizacion:** 2026-10-20 | **Sesion #:** 8 | **Rama:** main | **HEAD:** `26435f6` (+ commit de este handoff)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -32,8 +32,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `data/intubacion.js` + tab `#tab-intubacion` (linea 919) | Checklist SIR, registro de dosis administrada/hora, perfusiones de mantenimiento post-intubacion | EN_CURSO (foco de las ultimas 7 sesiones de commits) |
 | `data/pcr.js` + tab `#tab-pcr` (index.html) | Algoritmo de PCR con selector **Adulto (ALS, dosis fija) / Pediátrico (SVAP-EPALS 2025, dosis por peso real)** — sesion 5. Adulto: ritmo (desfibrilable/no), ciclos, desfibrilaciones, farmacos de dosis fija, causas reversibles 4H/4T, cuidados post-RCE, informe copiable/imprimible | EN_CURSO (anadido sesion 4, sin uso clinico real aun) |
 | `registro-utstein.html` | Formulario standalone (no integrado a la navegacion de tabs, precacheado en `sw.js`) — registro Utstein de PCR, combina Anexo N.I (MinSalud) + Anexo IV (Hospital Clinic Barcelona), exporta a `.txt`, sin persistencia ni `localStorage` | EN_CURSO (anadido sesion 4) |
-| `data/scales.js` | 65 escalas clinicas agrupadas por sistema (sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
-| `data/formulas.js` | 47 formulas (sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
+| `data/scales.js` | 73 escalas clinicas agrupadas por sistema (sesion 8: +ADD-RS, Padua, IMPROVE VTE, IMPROVE Bleeding, Ottawa SAH, ICH score, LRINEC, CIWA-Ar; sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
+| `data/formulas.js` | 49 formulas (sesion 8: +indice ROX, regla de los 9; sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
 | `data/infusions.js` | Perfusiones IV (fuente unica de mL/h); sesion 7: +Urapidilo, +Naloxona | ESTABLE |
 | `data/protocols.js` | Protocolos de codigos de activacion + toxindromes/intoxicaciones | ESTABLE |
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
@@ -54,6 +54,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Cabeceras de seguridad desde 2026-09-22: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` en `/*` — verificado con `curl -I` en produccion (ver seccion 5). Sin CSP todavia (backlog #8).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 8 - 2026-10-20
+
+- Commit `26435f6` feat(escalas): cierra backlog #9. Escalas: `addrs` (ADD-RS + dimero D, ADvISED; tag nuevo `Aorta` en Cardiovascular), `padua`, `improve-vte`, `improve-bleed` (edad y FG como tramos excluyentes), `ottawa-sah`, `ich` (0-6; mortalidad observada en la cohorte original, sin uso para limitar tratamiento), `lrinec` (nunca en verde: no excluye), `ciwa` (cortes ASAM 2020, PMID 32511109). Formulas: `f-rox` (2/6/12 h, zona indeterminada), `f-regla9` (%SCQ adulto para Parkland).
+- Contrastado con Vera Health via navegador; PMID verificados en PubMed (ver `src` de cada escala). Probado con Node (cortes y limites) y en Chrome (render, botones, 0 errores).
+- Decisiones: ADvISED dice "permite considerar la exclusion", no "descarta" (correccion de Vera); CIWA-Ar se anade al localizar la guia ASAM 2020, con los cortes marcados como clasificacion ASAM y no de la escala original.
 
 ### Sesion 7 - 2026-10-20
 
@@ -114,7 +120,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~5~~ | ~~Decidir si el tab PCR debe cubrir dosis pediatricas~~ — RESUELTO sesion 5 (2026-10-14): modo pediatrico implementado (EPALS 2025). Queda verificacion con Vera de las dosis nuevas | `data/pcr.js` | P3 | Decision del usuario | Usuario confirma si el alcance pediatrico es necesario; si es asi, definir dosis por peso con Vera+Perplexity antes de implementar |
 | ~~6~~ | ~~Decidir si `registro-utstein.html` debe precargar datos ya diligenciados en el tab PCR~~ — RESUELTO sesion 4 continuacion (2026-09-03): usuario confirmo que debia prellenarse, implementado via traspaso `sessionStorage` (no `localStorage`) al abrir desde el boton del tab PCR | `index.html`, `registro-utstein.html` | - | - | Resuelto: `abrirRegistroUtstein()` + `aplicarDatosPcr()` |
 | 8 | Content-Security-Policy para URG CLINICO. Es la unica cabecera que quedo fuera en la continuacion 11, y a proposito: `index.html` son 147 KB con scripts y estilos inline, asi que exige inventariar cada bloque inline y decidir entre hashes, nonces o `'unsafe-inline'` acotado. Referencia de como quedo en los otros dos sitios: `site/public/_headers` y `lpclinics-site/public/_headers` | `_headers`, `index.html` | P2 | - | `curl -I` devuelve `Content-Security-Policy` y la PWA sigue funcionando entera (tabs, busqueda, fichas, PCR, registro Utstein, offline) sin errores de CSP en consola |
-| 9 | Siguientes escalas (orden sugerido por Vera): ADD-RS + dimero D, Padua/IMPROVE, Ottawa SAH, ICH score, ROX, regla de los 9 / Lund-Browder para Parkland; CIWA-Ar solo tras localizar guia verificable; LRINEC solo con aviso de que no excluye | `data/scales.js`, `data/formulas.js` | P2 | - | Cada escala con PMID verificado en PubMed, criterios contrastados con Vera y prueba Node de sus cortes |
+| ~~9~~ | ~~Siguientes escalas del backlog~~ — HECHO sesion 8 (`26435f6`) | - | - | - | Resuelto |
 | 10 | Verificar en la tabla de la validacion CSRS (JAMA Intern Med 2020) los riesgos de las categorias medio y alto, hoy mostrados sin porcentaje | `data/scales.js` (`csrs`) | P3 | Acceso al texto completo | Porcentajes anadidos con cita o decision de dejarlos sin % |
 | ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
 
