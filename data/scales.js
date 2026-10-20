@@ -390,6 +390,18 @@ window.SCALES = [
   {t:'sel', l:'Afasia (si hemiparesia derecha) o agnosia/negligencia (si hemiparesia izquierda)', o:[['Ausente (0)',0],['Moderada (1)',1],['Severa (2)',2]]}],
   interp:function(s){return s>=5?['high',s+' pts','Alta probabilidad de oclusión de gran vaso (S 85%, E 68%) — activar código ictus a centro con trombectomía']:['low',s+' pts','Baja probabilidad de oclusión de gran vaso — traslado según protocolo territorial']}},
 
+{id:'mrs', src:'Rankin 1957 · PMID 13432835 · van Swieten 1988 · PMID 3363593', title:'Rankin modificada (mRS)', sub:'Ictus — situación funcional previa (basal) y pronóstico', badge:'red', tag:'Ictus', max:6, items:[
+  {t:'sel', l:'Situación funcional (preguntar a familiares por la basal, previa al ictus actual)', o:[
+    ['Asintomático (0)',0],
+    ['Sin discapacidad significativa: síntomas, pero realiza sus actividades habituales (1)',1],
+    ['Discapacidad leve: no realiza todas sus actividades previas, pero se vale por sí mismo sin ayuda (2)',2],
+    ['Discapacidad moderada: necesita alguna ayuda, pero camina sin ayuda de otra persona (3)',3],
+    ['Discapacidad moderada-grave: no camina sin ayuda ni atiende sus necesidades corporales sin ayuda (4)',4],
+    ['Discapacidad grave: encamado, incontinente, requiere atención constante (5)',5],
+    ['Muerte (6)',6]]}],
+  info:'La mRS previa no es por sí sola un criterio de exclusión de reperfusión. Valorar por separado trombólisis (ESO 2021: considerar en pacientes seleccionados con discapacidad previa, recomendación débil) y trombectomía (ensayos pivotales con mRS 0–1)',
+  interp:function(s){return s<=1?['low','mRS '+s,'Independiente — perfil predominante de los ensayos pivotales de trombectomía']:s===2?['low','mRS 2','Independiente con limitaciones — no excluye por sí sola trombólisis ni trombectomía; evaluar el resto de criterios']:s<=4?['mid','mRS '+s,'Dependiente — reperfusión individualizada (evidencia observacional): ¿puede volver a su situación previa aceptable?']:s===5?['high','mRS 5','Dependencia total — evidencia muy escasa; decisión individual según situación basal, pronóstico y preferencias']:['high','mRS 6','Muerte']}},
+
 {id:'rts', src:'Champion 1989 · J Trauma · PMID 2657085', title:'Revised Trauma Score', sub:'Trauma — índice fisiológico pronóstico', badge:'red', tag:'Trauma', max:7.84, agg:'custom', items:[
   {t:'sel', l:'Escala de Glasgow (codificado)', o:[['13–15 (4)',4],['9–12 (3)',3],['6–8 (2)',2],['4–5 (1)',1],['3 (0)',0]]},
   {t:'sel', l:'Presión arterial sistólica (mmHg)', o:[['>89 (4)',4],['76–89 (3)',3],['50–75 (2)',2],['1–49 (1)',1],['0 — sin pulso (0)',0]]},
@@ -573,6 +585,106 @@ window.SCALES = [
     '<tr><td>Chupito / carajillo</td><td>25 mL</td><td>40%</td><td>1</td><td>8–10 g</td></tr>' +
     '<tr><td>Cerveza (tercio/lata)</td><td>330 mL</td><td>5%</td><td>1,5</td><td>13,2 g</td></tr>' +
     '<tr><td>Combinado/cubata</td><td>50 mL destilado</td><td>40%</td><td>2</td><td>16–20 g</td></tr>' +
-    '<tr><td>Copa de licor (whisky/ron)</td><td>50 mL</td><td>40%</td><td>2</td><td>16–20 g</td></tr></table>'}
+    '<tr><td>Copa de licor (whisky/ron)</td><td>50 mL</td><td>40%</td><td>2</td><td>16–20 g</td></tr></table>'},
+
+// ── TEP: exclusión sin imagen (contrastado con Vera Health 2026-10) ─────
+{id:'perc', src:'Kline 2004, J Thromb Haemost · PMID 15304025', title:'PERC', sub:'TEP — exclusión sin dímero D en probabilidad clínica baja', badge:'red', tag:'TEP', max:8, items:[
+  {t:'chk', l:'Edad ≥50 años', p:1},
+  {t:'chk', l:'FC ≥100 lpm', p:1},
+  {t:'chk', l:'SatO₂ <95% respirando aire ambiente', p:1},
+  {t:'chk', l:'Hemoptisis', p:1},
+  {t:'chk', l:'Uso de estrógenos (anticonceptivos, THS)', p:1},
+  {t:'chk', l:'TVP o TEP previa', p:1},
+  {t:'chk', l:'Edema unilateral de pierna', p:1},
+  {t:'chk', l:'Cirugía o traumatismo con ingreso en las 4 semanas previas', p:1}],
+  info:'Aplicar SOLO si la probabilidad clínica es baja (gestalt <15%). No es una escala de riesgo: un criterio positivo no diagnostica TEP. No usar en embarazo ni en pediatría',
+  interp:function(s){return s===0?['low','PERC negativo','Con probabilidad clínica baja: no pedir dímero D ni imagen']:['mid','PERC positivo ('+s+')','No permite excluir: seguir con probabilidad clínica + dímero D (YEARS o ajustado por edad)']}},
+
+{id:'years', copyDatos:true, src:'van der Hulle 2017, Lancet (YEARS) · PMID 28549662', title:'YEARS', sub:'TEP — umbral de dímero D según criterios', badge:'red', tag:'TEP', max:3, agg:'custom', items:[
+  {t:'sel', btn:true, l:'Signos clínicos de TVP', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'Hemoptisis', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'TEP es el diagnóstico más probable', o:[['No',0],['Sí',1]]},
+  {t:'num', l:'Dímero D (ng/mL FEU) — opcional', u:'ng/mL', f:function(v){return 0}}],
+  info:'Versión original: sin ajuste por edad. Dímero D en unidades FEU; un valor igual al umbral NO es negativo',
+  calcCustom:function(v){var n=v[0]+v[1]+v[2]; this._y={thr: n===0?1000:500, dd:v[3]}; return n},
+  interp:function(s){
+    var y=this._y, base=s+' criterio'+(s===1?'':'s')+' → umbral <'+y.thr+' ng/mL FEU';
+    if (!y.dd) return ['low',s+' criterio'+(s===1?'':'s'),'Dímero D <'+y.thr+' ng/mL FEU excluye TEP; si ≥'+y.thr+' → angio-TC'];
+    return y.dd<y.thr ? ['low','TEP excluido',base+' · DD '+y.dd+' — no precisa angio-TC'] : ['high','Angio-TC',base+' · DD '+y.dd+' — no se puede excluir TEP'];
+  }},
+
+{id:'dd-edad', copyDatos:true, src:'Righini 2014, JAMA (ADJUST-PE) · PMID 24643601', title:'Dímero D ajustado por edad', sub:'TEP — umbral = edad × 10 ng/mL FEU en >50 años', badge:'red', tag:'TEP', max:1000, agg:'custom', items:[
+  {t:'num', l:'Edad (años)', u:'años', f:function(v){return 0}},
+  {t:'sel', btn:true, l:'Unidades del laboratorio', o:[['FEU',0],['DDU',1]]},
+  {t:'num', l:'Dímero D medido (ng/mL) — opcional', u:'ng/mL', f:function(v){return 0}}],
+  info:'Solo con probabilidad clínica NO alta (Wells ≤4 o Ginebra no alto). Con probabilidad alta, ir directamente a angio-TC. La adaptación a DDU (edad × 5) es una conversión de laboratorio, no procede de ADJUST-PE: confirmar con el laboratorio el tipo de ensayo',
+  calcCustom:function(v){
+    if (!v[0]) { this._dd=null; return 0; }
+    var ddu=v[1]===1, thr=v[0]>50 ? v[0]*(ddu?5:10) : (ddu?250:500);
+    this._dd={u:ddu?'DDU':'FEU', dd:v[2]}; return thr;
+  },
+  interp:function(s){
+    var d=this._dd; if (!d) return ['low','—','Introducir la edad'];
+    if (!d.dd) return ['low','Umbral <'+s+' ng/mL '+d.u,'Un dímero D por debajo de este valor excluye TEP si la probabilidad clínica no es alta'];
+    return d.dd<s ? ['low','TEP excluido','DD '+d.dd+' < '+s+' ng/mL '+d.u+' — no precisa angio-TC'] : ['high','Angio-TC','DD '+d.dd+' ≥ '+s+' ng/mL '+d.u+' — no se puede excluir TEP'];
+  }},
+
+// ── Trauma: reglas de imagen ──────────────────────────────────────
+{id:'cchr', src:'Stiell 2001, Lancet · PMID 11356436 · limitaciones: ACEP 2023', title:'Canadian CT Head Rule', sub:'TCE leve — ¿precisa TC craneal?', badge:'red', tag:'Trauma', max:57, items:[
+  {t:'chk', l:'ALTO RIESGO — GCS <15 a las 2 h del traumatismo', p:10},
+  {t:'chk', l:'ALTO RIESGO — Sospecha de fractura abierta o hundimiento craneal', p:10},
+  {t:'chk', l:'ALTO RIESGO — Signos de fractura de base (hemotímpano, ojos de mapache, otorrea/rinorrea de LCR, signo de Battle)', p:10},
+  {t:'chk', l:'ALTO RIESGO — ≥2 episodios de vómitos', p:10},
+  {t:'chk', l:'ALTO RIESGO — Edad ≥65 años', p:10},
+  {t:'chk', l:'RIESGO MEDIO — Amnesia de lo ocurrido antes del impacto >30 min', p:1},
+  {t:'chk', l:'RIESGO MEDIO — Mecanismo peligroso: peatón atropellado, expulsado del vehículo o caída desde >3 pies (0,9 m) o 5 escalones', p:1}],
+  info:'Aplicable solo a TCE cerrado con GCS 13–15 y pérdida de conciencia, amnesia o desorientación. NO aplicable (pedir TC según criterio clínico): <16 años, anticoagulación o coagulopatía, antiagregación distinta de AAS aislada, déficit focal, convulsión postraumática, fractura deprimida evidente, politraumatizado inestable, intoxicación que impida valorar',
+  interp:function(s){return s>=10?['high','Alto riesgo','Riesgo de intervención neuroquirúrgica → TC craneal']:s>=1?['mid','Riesgo medio','Riesgo de lesión cerebral en TC → TC craneal']:['low','Sin criterios','La regla no indica TC (solo si cumple inclusión y ninguna exclusión)']}},
+
+{id:'ccspine', copyDatos:true, src:'Stiell 2001, JAMA · PMID 11597285', title:'Canadian C-Spine Rule', sub:'Trauma cervical — ¿precisa imagen? (paciente alerta y estable)', badge:'red', tag:'Trauma', max:1, agg:'custom', items:[
+  {t:'sel', btn:true, l:'1. ¿Algún factor de ALTO riesgo? Edad ≥65 · mecanismo peligroso (caída ≥3 pies/5 escalones, carga axial, colisión a alta velocidad, vuelco o expulsión, vehículo recreativo motorizado, colisión en bicicleta) · parestesias en extremidades', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'2. ¿Algún factor de BAJO riesgo? Alcance trasero simple · sentado en urgencias · ha deambulado en algún momento · dolor cervical de inicio diferido · sin dolor en la línea media cervical', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'3. ¿Rota activamente el cuello 45° a izquierda Y derecha? (valorar solo si 1 = No y 2 = Sí)', o:[['No puede',0],['Sí',1]]}],
+  info:'Solo para traumatismo cerrado con GCS 15 y paciente estable. No aplicable en exploración no fiable, déficit neurológico agudo o patología cervical previa relevante. "Alcance trasero simple" excluye empuje al tráfico, impacto por autobús/camión, vuelco o alta velocidad',
+  calcCustom:function(v){this._cs=v[0]===1?'alto':v[1]!==1?'sinbajo':v[2]===1?'no':'rot'; return this._cs==='no'?0:1},
+  interp:function(s){var c=this._cs; return c==='alto'?['high','Imagen','Factor de alto riesgo → imagen cervical (no explorar la movilidad)']:c==='sinbajo'?['high','Imagen','Sin factores de bajo riesgo → imagen cervical']:c==='rot'?['high','Imagen','No rota 45° a ambos lados → imagen cervical']:['low','Sin imagen','La regla permite no hacer imagen cervical']}},
+
+// ── Digestivo ───────────────────────────────────────────────────
+{id:'oakland', src:'Oakland 2017, Lancet Gastroenterol Hepatol · PMID 28651935 · corte ≤8: ESGE 2021', title:'Oakland', sub:'Hemorragia digestiva baja — manejo ambulatorio seguro', badge:'amber', tag:'Digestivo', max:35, items:[
+  {t:'sel', l:'Edad', o:[['<40 años (0)',0],['40–69 años (1)',1],['≥70 años (2)',2]]},
+  {t:'sel', btn:true, l:'Sexo', o:[['Mujer (0)',0],['Hombre (1)',1]]},
+  {t:'sel', btn:true, l:'Ingreso previo por HDB', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Sangre en el tacto rectal', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Frecuencia cardíaca', o:[['<70 lpm (0)',0],['70–89 lpm (1)',1],['90–109 lpm (2)',2],['≥110 lpm (3)',3]]},
+  {t:'sel', l:'PA sistólica', o:[['≥160 mmHg (0)',0],['130–159 mmHg (2)',2],['120–129 mmHg (3)',3],['90–119 mmHg (4)',4],['50–89 mmHg (5)',5]]},
+  {t:'sel', l:'Hemoglobina', o:[['≥16,0 g/dL (0)',0],['13,0–15,9 g/dL (4)',4],['11,0–12,9 g/dL (8)',8],['9,0–10,9 g/dL (13)',13],['7,0–8,9 g/dL (17)',17],['3,6–6,9 g/dL (22)',22]]}],
+  info:'No usar en sangrado persistente o inestabilidad. PAS <50 mmHg o Hb <3,6 g/dL quedan fuera de la escala',
+  interp:function(s){return s<=8?['low',s+' pts','Riesgo bajo (≈95% de alta segura): considerar manejo ambulatorio si el sangrado se ha autolimitado, hay estabilidad clínica y no hay otros motivos de ingreso']:['mid',s+' pts','No cumple criterio de bajo riesgo — valorar ingreso']}},
+
+// ── SCA ─────────────────────────────────────────────────────────
+{id:'grace', src:'Granger 2003, Arch Intern Med · PMID 14581255 (GRACE 1.0 intrahospitalario)', title:'GRACE 1.0', sub:'SCASEST — mortalidad hospitalaria (no es GRACE 2.0 ni 3.0)', badge:'red', tag:'SCA', max:372, items:[
+  {t:'sel', l:'Edad', o:[['<30 años (0)',0],['30–39 (8)',8],['40–49 (25)',25],['50–59 (41)',41],['60–69 (58)',58],['70–79 (75)',75],['80–89 (91)',91],['≥90 (100)',100]]},
+  {t:'sel', l:'Frecuencia cardíaca', o:[['<50 lpm (0)',0],['50–69 (3)',3],['70–89 (9)',9],['90–109 (15)',15],['110–149 (24)',24],['150–199 (38)',38],['≥200 (46)',46]]},
+  {t:'sel', l:'PA sistólica', o:[['≥200 mmHg (0)',0],['160–199 (10)',10],['140–159 (24)',24],['120–139 (34)',34],['100–119 (43)',43],['80–99 (53)',53],['<80 (58)',58]]},
+  {t:'sel', l:'Creatinina', o:[['0–0,39 mg/dL (1)',1],['0,40–0,79 (4)',4],['0,80–1,19 (7)',7],['1,20–1,59 (10)',10],['1,60–1,99 (13)',13],['2,00–3,99 (21)',21],['≥4,0 (28)',28]]},
+  {t:'sel', btn:true, l:'Killip', o:[['I (0)',0],['II (20)',20],['III (39)',39],['IV (59)',59]]},
+  {t:'chk', l:'Parada cardíaca en la presentación inicial', p:39},
+  {t:'chk', l:'Desviación del ST', p:28},
+  {t:'chk', l:'Marcadores de necrosis miocárdica iniciales elevados', p:14}],
+  info:'Cortes válidos para SCASEST. No mezclar con el modelo a 6 meses ni con GRACE 2.0/3.0 (modelos y desenlaces distintos)',
+  interp:function(s){return s<=108?['low',s+' pts','Riesgo bajo (mortalidad hospitalaria <1%)']:s<=140?['mid',s+' pts','Riesgo intermedio (1–3%)']:['high',s+' pts','Riesgo alto (>3%) — ESC: estrategia invasiva precoz (<24 h)']}},
+
+// ── Síncope ─────────────────────────────────────────────────────
+{id:'csrs', src:'Thiruganasambandamoorthy 2016, CMAJ · PMID 27378464 · riesgos: validación JAMA Intern Med 2020', title:'Canadian Syncope Risk Score', sub:'Síncope — eventos graves a 30 días (tras la evaluación en urgencias)', badge:'red', tag:'Síncope', max:11, items:[
+  {t:'sel', btn:true, l:'Predisposición vasovagal (calor, aglomeración, bipedestación prolongada, miedo, emoción, dolor)', o:[['No (0)',0],['Sí (−1)',-1]]},
+  {t:'sel', btn:true, l:'Antecedente de cardiopatía', o:[['No (0)',0],['Sí (+1)',1]]},
+  {t:'sel', btn:true, l:'Cualquier PAS <90 o >180 mmHg en urgencias', o:[['No (0)',0],['Sí (+2)',2]]},
+  {t:'sel', btn:true, l:'Troponina > percentil 99', o:[['No (0)',0],['Sí (+2)',2]]},
+  {t:'sel', btn:true, l:'Eje QRS anormal (<−30° o >100°)', o:[['No (0)',0],['Sí (+1)',1]]},
+  {t:'sel', btn:true, l:'QRS >130 ms', o:[['No (0)',0],['Sí (+1)',1]]},
+  {t:'sel', btn:true, l:'QTc >480 ms', o:[['No (0)',0],['Sí (+2)',2]]},
+  {t:'sel', btn:true, l:'Diagnóstico en urgencias', o:[['Ninguno de los dos (0)',0],['Vasovagal (−2)',-2],['Cardíaco (+2)',2]]}],
+  info:'Aplicar al final de la evaluación, cuando no se ha identificado ya una causa grave. Los valores iguales al umbral (QRS 130, QTc 480) no puntúan. Riesgo = eventos graves compuestos a 30 días, no mortalidad',
+  interp:function(s){return s<=-2?['low',s+' pts','Riesgo muy bajo (0,3% a 30 días)']:s<=0?['low',s+' pts','Riesgo bajo (0,7% a 30 días)']:s<=3?['mid',s+' pts','Riesgo medio']:s<=5?['high',s+' pts','Riesgo alto']:['high',s+' pts','Riesgo muy alto (51,3% a 30 días)']}}
 
 ];

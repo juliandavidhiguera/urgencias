@@ -85,6 +85,11 @@ window.INFUSIONS = [
   diluyente: 'SF 0,9%', notas: 'Precedido de bolos de 10-20 mg IV lento (máx. 300 mg/día). Dilución alternativa equivalente: 100 mg en 80 mL SF. Proteger de la luz solar. Contraindicado en insuficiencia cardíaca, bradicardia y asma',
   ficha: 'Labetalol.md'},
 
+{name: 'Urapidilo', group: 'Antihipertensivos', badge: 'amber',
+  mg: 50, vol: 50, unit: 'mcg/kg/min', doseMin: 2, doseMax: 7,
+  diluyente: 'SF 0,9% / SG 5%', notas: 'Precedido de bolo 25 mg IV lento (20 s-2 min); si no hay respuesta a los 5 min, repetir 25 mg y después 50 mg. Dilución: 1 vial 50 mg/10 mL + 40 mL SF (1 mg/mL). Ficha técnica AEMPS: mantenimiento medio 9 mg/h; ESC 2019: 5-40 mg/h titulado a la respuesta (PMID 30165588). Precaución en ancianos, hipovolemia e IC; contraindicado en estenosis aórtica. No mezclar con otros hipotensores',
+  ficha: 'Urapidil.md'},
+
 {name: 'Amiodarona (mantenimiento)', group: 'Antiarrítmicos', badge: 'amber',
   mg: 150, vol: 50, unit: 'mg/h', doseMin: 37.5, doseMax: null,
   diluyente: 'SG 5% (NO usar SF)', notas: 'Perfusión de mantenimiento tras la carga (300 mg + 150 mg en descargas de PCR o 300 mg en 20-30 min en taquiarritmias): dosis total 900 mg/24h. Hipotensión si infusión rápida',
@@ -94,6 +99,11 @@ window.INFUSIONS = [
   mg: 50, vol: 50, unit: 'UI/kg/h', doseMin: 0.05, doseMax: 0.1, unitLabel: 'UI',
   diluyente: 'SF 0,9%', notas: 'Fase inicial 0,1 UI/kg/h en CAD (o EHH con criterios mixtos de cetosis/acidosis); 0,05 UI/kg/h si EHH puro sin cetosis significativa. Reducir a 0,05 UI/kg/h y añadir dextrosa 5-10% cuando la glucemia sea <250 mg/dl. Vigilar hipoglucemia y potasio seriados',
   ficha: 'Insulina.md'},
+
+{name: 'Naloxona', group: 'Antídotos', badge: 'red',
+  mg: 2, vol: 50, unit: 'mg/h', doseMin: 0.2, doseMax: 1.6,
+  diluyente: 'SF 0,9% / SG 5%', notas: 'Resedación tras bolos eficaces (metadona, opioides de acción prolongada, fentanilo a dosis altas): iniciar a 2/3 de la dosis eficaz de reversión por hora (AHA 2025, PMID 41122889) y ajustar a ventilación eficaz, no a despertar completo. El rango 0,2-1,6 mg/h es orientativo: manda la dosis eficaz. Dilución: 2 mg (5 amp. 0,4 mg) en 50 mL (0,04 mg/mL). Vigilar abstinencia y EAP no cardiogénico',
+  ficha: 'Naloxona.md'},
 
 {name: 'Somatostatina', group: 'Otros', badge: 'blue',
   mg: 3, vol: 50, unit: 'mcg/kg/h', doseMin: 1.75, doseMax: 3.5,

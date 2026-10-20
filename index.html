@@ -275,6 +275,34 @@ body {
   font-family: var(--sans);
   min-height: 36px;
 }
+.seg-btns { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.seg-btn {
+  font-size: 12px;
+  font-family: var(--sans);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 4px 10px;
+  min-height: 36px;
+  cursor: pointer;
+}
+.seg-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); font-weight: 600; }
+.paste-box { padding: 5px 0 8px; border-bottom: 1px solid var(--bg3); }
+.paste-box textarea {
+  width: 100%;
+  min-height: 60px;
+  margin-top: 4px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  resize: vertical;
+}
+.paste-res { font-size: 11px; color: var(--text2); margin-top: 4px; }
 
 .score-display {
   margin-top: 12px;
@@ -1563,6 +1591,11 @@ ${t('sca-aux')}`;
 function _scaleCtrl(sc, it, i, pfx) {
   pfx = pfx || '';
   const id = pfx + sc.id + '_' + i;
+  if (it.t === 'sel' && it.btn) {
+    return '<input type="hidden" id="' + id + '" value="' + it.o[0][1] + '"><div class="seg-btns" role="group">' +
+      it.o.map((o, j) => '<button type="button" class="seg-btn' + (j === 0 ? ' active' : '') + '" data-val="' + o[1] + '" aria-pressed="' + (j === 0) +
+        '" onclick="segSelect(this,\'' + id + '\',' + o[1] + ',\'' + sc.id + '\',\'' + pfx + '\')">' + o[0] + '</button>').join('') + '</div>';
+  }
   if (it.t === 'sel') {
     return '<select id="' + id + '" onchange="onScaleChange(\'' + sc.id + '\',\'' + pfx + '\')">' +
       it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>';
@@ -1586,6 +1619,9 @@ function renderOneScale(sc, favs, pfx, kind) {
         '" onclick="event.stopPropagation();toggleFav(\'' + kind + '\',\'' + sc.id + '\')" aria-label="Favorito" aria-pressed="' + (favs[kind + ':' + sc.id] ? 'true' : 'false') + '">★</button>' +
       '</summary>' +
       '<div class="scale-body">' +
+        (sc.paste ? '<div class="paste-box"><label class="scale-label" for="' + uid + '_paste">' + sc.paste.l + '</label>' +
+          '<textarea id="' + uid + '_paste" placeholder="' + sc.paste.ph + '" oninput="onScalePaste(\'' + sc.id + '\',\'' + pfx + '\')"></textarea>' +
+          '<div class="paste-res" id="' + uid + '_paste-res"></div></div>' : '') +
         sc.items.map((it, i) => {
           const ctrlId = pfx + sc.id + '_' + i;
           return '<div class="scale-item"><label class="scale-label" for="' + ctrlId + '">' + it.l + '</label>' +
@@ -1605,7 +1641,7 @@ function renderOneScale(sc, favs, pfx, kind) {
 
 const SCALE_GROUPS = [
   { name: 'Triaje y deterioro clínico', icon: '🚨', tags: ['Triaje'] },
-  { name: 'Cardiovascular', icon: '🫀', tags: ['SCA', 'FA', 'IC'] },
+  { name: 'Cardiovascular', icon: '🫀', tags: ['SCA', 'FA', 'IC', 'Síncope'] },
   { name: 'Neurológico', icon: '🧠', tags: ['Ictus', 'AIT/Ictus', 'Neuro'] },
   { name: 'Respiratorio', icon: '🫁', tags: ['Respiratorio', 'Neumonía', 'EPOC'] },
   { name: 'TEP y TVP', icon: '🩸', tags: ['TEP', 'TVP'] },
@@ -1626,6 +1662,8 @@ function _scaleGroupFor(sc) {
 const FORMULA_GROUPS = [
   { name: 'Hemodinámica', icon: '🫀', tags: ['Hemodinámica'] },
   { name: 'Electrolitos y ácido-base', icon: '🧪', tags: ['Electrolitos'] },
+  { name: 'Función renal', icon: '💧', tags: ['Renal'] },
+  { name: 'ECG', icon: '📉', tags: ['ECG'] },
   { name: 'Gasometría y compensación', icon: '🩸', tags: ['Gasometría'] },
   { name: 'Ventilación mecánica', icon: '🫁', tags: ['Ventilación'] },
   { name: 'Hemodinámica invasiva (UCI)', icon: '📈', tags: ['UCI'] },
@@ -1696,6 +1734,35 @@ function renderFormulas() {
   FORMULAS.forEach(f => calcScale(f.id));
 }
 
+/* Botones de selección (items sel con btn:true): guardan el valor en un input oculto con el id del control. */
+function _segSet(id, val) {
+  document.getElementById(id).value = val;
+  const btns = document.getElementById(id).nextElementSibling.querySelectorAll('.seg-btn');
+  btns.forEach(b => {
+    const on = b.dataset.val === String(val);
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+  });
+}
+
+function segSelect(btn, id, val, scId, pfx) {
+  _segSet(id, val);
+  onScaleChange(scId, pfx);
+}
+
+/* Texto pegado (sc.paste): sc.paste.parse devuelve {índice de item: valor} y rellena los campos numéricos. */
+function onScalePaste(id, pfx) {
+  pfx = pfx || '';
+  const uid = pfx + id;
+  const sc = _findScaleOrFormula(id);
+  const vals = sc.paste.parse(document.getElementById(uid + '_paste').value);
+  Object.keys(vals).forEach(i => { document.getElementById(uid + '_' + i).value = vals[i]; });
+  const keys = Object.keys(vals);
+  document.getElementById(uid + '_paste-res').textContent = keys.length ?
+    'Detectado: ' + keys.map(i => sc.items[i].l.split(' —')[0].split(' (')[0] + ' ' + vals[i]).join(' · ') : 'No se ha reconocido ningún valor';
+  onScaleChange(id, pfx);
+}
+
 /* Wrapper used by scale input handlers: registers real usage in "recientes" then recalculates. */
 function onScaleChange(id, pfx) {
   trackRecent(id);
@@ -1741,10 +1808,15 @@ function resetGeneric(id, pfx) {
   const sc = _findScaleOrFormula(id);
   sc.items.forEach((it, i) => {
     const el = document.getElementById(uid + '_' + i);
-    if (it.t === 'sel') el.selectedIndex = 0;
+    if (it.t === 'sel' && it.btn) _segSet(uid + '_' + i, it.o[0][1]);
+    else if (it.t === 'sel') el.selectedIndex = 0;
     else if (it.t === 'num') el.value = '';
     else el.checked = false;
   });
+  if (sc.paste) {
+    document.getElementById(uid + '_paste').value = '';
+    document.getElementById(uid + '_paste-res').textContent = '';
+  }
   calcScale(id, pfx);
 }
 
@@ -1755,8 +1827,21 @@ function copyScaleResult(id, pfx) {
   const num = document.getElementById(uid + '-num').textContent;
   const risk = document.getElementById(uid + '-risk').textContent;
   const detail = document.getElementById(uid + '-detail').textContent;
-  const score = sc.max ? num + '/' + sc.max : num;
-  const txt = sc.title + ': ' + score + ' — ' + risk + '\n' + detail;
+  let txt;
+  if (sc.copyDatos) {
+    // Fórmulas de informe: copia los datos introducidos y la interpretación, sin "puntos/máx"
+    const datos = sc.items.map((it, i) => {
+      const el = document.getElementById(uid + '_' + i);
+      const nombre = it.l.split(' —')[0];
+      if (it.t === 'num') return el.value === '' ? null : nombre + ' ' + el.value;
+      const opt = it.o.find(o => String(o[1]) === String(el.value));
+      return opt ? nombre + ': ' + opt[0] : null;
+    }).filter(Boolean).join(' · ');
+    txt = sc.title + '\nDatos: ' + datos + '\nResultado: ' + risk + '\n' + detail;
+  } else {
+    const score = sc.max ? num + '/' + sc.max : num;
+    txt = sc.title + ': ' + score + ' — ' + risk + '\n' + detail;
+  }
   navigator.clipboard.writeText(txt).then(() => {
     // Brief visual feedback
     const btn = event.target;
