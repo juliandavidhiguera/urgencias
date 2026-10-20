@@ -2788,10 +2788,13 @@ function calcPcr() {
       if (d.id === 'adrenalina') {
         due = ritmo === 'no_desfibrilable' ? !dado : (descargas >= 3);
       } else {
-        due = descargas >= 3;
+        /* Amiodarona y lidocaína son excluyentes: si ya se dio una, no se pide la otra. */
+        const otro = document.getElementById('pcr-fx-' + (d.id === 'amiodarona' ? 'lidocaina' : 'amiodarona') + '-chk');
+        due = descargas >= 3 && !(otro && otro.checked);
       }
     }
-    recEl.innerHTML = (due && !dado) ? '<span class="drug-flag pref-inestable">▶ administrar ahora</span>'
+    recEl.innerHTML = (due && !dado && d.id === 'lidocaina') ? '<span class="drug-flag pref-estable">↔ alternativa a amiodarona</span>'
+      : (due && !dado) ? '<span class="drug-flag pref-inestable">▶ administrar ahora</span>'
       : (ritmo && !d.ritmos.includes(ritmo)) ? '<span class="drug-flag pref-estable">no aplica al ritmo actual</span>' : '';
   });
 

@@ -685,7 +685,7 @@ window.SCALES = [
   {t:'sel', btn:true, l:'QTc >480 ms', o:[['No (0)',0],['Sí (+2)',2]]},
   {t:'sel', btn:true, l:'Diagnóstico en urgencias', o:[['Ninguno de los dos (0)',0],['Vasovagal (−2)',-2],['Cardíaco (+2)',2]]}],
   info:'Aplicar al final de la evaluación, cuando no se ha identificado ya una causa grave. Los valores iguales al umbral (QRS 130, QTc 480) no puntúan. Riesgo = eventos graves compuestos a 30 días, no mortalidad',
-  interp:function(s){return s<=-2?['low',s+' pts','Riesgo muy bajo (0,3% a 30 días)']:s<=0?['low',s+' pts','Riesgo bajo (0,7% a 30 días)']:s<=3?['mid',s+' pts','Riesgo medio']:s<=5?['high',s+' pts','Riesgo alto']:['high',s+' pts','Riesgo muy alto (51,3% a 30 días)']}},
+  interp:function(s){return s<=-2?['low',s+' pts','Riesgo muy bajo (0,3% a 30 días)']:s<=0?['low',s+' pts','Riesgo bajo (0,7% a 30 días)']:s<=3?['mid',s+' pts','Riesgo medio (8,0% a 30 días)']:s<=5?['high',s+' pts','Riesgo alto (19,2% a 30 días)']:['high',s+' pts','Riesgo muy alto (51,3% a 30 días)']}},
 
 // ── Backlog #9 (sesion 8, contrastado con Vera Health 2026-10) ──────────
 {id:'addrs', copyDatos:true, src:'Rogers 2011, Circulation · PMID 21555704 · ADvISED: Nazerian 2018, Circulation · PMID 29030346', title:'ADD-RS + dímero D', sub:'Síndrome aórtico agudo — ¿angio-TC o dímero D?', badge:'red', tag:'Aorta', max:3, agg:'custom', items:[
