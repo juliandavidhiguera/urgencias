@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-20 | **Sesion #:** 8 | **Rama:** main | **HEAD:** `26435f6` (+ commit de este handoff)
+**Ultima actualizacion:** 2026-10-20 | **Sesion #:** 9 | **Rama:** main | **HEAD:** `26b7e3d` (+ commit de este handoff)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -33,7 +33,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `data/pcr.js` + tab `#tab-pcr` (index.html) | Algoritmo de PCR con selector **Adulto (ALS, dosis fija) / Pediátrico (SVAP-EPALS 2025, dosis por peso real)** — sesion 5. Adulto: ritmo (desfibrilable/no), ciclos, desfibrilaciones, farmacos de dosis fija, causas reversibles 4H/4T, cuidados post-RCE, informe copiable/imprimible | EN_CURSO (anadido sesion 4, sin uso clinico real aun) |
 | `registro-utstein.html` | Formulario standalone (no integrado a la navegacion de tabs, precacheado en `sw.js`) — registro Utstein de PCR, combina Anexo N.I (MinSalud) + Anexo IV (Hospital Clinic Barcelona), exporta a `.txt`, sin persistencia ni `localStorage` | EN_CURSO (anadido sesion 4) |
 | `data/scales.js` | 73 escalas clinicas agrupadas por sistema (sesion 8: +ADD-RS, Padua, IMPROVE VTE, IMPROVE Bleeding, Ottawa SAH, ICH score, LRINEC, CIWA-Ar; sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
-| `data/formulas.js` | 49 formulas (sesion 8: +indice ROX, regla de los 9; sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
+| `data/formulas.js` | 48 formulas (sesion 9: -f-naloxona, pasada a la ficha; sesion 8: +indice ROX, regla de los 9; sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
 | `data/infusions.js` | Perfusiones IV (fuente unica de mL/h); sesion 7: +Urapidilo, +Naloxona | ESTABLE |
 | `data/protocols.js` | Protocolos de codigos de activacion + toxindromes/intoxicaciones | ESTABLE |
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
@@ -54,6 +54,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Cabeceras de seguridad desde 2026-09-22: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` en `/*` — verificado con `curl -I` en produccion (ver seccion 5). Sin CSP todavia (backlog #8).
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 9 - 2026-10-20
+
+- Commit `26b7e3d`. **Fichas**: la calculadora muestra la dosis en mL segun la presentacion comercial (`parsePresentacion()` lee `f.presentacion`: 55/76 fichas; campos editables), convierte g/mg/mcg y aplica el tope "max. X mg" de la propia linea (`_fichaTope()`).
+- **Naloxona**: `f-naloxona` retirada de Formulas a peticion del usuario; su pauta pediatrica (ERC PLS 2025, 10-40 mcg/kg max. 2 mg) va ahora en la ficha via `scripts/patch_fichas_verificacion.js` (linea en `dosis` + texto en `pediatria`).
+- **Perfusion IV**: lista en orden alfabetico + buscador `#inf-buscar` (filtra desplegable y tarjetas, sin tildes, tambien por grupo); `goToInfusion`, `irAPerfusion` y Reset quitan el filtro.
+- Discrepancia detectada con Vera: AHA 2025 da naloxona pediatrica 0,1 mg/kg (y perfusion 2/3 de la dosis eficaz/h) frente a 10-40 mcg/kg del ERC; se mantiene ERC (decision de la sesion 5) y la AHA queda escrita en Pediatria de la ficha.
 
 ### Sesion 8 - 2026-10-20
 
@@ -168,6 +175,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Motor de escalas/formulas (`calcScale`)**: con `calcCustom`, los valores crudos se leen con `parseFloat(el.value)||0`, y un checkbox da `"on"` -> 0. Por eso las escalas con `calcCustom` usan `sel` (con `btn:true`) para los si/no, nunca `chk`. `interp(s)` solo recibe el numero: para mostrar mas datos, `calcCustom` guarda el analisis en `this._x` (se llama como metodo del objeto) e `interp` lo lee (patron de `f-gasometria`, `f-qtc`, `f-na-correccion`, `years`, `dd-edad`, `ccspine`).
 - `sc.paste.parse` devuelve `{indice de item: valor}`: si se reordenan los `items` de `f-gasometria`, hay que actualizar los indices del parser y los `v[n]` de `analizar`.
 - Probar en localhost tras cambiar `index.html`: si el navegador tiene un SW antiguo puede servir el HTML viejo; desregistrar el SW y vaciar `caches` desde la consola antes de concluir que algo no funciona (paso en la sesion 7).
+
+- **Si se regenera `data/fichas.js`** con `scripts/merge_fichas.js`, ejecutar despues `node scripts/patch_fichas_verificacion.js`: sin eso se pierden las contraindicaciones anadidas y la dosis pediatrica de naloxona (el script es idempotente).
+- Calculadora de fichas: la dosis en mL depende de la presentacion leida con `parsePresentacion()` (prioridad: "X/mL" explicito, luego "X ud = Y mL", luego "Y mL = X ud"; quita puntos de miles). Si se anade una ficha y no se lee su presentacion, el usuario la puede escribir a mano; el tope por dosis solo se aplica si "max." esta en la MISMA linea que la pauta por kg.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
 Abrir en el movil `https://urgencias.doctorhiguera.com/` y probar con un caso real la gasometria pegando el informe del gasometro del hospital (si algun campo no se reconoce, anadir su etiqueta al parser de `f-gasometria` en `data/formulas.js`).
