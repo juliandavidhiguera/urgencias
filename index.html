@@ -558,6 +558,10 @@ body {
   background: var(--bg3);
   border-radius: 6px;
 }
+.ficha-calc-ml { font-size: 16px; color: var(--blue); background: var(--blue-bg); }
+.ficha-calc-ml:empty { display: none; }
+.ficha-pres-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+.ficha-pres-row input { width: 72px; }
 .ficha-calc-meta { font-size: 11.5px; color: var(--text2); line-height: 1.45; }
 .ficha-calc-aviso { font-size: 10.5px; color: var(--amber); line-height: 1.45; }
 .ficha-calc-perf {
@@ -969,6 +973,7 @@ body {
   <div class="subhead">Paciente y fármaco</div>
   <div class="fields">
     <div class="field"><label for="inf-peso">Peso (kg)</label><input type="number" id="inf-peso" min="1" max="300" value="70" oninput="updateInfusionPeso()"></div>
+    <div class="field"><label for="inf-buscar">Buscar medicamento</label><input type="search" id="inf-buscar" placeholder="Escribe para filtrar…" autocomplete="off" oninput="filterInfusions()"></div>
     <div class="field"><label for="inf-farmaco">Medicamento</label><select id="inf-farmaco" onchange="selectInfusionDrug()"></select></div>
     <div class="field"><label for="inf-nombre">Nombre (si "Otro")</label><input type="text" id="inf-nombre" placeholder="p.ej. Labetalol" oninput="calcInfusion()"></div>
     <div class="field"><label for="inf-mg">Cantidad fármaco (mg o UI)</label><input type="number" id="inf-mg" step="0.001" min="0" oninput="calcInfusion()"></div>
@@ -2004,10 +2009,37 @@ function _infuMLH(dosis, unit, peso, conc) {
   return mgh == null ? null : mgh / conc;
 }
 
+/* Lista en orden alfabético, filtrada por el buscador (sin tildes ni mayúsculas). */
+function _infuSinTildes(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+
+function _infuLista() {
+  const el = document.getElementById('inf-buscar');
+  const q = el ? _infuSinTildes(el.value.trim()) : '';
+  return INFUSIONS.slice()
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+    .filter(d => !q || _infuSinTildes(d.name + ' ' + d.group).includes(q));
+}
+
 function renderInfusionSelect() {
   const sel = document.getElementById('inf-farmaco');
-  sel.innerHTML = INFUSIONS.map(d => '<option value="' + d.name + '">' + d.name + '</option>').join('') +
+  sel.innerHTML = _infuLista().map(d => '<option value="' + d.name + '">' + d.name + '</option>').join('') +
     '<option value="_otro">Otro / no listado (manual)</option>';
+}
+
+function filterInfusions() {
+  const sel = document.getElementById('inf-farmaco');
+  const previo = sel.value;
+  renderInfusionSelect();
+  // Si el fármaco elegido sigue en la lista se conserva; si no, se elige la primera coincidencia
+  if ([...sel.options].some(o => o.value === previo)) sel.value = previo;
+  if (sel.value !== previo) selectInfusionDrug();
+  renderInfusionGrid();
+}
+
+/* Quita el filtro antes de seleccionar un fármaco desde otra pestaña. */
+function _infuLimpiarFiltro() {
+  const el = document.getElementById('inf-buscar');
+  if (el && el.value) { el.value = ''; renderInfusionSelect(); renderInfusionGrid(); }
 }
 
 function selectInfusionDrug() {
@@ -2088,6 +2120,7 @@ function goToInfusion(name, pesoFieldId) {
   showTab('perfusiones', document.getElementById('navbtn-perfusiones'));
   const origenPeso = pesoFieldId ? document.getElementById(pesoFieldId) : null;
   if (origenPeso && origenPeso.value) document.getElementById('inf-peso').value = origenPeso.value;
+  _infuLimpiarFiltro();
   document.getElementById('inf-farmaco').value = name;
   selectInfusionDrug();
   updateInfusionPeso();
@@ -2098,7 +2131,9 @@ function goToInfusion(name, pesoFieldId) {
 function renderInfusionGrid() {
   const peso = _n('inf-peso') || 70;
   const grid = document.getElementById('infusion-ref-grid');
-  grid.innerHTML = INFUSIONS.map(d => {
+  const lista = _infuLista();
+  if (!lista.length) { grid.innerHTML = '<div class="scale-note">Ningún medicamento coincide con la búsqueda</div>'; return; }
+  grid.innerHTML = lista.map(d => {
     const conc = d.mg / d.vol;
     const u = d.unitLabel || 'mg';
     const mlhMin = _infuMLH(d.doseMin, d.unit, peso, conc);
@@ -2147,6 +2182,8 @@ Resultado: ${mlh} mL/h`;
 
 function resetInfusion() {
   document.getElementById('inf-peso').value = '70';
+  document.getElementById('inf-buscar').value = '';
+  renderInfusionSelect();
   document.getElementById('inf-farmaco').selectedIndex = 0;
   document.getElementById('inf-nombre').value = '';
   selectInfusionDrug();
@@ -3082,6 +3119,52 @@ function parseDosisPorKg(texto) {
   }, []);
 }
 
+/* Presentación comercial ("Vial 0,4 mg = 1 mL", "(50 mg/ml)", "1 ml = 94 mg"...)
+   para pasar la dosis a mL. Prioridad: concentración explícita X/mL, luego
+   "X ud = Y mL" y por último "Y mL = X ud". Los puntos de miles se quitan antes
+   ("5.000 UI"). Es una sugerencia: los campos son editables. */
+const FICHA_PRES_UDS = ['mg', 'mcg', 'g', 'UI', 'mEq', 'mmol'];
+const FICHA_UD_MASA_MG = { g: 1000, mg: 1, mcg: 0.001 };
+
+function _fichaUd(u) {
+  const l = (u || '').toLowerCase();
+  if (l === 'microgramos' || l === 'mcg') return 'mcg';
+  if (l === 'ui') return 'UI';
+  if (l === 'meq') return 'mEq';
+  return l;
+}
+
+/* Convierte entre unidades de masa; null si no son convertibles (UI, mEq...). */
+function _fichaConvertir(valor, de, a) {
+  if (de === a) return valor;
+  if (FICHA_UD_MASA_MG[de] && FICHA_UD_MASA_MG[a]) return valor * FICHA_UD_MASA_MG[de] / FICHA_UD_MASA_MG[a];
+  return null;
+}
+
+function parsePresentacion(texto) {
+  if (!texto) return null;
+  const s = texto.replace(/(\d)\.(\d{3})(?!\d)/g, '$1$2').replace(/microgramos/gi, 'mcg');
+  const N = '(\\d+(?:[.,]\\d+)?)', U = '(mg|mcg|g|UI|mEq|mmol)';
+  const num = x => parseFloat(x.replace(',', '.'));
+  let m = s.match(new RegExp(N + '\\s*' + U + '\\s*\\/\\s*m[lL]\\b', 'i'));
+  if (m) return { cant: num(m[1]), ud: _fichaUd(m[2]), vol: 1 };
+  m = s.match(new RegExp(N + '\\s*' + U + '\\s*(?:=|\\/|en)\\s*' + N + '\\s*m[lL]\\b', 'i'));
+  if (m) return { cant: num(m[1]), ud: _fichaUd(m[2]), vol: num(m[3]) };
+  m = s.match(new RegExp(N + '\\s*m[lL]\\s*=\\s*' + N + '\\s*' + U + '\\b', 'i'));
+  if (m) return { cant: num(m[2]), ud: _fichaUd(m[3]), vol: num(m[1]) };
+  return null;
+}
+
+/* Tope por dosis escrito en la misma línea ("máx. 2 mg"), en la unidad de la
+   opción. Se ignoran topes por kg ("máx. 2 mg/kg"): ya los recoge la pauta. */
+function _fichaTope(o) {
+  const m = o.raw.match(/m[aá]x(?:imo|ima)?\.?\s*(?:de\s*)?(\d+(?:[.,]\d+)?)\s*(mg|mcg|microgramos|g|UI|mEq|mmol)\b(?!\s*\/\s*kg)/i);
+  if (!m) return null;
+  const v = _fichaConvertir(parseFloat(m[1].replace(',', '.')), _fichaUd(m[2]), _fichaUd(o.unidad));
+  return v == null ? null : { v, txt: m[1] + ' ' + m[2] };
+}
+
+let _fichaCalcPres = null;
 let _fichaCalcOpciones = [];       // solo bolo / dosis única (lo que calcula esta calculadora)
 let _fichaCalcOpcionesPerfusion = []; // dosis en perfusión continua detectadas (redirige a Perfusión IV)
 let _fichaCalcNombre = '';
@@ -3103,6 +3186,7 @@ function irAPerfusion(nombre) {
   showTab('perfusiones', document.getElementById('navbtn-perfusiones'));
   const sel = document.getElementById('inf-farmaco');
   if (sel && enInfusiones) {
+    _infuLimpiarFiltro();
     sel.value = enInfusiones;
     selectInfusionDrug();
   }
@@ -3147,7 +3231,14 @@ function _fichaCalcPanelHTML(nombre, opcionesBolo, opcionesPerfusion) {
         '<select id="ficha-calc-indicacion" onchange="onFichaIndicacionChange()"></select></div>' +
       '<div class="field" id="ficha-calc-via-wrap" style="display:none"><label for="ficha-calc-via">Vía de administración</label>' +
         '<select id="ficha-calc-via" onchange="calcFichaDosis()"></select></div>' +
+      '<div class="field" id="ficha-calc-pres-wrap"><label for="ficha-calc-pres-cant">Presentación comercial</label>' +
+        '<div class="ficha-pres-row"><input type="number" id="ficha-calc-pres-cant" min="0" step="any" aria-label="Cantidad de fármaco en la presentación" oninput="calcFichaDosis()">' +
+        '<select id="ficha-calc-pres-ud" aria-label="Unidad de la presentación" onchange="calcFichaDosis()">' +
+          FICHA_PRES_UDS.map(u => '<option value="' + u + '">' + u + '</option>').join('') + '</select>' +
+        '<span>en</span><input type="number" id="ficha-calc-pres-vol" min="0" step="any" aria-label="Volumen de la presentación en mL" oninput="calcFichaDosis()"><span>mL</span></div>' +
+        '<div class="ficha-calc-meta" id="ficha-calc-pres-nota"></div></div>' +
       '<div class="ficha-calc-res" id="ficha-calc-resultado" aria-live="polite">Introduce el peso</div>' +
+      '<div class="ficha-calc-res ficha-calc-ml" id="ficha-calc-ml" aria-live="polite"></div>' +
       '<div class="ficha-calc-meta" id="ficha-calc-contexto"></div>' +
       '<div class="ficha-src" id="ficha-calc-fuente"></div>' +
       '<div class="ficha-calc-aviso">⚠️ Dosis extraída del texto de esta ficha (peso real, no ideal). Verifícala contra "Dosis / vía de administración" antes de administrar.</div>';
@@ -3174,6 +3265,21 @@ function renderFichaCalc() {
   selInd.innerHTML = inds.map(i => '<option value="' + i.replace(/"/g, '&quot;') + '">' + i + '</option>').join('');
   const pesoEl = document.getElementById('ficha-calc-peso');
   if (pesoEl && _fichaCalcPesoUltimo) pesoEl.value = _fichaCalcPesoUltimo;
+  // Presentación: oculta si todas las pautas ya vienen en mL/kg
+  const presWrap = document.getElementById('ficha-calc-pres-wrap');
+  const todasEnMl = _fichaCalcOpciones.every(o => _fichaUd(o.unidad) === 'ml');
+  presWrap.style.display = todasEnMl ? 'none' : '';
+  const udSel = document.getElementById('ficha-calc-pres-ud');
+  if (_fichaCalcPres) {
+    document.getElementById('ficha-calc-pres-cant').value = _fichaCalcPres.cant;
+    document.getElementById('ficha-calc-pres-vol').value = _fichaCalcPres.vol;
+    udSel.value = _fichaCalcPres.ud;
+    document.getElementById('ficha-calc-pres-nota').textContent = 'Tomada de la ficha: corrígela si tu presentación es otra';
+  } else {
+    const ud0 = _fichaUd(_fichaCalcOpciones[0].unidad);
+    if (FICHA_PRES_UDS.includes(ud0)) udSel.value = ud0;
+    document.getElementById('ficha-calc-pres-nota').textContent = 'No se ha podido leer de la ficha: introdúcela para ver la dosis en mL';
+  }
   onFichaIndicacionChange();
 }
 
@@ -3201,16 +3307,40 @@ function calcFichaDosis() {
   const via = selVia && selVia.selectedIndex >= 0 ? selVia.options[selVia.selectedIndex].text : (o.rutas[0] || '');
   ctxEl.textContent = (o.indicacion || FICHA_IND_GENERAL) + (via ? ' · ' + via : '') +
     ' · pauta ' + _fmt(o.min, 3) + (o.max != null && o.max !== o.min ? '–' + _fmt(o.max, 3) : '') + ' ' + o.unidad + '/kg';
+  const mlEl = document.getElementById('ficha-calc-ml');
   if (!peso || peso <= 0) {
     resEl.textContent = 'Introduce el peso';
     fuenteEl.textContent = '';
+    mlEl.textContent = '';
     return;
   }
-  const dMin = o.min * peso;
-  const dMax = o.max != null ? o.max * peso : null;
-  const cifra = (dMax != null && dMax !== dMin) ? _fmt(dMin, 2) + '–' + _fmt(dMax, 2) : _fmt(dMin, 2);
-  resEl.textContent = cifra + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '');
+  let dMin = o.min * peso;
+  let dMax = o.max != null ? o.max * peso : null;
+  const tope = _fichaTope(o);
+  const topado = tope && (dMin > tope.v || (dMax != null && dMax > tope.v));
+  if (tope) {
+    dMin = Math.min(dMin, tope.v);
+    if (dMax != null) dMax = Math.min(dMax, tope.v);
+  }
+  const rango = (a, b, dec) => (b != null && b !== a) ? _fmt(a, dec) + '–' + _fmt(b, dec) : _fmt(a, dec);
+  resEl.textContent = rango(dMin, dMax, 2) + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '') +
+    (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '');
   fuenteEl.textContent = 'Texto original: "' + o.raw + '"';
+  // Dosis en mL según la presentación comercial
+  mlEl.textContent = '';
+  if (_fichaUd(o.unidad) === 'ml') return;
+  const cant = _n('ficha-calc-pres-cant'), vol = _n('ficha-calc-pres-vol');
+  const ud = document.getElementById('ficha-calc-pres-ud').value;
+  if (!cant || !vol || cant <= 0 || vol <= 0) return;
+  const aMin = _fichaConvertir(dMin, _fichaUd(o.unidad), ud);
+  const aMax = dMax != null ? _fichaConvertir(dMax, _fichaUd(o.unidad), ud) : null;
+  if (aMin == null) {
+    mlEl.textContent = 'La dosis va en ' + o.unidad + ' y la presentación en ' + ud + ': no se puede pasar a mL';
+    return;
+  }
+  const conc = cant / vol;
+  mlEl.textContent = '= ' + rango(aMin / conc, aMax != null ? aMax / conc : null, 2) + ' mL' +
+    (o.periodo && o.periodo !== 'dosis' ? '/' + o.periodo : '') + ' (presentación ' + _fmt(cant, 3) + ' ' + ud + ' en ' + _fmt(vol, 3) + ' mL)';
 }
 
 function _fichaHTML(f) {
@@ -3255,6 +3385,7 @@ function showFicha(file) {
   const todas = parseDosisPorKg(limpiarTablaAplanada(f.dosis || ''));
   _fichaCalcOpciones = todas.filter(o => !o.esPerfusion);
   _fichaCalcOpcionesPerfusion = todas.filter(o => o.esPerfusion);
+  _fichaCalcPres = parsePresentacion(f.presentacion);
   const modal = document.getElementById('ficha-modal');
   modal.classList.remove('galeria-modal');
   modal.innerHTML = _fichaHTML(f);

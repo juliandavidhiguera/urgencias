@@ -505,11 +505,6 @@ window.FORMULAS = [
   interp:function(s){return ['low',s+' cm','Longitud más allá de labios/narina. No sustituye la confirmación clínica, capnográfica y radiológica']}},
 
 // ── Toxicología ────────────────────────────────────────────────
-{id:'f-naloxona', src:'Dosis estándar de naloxona · pediatría: ERC PLS 2025 (curso EPALS 2025)', title:'Naloxona (antídoto de opioides)', sub:'Adultos: dosis fija · niños: por peso', badge:'red', tag:'Tóxicos', max:2, agg:'custom', items:[
-  {t:'num', l:'Peso (kg) — dejar en 0 si es adulto con dosis fija', u:'kg', f:function(v){return 0}}],
-  calcCustom:function(v){return v[0]>0 ? Math.min(Math.round(v[0]*0.01*100)/100, 2) : 0},
-  interp:function(s){return s>0?['high',s+' mg (10 mcg/kg)','Pediátrico (ERC 2025): 10–40 mcg/kg IV/IO/IM/IN, máx. 2 mg — dosis baja si sobredosis analgésica (conservar analgesia), alta si ingesta accidental. Repetir cada 3 min. Perfusión 10–160 mcg/kg/h si opioide de acción larga. Cautela en consumo crónico (abstinencia)']:['high','—','Adultos: 0,4–2 mg IV, repetir cada 2–3 min']}},
-
 {id:'f-flumazenil', src:'Dosis estándar de flumazenil', title:'Flumazenil (antídoto de benzodiacepinas)', sub:'Precaución extrema en dependencia a BZD o epilepsia', badge:'red', tag:'Tóxicos', max:3, agg:'custom', items:[],
   calcCustom:function(){return 0},
   interp:function(){return ['high','0,2 mg IV en 15 s','Repetir 0,2 mg cada minuto hasta máximo 3 mg']}},
