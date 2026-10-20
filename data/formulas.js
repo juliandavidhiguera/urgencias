@@ -344,7 +344,24 @@ window.FORMULAS = [
   interp:function(s){return ['low','HCO₃ esp. '+s+' mEq/L','Compensación renal completa (días)']}},
 
 // ── Ventilación mecánica ──────────────────────────────────────
-{id:'f-horowitz', src:'Criterios de Berlín para SDRA', title:'Índice de Horowitz (P/F)', sub:'PaO₂/FiO₂ — gravedad del SDRA', badge:'red', tag:'Ventilación', max:600, agg:'custom', items:[
+{id:'f-rox', copyDatos:true, src:'Roca 2019, Am J Respir Crit Care Med · PMID 30576221', title:'Índice ROX', sub:'Alto flujo nasal en neumonía — predicción de fracaso', badge:'red', tag:'Ventilación', max:30, agg:'custom', items:[
+  {t:'num', l:'SpO₂ (%)', u:'%', f:function(v){return 0}},
+  {t:'num', l:'FiO₂ (% o fracción)', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Frecuencia respiratoria (rpm)', u:'rpm', f:function(v){return 0}},
+  {t:'sel', btn:true, l:'Tiempo desde el inicio del alto flujo', o:[['2 h',2],['6 h',6],['12 h',12]]}],
+  info:'ROX = (SpO₂/FiO₂)/FR. Validado en neumonía con insuficiencia respiratoria hipoxémica en alto flujo. Es una asociación pronóstica: no ordena intubar ni autoriza a retrasar la intubación',
+  calcCustom:function(v){
+    if (!v[0] || !v[1] || !v[2]) { this._rox=null; return 0; }
+    var f=v[1]>1 ? v[1]/100 : v[1]; this._rox={h:v[3]};
+    return Math.round((v[0]/f)/v[2]*100)/100;
+  },
+  interp:function(s){
+    if (!this._rox) return ['low','—','Introducir SpO₂, FiO₂ y frecuencia respiratoria'];
+    var h=this._rox.h, lim={2:2.85,6:3.47,12:3.85}[h];
+    return s>=4.88?['low','ROX '+s,'≥4,88 a las '+h+' h: menor riesgo de fracaso del alto flujo']:s<lim?['high','ROX '+s,'<'+lim+' a las '+h+' h: alto riesgo de fracaso — valorar intubación']:['mid','ROX '+s,'Zona indeterminada a las '+h+' h — reevaluar en 1–2 h'];
+  }},
+
+{id:'f-horowitz',src:'Criterios de Berlín para SDRA', title:'Índice de Horowitz (P/F)', sub:'PaO₂/FiO₂ — gravedad del SDRA', badge:'red', tag:'Ventilación', max:600, agg:'custom', items:[
   {t:'num', l:'PaO₂ (mmHg)', u:'mmHg', f:function(v){return 0}},
   {t:'num', l:'FiO₂ (%)', u:'%', f:function(v){return 0}}],
   calcCustom:function(v){return v[1] ? Math.round((v[0]/(v[1]/100))*10)/10 : 0},
@@ -403,7 +420,20 @@ window.FORMULAS = [
   interp:function(s){return ['low',s+' mL','Normal aproximado 60–90 mL/latido']}},
 
 // ── Quemados y líquidos ────────────────────────────────────────
-{id:'f-parkland', src:'ATLS 10ª/11ª ed.', title:'Fórmula de Parkland', sub:'Reposición en quemados — 50% en 8h, 50% en 16h siguientes', badge:'red', tag:'Líquidos', max:20000, agg:'custom', items:[
+{id:'f-regla9', copyDatos:true, src:'Regla de los 9 de Wallace (Lancet 1951) · recogida en la guía de quemaduras de Yoshino 2016, J Dermatol', title:'Superficie corporal quemada (regla de los 9)', sub:'Adulto — % SCQ para la fórmula de Parkland', badge:'red', tag:'Líquidos', max:100, agg:'custom', items:[
+  {t:'num', l:'Cabeza y cuello (9%) — % de la región quemada', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Miembro superior derecho, con mano (9%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Miembro superior izquierdo, con mano (9%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Tronco anterior (18%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Tronco posterior (18%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Miembro inferior derecho, con pie (18%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Miembro inferior izquierdo, con pie (18%) — % quemado', u:'%', f:function(v){return 0}},
+  {t:'num', l:'Periné (1%) — % quemado', u:'%', f:function(v){return 0}}],
+  info:'Indicar qué porcentaje de cada región está quemado (100 = región completa). Incluir quemaduras de espesor parcial y total; excluir el eritema epidérmico aislado. Estimación rápida para adultos: en niños usar Lund-Browder',
+  calcCustom:function(v){var w=[9,9,9,18,18,18,18,1], s=0; for (var i=0;i<8;i++) s+=w[i]*Math.min(Math.max(v[i],0),100)/100; return Math.round(s*10)/10},
+  interp:function(s){return s===0?['low','—','Introducir el % quemado de cada región afectada']:s>=20?['high',s+'% SCQ','Usar este % en la fórmula de Parkland; reposición formal habitual a partir del 20% en adultos']:['mid',s+'% SCQ','Usar este % en la fórmula de Parkland si se indica reposición']}},
+
+{id:'f-parkland',src:'ATLS 10ª/11ª ed.', title:'Fórmula de Parkland', sub:'Reposición en quemados — 50% en 8h, 50% en 16h siguientes', badge:'red', tag:'Líquidos', max:20000, agg:'custom', items:[
   {t:'sel', l:'Grupo etario', o:[['Adulto (2 mL/kg/%SCQ)',2],['Niño (3 mL/kg/%SCQ)',3]]},
   {t:'num', l:'Peso (kg)', u:'kg', f:function(v){return 0}},
   {t:'num', l:'% Superficie corporal quemada (SCQ)', u:'%', f:function(v){return 0}}],

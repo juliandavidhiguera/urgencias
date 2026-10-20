@@ -685,6 +685,105 @@ window.SCALES = [
   {t:'sel', btn:true, l:'QTc >480 ms', o:[['No (0)',0],['Sí (+2)',2]]},
   {t:'sel', btn:true, l:'Diagnóstico en urgencias', o:[['Ninguno de los dos (0)',0],['Vasovagal (−2)',-2],['Cardíaco (+2)',2]]}],
   info:'Aplicar al final de la evaluación, cuando no se ha identificado ya una causa grave. Los valores iguales al umbral (QRS 130, QTc 480) no puntúan. Riesgo = eventos graves compuestos a 30 días, no mortalidad',
-  interp:function(s){return s<=-2?['low',s+' pts','Riesgo muy bajo (0,3% a 30 días)']:s<=0?['low',s+' pts','Riesgo bajo (0,7% a 30 días)']:s<=3?['mid',s+' pts','Riesgo medio']:s<=5?['high',s+' pts','Riesgo alto']:['high',s+' pts','Riesgo muy alto (51,3% a 30 días)']}}
+  interp:function(s){return s<=-2?['low',s+' pts','Riesgo muy bajo (0,3% a 30 días)']:s<=0?['low',s+' pts','Riesgo bajo (0,7% a 30 días)']:s<=3?['mid',s+' pts','Riesgo medio']:s<=5?['high',s+' pts','Riesgo alto']:['high',s+' pts','Riesgo muy alto (51,3% a 30 días)']}},
+
+// ── Backlog #9 (sesion 8, contrastado con Vera Health 2026-10) ──────────
+{id:'addrs', copyDatos:true, src:'Rogers 2011, Circulation · PMID 21555704 · ADvISED: Nazerian 2018, Circulation · PMID 29030346', title:'ADD-RS + dímero D', sub:'Síndrome aórtico agudo — ¿angio-TC o dímero D?', badge:'red', tag:'Aorta', max:3, agg:'custom', items:[
+  {t:'sel', btn:true, l:'Condición de alto riesgo: síndrome de Marfan, antecedente familiar de enfermedad aórtica, valvulopatía aórtica conocida, manipulación aórtica reciente, aneurisma de aorta torácica conocido', o:[['No',0],['Sí (+1)',1]]},
+  {t:'sel', btn:true, l:'Dolor de alto riesgo (torácico, dorsal o abdominal): inicio brusco, intensidad grave o carácter desgarrante — basta uno', o:[['No',0],['Sí (+1)',1]]},
+  {t:'sel', btn:true, l:'Exploración de alto riesgo: déficit de pulso o diferencia de PAS entre brazos, déficit neurológico focal con dolor, soplo nuevo de insuficiencia aórtica con dolor, hipotensión o shock', o:[['No',0],['Sí (+1)',1]]},
+  {t:'num', l:'Dímero D (ng/mL FEU) — opcional', u:'ng/mL', f:function(v){return 0}}],
+  info:'Un punto por CATEGORÍA positiva, no por hallazgo (0–3). Dímero D en FEU, sin ajuste por edad. La inestabilidad o una sospecha clínica alta mandan sobre un resultado bajo',
+  calcCustom:function(v){var n=v[0]+v[1]+v[2]; this._ad={dd:v[3]}; return n},
+  interp:function(s){
+    var dd=this._ad.dd;
+    if (s>=2) return ['high','ADD-RS '+s,'Imagen urgente (angio-TC) sin esperar al dímero D'];
+    if (!dd) return ['mid','ADD-RS '+s,'Pedir dímero D: <500 ng/mL FEU permite considerar la exclusión sin imagen'];
+    return dd<500 ? ['low','ADD-RS '+s+' + DD <500','Permite considerar la exclusión de síndrome aórtico agudo sin imagen en pacientes seleccionados (fallo 0,3% en ADvISED); no es certeza absoluta'] : ['high','Angio-TC','ADD-RS '+s+' con dímero D '+dd+' ≥500 ng/mL FEU — imagen'];
+  }},
+
+{id:'padua', src:'Barbar 2010, J Thromb Haemost · PMID 20738765', title:'Padua', sub:'Riesgo de ETV en el paciente médico ingresado', badge:'amber', tag:'TVP', max:20, items:[
+  {t:'chk', l:'Cáncer activo (local o metastásico, o QT/RT en los 6 meses previos)', p:3},
+  {t:'chk', l:'ETV previa (excluida la trombosis venosa superficial)', p:3},
+  {t:'chk', l:'Movilidad reducida ≥3 días previstos (cama con permiso para ir al baño)', p:3},
+  {t:'chk', l:'Trombofilia conocida', p:3},
+  {t:'chk', l:'Traumatismo o cirugía en el último mes', p:2},
+  {t:'chk', l:'Edad ≥70 años', p:1},
+  {t:'chk', l:'Insuficiencia cardíaca o respiratoria', p:1},
+  {t:'chk', l:'IAM o ictus isquémico agudo', p:1},
+  {t:'chk', l:'Infección aguda o enfermedad reumatológica', p:1},
+  {t:'chk', l:'Obesidad (IMC ≥30)', p:1},
+  {t:'chk', l:'Tratamiento hormonal en curso', p:1}],
+  info:'Para pacientes médicos ingresados, no para altas desde urgencias. Valorar a la vez el riesgo hemorrágico (IMPROVE Bleeding)',
+  interp:function(s){return s>=4?['high',s+' pts','Alto riesgo de ETV — profilaxis si el riesgo hemorrágico lo permite']:['low',s+' pts','Bajo riesgo de ETV']}},
+
+{id:'improve-vte', src:'Spyropoulos 2011, Chest · PMID 21436241 (modelo asociativo de 7 variables)', title:'IMPROVE VTE', sub:'Riesgo de ETV en el paciente médico ingresado', badge:'amber', tag:'TVP', max:12, items:[
+  {t:'chk', l:'ETV previa', p:3},
+  {t:'chk', l:'Trombofilia conocida', p:2},
+  {t:'chk', l:'Parálisis actual de miembros inferiores', p:2},
+  {t:'chk', l:'Cáncer actual', p:2},
+  {t:'chk', l:'Inmovilización ≥7 días', p:1},
+  {t:'chk', l:'Ingreso en UCI/UCC', p:1},
+  {t:'chk', l:'Edad >60 años', p:1}],
+  info:'No mezclar con IMPROVE modificado ni con IMPROVE-DD (incluye dímero D). La guía ASH 2018 considera riesgo aumentado desde ≥2',
+  interp:function(s){return s>=4?['high',s+' pts','Riesgo alto de ETV']:s>=2?['mid',s+' pts','Riesgo moderado (aumentado según ASH 2018)']:['low',s+' pts','Riesgo bajo']}},
+
+{id:'improve-bleed', src:'Decousus 2011, Chest · PMID 20453069', title:'IMPROVE Bleeding', sub:'Riesgo hemorrágico en el paciente médico ingresado (14 días)', badge:'amber', tag:'TVP', max:33.5, items:[
+  {t:'chk', l:'Úlcera gastroduodenal activa', p:4.5},
+  {t:'chk', l:'Sangrado en los 3 meses previos al ingreso', p:4},
+  {t:'chk', l:'Plaquetas <50.000/µL', p:4},
+  {t:'sel', btn:true, l:'Edad', o:[['<40 (0)',0],['40–84 (1,5)',1.5],['≥85 (3,5)',3.5]]},
+  {t:'chk', l:'Insuficiencia hepática (INR >1,5 no debido a anticoagulación)', p:2.5},
+  {t:'sel', btn:true, l:'FG (mL/min/1,73 m²)', o:[['≥60 (0)',0],['30–59 (1)',1],['<30 (2,5)',2.5]]},
+  {t:'chk', l:'Ingreso en UCI/UCC', p:2.5},
+  {t:'chk', l:'Catéter venoso central', p:2},
+  {t:'chk', l:'Enfermedad reumática', p:2},
+  {t:'chk', l:'Cáncer activo', p:2},
+  {t:'chk', l:'Varón', p:1}],
+  info:'Escala de sangrado de pacientes médicos hospitalizados, no de cualquier indicación de anticoagulación',
+  interp:function(s){return s>=7?['high',s+' pts','Alto riesgo hemorrágico — preferir profilaxis mecánica y reevaluar']:['low',s+' pts','Riesgo hemorrágico no elevado']}},
+
+{id:'ottawa-sah', src:'Perry 2013, JAMA · PMID 24065011', title:'Ottawa SAH Rule', sub:'Cefalea aguda — ¿estudiar hemorragia subaracnoidea?', badge:'red', tag:'Neuro', max:6, items:[
+  {t:'chk', l:'Edad ≥40 años', p:1},
+  {t:'chk', l:'Dolor o rigidez de cuello', p:1},
+  {t:'chk', l:'Pérdida de conciencia presenciada', p:1},
+  {t:'chk', l:'Inicio durante el esfuerzo', p:1},
+  {t:'chk', l:'Cefalea en trueno (máximo instantáneo)', p:1},
+  {t:'chk', l:'Limitación de la flexión del cuello en la exploración', p:1}],
+  info:'Inclusión: ≥16 años, alerta (GCS 15), cefalea nueva no traumática con máximo dentro de 1 h, consulta en ≤14 días. Exclusiones: traumatismo craneal reciente, papiledema o déficit focal nuevo, aneurisma, HSA, tumor cerebral o derivación ventricular previos, cefaleas recurrentes similares (≥3 episodios en >6 meses). Una regla negativa no descarta otras causas graves de cefalea',
+  interp:function(s){return s===0?['low','Regla negativa','Si cumple la inclusión: no precisa estudio de HSA por esta regla']:['high','Estudiar HSA',s+' criterio'+(s===1?'':'s')+' — TC craneal ± punción lumbar o angio-TC']}},
+
+{id:'ich', src:'Hemphill 2001, Stroke · PMID 11283388', title:'ICH score', sub:'Hemorragia intracerebral — gravedad (0–6)', badge:'red', tag:'Ictus', max:6, items:[
+  {t:'sel', btn:true, l:'GCS', o:[['13–15 (0)',0],['5–12 (1)',1],['3–4 (2)',2]]},
+  {t:'chk', l:'Volumen del hematoma ≥30 mL', p:1},
+  {t:'chk', l:'Hemorragia intraventricular', p:1},
+  {t:'chk', l:'Origen infratentorial', p:1},
+  {t:'chk', l:'Edad ≥80 años', p:1}],
+  info:'Mortalidad OBSERVADA a 30 días en la cohorte original (2001), no una probabilidad individual actual. No usar para decidir limitación del tratamiento: riesgo de profecía autocumplida (ESO/EANS 2025)',
+  interp:function(s){var m=[0,13,26,72,97,100]; return s===6?['high','6 pts','Sin pacientes con 6 puntos en la cohorte original']:[s===0?'low':s<=2?'mid':'high',s+' pts','Mortalidad observada a 30 días en la cohorte original: '+m[s]+'%']}},
+
+{id:'lrinec', src:'Wong 2004, Crit Care Med · PMID 15241098 · sensibilidad: Fernando 2018, Ann Surg', title:'LRINEC', sub:'Fascitis necrotizante — apoyo, NUNCA para descartar', badge:'red', tag:'Infección', max:13, items:[
+  {t:'sel', btn:true, l:'PCR', o:[['<150 mg/L (0)',0],['≥150 mg/L (4)',4]]},
+  {t:'sel', btn:true, l:'Leucocitos (×10⁹/L)', o:[['<15 (0)',0],['15–25 (1)',1],['>25 (2)',2]]},
+  {t:'sel', btn:true, l:'Hemoglobina (g/dL)', o:[['>13,5 (0)',0],['11–13,5 (1)',1],['<11 (2)',2]]},
+  {t:'sel', btn:true, l:'Sodio (mEq/L)', o:[['≥135 (0)',0],['<135 (2)',2]]},
+  {t:'sel', btn:true, l:'Creatinina (mg/dL)', o:[['≤1,6 (0)',0],['>1,6 (2)',2]]},
+  {t:'sel', btn:true, l:'Glucosa (mg/dL)', o:[['≤180 (0)',0],['>180 (1)',1]]}],
+  info:'Sensibilidad del 68% con ≥6 y del 41% con ≥8 (metaanálisis de 23 estudios): una puntuación baja NO excluye la fascitis necrotizante. Ante sospecha clínica, valoración quirúrgica urgente sin esperar a la analítica ni a la imagen',
+  interp:function(s){return s>=8?['high',s+' pts','Categoría alta — no es un diagnóstico: valoración quirúrgica urgente']:s>=6?['mid',s+' pts','Categoría intermedia — valoración quirúrgica si hay sospecha clínica']:['mid',s+' pts','Puntuación baja — NO excluye: si hay sospecha clínica, valoración quirúrgica igualmente']}},
+
+{id:'ciwa', src:'Sullivan 1989, Br J Addict · PMID 2597811 · cortes: guía ASAM 2020 · PMID 32511109', title:'CIWA-Ar', sub:'Abstinencia alcohólica — gravedad (0–67)', badge:'amber', tag:'Tóxicos', max:67, items:[
+  {t:'sel', l:'Náuseas y vómitos', o:[['0 — sin náuseas ni vómitos',0],['1 — náuseas leves sin vómitos',1],['2',2],['3',3],['4 — náuseas intermitentes con arcadas',4],['5',5],['6',6],['7 — náuseas constantes, arcadas y vómitos frecuentes',7]]},
+  {t:'sel', l:'Temblor (brazos extendidos, dedos separados)', o:[['0 — sin temblor',0],['1 — no visible, se palpa en la punta de los dedos',1],['2',2],['3',3],['4 — moderado con los brazos extendidos',4],['5',5],['6',6],['7 — intenso incluso sin extender los brazos',7]]},
+  {t:'sel', l:'Sudoración paroxística', o:[['0 — no visible',0],['1 — palmas apenas húmedas',1],['2',2],['3',3],['4 — gotas de sudor en la frente',4],['5',5],['6',6],['7 — sudoración profusa',7]]},
+  {t:'sel', l:'Ansiedad', o:[['0 — tranquilo',0],['1 — ligeramente ansioso',1],['2',2],['3',3],['4 — moderadamente ansioso o en guardia',4],['5',5],['6',6],['7 — equivalente a crisis de pánico',7]]},
+  {t:'sel', l:'Agitación', o:[['0 — actividad normal',0],['1 — algo más activo de lo normal',1],['2',2],['3',3],['4 — moderadamente inquieto',4],['5',5],['6',6],['7 — se mueve continuamente',7]]},
+  {t:'sel', l:'Alteraciones táctiles (picor, hormigueo, quemazón, insectos)', o:[['0 — ninguna',0],['1 — muy leves',1],['2 — leves',2],['3 — moderadas',3],['4 — alucinaciones moderadamente intensas',4],['5 — alucinaciones intensas',5],['6 — alucinaciones muy intensas',6],['7 — alucinaciones continuas',7]]},
+  {t:'sel', l:'Alteraciones auditivas', o:[['0 — ninguna',0],['1 — muy leves (sonidos ásperos o que asustan)',1],['2 — leves',2],['3 — moderadas',3],['4 — alucinaciones moderadamente intensas',4],['5 — alucinaciones intensas',5],['6 — alucinaciones muy intensas',6],['7 — alucinaciones continuas',7]]},
+  {t:'sel', l:'Alteraciones visuales', o:[['0 — ninguna',0],['1 — sensibilidad a la luz muy leve',1],['2 — leve',2],['3 — moderada',3],['4 — alucinaciones moderadamente intensas',4],['5 — alucinaciones intensas',5],['6 — alucinaciones muy intensas',6],['7 — alucinaciones continuas',7]]},
+  {t:'sel', l:'Cefalea o sensación de cabeza llena', o:[['0 — no',0],['1 — muy leve',1],['2 — leve',2],['3 — moderada',3],['4 — moderadamente intensa',4],['5 — intensa',5],['6 — muy intensa',6],['7 — extremadamente intensa',7]]},
+  {t:'sel', l:'Orientación', o:[['0 — orientado, puede sumar en serie',0],['1 — no puede sumar en serie o duda de la fecha',1],['2 — desorientado en la fecha ≤2 días',2],['3 — desorientado en la fecha >2 días',3],['4 — desorientado en lugar o persona',4]]}],
+  info:'Requiere un paciente que se comunique de forma fiable: no usar en delirio, intubación o enfermedad que confunda los ítems. Convulsiones o delirium tremens = abstinencia complicada (grave) con cualquier puntuación. Los cortes son la clasificación habitual de ASAM 2020, no de la publicación original',
+  interp:function(s){return s>=19?['high',s+' pts','Abstinencia grave — tratamiento farmacológico y valorar nivel de cuidados']:s>=10?['mid',s+' pts','Abstinencia moderada — tratamiento farmacológico guiado por síntomas']:['low',s+' pts','Abstinencia leve — reevaluar periódicamente']}}
 
 ];
