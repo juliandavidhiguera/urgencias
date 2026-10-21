@@ -387,6 +387,13 @@ body {
 #tab-intubacion .event-time input[type=time], #tab-pcr .event-time input[type=time] { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 6px; font-size: 13px; }
 #tab-intubacion .btn-now, #tab-pcr .btn-now { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
 #tab-intubacion .btn-now:hover, #tab-pcr .btn-now:hover { border-color: var(--blue); color: var(--blue); }
+#pcr-metro-btn { font-size: 14px; padding: 8px 14px; font-weight: 600; min-width: 190px; }
+#tab-pcr #pcr-metro-btn.on, #tab-pcr #pcr-metro-btn.on:hover { background: var(--red); border-color: var(--red); color: #fff; }
+#pcr-metro-btn.beat { filter: brightness(1.35); }
+#tab-pcr .metro-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding: 10px 14px 12px; }
+#tab-pcr .metro-ctrl { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; }
+#tab-pcr .metro-ctrl input[type=range] { flex: 1; min-width: 110px; accent-color: var(--red); }
+#tab-pcr .metro-ctrl output { font-family: var(--mono); font-size: 13px; min-width: 64px; }
 #tab-intubacion .drug-row, #tab-pcr .drug-row { padding: 8px 14px; border-bottom: 1px solid var(--bg3); }
 #tab-intubacion .drug-row:last-child, #tab-pcr .drug-row:last-child { border-bottom: none; }
 #tab-intubacion .drug-head, #tab-pcr .drug-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -1150,6 +1157,15 @@ body {
     </div>
   </div>
   <div class="tile-aux pcr-ped-only" id="pcr-ped-info" hidden></div>
+
+  <div class="subhead">Metrónomo de compresiones — ERC: 100–120/min</div>
+  <div class="metro-row">
+    <button class="btn-now" id="pcr-metro-btn" onclick="toggleMetronomo()" aria-pressed="false">▶ Activar metrónomo</button>
+    <label class="metro-ctrl" for="pcr-metro-frec">Frecuencia
+      <input type="range" id="pcr-metro-frec" min="100" max="120" step="1" value="110" oninput="ajustarMetronomo()"><output id="pcr-metro-frec-out">110/min</output></label>
+    <label class="metro-ctrl" for="pcr-metro-vol">Volumen
+      <input type="range" id="pcr-metro-vol" min="0" max="100" step="5" value="70" oninput="ajustarMetronomo()"><output id="pcr-metro-vol-out">70%</output></label>
+  </div>
 
   <div class="subhead">Datos del evento</div>
   <div class="fields">
@@ -2912,6 +2928,64 @@ function printPcrReport() {
   w.document.close();
   w.focus();
   w.print();
+}
+
+/* Metrónomo de compresiones: Web Audio con planificación anticipada para que el
+   ritmo no dependa de la precisión de setTimeout. No se para al cambiar de tab
+   ni con Reset: solo con su propio botón. */
+let _metroCtx = null, _metroGain = null, _metroTimer = null, _metroProx = 0;
+
+function _metroFrec() { return parseInt(document.getElementById('pcr-metro-frec').value) || 110; }
+
+function ajustarMetronomo() {
+  const vol = parseInt(document.getElementById('pcr-metro-vol').value) || 0;
+  document.getElementById('pcr-metro-frec-out').textContent = _metroFrec() + '/min';
+  document.getElementById('pcr-metro-vol-out').textContent = vol + '%';
+  if (_metroGain) _metroGain.gain.value = vol / 100;
+}
+
+function _metroPlanificar() {
+  while (_metroProx < _metroCtx.currentTime + 0.12) {
+    const osc = _metroCtx.createOscillator(), env = _metroCtx.createGain();
+    osc.frequency.value = 1000;
+    env.gain.setValueAtTime(1, _metroProx);
+    env.gain.exponentialRampToValueAtTime(0.001, _metroProx + 0.05);
+    osc.connect(env).connect(_metroGain);
+    osc.start(_metroProx);
+    osc.stop(_metroProx + 0.06);
+    const retraso = Math.max(0, (_metroProx - _metroCtx.currentTime) * 1000);
+    setTimeout(() => {
+      const b = document.getElementById('pcr-metro-btn');
+      b.classList.add('beat');
+      setTimeout(() => b.classList.remove('beat'), 80);
+    }, retraso);
+    _metroProx += 60 / _metroFrec();
+  }
+}
+
+function toggleMetronomo() {
+  const btn = document.getElementById('pcr-metro-btn');
+  if (_metroTimer) {
+    clearInterval(_metroTimer);
+    _metroTimer = null;
+    btn.classList.remove('on');
+    btn.textContent = '▶ Activar metrónomo';
+    btn.setAttribute('aria-pressed', 'false');
+    return;
+  }
+  if (!_metroCtx) {
+    _metroCtx = new (window.AudioContext || window.webkitAudioContext)();
+    _metroGain = _metroCtx.createGain();
+    _metroGain.connect(_metroCtx.destination);
+  }
+  _metroCtx.resume();
+  ajustarMetronomo();
+  _metroProx = _metroCtx.currentTime + 0.05;
+  _metroTimer = setInterval(_metroPlanificar, 25);
+  _metroPlanificar();
+  btn.classList.add('on');
+  btn.textContent = '■ Parar metrónomo';
+  btn.setAttribute('aria-pressed', 'true');
 }
 
 function resetPcr() {
