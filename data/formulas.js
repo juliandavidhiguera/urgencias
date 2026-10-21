@@ -155,7 +155,7 @@ window.FORMULAS = [
 // ── Gasometría y compensación ácido-base ─────────────────────────
 // Interpretación completa: calcCustom guarda el análisis en this._gas y interp lo lee
 // (ambos se llaman como métodos del objeto). Campos vacíos = 0 = no aportado.
-{id:'f-gasometria', copyDatos:true, src:'Berend 2014, NEJM · PMID 25295502 · AG y delta ratio: Fenves 2021 · PMID 34400023 · Reglas de Boston · PMID 9671365 · contrastado con Vera Health 2026-10', title:'Interpretación de gasometría arterial', sub:'Trastorno primario, compensación, AG, delta ratio, oxigenación y posibles causas', badge:'red', tag:'Gasometría', max:8, agg:'custom', items:[
+{id:'f-gasometria', copyDatos:true, src:'Berend 2014, NEJM · PMID 25295502 · AG y delta ratio: Fenves 2021 · PMID 34400023 · Reglas de Boston · PMID 9671365 · CAD/EHH: consenso ADA/EASD/JBDS 2024 · PMID 39052901 · contrastado con Vera Health 2026-10', title:'Interpretación de gasometría arterial', sub:'Trastorno primario, compensación, AG, delta ratio, lactato, glucosa, oxigenación y posibles causas', badge:'red', tag:'Gasometría', max:8, agg:'custom', items:[
   {t:'num', l:'pH', u:'pH', f:function(v){return 0}},
   {t:'num', l:'PaCO₂ (mmHg)', u:'mmHg', f:function(v){return 0}},
   {t:'num', l:'Bicarbonato, HCO₃ (mEq/L)', u:'mEq/L', f:function(v){return 0}},
@@ -164,7 +164,9 @@ window.FORMULAS = [
   {t:'num', l:'Edad (años) — opcional, para el gradiente A-a', u:'años', f:function(v){return 0}},
   {t:'num', l:'Sodio (mEq/L) — opcional, para el AG', u:'mEq/L', f:function(v){return 0}},
   {t:'num', l:'Cloro (mEq/L) — opcional, para el AG', u:'mEq/L', f:function(v){return 0}},
-  {t:'num', l:'Albúmina (g/dL) — opcional, corrige el AG', u:'g/dL', f:function(v){return 0}}],
+  {t:'num', l:'Albúmina (g/dL) — opcional, corrige el AG', u:'g/dL', f:function(v){return 0}},
+  {t:'num', l:'Lactato (mmol/L) — opcional', u:'mmol/L', f:function(v){return 0}},
+  {t:'num', l:'Glucosa (mg/dL) — opcional, para CAD / EHH', u:'mg/dL', f:function(v){return 0}}],
   // Lector de informe pegado: busca cada etiqueta seguida de su número (acepta coma decimal,
   // subíndices y kPa). Devuelve {índice de item: valor} para rellenar los campos de arriba.
   paste:{l:'Pegar el informe del laboratorio (opcional: rellena los campos de abajo)', ph:'pH 7,25 · pCO2 30 · HCO3 14 · pO2 65 · FiO2 21 · Na 140 · Cl 104 · Alb 3,2',
@@ -180,6 +182,14 @@ window.FORMULAS = [
       if (out[2]==null && (m=t.match(/(?:c?HCO3|bicarbonato)[^0-9\n]{0,20}?(\d+(?:[.,]\d+)?)/i))) out[2]=parseFloat(m[1].replace(',','.'));
       if (/kPa/i.test(t)) [1,3].forEach(function(i){ if (out[i]!=null) out[i]=Math.round(out[i]*7.50062*10)/10; });
       if (out[8]!=null && out[8]>10) out[8]=Math.round(out[8])/10;
+      // Lactato y glucosa: los gasómetros europeos suelen dar mmol/L; la glucosa se pasa a mg/dL
+      // si el informe dice mmol o si el valor (<35) solo es plausible en mmol/L; lactato >30 → venía en mg/dL
+      if ((m=t.match(/\bc?(?:Lac|lactato|lactate)\b[^0-9\n]{0,20}?(\d+(?:[.,]\d+)?)/i))) {
+        out[9]=parseFloat(m[1].replace(',','.')); if (out[9]>30) out[9]=Math.round(out[9]/9.008*10)/10;
+      }
+      if ((m=t.match(/\bc?(?:Glu|glucosa|glucose|glucemia)\b[^0-9\n]{0,20}?(\d+(?:[.,]\d+)?)\s*(mmol)?/i))) {
+        out[10]=parseFloat(m[1].replace(',','.')); if (m[2] || out[10]<35) out[10]=Math.round(out[10]*18.016);
+      }
       if (out[0]!=null && (out[0]<6.5 || out[0]>8)) delete out[0];
       return out;
     }},
@@ -193,7 +203,7 @@ window.FORMULAS = [
     hipoxAlto:'<b>Hipoxemia con gradiente A-a elevado:</b> alteración V/Q (EPOC, asma, TEP, neumonía), shunt (SDRA, atelectasia, EAP, shunt intracardiaco: no corrige con O₂) o trastorno de la difusión (EPID)'
   },
   analizar:function(v){
-    var pH=v[0], pco2=v[1], hco3=v[2], pao2=v[3], fio2=v[4], edad=v[5], na=v[6], cl=v[7], alb=v[8];
+    var pH=v[0], pco2=v[1], hco3=v[2], pao2=v[3], fio2=v[4], edad=v[5], na=v[6], cl=v[7], alb=v[8], lac=v[9], glu=v[10];
     if (!pH || !pco2 || !hco3) return null;
     var r1=function(x){return Math.round(x*10)/10}, r2=function(x){return Math.round(x*100)/100};
     var C=this.causas, trast=[], lin=[], causas=[], grave=false;
@@ -275,6 +285,33 @@ window.FORMULAS = [
     var tl=trast.join(' ').toLowerCase();
     if (tl.indexOf('alcalosis respiratoria')!==-1 && tl.indexOf('ag elevado')!==-1)
       lin.push('Perla: acidosis con AG elevado + alcalosis respiratoria → pensar en salicilatos o sepsis');
+
+    // Lactato: se informa la concentración, no se etiqueta automáticamente como acidosis láctica
+    // (Vera 2026-10: definición clásica lactato ≥5 + pH ≤7,35 + HCO₃ ≤20; los trastornos mixtos la enmascaran)
+    if (lac) {
+      lin.push('Lactato '+lac+' mmol/L'+(lac>=4 ? ' — hiperlactatemia marcada (≥4): buscar hipoperfusión, sepsis, hipoxia, convulsiones, fármacos/tóxicos, hepatopatía' : lac>2 ? ' — hiperlactatemia (>2); no implica por sí sola hipoperfusión ni acidosis' : ' — normal'));
+      if (agAlto) {
+        var res=(agc-12)-lac;
+        lin.push('Exceso de AG residual tras descontar el lactato: '+r1(res)+' mEq/L — estimación orientativa'+(res>2 ? '; sugiere otros aniones (cetonas, insuficiencia renal, tóxicos): no atribuir toda la acidosis al lactato' : '; un residuo bajo no excluye otras causas'));
+      }
+    }
+    // Crisis hiperglucémicas: consenso ADA/EASD/JBDS 2024 (PMID 39052901). Las cetonas no se piden
+    // aquí: se indica medir β-hidroxibutirato en vez de dar el diagnóstico por hecho.
+    if (glu) {
+      var acidCAD=pH<7.3 || hco3<18, osmEf=na ? 2*na+glu/18 : null;
+      var osmTxt=osmEf ? ' · osmolalidad efectiva '+Math.round(osmEf)+' mOsm/kg (2·Na medido + glucosa/18; criterio EHH >300)' : ' (introducir Na para la osmolalidad efectiva)';
+      if (glu>=600 && (pH<7.3 || hco3<15)) {
+        trast.push('+ glucosa ≥600 con acidosis: valorar cuadro mixto CAD-EHH'); grave=true;
+        lin.push('Glucosa '+glu+' mg/dL'+osmTxt+' — medir β-hidroxibutirato (CAD si ≥3 mmol/L)');
+      } else if (glu>=600) {
+        trast.push('+ glucosa ≥600 con pH ≥7,30 y HCO₃ ≥15: valorar estado hiperglucémico hiperosmolar'); grave=true;
+        lin.push('EHH (consenso 2024): glucosa ≥600, osmolalidad efectiva >300 o total >320, β-hidroxibutirato &lt;3 mmol/L'+osmTxt);
+      } else if (acidCAD) {
+        lin.push('Glucosa '+glu+' mg/dL con pH &lt;7,30 y/o HCO₃ &lt;18: '+(glu>=200 ? 'compatible con CAD si β-hidroxibutirato ≥3 mmol/L (consenso 2024) — medir cetonemia' : 'si hay diabetes conocida, no excluye CAD euglucémica (iSGLT2, ayuno, embarazo, alcohol) — medir β-hidroxibutirato'));
+      } else {
+        lin.push('Glucosa '+glu+' mg/dL'+(glu<70 ? ' — hipoglucemia' : ''));
+      }
+    }
 
     if (pao2) {
       var f=fio2 ? (fio2<=1 ? fio2*100 : fio2) : 21;
