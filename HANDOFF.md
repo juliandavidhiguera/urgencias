@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-21 | **Sesion #:** 10 | **Rama:** main | **HEAD:** `cd89ab8` (+ commit de este handoff)
+**Ultima actualizacion:** 2026-10-21 | **Sesion #:** 10 | **Rama:** main | **HEAD:** `0779702` (+ commit de este handoff)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -63,6 +63,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Simulacro PCR** adulto (FV presenciada, 5 descargas, adrenalina+amiodarona, via aerea, RCE): informe completo y legible, impresion y traspaso a Utstein OK. Bug corregido: tras la 3a descarga pedia "administrar ahora" amiodarona Y lidocaina; ahora lidocaina sale como "alternativa a amiodarona" y si se marca una no se pide la otra (`calcPcr()`).
 - Detectado, sin cambiar (pendiente decision del usuario): tras marcar la 1a dosis la fila no vuelve a avisar de repeticiones (adrenalina cada 3-5 min, 2a amiodarona tras la 5a descarga); solo lo dice el texto de recomendacion, y las dosis repetidas solo quedan en el campo "Total dosis".
 - Commit `cd89ab8`. **Metronomo de compresiones** en el tab PCR (bajo "Paciente"): boton on/off, frecuencia 100-120/min (rango ERC adulto y pediatrico, defecto 110) y volumen 0-100% en vivo. Web Audio (`AudioContext`, oscilador 1 kHz 50 ms) con planificacion anticipada de 120 ms via `setInterval` 25 ms; el boton parpadea en cada golpe. No se para al cambiar de tab ni con Reset. Verificado en local: 5,5 golpes/3 s a 110 y 6/3 s a 120, sin errores ni violaciones CSP, claro y oscuro.
+- Commit `0779702`. **Gasometria: lactato y glucosa opcionales** (items 9 y 10 de `f-gasometria`). Lactato >2 hiperlactatemia, >=4 marcada (no se etiqueta acidosis lactica sola); con AG alto, AG residual = (AGc-12)-lactato, orientativo. Glucosa: acidosis (pH<7,30 y/o HCO3<18) + glu>=200 -> CAD si beta-HB>=3 (pide medirlo); glu<200 -> nota CAD euglucemica (iSGLT2, ayuno, embarazo, alcohol); glu>=600 con pH>=7,30 y HCO3>=15 -> EHH con osmolalidad efectiva (Na medido); glu>=600 con acidosis -> mixto CAD-EHH. Fuente: consenso ADA/EASD/JBDS 2024 (PMID 39052901); Vera y Perplexity coinciden. Parser: cLac/Lactato, cGlu/Glucosa/Glucemia; convierte glucosa mmol/L->mg/dL y lactato mg/dL->mmol/L. Probado: 6 casos en node + pegado en navegador local (11 campos rellenos).
 - No hecho: prueba en movil real (el navegador de pruebas no emula viewport movil; presentaciones reales del hospital solo las conoce el usuario).
 
 ### Sesion 9 - 2026-10-20
@@ -185,6 +186,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - En la calculadora, **indicacion y via son cosas distintas**: la indicacion es el motivo clinico (sedacion, convulsiones, TVP) y la via el modo de administracion (IV, IM, SC...). Una misma indicacion puede tener dosis DIFERENTES segun la via (Ketamina: IV 0,25-0,5 vs IM/intranasal 2-4 mg/kg), por eso cada via apunta a su propia opcion parseada y el selector de via no es decorativo: cambiarlo cambia el numero.
 
 - **Motor de escalas/formulas (`calcScale`)**: con `calcCustom`, los valores crudos se leen con `parseFloat(el.value)||0`, y un checkbox da `"on"` -> 0. Por eso las escalas con `calcCustom` usan `sel` (con `btn:true`) para los si/no, nunca `chk`. `interp(s)` solo recibe el numero: para mostrar mas datos, `calcCustom` guarda el analisis en `this._x` (se llama como metodo del objeto) e `interp` lo lee (patron de `f-gasometria`, `f-qtc`, `f-na-correccion`, `years`, `dd-edad`, `ccspine`).
+- Unidades en el pegado de gasometria: sin la palabra "mmol", glucosa <35 se toma como mmol/L y lactato >30 como mg/dL. Un informe con otras unidades raras puede convertirse mal; revisar con informes reales (#12).
 - `sc.paste.parse` devuelve `{indice de item: valor}`: si se reordenan los `items` de `f-gasometria`, hay que actualizar los indices del parser y los `v[n]` de `analizar`.
 - Probar en localhost tras cambiar `index.html`: si el navegador tiene un SW antiguo puede servir el HTML viejo; desregistrar el SW y vaciar `caches` desde la consola antes de concluir que algo no funciona (paso en la sesion 7).
 
