@@ -2617,6 +2617,9 @@ function renderPcrRitmoLog() {
 }
 
 let pcrDescargasLog = [];
+/* Hora (ms) de cada dosis registrada con «+ Dosis», por fármaco: da la última
+   dosis para avisar de la repetición (adrenalina) y el nº de dosis (antiarrítmico). */
+let pcrDosisLog = {};
 
 function registrarDescarga() {
   pcrDescargasLog.push({ hora: _pcrNow(), energia: '', doble: false });
@@ -2734,7 +2737,8 @@ function renderPcrFarmacos() {
           '<span class="drug-dose" id="pcr-fx-' + d.id + '-dosis" aria-live="polite">' + _pcrDosisTexto(d) + '</span>' +
           '<input type="time" id="pcr-fx-' + d.id + '-hora" aria-label="Hora de primera dosis de ' + d.nombre + '" onchange="calcPcr()">' +
           '<button class="btn-now" aria-label="Marcar hora actual de ' + d.nombre + '" onclick="stampPcrTime(\'pcr-fx-' + d.id + '-hora\')">Ahora</button>' +
-          '<input type="number" class="drug-real-input" id="pcr-fx-' + d.id + '-total" min="0" placeholder="Total dosis" aria-label="Total de dosis administradas de ' + d.nombre + '" style="width:70px">' +
+          '<input type="number" class="drug-real-input" id="pcr-fx-' + d.id + '-total" min="0" placeholder="Total dosis" aria-label="Total de dosis administradas de ' + d.nombre + '" style="width:70px" onchange="calcPcr()">' +
+          '<button class="btn-now" aria-label="Registrar una dosis de ' + d.nombre + ' ahora" onclick="registrarDosisPcr(\'' + d.id + '\')">+ Dosis</button>' +
         '</div>' +
       '</div>' +
       '<div class="drug-note" id="pcr-fx-' + d.id + '-nota">' + d.nota + '</div>' +
@@ -2773,6 +2777,34 @@ function _pcrSyncEventosConFarmacos() {
   });
 }
 
+function registrarDosisPcr(id) {
+  (pcrDosisLog[id] = pcrDosisLog[id] || []).push(Date.now());
+  document.getElementById('pcr-fx-' + id + '-chk').checked = true;
+  const horaEl = document.getElementById('pcr-fx-' + id + '-hora');
+  if (!horaEl.value) horaEl.value = _pcrNow();
+  document.getElementById('pcr-fx-' + id + '-total').value = pcrDosisLog[id].length;
+  calcPcr();
+}
+
+/* Nº de dosis dadas y hora (ms) de la última. Sin «+ Dosis», la última es la
+   hora de 1ª dosis solo si consta una única dosis; si no, se desconoce. */
+function _pcrDosisInfo(id) {
+  const log = pcrDosisLog[id] || [];
+  const n = Math.max(log.length, parseInt(document.getElementById('pcr-fx-' + id + '-total').value, 10) || 1);
+  if (log.length) return { n, ultima: n === log.length ? log[log.length - 1] : null };
+  const hora = document.getElementById('pcr-fx-' + id + '-hora').value;
+  if (!hora || n > 1) return { n, ultima: null };
+  const t = new Date(); t.setHours(+hora.slice(0, 2), +hora.slice(3, 5), 0, 0);
+  if (t > Date.now()) t.setDate(t.getDate() - 1);
+  return { n, ultima: t.getTime() };
+}
+
+/* Refresca la cuenta atrás de la adrenalina mientras el tab PCR está visible. */
+setInterval(() => {
+  const tab = document.getElementById('tab-pcr');
+  if (!document.hidden && tab && tab.offsetParent !== null && (document.getElementById('pcr-fx-adrenalina-chk') || {}).checked) calcPcr();
+}, 15000);
+
 function calcPcr() {
   const ritmo = _pcrRitmoActual();
   const descargas = pcrDescargasLog.length;
@@ -2809,8 +2841,28 @@ function calcPcr() {
         due = descargas >= 3 && !(otro && otro.checked);
       }
     }
+    /* Ya dada: avisar de la repetición. Adrenalina por tiempo (adulto 3–5 min,
+       pediatría ERC cada 4 min); antiarrítmico, 2ª dosis tras la 5ª descarga
+       (lidocaína pediátrica: dosis única en la pauta de la app). */
+    let repetir = '';
+    if (dado && ritmo && d.ritmos.includes(ritmo)) {
+      const info = _pcrDosisInfo(d.id);
+      if (d.id === 'adrenalina') {
+        const min = ped ? 4 : 3;
+        if (info.ultima === null) repetir = '<span class="drug-flag pref-estable">registra cada dosis con «+ Dosis» para avisar de la siguiente</span>';
+        else {
+          const m = (Date.now() - info.ultima) / 60000;
+          repetir = m >= min ? '<span class="drug-flag pref-inestable">▶ repetir ahora (' + Math.floor(m) + ' min desde la última · cada ' + (ped ? '4' : '3–5') + ' min)</span>'
+            : '<span class="drug-flag pref-estable">próxima dosis en ~' + Math.ceil(min - m) + ' min</span>';
+        }
+      } else if (info.n < 2 && !(ped && d.id === 'lidocaina')) {
+        repetir = descargas >= 5 ? '<span class="drug-flag pref-inestable">▶ 2ª dosis ahora (tras la 5ª descarga)</span>'
+          : '<span class="drug-flag pref-estable">2ª dosis tras la 5ª descarga</span>';
+      }
+    }
     recEl.innerHTML = (due && !dado && d.id === 'lidocaina') ? '<span class="drug-flag pref-estable">↔ alternativa a amiodarona</span>'
       : (due && !dado) ? '<span class="drug-flag pref-inestable">▶ administrar ahora</span>'
+      : repetir ? repetir
       : (ritmo && !d.ritmos.includes(ritmo)) ? '<span class="drug-flag pref-estable">no aplica al ritmo actual</span>' : '';
   });
 
@@ -2855,7 +2907,8 @@ function _pcrFarmacosTexto() {
   return admin.map(d => {
     const hora = document.getElementById('pcr-fx-' + d.id + '-hora').value;
     const total = document.getElementById('pcr-fx-' + d.id + '-total').value;
-    return '- ' + d.nombre + ' (' + _pcrDosisTexto(d) + '): 1ª dosis' + (hora ? ' — ' + hora : '') + (total ? ' · total dosis: ' + total : '');
+    const log = (pcrDosisLog[d.id] || []).map(t => { const x = new Date(t); return String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0'); });
+    return '- ' + d.nombre + ' (' + _pcrDosisTexto(d) + '): 1ª dosis' + (hora ? ' — ' + hora : '') + (total ? ' · total dosis: ' + total : '') + (log.length ? ' · dosis registradas: ' + log.join(', ') : '');
   }).join('\n');
 }
 
@@ -2991,6 +3044,7 @@ function toggleMetronomo() {
 function resetPcr() {
   pcrRitmoLog = [];
   pcrDescargasLog = [];
+  pcrDosisLog = {};
   document.getElementById('pcr-modo').value = 'adulto';
   document.getElementById('pcr-peso').value = '';
   document.getElementById('pcr-edad').value = '';
