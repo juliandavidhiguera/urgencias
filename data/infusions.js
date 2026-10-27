@@ -10,10 +10,10 @@
    (omitido si no existe una ficha correspondiente en esa carpeta)
    mg/vol son los valores por defecto de la dilución de referencia
    (p.ej. 5 mg en 50 mL); el usuario puede editarlos en la calculadora.
-   regla: si existe, la dilución por defecto es regla × peso (kg) mg hasta 50 mL
-   (regla del 3 = 3, regla del 0,3 = 0.3: lo que se usa en urgencias y ambulancia).
+   regla: solo vasoactivos y solo en paciente PEDIÁTRICO: la dilución por defecto
+   es regla × peso (kg) mg hasta 50 mL (regla del 3 = 3, regla del 0,3 = 0.3).
    Con 50 mL, 1 mL/h = regla/3 mcg/kg/min. La cantidad sigue al peso hasta que el
-   usuario la edita; mg/vol quedan como dilución fija alternativa (opcional).
+   usuario la edita. En adulto se usa siempre la dilución fija mg/vol.
    ================================================================== */
 window.INFUSIONS = [
 
@@ -27,9 +27,9 @@ window.INFUSIONS = [
   diluyente: 'No se diluye', notas: 'Hipotensión; no administrar en bolo',
   ficha: 'Propofol.md'},
 
-{name: 'Lidocaína (analgesia)', group: 'Sedación / Analgesia', badge: 'amber', regla: 3,
-  unit: 'mg/kg/h', doseMin: 1, doseMax: 1.5,
-  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar; el consenso calcula con peso ideal (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Con la regla del 3, 1 mL/h = 0,06 mg/kg/h (1,5 mg/kg/h = 25 mL/h; la jeringa dura 2 h). ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
+{name: 'Lidocaína (analgesia)', group: 'Sedación / Analgesia', badge: 'amber',
+  mg: 500, vol: 50, unit: 'mg/kg/h', doseMin: 1, doseMax: 1.5,
+  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Dosis por peso real. Dilución: lidocaína 1% sin diluir, 500 mg en 50 mL (10 mg/mL). ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
   ficha: 'Lidocaïna.md'},
 
 {name: 'Dexmedetomidina', group: 'Sedación / Analgesia', badge: 'amber',

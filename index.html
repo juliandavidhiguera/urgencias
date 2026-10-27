@@ -980,6 +980,7 @@ body {
   <div class="subhead">Paciente y fármaco</div>
   <div class="fields">
     <div class="field"><label for="inf-peso">Peso (kg)</label><input type="number" id="inf-peso" min="1" max="300" value="70" oninput="updateInfusionPeso()"></div>
+    <div class="field"><label for="inf-pac">Paciente</label><select id="inf-pac" onchange="cambiarPacienteInfusion()"><option value="adulto">Adulto</option><option value="ped">Pediátrico</option></select></div>
     <div class="field"><label for="inf-buscar">Buscar medicamento</label><input type="search" id="inf-buscar" placeholder="Escribe para filtrar…" autocomplete="off" oninput="filterInfusions()"></div>
     <div class="field"><label for="inf-farmaco">Medicamento</label><select id="inf-farmaco" onchange="selectInfusionDrug()"></select></div>
     <div class="field"><label for="inf-nombre">Nombre (si "Otro")</label><input type="text" id="inf-nombre" placeholder="p.ej. Labetalol" oninput="calcInfusion()"></div>
@@ -1042,7 +1043,7 @@ body {
     <div class="scale-item"><span class="scale-label">Regla del 0,3 · adrenalina, noradrenalina</span><span class="scale-pts">0,3 × peso (kg) mg hasta 50 mL → 1 mL/h = 0,1 mcg/kg/min. Ej. 10 kg: 3 mg hasta 50 mL</span></div>
     <div class="scale-item"><span class="scale-label">Cualquier concentración</span><span class="scale-pts">Peso (kg) × 0,06 mL/h = x mcg/kg/min, siendo x la concentración de la jeringa en mg/mL. Ej. 10 kg a 0,6 mL/h: dobutamina 250 mg/50 mL (5 mg/mL) = 5 mcg/kg/min; adrenalina 10 mg/50 mL (0,2 mg/mL) = 0,2 mcg/kg/min</span></div>
     <div class="scale-item"><span class="scale-label">Concentración constante</span><span class="scale-pts">Adrenalina o noradrenalina 1 mg en 50 mL, o dopamina o dobutamina 50 mg en 50 mL: kg/3 mL/h ≈ 0,1 o ≈ 5 mcg/kg/min. Ej. 6 kg: adrenalina 1 mg/50 mL a 2 mL/h ≈ 0,1 mcg/kg/min</span></div>
-    <div class="scale-item drug-alerts"><span class="scale-label">⚠ Aproximación</span><span class="scale-pts">La concentración constante administra un 11% más de lo que indica (kg/3 mL/h = 0,111 mcg/kg/min de adrenalina y 5,56 de dopamina). Las otras tres reglas son exactas. En el adulto la regla del 3 y la del 0,3 dan jeringas concentradas (70 kg: 210 mg de dopamina o 21 mg de adrenalina en 50 mL)</span></div>
+    <div class="scale-item drug-alerts"><span class="scale-label">⚠ Aproximación</span><span class="scale-pts">La concentración constante administra un 11% más de lo que indica (kg/3 mL/h = 0,111 mcg/kg/min de adrenalina y 5,56 de dopamina). Las otras tres reglas son exactas. La calculadora aplica la regla del 3 y la del 0,3 por defecto solo con paciente Pediátrico; en el adulto usa la dilución fija de cada fármaco</span></div>
   </div>
 </div>
 
@@ -2077,23 +2078,49 @@ function _infuLimpiarFiltro() {
   if (el && el.value) { el.value = ''; renderInfusionSelect(); renderInfusionGrid(); }
 }
 
-/* Regla del 3 / 0,3: regla × peso mg hasta 50 mL. La cantidad sigue al peso
-   hasta que el usuario edita mg o volumen (_infuManual). */
+/* Regla del 3 / 0,3 (vasoactivos, solo pediatría): regla × peso mg hasta 50 mL.
+   La cantidad sigue al peso hasta que el usuario edita mg o volumen (_infuManual). */
 let _infuManual = false;
+
+function _infuEsPed() { return document.getElementById('inf-pac').value === 'ped'; }
+
+function _infuUsaRegla(d) { return !!(d && d.regla && _infuEsPed()); }
 
 function _infuReglaTxt(d) {
   const r = String(d.regla).replace('.', ',');
   return 'Regla del ' + r + ': ' + r + ' × peso (kg) ' + (d.unitLabel || 'mg') + ' hasta 50 mL';
 }
 
-/* Dilución por defecto de un fármaco: la regla si la tiene (y hay peso), si no la fija. */
-function _infuDilucion(d, peso) {
-  return d.regla && peso ? { mg: +(d.regla * peso).toFixed(2), vol: 50 } : { mg: d.mg, vol: d.vol };
+/* Dilución por defecto: la regla si es pediátrico y el fármaco la tiene (y hay peso), si no la fija. */
+function _infuDilucion(d, peso, ped) {
+  return ped && d.regla && peso ? { mg: +(d.regla * peso).toFixed(2), vol: 50 } : { mg: d.mg, vol: d.vol };
 }
 
 function _infuVolverRegla() {
   const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
-  if (d && d.regla) { _infuAplicarRegla(d); calcInfusion(); }
+  if (_infuUsaRegla(d)) { _infuAplicarRegla(d); calcInfusion(); }
+}
+
+function cambiarPacienteInfusion() {
+  const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
+  if (d && !_infuManual) {
+    if (_infuUsaRegla(d)) {
+      _infuAplicarRegla(d);
+    } else {
+      document.getElementById('inf-mg').value = d.mg;
+      document.getElementById('inf-vol').value = d.vol;
+    }
+  }
+  if (d) _infuPintarRango(d);
+  calcInfusion();
+  renderInfusionGrid();
+}
+
+function _infuPintarRango(d) {
+  document.getElementById('inf-range').innerHTML = '<strong>Rango terapéutico:</strong> ' + d.doseMin +
+    (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') +
+    ' ' + d.unit + ' · Diluyente: ' + d.diluyente +
+    (_infuUsaRegla(d) ? '<br><strong>Dilución por defecto (pediatría):</strong> ' + _infuReglaTxt(d) + ' (editable)' : '');
 }
 
 function _infuAplicarRegla(d) {
@@ -2117,7 +2144,7 @@ function selectInfusionDrug() {
     alertEl.textContent = '';
     fichaBtn.disabled = true;
   } else {
-    if (d.regla) {
+    if (_infuUsaRegla(d)) {
       _infuAplicarRegla(d);
     } else {
       document.getElementById('inf-mg').value = d.mg;
@@ -2126,10 +2153,7 @@ function selectInfusionDrug() {
     }
     document.getElementById('inf-dosis').value = d.doseMin;
     document.getElementById('inf-unidad').value = d.unit;
-    rangeEl.innerHTML = '<strong>Rango terapéutico:</strong> ' + d.doseMin +
-      (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') +
-      ' ' + d.unit + ' · Diluyente: ' + d.diluyente +
-      (d.regla ? '<br><strong>Dilución por defecto:</strong> ' + _infuReglaTxt(d) + ' (editable)' : '');
+    _infuPintarRango(d);
     alertEl.textContent = d.notas || '';
     fichaBtn.disabled = !d.ficha;
   }
@@ -2159,9 +2183,9 @@ function calcInfusion() {
   const needsPeso = unit.indexOf('/kg/') !== -1;
   document.getElementById('inf-equiv').innerHTML = conc != null && porUnidad && (!needsPeso || peso > 0)
     ? '<strong>Equivalencia:</strong> 1 mL/h = ' + _fmt(conc / porUnidad, 3) + ' ' + unit +
-      (d && d.regla && _infuManual ? ' · <span style="color:var(--red)">dilución modificada (no es la regla)</span>' : '')
+      (_infuUsaRegla(d) && _infuManual ? ' · <span style="color:var(--red)">dilución modificada (no es la regla)</span>' : '')
     : '';
-  document.getElementById('inf-regla-btn').style.display = d && d.regla && _infuManual ? '' : 'none';
+  document.getElementById('inf-regla-btn').style.display = _infuUsaRegla(d) && _infuManual ? '' : 'none';
 
   const warnEl = document.getElementById('inf-warning');
   const copyBtn = document.getElementById('inf-copy-btn');
@@ -2187,7 +2211,7 @@ function openInfusionFicha() {
 
 function updateInfusionPeso() {
   const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
-  if (d && d.regla && !_infuManual) _infuAplicarRegla(d);
+  if (_infuUsaRegla(d) && !_infuManual) _infuAplicarRegla(d);
   calcInfusion();
   renderInfusionGrid();
 }
@@ -2209,12 +2233,14 @@ function goToInfusion(name, pesoFieldId) {
 function renderInfusionGrid() {
   const peso = _n('inf-peso') || 70;
   const grid = document.getElementById('infusion-ref-grid');
+  const ped = _infuEsPed();
   const lista = _infuLista();
   if (!lista.length) { grid.innerHTML = '<div class="scale-note">Ningún medicamento coincide con la búsqueda</div>'; return; }
   grid.innerHTML = lista.map(d => {
     const u = d.unitLabel || 'mg';
-    const mgRef = d.regla ? d.regla * peso : d.mg;
-    const conc = mgRef / (d.regla ? 50 : d.vol);
+    const regla = ped && d.regla;
+    const mgRef = regla ? d.regla * peso : d.mg;
+    const conc = mgRef / (regla ? 50 : d.vol);
     const mlhMin = _infuMLH(d.doseMin, d.unit, peso, conc);
     const mlhMax = d.doseMax != null ? _infuMLH(d.doseMax, d.unit, peso, conc) : null;
     const mlhTxt = mlhMin == null ? '—' :
@@ -2226,10 +2252,11 @@ function renderInfusionGrid() {
       '</div><span class="badge badge-' + d.badge + '">' + d.unit + '</span>' +
       '</div>' +
       '<div class="scale-body">' +
-        (d.regla
-          ? '<div class="scale-item"><span class="scale-label">Dilución por defecto</span><span class="scale-pts">' + _infuReglaTxt(d) + ' = ' + _fmt(mgRef, 2) + ' ' + u + ' en 50 mL (' + _fmt(conc, 3) + ' ' + u + '/mL) · 1 mL/h = ' + _fmt(conc / _infuMgPerHour(1, d.unit, peso), 3) + ' ' + d.unit + '</span></div>' +
-            (d.mg ? '<div class="scale-item"><span class="scale-label">Dilución fija alternativa</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(d.mg / d.vol, 3) + ' ' + u + '/mL)</span></div>' : '')
-          : '<div class="scale-item"><span class="scale-label">Dilución de referencia</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(conc, 3) + ' ' + u + '/mL)</span></div>') +
+        (regla
+          ? '<div class="scale-item"><span class="scale-label">Dilución por defecto (pediatría)</span><span class="scale-pts">' + _infuReglaTxt(d) + ' = ' + _fmt(mgRef, 2) + ' ' + u + ' en 50 mL (' + _fmt(conc, 3) + ' ' + u + '/mL) · 1 mL/h = ' + _fmt(conc / _infuMgPerHour(1, d.unit, peso), 3) + ' ' + d.unit + '</span></div>' +
+            (d.mg ? '<div class="scale-item"><span class="scale-label">Dilución fija (adulto)</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(d.mg / d.vol, 3) + ' ' + u + '/mL)</span></div>' : '')
+          : '<div class="scale-item"><span class="scale-label">Dilución de referencia</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(conc, 3) + ' ' + u + '/mL)</span></div>' +
+            (d.regla ? '<div class="scale-item"><span class="scale-label">Pediatría</span><span class="scale-pts">' + _infuReglaTxt(d) + '</span></div>' : '')) +
         '<div class="scale-item"><span class="scale-label">Rango terapéutico</span><span class="scale-pts">' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</span></div>' +
         '<div class="scale-item"><span class="scale-label">Infusión a ' + peso + ' kg</span><span class="scale-pts">' + mlhTxt + ' mL/h</span></div>' +
         '<div class="scale-item"><span class="scale-label">Diluyente</span><span class="scale-pts">' + d.diluyente + '</span></div>' +
@@ -2264,6 +2291,7 @@ Resultado: ${mlh} mL/h`;
 
 function resetInfusion() {
   document.getElementById('inf-peso').value = '70';
+  document.getElementById('inf-pac').value = 'adulto';
   document.getElementById('inf-buscar').value = '';
   renderInfusionSelect();
   document.getElementById('inf-farmaco').selectedIndex = 0;
@@ -2340,7 +2368,7 @@ function _itbMantFixedNames() {
 }
 
 function _itbMantDrugRowHtml(d, removable) {
-  const dil = _infuDilucion(d, _n('itb-peso'));
+  const dil = _infuDilucion(d, _n('itb-peso'), false);
   return '<div class="drug-row">' +
     '<div class="drug-head">' +
       '<span class="event-label" style="min-width:180px">' + d.name + '</span>' +
@@ -2407,7 +2435,7 @@ function calcIntubacionMantenimiento() {
     const el = document.getElementById(_itbMantId(d.name));
     if (!el) return;
     if (!peso) { el.textContent = '—'; return; }
-    const dil = _infuDilucion(d, peso);
+    const dil = _infuDilucion(d, peso, false);
     const mg = _n(_itbMantId(d.name) + '-mg') || dil.mg;
     const vol = _n(_itbMantId(d.name) + '-vol') || dil.vol;
     const conc = mg / vol;

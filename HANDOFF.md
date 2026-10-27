@@ -61,7 +61,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Lidocaina (analgesia)** nueva en `INFUSIONS` (mg/kg/h, rango 1-1,5, regla del 3, ficha `Lidocaïna.md`): bolo y perfusion <=1,5 mg/kg(/h) <=24 h del consenso Foo, Anaesthesia 2021 (PMID 33141959, verificado en PubMed); pediatria sin guia (series 1,5 mg/kg/h, hasta 2); toxicidad y emulsion lipidica. Uso analgesico fuera de ficha tecnica.
 - **Equivalencia** «1 mL/h = X unidad» para cualquier farmaco (`#inf-equiv`) y bloque «Reglas de preparacion de jeringa» con las 4 reglas que paso el usuario (regla del 3, del 0,3, cualquier concentracion kg x 0,06 y concentracion constante, esta marcada como aproximacion +11%).
 - Verificado en Chrome contra servidor local: dopamina 10 kg -> 30 mg/50 mL, 1 mL/h = 1 mcg/kg/min; adrenalina 10 mg/50 mL a 0,6 mL/h en 10 kg = 0,2; lidocaina 70 kg 1,5 mg/kg/h = 25 mL/h; Intubacion con lidocaina 20 kg -> 60/50, 16,67-25 mL/h; consola sin errores.
-- Decision pendiente del usuario: el consenso de lidocaina dosifica con peso ideal; la app usa peso real (regla de la seccion 2). Queda escrito en las notas del farmaco, no cambiado en el calculo.
+- **Decisiones del usuario (misma sesion, 2o commit):** (1) la regla del 3 / 0,3 por defecto **solo para vasoactivos en paciente pediatrico**: selector `#inf-pac` Adulto/Pediatrico en Perfusion IV (`_infuUsaRegla(d)`); en adulto, dilucion fija `mg`/`vol` de siempre; Intubacion usa siempre la fija. (2) **Peso real** tambien para lidocaina (se quita la mencion a peso ideal). La lidocaina deja de usar la regla y pasa a dilucion fija 500 mg/50 mL (lidocaina 1% sin diluir, 10 mg/mL) — eleccion del asistente, pendiente de que el usuario la confirme.
+- Verificado (2o commit): dopamina adulto 70 kg 200/50; pediatrico 10 kg 30/50 y 1 mL/h = 1 mcg/kg/min; adrenalina ped 10 kg 3/50; lidocaina 70 kg 1,5 mg/kg/h = 10,5 mL/h; Intubacion dopamina 20 kg 200/50; consola sin errores.
 - Contexto: el trabajo se empezo por error en el repo `herramientas` y se revirtio alli por completo.
 
 ### Sesion 10 - 2026-10-21
@@ -153,7 +154,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~11~~ | ~~Avisos de dosis repetidas en filas de farmacos PCR~~ HECHO sesion 10 (`539fbbf`) | `index.html` | - | - | - |
 | 12 | Probar en movil real: pegado de gasometria del gasometro del hospital, dosis en mL de fichas con presentaciones reales y metronomo PCR (sonido con iPhone en silencio, pantalla bloqueada) | `data/formulas.js`, `index.html` | P2 | Usuario (movil + presentaciones) | Sin campos no reconocidos ni presentaciones mal parseadas |
 | ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
-| 13 | Revision clinica de la regla del 3 por defecto en adulto (jeringas concentradas: 70 kg = 21 mg adrenalina/50 mL) y de la lidocaina (peso real vs ideal), y push | `data/infusions.js`, `index.html` | P1 | Usuario | Visto bueno y push a `main` |
+| 13 | Confirmar la dilucion fija de lidocaina (500 mg/50 mL, 1% sin diluir) y push | `data/infusions.js`, `index.html` | P1 | Usuario | Visto bueno y push a `main` |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -209,4 +210,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Metronomo PCR**: el `AudioContext` se crea en el primer clic (los navegadores exigen gesto del usuario). Con la app en segundo plano o pantalla apagada el SO puede estrangular `setInterval` y cortar/retrasar el sonido: no es un bug del codigo.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Que el usuario revise la regla del 3 por defecto y la lidocaina en Perfusion IV (#13) y, con su visto bueno, `git push` para desplegar. Despues: Abrir en el movil `https://urgencias.doctorhiguera.com/` y probar con un caso real la gasometria pegando el informe del gasometro del hospital (si algun campo no se reconoce, anadir su etiqueta al parser de `f-gasometria` en `data/formulas.js`).
+Que el usuario confirme la dilucion de lidocaina en Perfusion IV (#13) y, con su visto bueno, `git push` para desplegar. Despues: Abrir en el movil `https://urgencias.doctorhiguera.com/` y probar con un caso real la gasometria pegando el informe del gasometro del hospital (si algun campo no se reconoce, anadir su etiqueta al parser de `f-gasometria` en `data/formulas.js`).
