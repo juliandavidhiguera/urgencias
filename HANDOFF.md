@@ -154,7 +154,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~11~~ | ~~Avisos de dosis repetidas en filas de farmacos PCR~~ HECHO sesion 10 (`539fbbf`) | `index.html` | - | - | - |
 | 12 | Probar en movil real: pegado de gasometria del gasometro del hospital, dosis en mL de fichas con presentaciones reales y metronomo PCR (sonido con iPhone en silencio, pantalla bloqueada) | `data/formulas.js`, `index.html` | P2 | Usuario (movil + presentaciones) | Sin campos no reconocidos ni presentaciones mal parseadas |
 | ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
-| 13 | Confirmar la dilucion fija de lidocaina (500 mg/50 mL, 1% sin diluir) y push | `data/infusions.js`, `index.html` | P1 | Usuario | Visto bueno y push a `main` |
+| 13 | Confirmar la dilucion fija de lidocaina: 500 mg/50 mL (10 mg/mL) = 2% 25 mL + 25 mL SF o 5% 10 mL + 40 mL SF | `data/infusions.js` | P1 | Usuario | Visto bueno y push a `main` |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |

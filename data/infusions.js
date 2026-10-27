@@ -29,7 +29,7 @@ window.INFUSIONS = [
 
 {name: 'Lidocaína (analgesia)', group: 'Sedación / Analgesia', badge: 'amber',
   mg: 500, vol: 50, unit: 'mg/kg/h', doseMin: 1, doseMax: 1.5,
-  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Dosis por peso real. Dilución: lidocaína 1% sin diluir, 500 mg en 50 mL (10 mg/mL). ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
+  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Dosis por peso real. Dilución: 500 mg en 50 mL (10 mg/mL): lidocaína 2% 25 mL + 25 mL SF, o lidocaína 5% 10 mL + 40 mL SF. ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
   ficha: 'Lidocaïna.md'},
 
 {name: 'Dexmedetomidina', group: 'Sedación / Analgesia', badge: 'amber',
