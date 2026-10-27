@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-27 | **Sesion #:** 11 | **Rama:** main | **HEAD:** `9fc327c` (desplegado en produccion)
+**Ultima actualizacion:** 2026-10-27 | **Sesion #:** 11 | **Rama:** main | **HEAD:** `46fc720` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -58,8 +58,11 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ### Sesion 11 - 2026-10-27
 - Perfusion IV: campo opcional `info` en `data/infusions.js` (secciones clinicas) que `_infuInfoHtml(d)` pinta en `#inf-info` debajo del calculo. Lidocaina: pauta, otras indicaciones (PCR, TV con SCA, premedicacion, anestesia local), efectos secundarios, signos de alarma (toxicidad por anestesico local + lipidos), contraindicaciones, monitorizacion.
 - Contraste: token nuevo `--red-text` (claro #a40e26 = 7,5:1 sobre fondo; oscuro #ff7b72 = 7,5:1) para todo texto rojo; `--red` (#cf222e 5,1:1 / #f85149 5,7:1, AA justo) queda para bordes y fondos. `#inf-alert` pasa de monoespaciada roja a sans 13px semibold. Antes la alerta usaba estilo inline rojo; el selector `#tab-perfusiones .tile-aux` la habria vuelto negra, de ahi `#tab-perfusiones #inf-alert`.
+- Verificado (`46fc720`) en Chrome local, claro y oscuro: 6 secciones de lidocaina, el bloque desaparece con noradrenalina, contraste medido en pagina #inf-alert 7,46 (claro) / 7,51 (oscuro), titulo de alarma 7,87 / 6,86; consola sin errores. Produccion verificada con curl tras push.
+- Commits sesion 11 (todos en `main` y desplegados): `e81f4b8`, `7315970`, `a8756dc`, `9fc327c`, `84c5428`, `46fc720`.
+- Descartado: cambiar `--red` global (el boton del metronomo de PCR usa `--red` de fondo con texto blanco; un rojo mas claro en oscuro lo empeoraria).
 
-- Commit `e81f4b8` (sin push). **Perfusion IV: regla del 3 / 0,3 en 50 mL por defecto** (peticion del usuario: es lo que se usa en urgencias y ambulancia). Campo nuevo `regla` en `data/infusions.js`: dopamina y dobutamina 3 x kg mg, adrenalina y noradrenalina 0,3 x kg mg, siempre hasta 50 mL; la cantidad sigue al peso hasta que se edita mg o volumen (`_infuManual`), boton «Volver a la regla en 50 mL». `mg`/`vol` quedan como «dilucion fija alternativa» en la tarjeta de referencia. Helper `_infuDilucion(d, peso)` usado tambien por Intubacion > Mantenimiento.
+- Commit `e81f4b8`. **Perfusion IV: regla del 3 / 0,3 en 50 mL por defecto** (peticion del usuario: es lo que se usa en urgencias y ambulancia). Campo nuevo `regla` en `data/infusions.js`: dopamina y dobutamina 3 x kg mg, adrenalina y noradrenalina 0,3 x kg mg, siempre hasta 50 mL; la cantidad sigue al peso hasta que se edita mg o volumen (`_infuManual`), boton «Volver a la regla en 50 mL». `mg`/`vol` quedan como «dilucion fija alternativa» en la tarjeta de referencia. Helper `_infuDilucion(d, peso)` usado tambien por Intubacion > Mantenimiento.
 - **Lidocaina (analgesia)** nueva en `INFUSIONS` (mg/kg/h, rango 1-1,5, regla del 3, ficha `Lidocaïna.md`): bolo y perfusion <=1,5 mg/kg(/h) <=24 h del consenso Foo, Anaesthesia 2021 (PMID 33141959, verificado en PubMed); pediatria sin guia (series 1,5 mg/kg/h, hasta 2); toxicidad y emulsion lipidica. Uso analgesico fuera de ficha tecnica.
 - **Equivalencia** «1 mL/h = X unidad» para cualquier farmaco (`#inf-equiv`) y bloque «Reglas de preparacion de jeringa» con las 4 reglas que paso el usuario (regla del 3, del 0,3, cualquier concentracion kg x 0,06 y concentracion constante, esta marcada como aproximacion +11%).
 - Verificado en Chrome contra servidor local: dopamina 10 kg -> 30 mg/50 mL, 1 mL/h = 1 mcg/kg/min; adrenalina 10 mg/50 mL a 0,6 mL/h en 10 kg = 0,2; lidocaina 70 kg 1,5 mg/kg/h = 25 mL/h; Intubacion con lidocaina 20 kg -> 60/50, 16,67-25 mL/h; consola sin errores.
@@ -210,6 +213,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **CSP activa (`_headers`)**: cualquier recurso externo nuevo (CDN, fuente, `fetch` a una API, Cloudflare Web Analytics / Rocket Loader / email obfuscation) quedara BLOQUEADO hasta anadir su origen a la directiva correspondiente. Probar en local con un servidor que aplique `_headers` (python `http.server` no lo hace).
 
 - **Metronomo PCR**: el `AudioContext` se crea en el primer clic (los navegadores exigen gesto del usuario). Con la app en segundo plano o pantalla apagada el SO puede estrangular `setInterval` y cortar/retrasar el sonido: no es un bug del codigo.
+
+- Texto rojo: usar `var(--red-text)`, no `var(--red)` (este queda para bordes y fondos; AA justo como color de letra). En `#tab-perfusiones` las reglas `#tab-perfusiones .tile-aux` y `.scale-pts` fuerzan `color: var(--text)`: cualquier color propio ahi necesita selector con `#tab-perfusiones`.
+- `info` en `data/infusions.js` es opcional por farmaco; se pinta con `innerHTML` (datos estaticos del repo, no entrada de usuario).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
 Abrir en el movil `https://urgencias.doctorhiguera.com/` y probar con un caso real la gasometria pegando el informe del gasometro del hospital (si algun campo no se reconoce, anadir su etiqueta al parser de `f-gasometria` en `data/formulas.js`).
