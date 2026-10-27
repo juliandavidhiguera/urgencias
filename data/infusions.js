@@ -10,6 +10,8 @@
    (omitido si no existe una ficha correspondiente en esa carpeta)
    mg/vol son los valores por defecto de la dilución de referencia
    (p.ej. 5 mg en 50 mL); el usuario puede editarlos en la calculadora.
+   info: opcional, secciones clínicas [{titulo, alerta?, items: [[etiqueta, texto]]}]
+   que se muestran debajo del cálculo al elegir el fármaco.
    regla: solo vasoactivos y solo en paciente PEDIÁTRICO: la dilución por defecto
    es regla × peso (kg) mg hasta 50 mL (regla del 3 = 3, regla del 0,3 = 0.3).
    Con 50 mL, 1 mL/h = regla/3 mcg/kg/min. La cantidad sigue al peso hasta que el
@@ -29,7 +31,35 @@ window.INFUSIONS = [
 
 {name: 'Lidocaína (analgesia)', group: 'Sedación / Analgesia', badge: 'amber',
   mg: 500, vol: 50, unit: 'mg/kg/h', doseMin: 1, doseMax: 1.5,
-  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Dosis por peso real. Dilución: 500 mg en 50 mL (10 mg/mL): lidocaína 2% 25 mL + 25 mL SF, o lidocaína 5% 10 mL + 40 mL SF. ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
+  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica (Foo, Anaesthesia 2021, PMID 33141959). Dosis por peso real. Dilución: 500 mg en 50 mL (10 mg/mL): lidocaína 2% 25 mL + 25 mL SF, o lidocaína 5% 10 mL + 40 mL SF. ECG, SpO2 y PA continuos. Toxicidad: parar la perfusión y emulsión lipídica 20%',
+  info: [
+    {titulo: 'Pauta analgésica (peso real)', items: [
+      ['Adulto · bolo', '≤1,5 mg/kg en 10 min'],
+      ['Adulto · perfusión', '≤1,5 mg/kg/h durante ≤24 h, después reevaluar'],
+      ['Niño · bolo', '1–1,5 mg/kg en 5–10 min'],
+      ['Niño · perfusión', '1–1,5 mg/kg/h (hasta 2 mg/kg/h en series publicadas; sin guía de sociedad). Solo con monitorización']]},
+    {titulo: 'Dosis en otras indicaciones', items: [
+      ['PCR, ritmo desfibrilable (alternativa a amiodarona, nunca juntas)', 'Adulto: 100 mg IV/IO tras la 3ª descarga y 50 mg tras la 5ª. Niño: 1 mg/kg (máx. 100 mg)'],
+      ['TV con SCA (2ª elección)', '1–1,5 mg/kg IV lento; repetir 0,5–0,75 mg/kg cada 5–10 min (máx. 3 mg/kg)'],
+      ['Premedicación en intubación', '1,5 mg/kg IV (TCE con hipertensión intracraneal, broncoespasmo grave)'],
+      ['Anestesia local y bloqueo periférico', '0,5–1 mg/kg. Dosis máxima: 4,5 mg/kg sin adrenalina (máx. 300 mg), 7 mg/kg con adrenalina (máx. 500 mg)']]},
+    {titulo: 'Efectos secundarios', items: [
+      ['Frecuentes', 'Hipotensión, cefalea, náuseas y vómitos'],
+      ['Por sobredosis', 'Neurológicos (mareo, somnolencia, confusión, acúfenos, visión borrosa, temblor, convulsiones) y cardiovasculares (bradicardia, bloqueo, arritmias, depresión miocárdica, PCR)']]},
+    {titulo: 'Signos de alarma: toxicidad sistémica por anestésico local', alerta: true, items: [
+      ['Precoces', 'Parestesia peribucal, sabor metálico, acúfenos, mareo, somnolencia, disartria, agitación'],
+      ['Graves', 'Convulsiones, disminución del nivel de conciencia'],
+      ['Cardiovasculares', 'Bradicardia, bloqueo, arritmias ventriculares, hipotensión, parada'],
+      ['Actuación', 'Parar la perfusión, pedir ayuda, O2 100% y vía aérea, benzodiacepina si convulsiones. Emulsión lipídica 20%: 1,5 mL/kg en 1 min + 15 mL/kg/h; si no mejora a los 5 min, repetir el bolo (hasta 2 veces más) y subir a 30 mL/kg/h. Máx. acumulado 12 mL/kg']]},
+    {titulo: 'Contraindicaciones y precauciones', items: [
+      ['No administrar', 'Alergia a anestésicos locales tipo amida; BAV de 2º-3er grado, WPW u otros trastornos graves de conducción; insuficiencia cardiaca grave o shock cardiogénico; insuficiencia hepática grave; porfiria'],
+      ['Precaución', 'Mayores de 70 años, insuficiencia cardiaca, insuficiencia hepática moderada o renal avanzada, epilepsia, hipovolemia y shock'],
+      ['Otra técnica con anestésico local', 'No simultanear (bloqueo, infiltración, epidural): separar 4 h'],
+      ['Interacciones', 'Procainamida, betabloqueantes, bloqueantes neuromusculares. Nunca junto con amiodarona']]},
+    {titulo: 'Monitorización', items: [
+      ['Constantes', 'ECG continuo, SpO2 y PA durante el bolo y la perfusión'],
+      ['Neurológico', 'Preguntar periódicamente por síntomas de toxicidad'],
+      ['Bomba', 'Jeringa etiquetada y línea exclusiva']]}],
   ficha: 'Lidocaïna.md'},
 
 {name: 'Dexmedetomidina', group: 'Sedación / Analgesia', badge: 'amber',
