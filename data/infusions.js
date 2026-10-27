@@ -10,6 +10,10 @@
    (omitido si no existe una ficha correspondiente en esa carpeta)
    mg/vol son los valores por defecto de la dilución de referencia
    (p.ej. 5 mg en 50 mL); el usuario puede editarlos en la calculadora.
+   regla: si existe, la dilución por defecto es regla × peso (kg) mg hasta 50 mL
+   (regla del 3 = 3, regla del 0,3 = 0.3: lo que se usa en urgencias y ambulancia).
+   Con 50 mL, 1 mL/h = regla/3 mcg/kg/min. La cantidad sigue al peso hasta que el
+   usuario la edita; mg/vol quedan como dilución fija alternativa (opcional).
    ================================================================== */
 window.INFUSIONS = [
 
@@ -22,6 +26,11 @@ window.INFUSIONS = [
   mg: 500, vol: 50, unit: 'mg/kg/h', doseMin: 0.3, doseMax: 4.0,
   diluyente: 'No se diluye', notas: 'Hipotensión; no administrar en bolo',
   ficha: 'Propofol.md'},
+
+{name: 'Lidocaína (analgesia)', group: 'Sedación / Analgesia', badge: 'amber', regla: 3,
+  unit: 'mg/kg/h', doseMin: 1, doseMax: 1.5,
+  diluyente: 'SF 0,9%', notas: 'Uso analgésico fuera de ficha técnica. Bolo previo ≤1,5 mg/kg en 10 min (niño 1-1,5 mg/kg en 5-10 min). Adulto: perfusión ≤1,5 mg/kg/h durante ≤24 h y reevaluar; el consenso calcula con peso ideal (Foo, Anaesthesia 2021, PMID 33141959). Niño: sin guía; en series 1,5 mg/kg/h (hasta 2 mg/kg/h). Con la regla del 3, 1 mL/h = 0,06 mg/kg/h (1,5 mg/kg/h = 25 mL/h; la jeringa dura 2 h). ECG, SpO2 y PA continuos. No simultanear con otra técnica de anestésico local (separar 4 h). Toxicidad (parestesia peribucal, sabor metálico, acúfenos → convulsiones, arritmias): parar la perfusión; emulsión lipídica 20% 1,5 mL/kg en 1 min + 15 mL/kg/h (máx. 12 mL/kg)',
+  ficha: 'Lidocaïna.md'},
 
 {name: 'Dexmedetomidina', group: 'Sedación / Analgesia', badge: 'amber',
   mg: 0.2, vol: 50, unit: 'mcg/kg/h', doseMin: 0.2, doseMax: 1.4,
@@ -37,22 +46,22 @@ window.INFUSIONS = [
   diluyente: 'SF 0,9% / SG 5%', notas: 'Hipotensión, liberación de histamina',
   ficha: 'Clorur mòrfic.md'},
 
-{name: 'Noradrenalina', group: 'Vasoactivos', badge: 'red',
+{name: 'Noradrenalina', group: 'Vasoactivos', badge: 'red', regla: 0.3,
   mg: 5, vol: 50, unit: 'mcg/kg/min', doseMin: 0.05, doseMax: 1.0,
   diluyente: 'SG 5% / SF 0,9%', notas: 'Preferible vía central. Vigilar extravasación',
   ficha: 'Noradrenalina.md'},
 
-{name: 'Adrenalina (perfusión)', group: 'Vasoactivos', badge: 'red',
+{name: 'Adrenalina (perfusión)', group: 'Vasoactivos', badge: 'red', regla: 0.3,
   mg: 4, vol: 50, unit: 'mcg/kg/min', doseMin: 0.05, doseMax: 0.5,
   diluyente: 'SG 5% / SF 0,9%', notas: 'Aumenta el riesgo de taquiarritmias',
   ficha: 'Adrenalina.md'},
 
-{name: 'Dobutamina', group: 'Vasoactivos', badge: 'red',
+{name: 'Dobutamina', group: 'Vasoactivos', badge: 'red', regla: 3,
   mg: 250, vol: 50, unit: 'mcg/kg/min', doseMin: 2.5, doseMax: 20,
   diluyente: 'SG 5% / SF 0,9%', notas: 'Puede producir hipotensión (vasodilatador); no usar como vasopresor',
   ficha: 'Dobutamina.md'},
 
-{name: 'Dopamina', group: 'Vasoactivos', badge: 'red',
+{name: 'Dopamina', group: 'Vasoactivos', badge: 'red', regla: 3,
   mg: 200, vol: 50, unit: 'mcg/kg/min', doseMin: 5, doseMax: 20,
   diluyente: 'SG 5%', notas: 'Uso limitado; más taquiarritmias que noradrenalina'},
 
