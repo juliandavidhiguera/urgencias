@@ -1,0 +1,53 @@
+# Despliegue a Cloudflare Pages (proyecto: urgencias)
+# - push a main      -> producción (urgencias.pages.dev + dominio personalizado)
+# - pull request     -> preview (<rama>.urgencias.pages.dev)
+# - cambios solo de documentación / config de agentes: no despliega (ahorro de minutos de Actions)
+# Sin paso de build: se publica la raíz del repo, igual que la integración Git actual.
+# Requiere el secret CLOUDFLARE_API_TOKEN (Account · Cloudflare Pages · Edit),
+# a nivel de org doctorhiguera (tras el traspaso) o de este repo.
+#
+# IMPORTANTE: fusionar solo cuando el repo se mueva a la org y DESPUÉS de poner
+# "Implementaciones automáticas: Deshabilitado" en Cloudflare (Pages › urgencias ›
+# Configuración › Compilación). Si no, cada push se desplegaría dos veces.
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**', '.claude/**', '.devcontainer/**']
+  pull_request:
+    paths-ignore: ['**/*.md', 'docs/**', '.claude/**', '.devcontainer/**']
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+
+env:
+  CF_ACCOUNT_ID: 3275eea7fdc8f05e8993aa0f09e5db2c
+  CF_PROJECT: urgencias
+
+jobs:
+  deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # Fijado a 24.04: ubuntu-latest migra a Ubuntu 26 desde el 19/10/2026; migrar de forma controlada
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Deploy a Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CF_ACCOUNT_ID }}
+          command: >-
+            pages deploy .
+            --project-name=${{ env.CF_PROJECT }}
+            --branch=${{ github.head_ref || github.ref_name }}
+            --commit-hash=${{ github.event.pull_request.head.sha || github.sha }}
+            --commit-dirty=true
