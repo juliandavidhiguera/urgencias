@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `53d6aca` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `c70f885` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -64,9 +64,11 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
   - TEP: Wells/PERC/dimero D ajustado por edad (solo si no confirmado); PESI/sPESI/Hestia; categoria A–E AHA/ACC 2026 + modificador R + riesgo ESC 2019; enoxaparina/HNF (mL/h)/alteplasa/ACOD por peso real y ClCr; destino red Campdevanol–CHV Vic–PERT Clinic
 - Anadido: `protocolos/Flujograma_Asma_Campdevanol.pdf` (1 pag, 1,5 MB) y `Flujograma_TEP_Campdevanol.pdf` (3 pags): imagenes de los Word impresas con Chrome headless (PIL sin JPEG en este equipo). Precacheados; `sw.js` `CACHE` `urg-v67`
 - Verificado: 13 casos con node (vacio, leve→vital, A→E2); navegador local sin errores de consola ni desbordes; produccion sirve ambos ids, `urg-v67` y los 2 PDF (200)
-- Commits: `53d6aca` feat(protocolos): crisis de asma y TEP agudo con evaluador, dosis y destino Campdevanol
+- Commits: `53d6aca` feat(protocolos): crisis de asma y TEP agudo con evaluador, dosis y destino Campdevanol · `c70f885` fix(protocolos): dosis verificadas
 - Decisiones: prednisona asma con peso REAL (SEMES dice peso ideal; tope 50 mg); TEP sPESI 0 con VD o biomarcador + → C2 (Word no lo define); C3 con ClCr <30 → HNF (Word contradice 4.2 vs tabla 6); PERC usa el item Wells «inmovilizacion/cirugia 4 sem» (mas conservador)
 - Descartado: rehacer los flujogramas desde HTML como en EPOC (se usan las imagenes de los Word tal cual)
+- Verificacion de dosis (Vera + Perplexity, /md-urg-hosp) → `c70f885` fix(protocolos): asma prednisona fija 40–50 mg/dia (GINA/GEMA; SEMES mg/kg como nota); salbutamol IV solo rescate refractario; notas de evidencia (budesonida NEB 0,5 mg = pauta SEMES, ensayo adulto uso 9 mg; VMNI/VMI = pauta SEMES; noradrenalina inicio = pauta local). TEP: alteplasa en PCR 50 mg bolo + 2.a dosis 50 mg a los 15–30 min sin ROSC (max 100 mg) segun OUH Medicines Information Leaflet ene 2026 (PDF del usuario en Downloads), se mantiene 0,3–0,5 mg/kg; HNF preferente con ClCr ≤30 en C1–C2 (ESC), enoxaparina c/24 h + anti-Xa como alternativa (AHA 2026); fibrinolisis «a considerar» en D (AHA 2026)
+- No verificable con Vera/Perplexity: subcategorias C1–E2 AHA 2026, NT-proBNP ≥600, VD/VI ≥1,0, tope 1,5 mg/kg <65 kg de la ficha tecnica. OUH da tabla por peso para TEP con pulso (<50 kg 10+50; 50–64 kg 10+70; ≥65 kg 10+90) distinta del 1,5 mg/kg: no aplicada, pendiente de decision del usuario
 
 ### Sesion 13 - 2026-11-01
 - Modificado: `index.html` (solo `<style>` + 4 `style` inline de textarea/select) -> tipografia y contraste (`/impeccable` typeset: evaluacion + detector en paralelo, vista previa `preview.html` aprobada por el usuario antes de aplicar)
@@ -201,7 +203,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 14 | Consensuar los umbrales locales del protocolo EPOC (FiO2 >40 % para trasladar, tiempos de reevaluacion, VMNI como techo en planta) con la Direccion Asistencial y UCI/Neumologia de HUV | `data/protocols.js` (`epoc-agudizado`), flujograma | P2 | Usuario (reunion con HUV) | Umbrales confirmados y la nota «a consensuar» retirada del destino y del flujograma |
 | 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
-| 17 | Verificar con Vera + Perplexity las dosis de asma y TEP (no hecho, a diferencia de EPOC): alteplasa en PCR 0,3–0,5 mg/kg (ERC 2025), prednisona peso real vs ideal, hidrocortisona 250 mg, salbutamol IV, HNF en C3 con FG <30 | `data/protocols.js` (`asma-crisis`, `tep-agudo`) | P2 | - | Cada dosis con cita o discrepancia anotada en `src` |
+| ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
