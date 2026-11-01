@@ -62,6 +62,16 @@ patch('Tenecteplasa', f => {
   if (!f.dosis.includes('ICTUS ISQUÉMICO')) {
     f.dosis = f.dosis.trim() + '\n• ICTUS ISQUÉMICO (dosis distinta, NO usar la tabla anterior): 0,25 mg/kg en bolo IV único en 5–10 s, máximo 25 mg (5.000 UI) = 0,05 ml/kg de la solución a 5 mg/ml, máximo 5 ml. Ejemplos: 60 kg → 15 mg (3 ml) · 70 kg → 17,5 mg (3,5 ml) · 80 kg → 20 mg (4 ml) · ≥100 kg → 25 mg (5 ml).\n   ◦ No usar la dosis alta de los ensayos antiguos (0,4 mg por kilo).\n   ◦ Si se usa el vial de 50 mg, desechar el sobrante: el error más grave es dar la dosis de SCACEST.\n   ◦ Sin antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control). PA <180/105 mmHg durante y después.';
   }
+  /* SCACEST en ≥75 años: media dosis (STREAM-2, PMID 37439219; ACC/AHA 2025).
+     TEP: fuera de ficha técnica (ESC 2019, AHA/ACC 2026); de elección, alteplasa. */
+  const SCA = 'En SCACEST: idealmente en los primeros 10 min desde el ECG, junto con la doble antiagregación y la anticoagulación.';
+  if (!f.dosis.includes('MEDIA DOSIS')) {
+    f.dosis = f.dosis.replace(SCA, SCA + '\n• SCACEST en ≥75 años: MEDIA DOSIS del tramo de peso (STREAM-2): <60 kg 15 mg (3 ml) · 60–69 kg 17,5 mg (3,5 ml) · 70–79 kg 20 mg (4 ml) · 80–89 kg 22,5 mg (4,5 ml) · ≥90 kg 25 mg (5 ml).');
+  }
+  if (!f.dosis.includes('fuera de ficha técnica')) {
+    f.dosis = f.dosis.replace('En TEP: en paciente inestable', 'En TEP: uso fuera de ficha técnica (ESC 2019, AHA/ACC 2026); el fibrinolítico de elección es la alteplasa, reservar la tenecteplasa si no la hay. Solo en paciente inestable');
+    f.indicaciones = f.indicaciones.replace('o PCR por sospecha de TEP.', 'o PCR por sospecha de TEP (fuera de ficha técnica: de elección, alteplasa).');
+  }
   if (!f.contraindicaciones.startsWith('En el ictus')) {
     f.contraindicaciones = 'En el ictus se aplican los criterios de inclusión y exclusión de la trombólisis del Codi Ictus, no esta lista (que es la de SCACEST/TEP).\n' + f.contraindicaciones;
   }
