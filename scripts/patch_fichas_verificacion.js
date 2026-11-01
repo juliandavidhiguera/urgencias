@@ -138,6 +138,29 @@ patch('Tenecteplasa', f => {
   console.log('Añadida: Alteplasa');
 }
 
+/* 2026-11-01: adrenalina. Bradicardia: la ficha del SEM decía "2 - 10 microgramos/kg/min"
+   (14-70 veces la dosis con 70 kg); ERC 2025, AHA 2025 y ACC/AHA/HRS (PMID 30586772) dan
+   2-10 microgramos/min. Anafilaxia: repetición cada 5 min sin máximo y sin bolo IV fuera de la
+   parada (ERC 2025, PMID 41117569). Se evita escribir "mg/kg" o "µg/kg/min" para que la
+   calculadora de la ficha no ofrezca opciones falsas. Idempotente: reescribe los bloques. */
+patch('Adrenalina', f => {
+  const lineas = f.dosis.split('\n');
+  const iBradi = lineas.findIndex(l => /^• Bradicardias/.test(l));
+  if (iBradi < 0) { console.error('Adrenalina: no se encuentra el bloque de bradicardias'); process.exit(1); }
+  const ADRENALINA_BRADI = [
+    '• Bradicardias (sin respuesta a la atropina, como puente al marcapasos):',
+    '   ◦ Perfusión continua 2 - 10 microgramos/min IV (dosis total por minuto, NO por kilo), ajustada a la respuesta (ERC 2025; AHA 2025; ACC/AHA/HRS).',
+    '   ◦ Preparación: diluya 1 mg en 100 ml SF = 10 microgramos/ml (1/100.000). 2 - 10 microgramos/min = 12 - 60 ml/h.',
+    '   ◦ Pediatría (ERC 2025): en la bradicardia con mala perfusión que requiere RCP, 10 microgramos por kilo IV/IO en bolo (máximo 1 mg), repetir cada 3 - 5 min.',
+    '• Shock anafiláctico:',
+    '   ◦ Vía intramuscular de elección: 0,5 mg i.m. (preferiblemente en cuádriceps, cuadrante externo). Repetir cada 5 min si no hay respuesta, sin número máximo de dosis (ERC 2025).',
+    '   ◦ Refractaria (sin respuesta tras 2 dosis i.m. y sueroterapia): perfusión i.v. desde 0,1 microgramos por kilo y minuto, ajustada a la respuesta, con monitorización continua y personal experimentado (ver protocolo de Anafilaxia).',
+    '   ◦ Bolo i.v.: el ERC 2025 no lo recomienda fuera de la parada (más sobredosis y eventos cardiovasculares que la vía i.m.). Solo en hipotensión extrema inminente a la parada (TAS <50 mmHg), personal experto puede dar bolos de 50 - 100 microgramos i.v.',
+    '   ◦ Parada cardiaca por anafilaxia: SVA estándar, 1 mg i.v./i.o. cada 3 - 5 min.'
+  ];
+  f.dosis = lineas.slice(0, iBradi).concat(ADRENALINA_BRADI).join('\n');
+});
+
 const out = header + JSON.stringify(fichas, null, 2) + ';\n';
 fs.writeFileSync(FICHAS_PATH, out, 'utf8');
 console.log('data/fichas.js actualizado.');

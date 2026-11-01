@@ -7,7 +7,7 @@ window.PROTOCOLS = [
 
 {id:'anafilaxia', title:'Anafilaxia', sub:'Adrenalina IM inmediata — ERC 2025', badge:'red', tag:'Crítico', rank:8, steps:[
   {type:'action', text:'Retirar el desencadenante si es posible (fármaco IV, picadura). NO retrasar la adrenalina por esto'},
-  {type:'action', text:'ADRENALINA IM 0,5 mg (0,5 mL de solución 1 mg/mL = 1:1000) en cara anterolateral del muslo (vasto lateral), lo antes posible.\nAlternativa ponderal equivalente: 0,01 mg/kg IM, máximo 0,5 mg'},
+  {type:'action', text:'ADRENALINA IM 0,5 mg (0,5 mL de solución 1 mg/mL = 1:1000) en cara anterolateral del muslo (vasto lateral), lo antes posible.\nAlternativa ponderal equivalente: 0,01 mg/kg IM, máximo 0,5 mg.\nNiños por edad (ERC 2025): 1–5 años 0,15 mg · 6–12 años 0,3 mg · >12 años 0,5 mg (o 0,01 mg/kg, máx. 0,5 mg)'},
   {type:'info', text:'IM en muslo, NO subcutánea ni en deltoides. Autoinyector en adultos: 0,5 mg (ERC First Aid 2025)'},
   {type:'info', text:'CUIDADO CON LA AMPOLLA: 1 mg/mL (1:1000) es la de uso IM. 0,1 mg/mL (1:10.000) es la de uso IV/IO. Administrar por vía IV la ampolla de 1 mg/mL es una causa clásica de sobredosis grave'},
   {type:'action', text:'Posición: decúbito supino con piernas elevadas. Si disnea, semiincorporado. Si embarazo, decúbito lateral izquierdo.\nNO sentar ni levantar bruscamente'},
@@ -17,6 +17,7 @@ window.PROTOCOLS = [
   {type:'action', branch:'yes', text:'Fluidoterapia: cristaloide 500–1000 mL IV rápido si hipotensión; repetir según respuesta'},
   {type:'action', branch:'yes', text:'Refractaria tras ≥2 dosis IM, con monitorización completa y personal experto: PERFUSIÓN IV de adrenalina 0,1 µg/kg/min, titulando a efecto (ERC 2025).\nPreparación práctica: 1 mg en 250 mL de SSF o SG5% = 4 µg/mL.\nNO dar bolo IV fuera de la parada: se asocia a más sobredosis y más eventos cardiovasculares que la vía IM'},
   {type:'action', branch:'no', text:'Mantener monitorización: riesgo de reacción bifásica'},
+  {type:'action', text:'PARADA CARDIACA POR ANAFILAXIA: SVA estándar (protocolo RCP / SVA). Adrenalina 1 mg IV/IO cada 3–5 min (niños 10 µg/kg, máx. 1 mg). Fluidos IV en bolo rápido (ERC 2025)'},
   {type:'info', text:'Broncoespasmo asociado: salbutamol nebulizado como adyuvante, nunca en sustitución de la adrenalina'},
   {type:'info', text:'Corticoide y antihistamínico son de segunda línea: no salvan la vida ni sustituyen a la adrenalina'},
   {type:'info', text:'Observación antes del alta según gravedad y respuesta. Alta con autoinyector, plan escrito y derivación a alergología'}],
