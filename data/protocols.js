@@ -193,7 +193,183 @@ window.PROTOCOLS = [
         significado:'Riesgo de progresión a bloqueo AV completo (~20–40%) — preparar marcapasos transcutáneo. Predictor independiente de mortalidad. Angiografía urgente + monitorización con capacidad de estimulación.',
         fuente:'2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline · PMID 40013746'}
     ]
-  }, steps:[
+  },
+  flow:(() => {
+    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    const hay = x => !isNaN(x) && x > 0;
+    const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular la dosis.</span>';
+    const tnk = v => {
+      if (!hay(v.peso)) return 'Tabla por peso: &lt;60 kg 30 mg (6 ml) · 60–69 kg 35 mg (7 ml) · 70–79 kg 40 mg (8 ml) · 80–89 kg 45 mg (9 ml) · ≥90 kg 50 mg (10 ml); con ≥75 años, media dosis. ' + faltaPeso;
+      const llena = v.peso < 60 ? 30 : v.peso < 70 ? 35 : v.peso < 80 ? 40 : v.peso < 90 ? 45 : 50;
+      if (!hay(v.edad)) return '<b>' + llena + ' mg (' + f(llena / 5) + ' ml)</b> por peso; si tiene ≥75 años, MEDIA DOSIS: <b>' + f(llena / 2) + ' mg (' + f(llena / 10) + ' ml)</b>. Introduce la edad.';
+      const mg = v.edad >= 75 ? llena / 2 : llena;
+      return '<b>' + f(mg) + ' mg = ' + f(mg / 5) + ' ml</b> IV en bolo único en 5–10 s' + (v.edad >= 75 ? ' (MEDIA DOSIS por ≥75 años; dosis completa ' + llena + ' mg)' : '') + '.';
+    };
+    const clopi = v => !hay(v.edad) ? 'clopidogrel 300 mg VO con ≤75 años o 75 mg sin carga con >75 años' :
+      v.edad <= 75 ? '<b>clopidogrel 300 mg VO</b> (≤75 años)' : '<b>clopidogrel 75 mg VO sin dosis de carga</b> (>75 años)';
+    const enox = v => {
+      if (!hay(v.peso) || !hay(v.edad)) return 'ENOXAPARINA: &lt;75 años 30 mg IV en bolo y a los 15 min 1 mg/kg SC cada 12 h (máx. 100 mg en las 2 primeras dosis) · ≥75 años sin bolo, 0,75 mg/kg SC cada 12 h (máx. 75 mg en las 2 primeras) · ClCr &lt;30: 1 mg/kg SC cada 24 h. ' + (hay(v.peso) ? 'Introduce la edad.' : faltaPeso);
+      const r = Math.round;
+      if (hay(v.clcr) && v.clcr < 30) return 'ENOXAPARINA (ClCr &lt;30): ' + (v.edad < 75 ? '30 mg IV en bolo y a los 15 min ' : 'sin bolo, ') + '<b>' + r(v.peso) + ' mg SC cada 24 h</b> (1 mg/kg).';
+      if (v.edad < 75) return 'ENOXAPARINA: <b>30 mg IV en bolo</b> y a los 15 min <b>' + r(Math.min(v.peso, 100)) + ' mg SC cada 12 h</b> (1 mg/kg; máx. 100 mg en las 2 primeras dosis' + (v.peso > 100 ? ', después ' + r(v.peso) + ' mg' : '') + ').' + (hay(v.clcr) ? '' : ' Si ClCr &lt;30, cada 24 h.');
+      return 'ENOXAPARINA (≥75 años): sin bolo, <b>' + r(Math.min(0.75 * v.peso, 75)) + ' mg SC cada 12 h</b> (0,75 mg/kg; máx. 75 mg en las 2 primeras dosis' + (0.75 * v.peso > 75 ? ', después ' + r(0.75 * v.peso) + ' mg' : '') + ').' + (hay(v.clcr) ? '' : ' Si ClCr &lt;30: 1 mg/kg cada 24 h.');
+    };
+    const hnf = v => hay(v.peso) ? 'Alternativa, HEPARINA SÓDICA: <b>' + f(Math.min(60 * v.peso, 4000)) + ' UI IV</b> en bolo (60 UI/kg, máx. 4.000) + <b>' + f(Math.min(12 * v.peso, 1000)) + ' UI/h</b> (12 UI/kg/h, máx. 1.000) según TTPa.' :
+      'Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa.';
+    const TQ = {
+      q: 'Tiempo estimado desde el ECG hasta la llegada al hospital con ICP',
+      opts: [{ l: '&lt;90 min', go: 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana' }, { l: '>120 min', go: 'fibci' }]
+    };
+    const mlh = (dosis, peso, conc) => f(Math.round(dosis * peso * 60 / conc * 10) / 10);
+    return {
+      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'clcr', l: 'ClCr (opcional)', u: 'ml/min' }],
+      start: 'ecg',
+      nodes: {
+        ecg: {
+          t: 'Primer contacto', show: 'Dolor torácico sugestivo de SCA (valorar SCA sin dolor en mujeres, diabéticos y ancianos): <b>ECG de 12 derivaciones en &lt;10 min</b>.',
+          q: '¿Cumple criterios ECG de activación del Codi IAM?',
+          help: 'Elevación nueva del ST en el punto J en 2 derivaciones contiguas (≥1 mm; en V2–V3 ≥2 mm hombres >40 a, ≥2,5 mm hombres &lt;40 a, ≥1,5 mm mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación en aVR · elevación >0,5 mm en V7–V9 con descenso en V1–V3 · elevación en derivaciones derechas · BRIHH o BRDHH nuevo (Sgarbossa-Smith), patrón de Winter o marcapasos con BRIHH. Equivalentes OMI: botón «Ver patrones IAM nuevos».',
+          opts: [{ l: 'Sí, cumple criterios', go: 'activar' }, { l: 'No', go: 'scasest' }]
+        },
+        scasest: {
+          q: '¿SCASEST de muy alto riesgo?',
+          help: 'Inestabilidad hemodinámica o shock cardiogénico · dolor recurrente o refractario · arritmias potencialmente mortales · complicaciones mecánicas del IAM · insuficiencia cardiaca relacionada · elevación transitoria del ST.',
+          opts: [{ l: 'Sí, algún criterio', go: 'muyalto' }, { l: 'No', go: 'nosca' }]
+        },
+        muyalto: { t: 'SCASEST de muy alto riesgo', c: 'high', show: 'Tratar como muy alto riesgo <b>SIN activar el Codi IAM</b>: estrategia invasiva inmediata (&lt;2 h, ESC 2023).' },
+        nosca: { t: 'Sin criterios de Codi IAM', c: 'mid', show: 'Seguir el protocolo de SCASEST específico.' },
+        activar: {
+          t: 'ACTIVAR CODI IAM', c: 'high',
+          show: 'Notificar y anotar la hora del ECG.<br><b>Tratamiento inicial:</b> O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg) · <b>AAS 150–300 mg VO masticada</b> (450 mg IV de acetilsalicilato de lisina si no puede VO).<br>Nitroglicerina (SL 0,4 mg o IV): NO si TAS &lt;90, FC &lt;50, sospecha de IAM de VD o inhibidores de la PDE-5 en 24 h, ni como prueba diagnóstica.<br>Killip: I normal · II crepitantes o 3.er ruido · III edema agudo de pulmón · IV shock cardiogénico.',
+          q: 'Localización del infarto en el ECG',
+          help: 'En todo IAM inferior, y si hay descenso del ST en V1–V3, registrar V3R–V4R y V7–V9.',
+          opts: [
+            { l: 'Anterior o anteroseptal (V1–V4) o anterior extenso (V1–V6, I, aVL)', go: 'loc_ant' },
+            { l: 'Inferior (II, III, aVF)', go: 'loc_infq' },
+            { l: 'Lateral (I, aVL, V5–V6)', go: 'loc_lat' },
+            { l: 'Posterior (descenso del ST en V1–V3, elevación en V7–V9)', go: 'loc_post' },
+            { l: 'Descenso del ST en ≥8 derivaciones + elevación en aVR', go: 'loc_tronco' },
+            { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro' }
+          ]
+        },
+        loc_ant: {
+          t: 'IAM ANTERIOR — arteria descendente anterior', c: 'high',
+          show: 'Mayor riesgo de <b>insuficiencia cardiaca, shock y arritmias ventriculares</b>: vigilar crepitantes, TA y perfusión (Killip).<br>Los bloqueos AV del IAM anterior suelen ser infranodales (QRS ancho): la <b>atropina suele ser ineficaz</b> → preparar marcapasos transcutáneo.<br>Ecocardiograma precoz: trombo en el VI si hay acinesia apical.',
+          ...TQ
+        },
+        loc_infq: {
+          q: '¿Elevación del ST en V3R–V4R? (≥0,5 mm; ≥1 mm en hombres &lt;30 años)',
+          opts: [{ l: 'Sí: afecta al ventrículo derecho', go: 'loc_vd' }, { l: 'No', go: 'loc_inf' }]
+        },
+        loc_inf: {
+          t: 'IAM INFERIOR — coronaria derecha o circunfleja', c: 'mid',
+          show: 'Frecuentes: <b>bradicardia sinusal, hipotensión vagal y BAV nodal</b> (QRS estrecho), que suele responder a la atropina.<br><b>Evitar betabloqueante</b> si hay bradicardia, BAV o hipotensión.<br>Descartado el VD, la nitroglicerina se puede usar con las precauciones habituales.',
+          ...TQ
+        },
+        loc_vd: {
+          t: 'IAM INFERIOR CON VENTRÍCULO DERECHO', c: 'high',
+          show: '<b>Dependiente de la precarga:</b> NO nitratos (ni SL ni IV) · NO diuréticos · opioides con mucha precaución (hipotensión) · evitar betabloqueante.<br>Si hay hipotensión sin congestión pulmonar: <b>cristaloide en bolos de 250–500 ml IV</b>, reevaluando TA, yugulares, auscultación y ecografía tras cada bolo.<br>Si persiste la hipotensión con la precarga optimizada: dobutamina ± noradrenalina (ver «Shock cardiogénico»).<br>Bradicardia y BAV frecuentes (ver «Bradicardia o bloqueo AV»).<br><span class="pe-nota">ESC 2023; ACC/AHA 2025.</span>',
+          ...TQ
+        },
+        loc_lat: {
+          t: 'IAM LATERAL — circunfleja o rama diagonal',
+          show: 'Sin precauciones farmacológicas específicas por la localización.',
+          ...TQ
+        },
+        loc_post: {
+          t: 'IAM POSTERIOR — circunfleja o coronaria derecha', c: 'mid',
+          show: 'Equivalente de IAMCEST: misma estrategia de reperfusión.<br>Suele acompañar al inferior: aplicar sus precauciones y descartar el VD con V3R–V4R.',
+          ...TQ
+        },
+        loc_tronco: {
+          t: 'Sospecha de TRONCO COMÚN o enfermedad multivaso', c: 'high',
+          show: 'Alto riesgo de <b>shock cardiogénico</b>: coronariografía urgente; vigilar TA y perfusión (ver «Shock cardiogénico»).',
+          ...TQ
+        },
+        loc_otro: {
+          t: 'Localización no valorable en el ECG',
+          show: 'BRIHH nuevo, marcapasos con criterios de Sgarbossa-Smith u otro equivalente: tratar como IAMCEST. Las precauciones dependen de la clínica (hipotensión, bradicardia, congestión).',
+          ...TQ
+        },
+        ventana: {
+          q: 'Ventana de 90–120 min: decidir según el caso. ¿Qué estrategia se elige?',
+          opts: [{ l: 'Angioplastia primaria', go: 'icp' }, { l: 'Fibrinólisis prehospitalaria', go: 'fibci' }]
+        },
+        icp: {
+          t: 'ANGIOPLASTIA PRIMARIA', c: 'high',
+          show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + ' UI</b>' : '. ' + faltaPeso),
+          q: 'Segundo antiagregante: ¿qué situación aplica?',
+          opts: [
+            { l: 'Dudas diagnósticas, hemorragia activa grave, no puede tomar VO o ya con doble antiagregación', go: 'sa_no' },
+            { l: 'No se puede obtener información o alto riesgo hemorrágico', go: 'sa_clopi' },
+            { l: 'Ictus o AIT previo, >75 años o &lt;60 kg', go: 'sa_tica', sug: v => (hay(v.edad) && v.edad > 75) || (hay(v.peso) && v.peso < 60) },
+            { l: 'Ninguna de las anteriores', go: 'sa_pras' }
+          ]
+        },
+        sa_no: { t: 'Segundo antiagregante', show: '<b>Ninguno</b> de momento.' },
+        sa_clopi: { t: 'Segundo antiagregante', show: '<b>Clopidogrel 600 mg VO.</b>' },
+        sa_tica: { t: 'Segundo antiagregante', show: '<b>Ticagrelor 180 mg VO.</b>' },
+        sa_pras: { t: 'Segundo antiagregante', show: '<b>Prasugrel 60 mg VO.</b>' },
+        fibci: {
+          q: '¿Alguna contraindicación absoluta para la fibrinólisis?',
+          help: 'Hemorragia cerebral previa o ictus de causa desconocida · ictus isquémico &lt;6 meses · neoplasia o traumatismo del SNC · cirugía o traumatismo &lt;1 mes · sospecha de disección aórtica · sangrado activo o digestivo &lt;1 mes · punciones no compresibles recientes.',
+          opts: [{ l: 'Sí', go: 'fibno' }, { l: 'No', go: 'fib' }]
+        },
+        fibno: {
+          t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
+          q: 'Continuar', opts: [{ l: 'Pautar la angioplastia primaria', go: 'icp' }]
+        },
+        fib: {
+          t: 'FIBRINÓLISIS CON TENECTEPLASA', c: 'high',
+          show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
+            '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
+            '<b>Anticoagulación</b> (hasta la revascularización o el alta, máx. 8 días): ' + enox(v) + '<br>' + hnf(v) + '<br>' +
+            'Traslado inmediato a un centro con ICP.<br><span class="pe-nota">Fuentes de la dosis: ACC/AHA 2025 y ESC 2023 (media dosis ≥75 años, STREAM-2); SEM v.03 2023 «mitad de dosis si >75 años»: el corte correcto es ≥75.</span>',
+          q: 'A los 60–90 min de la lisis: ¿el ST baja ≥50 %, cede el dolor y está estable?',
+          opts: [{ l: 'Sí: lisis eficaz', go: 'fibok' }, { l: 'No, o inestabilidad hemodinámica o eléctrica', go: 'rescate' }]
+        },
+        fibok: { t: 'Lisis eficaz', c: 'low', show: 'Coronariografía en <b>2–24 h</b> (ACC/AHA 2025, ESC 2023).' },
+        rescate: { t: 'Lisis fallida', c: 'high', show: '<b>Coronariografía inmediata e ICP DE RESCATE</b> (ACC/AHA 2025, ESC 2023).' }
+      },
+      extras: {
+        t: 'Complicaciones durante la evolución',
+        help: 'Ábrelas cuando aparezcan, en cualquier momento del flujograma. Las dosis usan el peso de arriba.',
+        items: [
+          {
+            l: 'Hipertensión arterial', t: 'Hipertensión arterial', c: 'mid',
+            show: 'Tratar antes el dolor y la ansiedad. No bajar la TA de forma brusca.<br>' +
+              '<b>Nitroglicerina IV</b>: empezar con 5–10 µg/min y subir cada 3–5 min según TA y dolor (Perfusión IV → Nitroglicerina). NO si IAM de VD, TAS &lt;90, FC &lt;50 o inhibidores de la PDE-5 (sildenafilo o vardenafilo 24 h, tadalafilo 48 h).<br>' +
+              '<b>Metoprolol IV</b> 5 mg cada 2 min (máx. 15 mg), solo sin insuficiencia cardiaca, hipotensión, bradicardia ni BAV. La ESC 2023 lo contempla al ingreso si la TAS es >120 mmHg; la ACC/AHA 2025 no lo recomienda de rutina, solo con indicación (HTA, isquemia persistente). Si no, betabloqueante oral en las primeras 24 h.'
+          },
+          {
+            l: 'Edema agudo de pulmón (Killip III)', t: 'Edema agudo de pulmón (Killip III)', c: 'high',
+            show: 'Sentado. O₂ si SpO₂ &lt;90 %. <b>VMNI (CPAP o BiPAP)</b> si hay trabajo respiratorio, hipoxemia o acidosis.<br>' +
+              '<b>Nitroglicerina IV</b> si TAS ≥90 y sin IAM de VD; de elección en el edema hipertensivo.<br>' +
+              '<b>Furosemida IV</b> si hay congestión: 20–40 mg si no tomaba diurético; si lo tomaba, 1–2,5 veces su dosis oral diaria.<br>' +
+              'NO morfina de rutina (solo dolor intenso). NO betabloqueante.<br>' +
+              'Ecocardiograma urgente: descartar complicación mecánica (insuficiencia mitral aguda, CIV).'
+          },
+          {
+            l: 'Shock cardiogénico (Killip IV)', t: 'Shock cardiogénico (Killip IV)', c: 'high',
+            show: v => '<b>ICP urgente solo de la arteria culpable</b>, aunque hayan pasado más de 12 h; no tratar otras arterias en el mismo procedimiento (ACC/AHA 2025, ESC 2023).<br>' +
+              'Si es IAM de VD, primero volumen en bolos de 250–500 ml.<br>' +
+              '<b>Noradrenalina</b> de primera elección, desde 0,05–0,1 µg/kg/min' + (hay(v.peso) ? ' = <b>' + mlh(0.05, v.peso, 16) + '–' + mlh(0.1, v.peso, 16) + ' ml/h</b> con 4 mg en 250 ml (16 µg/ml)' : '') + '; objetivo PAM ≥65 mmHg.<br>' +
+              '<b>Dobutamina</b> si persiste el bajo gasto con TA sostenida: 2–5 µg/kg/min' + (hay(v.peso) ? ' = <b>' + mlh(2, v.peso, 1000) + '–' + mlh(5, v.peso, 1000) + ' ml/h</b> con 250 mg en 250 ml (1.000 µg/ml)' : '') + ', hasta 20 µg/kg/min.<br>' +
+              'Evitar betabloqueantes y nitratos.<br>' +
+              '<b>Ecocardiograma urgente</b>: CIV, insuficiencia mitral aguda por rotura de músculo papilar, rotura de pared libre o taponamiento.<br>' +
+              'Soporte mecánico (Impella) en pacientes seleccionados y en un centro con experiencia (ACC/AHA 2025, ensayo DanGer Shock); ECMO no de rutina.' + (hay(v.peso) ? '' : ' ' + faltaPeso)
+          },
+          {
+            l: 'Bradicardia o bloqueo AV', t: 'Bradicardia o bloqueo AV', c: 'mid',
+            show: '<b>Atropina</b> si es sintomática o hay compromiso hemodinámico: 0,5 mg IV (ERC; la AHA da 1 mg) cada 3–5 min, máx. 3 mg. Menos de 0,5 mg puede causar bradicardia paradójica.<br>' +
+              'Si no responde, hay BAV avanzado o QRS ancho (típico del IAM anterior): <b>marcapasos transcutáneo</b>. Como puente: adrenalina 2–10 µg/min IV o isoprenalina (ver Fichas).<br>' +
+              'En el IAM inferior el BAV suele ser nodal (QRS estrecho) y responder a la atropina. Evitar betabloqueantes.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'Dolor torácico sugestivo de SCA (valorar alto riesgo de SCA sin dolor en mujeres, diabéticos y ancianos): ECG de 12 derivaciones en <10 minutos'},
   {type:'decision', text:'¿Cumple criterios ECG de activación del Codi IAM?', yes:'Sí', no:'No'},
   {type:'info', branch:'yes', text:'Criterios ECG: nueva elevación del ST en el punto J en 2 derivaciones contiguas (≥1 mm en todas excepto V2-V3; en V2-V3 ≥2 mm en hombres >40a, ≥2,5 mm en hombres <40a, ≥1,5 mm en mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación del ST en aVR (sospecha de tronco común/multivaso) · elevación persistente del ST >0,5 mm en V7-V9 con descenso especular en V1-V3 (IAM posterior) · elevación del ST en derivaciones derechas (IAM de VD) · BRIHH o BRDHH de nueva aparición (valorar Sgarbossa-Smith), patrón de Winter o ritmo de marcapasos con BRIHH'},

@@ -671,9 +671,31 @@ body {
 .pe-title { font-size: var(--fs-base); font-weight: 600; padding: 6px 0; }
 .pe-h { font-size: var(--fs-xs); font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; padding: 12px 0 2px; }
 .pe-out { margin-top: 10px; }
-.pe-out .ficha-section-title.risk-low { color: var(--green); }
-.pe-out .ficha-section-title.risk-mid { color: var(--amber); }
-.pe-out .ficha-section-title.risk-high { color: var(--red-text); }
+.pe-out .ficha-section-title.risk-low, .fl-card .ficha-section-title.risk-low { color: var(--green); }
+.pe-out .ficha-section-title.risk-mid, .fl-card .ficha-section-title.risk-mid { color: var(--amber); }
+.pe-out .ficha-section-title.risk-high, .fl-card .ficha-section-title.risk-high { color: var(--red-text); }
+.fl-box { padding: 6px 14px 14px; border-bottom: 2px solid var(--border); margin-bottom: 4px; }
+.fl-inputs { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 4px 0; }
+.fl-inputs label { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-sm); color: var(--text2); }
+.fl-inputs input { width: 110px; }
+.fl-hint { font-size: var(--fs-xs); color: var(--text2); padding: 2px 0 6px; }
+.fl-card { margin-top: 10px; }
+.fl-q { margin-top: 14px; padding: 10px 12px; border-radius: 6px; background: var(--amber-bg); font-weight: 600; font-size: var(--fs-base); }
+.fl-help { margin-top: 6px; font-size: var(--fs-sm); color: var(--text2); }
+.fl-opts { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.fl-opt { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; font-size: var(--fs-base); cursor: pointer; }
+.fl-opt:hover { background: var(--bg3); }
+.fl-opt.fl-sug { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.fl-sug-tag { flex-shrink: 0; font-size: var(--fs-xs); color: var(--blue); font-weight: 600; }
+.fl-done { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; width: 100%; margin-top: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg3); color: var(--text2); font: inherit; font-size: var(--fs-sm); text-align: left; cursor: pointer; }
+.fl-done-q { flex: 1 1 260px; min-width: 0; }
+.fl-done-a { color: var(--green); font-weight: 600; }
+.fl-done-edit { font-size: var(--fs-xs); color: var(--blue); text-decoration: underline; }
+.fl-extras { margin-top: 18px; padding-top: 4px; border-top: 1px dashed var(--border); }
+.fl-ex { width: 100%; margin-top: 6px; }
+.fl-ex-on { border-color: var(--red); }
+.fl-full { border-top: 2px solid var(--border); }
+.fl-full > summary { padding: 10px 14px; font-size: var(--fs-sm); font-weight: 600; color: var(--text2); cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .pe-nota { color: var(--text2); font-size: var(--fs-sm); }
 .protocol-step {
   padding: 8px 14px;
@@ -2019,11 +2041,13 @@ function renderProtocols() {
         '</summary>' +
         '<div class="scale-body">' +
           (p.eval ? _protoEvalHtml(p) : '') +
+          (p.flow ? _flowHtml(p) + '<details class="fl-full"><summary>Ver el protocolo completo</summary>' : '') +
           (() => { let n = 0; return p.steps.map(s => {
             const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (++n);
             const cls = s.type === 'decision' ? ' step-decision' : s.type === 'info' ? ' step-info' : '';
             return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
           }).join(''); })() +
+          (p.flow ? '</details>' : '') +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
           ((p.folleto || p.flujograma) ? '<div class="btn-row" style="padding:10px 0 0">' +
             (p.folleto ? '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button>' : '') +
@@ -2033,7 +2057,7 @@ function renderProtocols() {
         '</div>' +
       '</details>'
     ).join('');
-  PROTOCOLS.forEach(p => { if (p.eval) calcProtoEval(p.id); });
+  PROTOCOLS.forEach(p => { if (p.eval) calcProtoEval(p.id); if (p.flow) renderFlow(p.id); });
 }
 
 /* Evaluador interactivo dentro de un protocolo (p.eval): items num/chk/sel/h
@@ -2091,6 +2115,125 @@ function copyProtoEval(pid) {
   const res = [...document.querySelectorAll('#pe-' + pid + '-out .ficha-section')].map(s =>
     s.querySelector('.ficha-section-title').textContent + '\n' + s.querySelector('.ficha-section-text').innerText).join('\n\n');
   navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res).then(showToast).catch(showCopyError);
+}
+
+/* Flujograma paso a paso dentro de un protocolo (p.flow).
+   p.flow = { inputs:[{k,l,u}], start:'id', nodes:{ id:{ t, c, show, q, help, opts:[{l, go, sug}] } } }
+   - show: HTML o función (v) => HTML, que se pinta al llegar al nodo (v = datos del paciente).
+   - q/opts: pregunta con botones; sin opts el nodo es final. sug(v) marca la opción que sugieren los datos.
+   El estado vive solo en memoria (nunca en localStorage: son datos de paciente). */
+const _flowPath = {};
+const _flowExtra = {};
+
+function _flowVals(p) {
+  const v = {};
+  (p.flow.inputs || []).forEach(it => {
+    const el = document.getElementById('fl-' + p.id + '-' + it.k);
+    v[it.k] = el ? parseFloat(String(el.value).replace(',', '.')) : NaN;
+  });
+  return v;
+}
+
+function _flowHtml(p) {
+  const on = 'renderFlow(\'' + p.id + '\')';
+  return '<div class="fl-box"><div class="pe-title">🧭 Flujograma del caso</div>' +
+    ((p.flow.inputs || []).length ? '<div class="fl-inputs">' + p.flow.inputs.map(it =>
+      '<label for="fl-' + p.id + '-' + it.k + '">' + it.l + (it.u ? ' (' + it.u + ')' : '') +
+      '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
+      '</div><div class="fl-hint">Los datos solo se usan para calcular las dosis; no se guardan.</div>' : '') +
+    '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
+    (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-help">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
+    '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
+    '<button class="btn btn-copy" onclick="copyFlow(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resumen</button>' +
+    '</div>';
+}
+
+function _flowShow(n, v) {
+  const h = typeof n.show === 'function' ? n.show(v) : n.show;
+  if (!h) return '';
+  return '<div class="ficha-section fl-card"><div class="ficha-section-title' + (n.c ? ' risk-' + n.c : '') + '">' + (n.t || '') + '</div>' +
+    '<div class="ficha-section-text">' + h + '</div></div>';
+}
+
+function renderFlow(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const body = document.getElementById('fl-' + pid + '-body');
+  if (!p || !body) return;
+  const path = _flowPath[pid] || (_flowPath[pid] = [{ n: p.flow.start, o: null }]);
+  const v = _flowVals(p);
+  body.innerHTML = path.map((st, i) => {
+    const n = p.flow.nodes[st.n];
+    let h = _flowShow(n, v);
+    if (!n.q) return h;
+    if (st.o !== null) {
+      return h + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta">' +
+        '<span class="fl-done-q">' + n.q + '</span><span class="fl-done-a">✓ ' + n.opts[st.o].l + '</span><span class="fl-done-edit">cambiar</span></button>';
+    }
+    return h + '<div class="fl-q">' + n.q + '</div>' +
+      (n.help ? '<div class="fl-help">' + (typeof n.help === 'function' ? n.help(v) : n.help) + '</div>' : '') +
+      '<div class="fl-opts">' + n.opts.map((o, j) => {
+        const sug = o.sug && o.sug(v);
+        return '<button class="fl-opt' + (sug ? ' fl-sug' : '') + '" onclick="flowGo(\'' + pid + '\',' + i + ',' + j + ')">' + o.l +
+          (sug ? '<span class="fl-sug-tag">según los datos</span>' : '') + '</button>';
+      }).join('') + '</div>';
+  }).join('');
+  const ex = document.getElementById('fl-' + pid + '-extras');
+  if (ex) {
+    const abiertos = _flowExtra[pid] || [];
+    ex.innerHTML = p.flow.extras.items.map((it, k) => {
+      const on = abiertos.includes(k);
+      return '<button class="fl-opt fl-ex' + (on ? ' fl-ex-on' : '') + '" aria-expanded="' + on + '" onclick="flowExtra(\'' + pid + '\',' + k + ')">' + it.l +
+        '<span class="fl-sug-tag">' + (on ? 'ocultar' : 'ver') + '</span></button>' + (on ? _flowShow(it, v) : '');
+    }).join('');
+  }
+}
+
+function flowExtra(pid, k) {
+  const a = _flowExtra[pid] || (_flowExtra[pid] = []);
+  const i = a.indexOf(k);
+  if (i < 0) a.push(k); else a.splice(i, 1);
+  renderFlow(pid);
+}
+
+function flowGo(pid, i, j) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const path = _flowPath[pid].slice(0, i + 1);
+  path[i] = { n: path[i].n, o: j };
+  path.push({ n: p.flow.nodes[path[i].n].opts[j].go, o: null });
+  _flowPath[pid] = path;
+  renderFlow(pid);
+}
+
+function flowBack(pid, i) {
+  _flowPath[pid] = _flowPath[pid].slice(0, i + 1);
+  _flowPath[pid][i] = { n: _flowPath[pid][i].n, o: null };
+  renderFlow(pid);
+}
+
+function resetFlow(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  (p.flow.inputs || []).forEach(it => { const el = document.getElementById('fl-' + pid + '-' + it.k); if (el) el.value = ''; });
+  delete _flowPath[pid];
+  delete _flowExtra[pid];
+  renderFlow(pid);
+}
+
+function copyFlow(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const v = _flowVals(p);
+  const datos = (p.flow.inputs || []).filter(it => !isNaN(v[it.k])).map(it => it.l + ' ' + v[it.k] + (it.u ? ' ' + it.u : '')).join(' · ');
+  const tmp = document.createElement('div');
+  const txt = h => { tmp.innerHTML = String(h).replace(/<br\s*\/?>/g, '\n'); return tmp.textContent; };
+  const lineas = (_flowPath[pid] || []).map(st => {
+    const n = p.flow.nodes[st.n];
+    const s = typeof n.show === 'function' ? n.show(v) : n.show;
+    return [s ? (n.t ? n.t + '\n' : '') + txt(s) : '', n.q && st.o !== null ? '• ' + txt(n.q) + ' → ' + txt(n.opts[st.o].l) : ''].filter(Boolean).join('\n');
+  }).filter(Boolean);
+  (_flowExtra[pid] || []).forEach(k => {
+    const it = p.flow.extras.items[k];
+    lineas.push((it.t || txt(it.l)) + '\n' + txt(typeof it.show === 'function' ? it.show(v) : it.show));
+  });
+  navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n')).then(showToast).catch(showCopyError);
 }
 
 function _drugId(name) {
