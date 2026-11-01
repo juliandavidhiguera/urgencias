@@ -271,4 +271,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-En el movil, Protocolos → «Crisis de asma (adulto)» y «TEP agudo»: pasar un caso real por cada evaluador y abrir «Ver flujograma» (PDF de asma 1,5 MB); anotar clasificaciones, dosis o destinos que no coincidan con el juicio clinico. Despues, #17 (verificacion de dosis).
+En el movil, Protocolos → «Crisis de asma (adulto)» y «TEP agudo»: pasar un caso real por cada evaluador y abrir «Ver flujograma» (PDF de asma 1,5 MB); anotar clasificaciones, dosis o destinos que no coincidan con el juicio clinico. Dosis ya verificadas (#17, `c70f885`).
