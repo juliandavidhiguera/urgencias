@@ -59,8 +59,18 @@ patch('Tenecteplasa', f => {
   if (!/Ictus isquémico agudo/.test(f.indicaciones)) {
     f.indicaciones = f.indicaciones.trim() + ' Ictus isquémico agudo en las primeras 4,5 h, como alternativa a la alteplasa (AHA/ASA 2026; ESO 2023).';
   }
-  if (!f.dosis.includes('ICTUS ISQUÉMICO')) {
-    f.dosis = f.dosis.trim() + '\n• ICTUS ISQUÉMICO (dosis distinta, NO usar la tabla anterior): 0,25 mg/kg en bolo IV único en 5–10 s, máximo 25 mg (5.000 UI) = 0,05 ml/kg de la solución a 5 mg/ml, máximo 5 ml. Ejemplos: 60 kg → 15 mg (3 ml) · 70 kg → 17,5 mg (3,5 ml) · 80 kg → 20 mg (4 ml) · ≥100 kg → 25 mg (5 ml).\n   ◦ No usar la dosis alta de los ensayos antiguos (0,4 mg por kilo).\n   ◦ Si se usa el vial de 50 mg, desechar el sobrante: el error más grave es dar la dosis de SCACEST.\n   ◦ Sin antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control). PA <180/105 mmHg durante y después.';
+  /* Ictus: tabla por peso de la ficha técnica de Metalyse 25 mg (CIMA FT_1000169007),
+     que equivale a ≈0,25 mg/kg. Se reescribe siempre el bloque (idempotente). */
+  const iIct = f.dosis.indexOf('\n• ICTUS ISQUÉMICO');
+  if (iIct !== -1) f.dosis = f.dosis.slice(0, iIct);
+  f.dosis = f.dosis.trim() + '\n• ICTUS ISQUÉMICO (dosis distinta, NO usar la tabla anterior): bolo IV único en 5–10 s según el peso (ficha técnica de Metalyse 25 mg; ≈0,25 mg por kilo, máximo 25 mg):\n   ◦ < 60 kg: 3.000 UI (15 mg, 3 ml).\n   ◦ De 60 a < 70 kg: 3.500 UI (17,5 mg, 3,5 ml).\n   ◦ De 70 a < 80 kg: 4.000 UI (20 mg, 4 ml).\n   ◦ De 80 a < 90 kg: 4.500 UI (22,5 mg, 4,5 ml).\n   ◦ ≥ 90 kg: 5.000 UI (25 mg, 5 ml).\n   ◦ Es la mitad de la dosis de SCACEST: si se usa el vial de 50 mg, desechar el sobrante antes de administrar. No usar la dosis alta de los ensayos antiguos (0,4 mg por kilo).\n   ◦ Más de 80 años: con precaución (más riesgo de hemorragia), sin ajuste de dosis.\n   ◦ Sin antiagregantes ni heparina IV en las 24 h siguientes (hasta la TC de control); si la heparina es imprescindible, máximo 10.000 UI/día SC. PA <180/105 mmHg durante y después.';
+  /* Preparación y vía (ficha técnica 6.2, 6.3 y 6.6) */
+  const PREP = 'Reconstituir el preparado con el disolvente de la jeringa y no agitarlo.';
+  if (!f.dosis.includes('INCOMPATIBLE CON GLUCOSA')) {
+    f.dosis = f.dosis.replace(PREP, 'Preparación: reconstituir SOLO con el agua para preparaciones inyectables de la jeringa del envase (10 ml en el vial de 50 mg; 5 ml en el de 25 mg), empujando el émbolo despacio para evitar espuma y girando suavemente, sin agitar: queda a 5 mg/ml. No diluir más.\n• INCOMPATIBLE CON GLUCOSA: usar una vía que solo haya llevado SF 0,9 % (si ha llevado glucosa, lavarla con SF 0,9 % o usar otra). No añadir otros fármacos a la jeringa ni a la vía.\n• Usar de inmediato (estable 8 h a 30 °C o 24 h a 2–8 °C). Desechar la solución sobrante.');
+  }
+  if (!f.presentacion.includes('25 mg')) {
+    f.presentacion = f.presentacion.trim() + ' Vial de 5.000 UI (25 mg) con 5 ml de disolvente: solo autorizado para el ictus isquémico.';
   }
   /* SCACEST en ≥75 años: media dosis (STREAM-2, PMID 37439219; ACC/AHA 2025).
      TEP: fuera de ficha técnica (ESC 2019, AHA/ACC 2026); de elección, alteplasa. */
@@ -82,7 +92,9 @@ patch('Tenecteplasa', f => {
    AHA/ASA 2026 ictus, ESC 2019 TEP (PMID 31504429), AHA/ACC 2026 TEP (PMID 41712677),
    ERC 2025 (PMID 41117569), OUH Medicines Information Leaflet ene 2026.
    Las dosis que no debe calcular la calculadora se escriben sin «mg/kg». Idempotente. */
-if (!fichas.some(x => x.id === 'alteplasa')) {
+{
+  const prev = fichas.findIndex(x => x.id === 'alteplasa');
+  if (prev !== -1) fichas.splice(prev, 1);
   const ficha = {
     file: 'Alteplasa.md',
     nombre: 'Alteplasa',
@@ -90,16 +102,23 @@ if (!fichas.some(x => x.id === 'alteplasa')) {
     fuente: 'https://cima.aemps.es/cima/publico/home.html',
     subtitulo: 'Ficha propia (no está en la guía del SEM): ficha técnica de Actilyse® y guías citadas',
     alerta: 'Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas.',
-    presentacion: 'Actilyse®: vial de polvo de 10, 20 o 50 mg + disolvente. Una vez reconstituido, contiene 1 mg/ml.',
+    presentacion: 'Actilyse®: vial de polvo de 10, 20 o 50 mg + vial de agua para preparaciones inyectables (10, 20 o 50 ml). Reconstituido con todo el disolvente contiene 1 mg/ml (con la mitad del disolvente, 2 mg/ml).',
     propiedades: 'Fibrinolítico fibrinoespecífico (activador tisular del plasminógeno recombinante, rt-PA). Vida media de 4–5 min.',
     indicaciones: 'IAM con elevación del ST cuando la ICP primaria no es posible en plazo (en este escenario se prefiere la tenecteplasa en bolo). Ictus isquémico agudo en las primeras 4,5 h. TEP de alto riesgo con inestabilidad hemodinámica. Parada cardiaca por TEP sospechado o confirmado.',
-    dosis: 'Reconstituir con el disolvente del envase (1 mg/ml) sin agitar. Las dosis por peso se calculan con el peso real.\n' +
-      '• IAM con elevación del ST, bolo: 15 mg IV en 1–2 min.\n' +
-      '• IAM con elevación del ST, 1.ª perfusión: 0,75 mg/kg IV en 30 min, máximo 50 mg.\n' +
-      '• IAM con elevación del ST, 2.ª perfusión: 0,5 mg/kg IV en 60 min, máximo 35 mg. Dosis total máxima 100 mg (≥67 kg: 15 + 50 + 35 mg).\n' +
-      '• Ictus isquémico (<4,5 h), dosis total: 0,9 mg/kg IV, máximo 90 mg. El 10 % en bolo en 1 min y el 90 % restante en perfusión de 60 min.\n' +
-      '• TEP de alto riesgo (con pulso): 100 mg IV en 2 h, 10 mg en bolo en 1–2 min + 90 mg en perfusión. Con menos de 65 kg, la dosis total no debe superar 1,5 mg por kilo (ficha técnica).\n' +
-      '• Parada cardiaca por TEP: 50 mg IV en bolo en 2 min; si no hay ROSC a los 15–30 min, segunda dosis de 50 mg (máximo total 100 mg). Mantener la RCP 60–90 min tras la lisis (ERC 2025; OUH 2026).',
+    dosis: 'Preparación (ficha técnica 6.2, 6.3 y 6.6):\n' +
+      '• Disolvente: SOLO el agua para preparaciones inyectables del envase, todo el volumen (queda a 1 mg/ml, 1 ml = 1 mg). Con la cánula de transferencia en los viales de 20 y 50 mg.\n' +
+      '• Girar suavemente, NO agitar (hace espuma; si la hay, dejar reposar unos minutos).\n' +
+      '• Si hace falta diluir más: SOLO con SF 0,9 %, hasta un mínimo de 0,2 mg/ml. NUNCA con glucosa ni con más agua (enturbia la solución).\n' +
+      '• Vía exclusiva: no mezclar con ningún otro fármaco, tampoco heparina, ni en el frasco ni en el mismo catéter.\n' +
+      '• Usar de inmediato (estable 8 h a 25 °C o 24 h a 2–8 °C). Desechar el sobrante.\n' +
+      'Dosis y forma de administración (las dosis por peso se calculan con el peso real):\n' +
+      '• IAM con elevación del ST, bolo: 15 mg IV directo en 1–2 min.\n' +
+      '• IAM con elevación del ST, 1.ª perfusión: 0,75 mg/kg IV con bomba en 30 min, máximo 50 mg.\n' +
+      '• IAM con elevación del ST, 2.ª perfusión: 0,5 mg/kg IV con bomba en 60 min, máximo 35 mg. Dosis total máxima 100 mg (≥67 kg: 15 + 50 + 35 mg).\n' +
+      '• Ictus isquémico (<4,5 h), dosis total: 0,9 mg/kg IV, máximo 90 mg. Antes de empezar, retirar del vial y desechar lo que sobre por encima de la dosis calculada. El 10 % en bolo IV directo en 1 min y el 90 % restante con bomba en 60 min.\n' +
+      '• TEP de alto riesgo (con pulso): 10 mg en bolo IV en 1–2 min + 90 mg con bomba en 2 h (100 mg en total). Con menos de 65 kg, la dosis total no debe superar 1,5 mg por kilo (ficha técnica).\n' +
+      '• Parada cardiaca por TEP: 50 mg en bolo IV directo en 2 min; si no hay ROSC a los 15–30 min, segunda dosis de 50 mg (máximo total 100 mg). Mantener la RCP 60–90 min tras la lisis (ERC 2025; OUH 2026).\n' +
+      '• Al terminar cualquier perfusión, pasar SF 0,9 % por la misma vía y al mismo ritmo para administrar el fármaco que queda en el sistema, sin darlo en bolo.',
     contraindicaciones: 'En el ictus se aplican los criterios de inclusión y exclusión de la trombólisis del Codi Ictus. En la parada cardiaca por TEP las contraindicaciones pueden no ser absolutas: decide quien lidera la reanimación.\n' +
       '• Absolutas (TEP, ESC 2019):\n   ◦ Ictus hemorrágico o de origen desconocido previo.\n   ◦ Ictus isquémico en los últimos 6 meses.\n   ◦ Neoplasia o malformación del SNC.\n   ◦ Traumatismo mayor, cirugía o TCE en las últimas 3 semanas.\n   ◦ Diátesis hemorrágica.\n   ◦ Sangrado activo.\n   ◦ Sospecha de disección aórtica.\n' +
       '• Relativas:\n   ◦ AIT en los últimos 6 meses.\n   ◦ Anticoagulación oral.\n   ◦ Embarazo o primera semana posparto.\n   ◦ Punción en un lugar no compresible.\n   ◦ RCP traumática.\n   ◦ PAS >180 mmHg refractaria.\n   ◦ Hepatopatía avanzada, endocarditis infecciosa, úlcera péptica activa.',

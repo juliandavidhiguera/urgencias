@@ -207,7 +207,7 @@ window.DRUGS = [
 {group: 'Fibrinolíticos', badge: 'red', tag: 'IAM/Ictus/TEP', drugs: [
   {
     name: 'Alteplasa (rtPA)',
-    dilution: 'Reconstituir según ficha técnica',
+    dilution: 'Reconstituir con el agua del envase a 1 mg/mL (girar, no agitar) · diluir solo con SF 0,9 % (mín. 0,2 mg/mL), nunca glucosa · vía exclusiva',
     doseRange: 'IAM: 15 mg bolo + 0.75 mg/kg (máx 50) en 30 min + 0.5 mg/kg (máx 35) en 60 min · Ictus: 0.9 mg/kg (máx 90 mg), 10% bolo en 1 min, resto en 60 min · TEP: 10 mg bolo + 90 mg en 2 h (<65 kg: máx 1.5 mg/kg total) · PCR por TEP: 50 mg bolo en 2 min, repetible una vez a los 15–30 min (máx 100 mg)',
     doseCalc: function(peso) {
       var d = Math.min(0.9 * peso, 90).toFixed(1);
@@ -217,15 +217,15 @@ window.DRUGS = [
       var f1 = Math.min(0.75 * peso, 50).toFixed(1);
       var f2 = Math.min(0.5 * peso, 35).toFixed(1);
       var ict = Math.min(0.9 * peso, 90);
-      var tnk = Math.min(0.25 * peso, 25).toFixed(1);
+      var tnk = peso < 60 ? '15' : peso < 70 ? '17.5' : peso < 80 ? '20' : peso < 90 ? '22.5' : '25';
       var tep = peso < 65 ? '10 mg bolo + ' + (1.5 * peso - 10).toFixed(1) + ' mg en 2 h (máx 1.5 mg/kg)' : '10 mg bolo + 90 mg en 2 h';
       return 'IAM: 15 mg bolo + ' + f1 + ' mg (30 min) + ' + f2 + ' mg (60 min)' +
         ' · Ictus: ' + (ict * 0.1).toFixed(1) + ' mg bolo (1 min) + ' + (ict * 0.9).toFixed(1) + ' mg (60 min)' +
-        ' · Ictus, alternativa tenecteplasa: ' + tnk + ' mg en bolo único (0.25 mg/kg, máx 25)' +
+        ' · Ictus, alternativa tenecteplasa: ' + tnk + ' mg en bolo único (tabla por peso de ficha técnica, ≈0.25 mg/kg, máx 25)' +
         ' · TEP: ' + tep + ' · PCR por TEP: 50 mg bolo';
     },
     ficha: 'Alteplasa.md',
-    alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas', 'Ictus: no dar antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control)', 'Tenecteplasa en ictus (0.25 mg/kg, máx 25 mg) ≠ tenecteplasa en IAM (por tramos de peso, hasta 50 mg)'],
+    alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas', 'Ictus: no dar antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control)', 'Tenecteplasa en ictus (15–25 mg por tramos de peso) es la mitad que en IAM (30–50 mg): no confundirlas', 'Al acabar la perfusión, pasar SF 0,9 % al mismo ritmo para dar el fármaco que queda en el sistema'],
     src: 'IAM: ACC/AHA 2025 SCA · PMID 40013746 · Ictus: AHA/ASA 2026; ESO 2023 tenecteplasa; metaanálisis TNK vs rtPA · PMID 39413337 · TEP: ESC 2019 · PMID 31504429; ficha técnica Actilyse (CIMA) · PCR por TEP: OUH Medicines Information Leaflet 2026; Resuscitation Council UK'
   }
 ]},
