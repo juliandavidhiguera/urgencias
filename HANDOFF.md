@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `34c279c` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `9992522` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -73,6 +73,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - `384ee92` ficha propia ALTEPLASA (76 fichas): IAM/ictus/TEP/PCR por TEP, contraindicaciones ESC 2019, enlazada desde la tarjeta de Farmacos (`ficha: 'Alteplasa.md'`). Alteplasa y el ictus de tenecteplasa viven en `scripts/patch_fichas_verificacion.js` (idempotente, verificado ejecutandolo 2 veces): si se regenera `fichas.js` con `merge_fichas.js` (que espera 75), ejecutar despues el parche.
 - `ce52448` protocolo TEP: alteplasa en PCR por peso = ERC 2025 0,6–1,0 mg/kg max 100 mg (sustituye al 0,3–0,5 del Word); ficha tenecteplasa: media dosis SCACEST ≥75 a (STREAM-2) y TEP fuera de ficha tecnica
 - `34c279c` preparacion/disolvente/administracion de alteplasa (CIMA FT_59494 6.2/6.3/6.6: agua del envase 1 mg/ml, solo SF 0,9 % hasta 0,2 mg/ml, nunca glucosa, via exclusiva, lavado final con SF al mismo ritmo) y tenecteplasa (CIMA FT_1000169007: 5 mg/ml, incompatible con glucosa, vial 25 mg solo ictus). Ictus con tenecteplasa = TABLA por peso de la ficha tecnica (15/17,5/20/22,5/25 mg), no 0,25 mg/kg exactos: la ficha ya no tiene calculadora (todo por tramos). Los parches de Alteplasa/Tenecteplasa reescriben su bloque en cada ejecucion (idempotente, verificado con cmp)
+- `9992522` Codi IAM: el paso de fibrinolisis del SEM v.03 (2023) decia «mitad de dosis si >75a» (corte correcto ≥75, STREAM/ESC/ACC-AHA) y no tenia dosis, anticoagulacion ni conducta post-lisis. Ahora: tabla TNK 30–50 mg y media dosis ≥75; dosis con su fuente (ACC/AHA 2025, ESC 2023, SEM 2023, a peticion del usuario); clopidogrel; enoxaparina 30 mg IV + 1 mg/kg c/12 h (≥75: 0,75 mg/kg sin bolo; ClCr <30 c/24 h) o HNF 60 UI/kg + 12 UI/kg/h; ICP de rescate a 60–90 min y coronariografia 2–24 h. Se aparta del documento SEM: anotado en `src`
 
 ### Sesion 13 - 2026-11-01
 - Modificado: `index.html` (solo `<style>` + 4 `style` inline de textarea/select) -> tipografia y contraste (`/impeccable` typeset: evaluacion + detector en paralelo, vista previa `preview.html` aprobada por el usuario antes de aplicar)
