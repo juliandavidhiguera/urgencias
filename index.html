@@ -637,6 +637,14 @@ body {
 }
 .protocol-card[open] > summary::after, .scale-card[open] > summary::after, .databox[open] > summary::after, .card[open] > summary::after { content: '▴'; }
 .protocol-card > summary:hover, .scale-card > summary:hover, .databox > summary:hover, .card > summary:hover { background: var(--bg3); }
+.pe-box { padding: 6px 14px 14px; border-bottom: 2px solid var(--border); margin-bottom: 4px; }
+.pe-title { font-size: 13px; font-weight: 600; padding: 6px 0; }
+.pe-h { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; padding: 12px 0 2px; }
+.pe-out { margin-top: 10px; }
+.pe-out .ficha-section-title.risk-low { color: var(--green); }
+.pe-out .ficha-section-title.risk-mid { color: var(--amber); }
+.pe-out .ficha-section-title.risk-high { color: var(--red-text); }
+.pe-nota { color: var(--text2); font-size: 12px; }
 .protocol-step {
   padding: 8px 14px;
   border-bottom: 1px solid var(--bg3);
@@ -1932,17 +1940,79 @@ function renderProtocols() {
           '" onclick="event.stopPropagation();toggleFav(\'protocol\',\'' + p.id + '\')" aria-label="Favorito" aria-pressed="' + (favs['protocol:' + p.id] ? 'true' : 'false') + '">★</button>' +
         '</summary>' +
         '<div class="scale-body">' +
+          (p.eval ? _protoEvalHtml(p) : '') +
           (() => { let n = 0; return p.steps.map(s => {
             const icon = s.type === 'decision' ? '◇' : s.type === 'info' ? 'ℹ' : (++n);
             const cls = s.type === 'decision' ? ' step-decision' : s.type === 'info' ? ' step-info' : '';
             return '<div class="protocol-step' + cls + '"><span class="step-icon">' + icon + '</span><span>' + s.text.replace(/\n/g, '<br>') + '</span></div>';
           }).join(''); })() +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
-          (p.folleto ? '<div class="btn-row" style="padding:10px 0 0"><button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button></div>' : '') +
+          ((p.folleto || p.flujograma) ? '<div class="btn-row" style="padding:10px 0 0">' +
+            (p.folleto ? '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button>' : '') +
+            (p.flujograma ? '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.flujograma) + '\',\'_blank\')">🗺️ Ver flujograma</button>' : '') +
+          '</div>' : '') +
           (p.galeria ? '<div class="btn-row" style="padding:6px 0 0"><button class="btn" onclick="event.stopPropagation();openGaleria(\'' + p.id + '\')">🫀 Ver patrones IAM nuevos (OMI)</button></div>' : '') +
         '</div>' +
       '</details>'
     ).join('');
+  PROTOCOLS.forEach(p => { if (p.eval) calcProtoEval(p.id); });
+}
+
+/* Evaluador interactivo dentro de un protocolo (p.eval): items num/chk/sel/h
+   y p.eval.calc(v) devuelve secciones {t, c, h} que se pintan en #pe-<id>-out. */
+function _protoEvalHtml(p) {
+  const pid = 'pe-' + p.id;
+  const on = 'calcProtoEval(\'' + p.id + '\')';
+  return '<div class="pe-box"><div class="pe-title">🧮 Evaluador del paciente</div>' +
+    p.eval.items.map(it => {
+      if (it.t === 'h') return '<div class="pe-h">' + it.l + '</div>';
+      const id = pid + '-' + it.k;
+      const ctrl = it.t === 'num' ? '<input type="number" step="any" class="num-in" id="' + id + '" oninput="' + on + '" placeholder="' + (it.u || '') + '">' :
+        it.t === 'sel' ? '<select id="' + id + '" onchange="' + on + '">' + it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>' :
+        '<input type="checkbox" id="' + id + '" onchange="' + on + '">';
+      return '<div class="scale-item"><label class="scale-label" for="' + id + '">' + it.l + '</label><div class="scale-input">' + ctrl + '</div></div>';
+    }).join('') +
+    '<div id="' + pid + '-out" class="pe-out" aria-live="polite"></div>' +
+    '<button class="reset-btn" onclick="resetProtoEval(\'' + p.id + '\')">↺ Reset</button>' +
+    '<button class="btn btn-copy" onclick="copyProtoEval(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
+    '</div>';
+}
+
+function calcProtoEval(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const v = {};
+  p.eval.items.forEach(it => {
+    if (it.t === 'h') return;
+    const el = document.getElementById('pe-' + pid + '-' + it.k);
+    v[it.k] = it.t === 'chk' ? el.checked : parseFloat(String(el.value).replace(',', '.'));
+  });
+  document.getElementById('pe-' + pid + '-out').innerHTML = p.eval.calc(v).map(s =>
+    '<div class="ficha-section"><div class="ficha-section-title' + (s.c ? ' risk-' + s.c : '') + '">' + s.t + '</div>' +
+    '<div class="ficha-section-text">' + s.h + '</div></div>').join('');
+}
+
+function resetProtoEval(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  p.eval.items.forEach(it => {
+    if (it.t === 'h') return;
+    const el = document.getElementById('pe-' + pid + '-' + it.k);
+    if (it.t === 'chk') el.checked = false; else if (it.t === 'sel') el.selectedIndex = 0; else el.value = '';
+  });
+  calcProtoEval(pid);
+}
+
+function copyProtoEval(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const datos = p.eval.items.filter(it => it.t !== 'h').map(it => {
+    const el = document.getElementById('pe-' + pid + '-' + it.k);
+    const nombre = it.l.split(' (')[0].split(':')[0];
+    if (it.t === 'chk') return el.checked ? nombre : null;
+    if (it.t === 'sel') return nombre + ': ' + el.options[el.selectedIndex].text;
+    return el.value === '' ? null : nombre + ' ' + el.value;
+  }).filter(Boolean).join(' · ');
+  const res = [...document.querySelectorAll('#pe-' + pid + '-out .ficha-section')].map(s =>
+    s.querySelector('.ficha-section-title').textContent + '\n' + s.querySelector('.ficha-section-text').innerText).join('\n\n');
+  navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res).then(showToast).catch(showCopyError);
 }
 
 function _drugId(name) {

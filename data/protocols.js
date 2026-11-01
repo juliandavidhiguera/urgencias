@@ -303,4 +303,187 @@ window.PROTOCOLS = [
 ],
   src:'ERC 2025 Special Circumstances · PMID 41117569 · Carbon activado dosis unica, AACT/EAPCCT · PMID 15822758 · Irrigacion intestinal total, AACT/EAPCCT · PMID 25511637 · Jarabe de ipecacuana, AACT/EAPCCT · PMID 23406298 · Criterios de Hunter para toxicidad serotoninergica · PMID 12925718 · EXTRIP salicilatos · PMID 25986310 · EXTRIP etilenglicol · PMID 36765419 · Insulina a dosis altas en calcioantagonistas y betabloqueantes · PMID 30141827'},
 
+{id:'epoc-agudizado', title:'EPOC agudizado (SAE)', sub:'Gravedad (criterios de Roma · GOLD 2026), tratamiento en urgencias y destino inicial', badge:'amber', tag:'Urgente', rank:12.5,
+  flujograma:'protocolos/Flujograma_SAE_Campdevanol.pdf',
+  /* Evaluador interactivo: index.html pinta los items y llama a calc(v) con
+     v[k] = número (NaN si vacío), booleano (chk) o número (sel). calc devuelve
+     secciones [{t: título, c: 'low'|'mid'|'high'|'', h: html}]. */
+  eval:{
+    items:[
+      {t:'h', l:'Riesgo vital y nivel de intensidad terapéutica'},
+      {k:'vital', t:'chk', l:'Riesgo vital inmediato: parada o preparada respiratoria, estupor/coma o agitación incontrolable, inestabilidad hemodinámica o arritmia grave, pH &lt;7,20 con deterioro rápido'},
+      {k:'iot', t:'sel', l:'¿Candidato a IOT/UCI? (PIIC/PCC, voluntades anticipadas, situación basal, opinión del paciente)', o:[['Sin decidir',2],['Sí',1],['No: VMNI como techo',0]]},
+      {t:'h', l:'Gravedad del episodio — criterios de Roma'},
+      {k:'eva', t:'num', l:'Disnea EVA (0–10)', u:'0–10'},
+      {k:'disAct', t:'sel', l:'Disnea actual en escala mMRC (GesEPOC)', o:[['0–2: solo al andar deprisa o en llano a su paso',0],['3–4: se para tras ~100 m o disnea al vestirse o en reposo',1]]},
+      {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
+      {k:'fc', t:'num', l:'Frecuencia cardiaca', u:'lpm'},
+      {k:'spo2', t:'num', l:'SpO₂ en reposo (aire ambiente u O₂ habitual)', u:'%'},
+      {k:'spo2b', t:'num', l:'SpO₂ basal conocida (opcional)', u:'%'},
+      {k:'pcr', t:'num', l:'PCR (opcional)', u:'mg/L'},
+      {t:'h', l:'Gasometría y soporte'},
+      {k:'ph', t:'num', l:'pH', u:'7,xx'},
+      {k:'pco2', t:'num', l:'PaCO₂ (o pCO₂ venosa para seguir la tendencia)', u:'mmHg'},
+      {k:'po2', t:'num', l:'PaO₂ (opcional)', u:'mmHg'},
+      {k:'o2', t:'sel', l:'Oxígeno que necesita para SpO₂ 88–92 %', o:[['Aire ambiente / O₂ habitual',0],['Venturi ≤35 % (o gafas 1–2 L/min)',1],['Venturi &gt;35 % (≤40 %)',2],['FiO₂ &gt;40 % o no corrige con Venturi',3]]},
+      {k:'musc', t:'chk', l:'Musculatura accesoria, respiración paradójica o fatiga muscular'},
+      {k:'mental', t:'sel', l:'Nivel de conciencia', o:[['Normal',0],['Confusión o somnolencia',1],['Estupor o coma',2]]},
+      {t:'h', l:'Antibiótico'},
+      {k:'purul', t:'chk', l:'Esputo purulento'},
+      {k:'vol', t:'chk', l:'Aumento del volumen del esputo'},
+      {k:'disnea', t:'chk', l:'Aumento de la disnea'},
+      {k:'fiebre', t:'chk', l:'Fiebre'},
+      {k:'cultivo', t:'chk', l:'Cultivo de esputo positivo en una exacerbación previa'},
+      {k:'pseudo', t:'chk', l:'Riesgo de Pseudomonas (aislamiento previo, ≥4 ciclos de antibiótico/año, FEV₁ &lt;30 %, bronquiectasias, corticoide oral crónico, ingreso reciente)'},
+      {t:'h', l:'Situación basal y entorno'},
+      {k:'fev1', t:'chk', l:'FEV₁ post-BD &lt;50 %'},
+      {k:'mmrc', t:'chk', l:'Disnea basal mMRC ≥2'},
+      {k:'exac', t:'chk', l:'≥2 agudizaciones o ≥1 ingreso en el último año'},
+      {k:'social', t:'chk', l:'Comorbilidad grave descompensada (IC, arritmia) o apoyo domiciliario insuficiente'},
+      {k:'compl', t:'chk', l:'Complicación que requiere UCI o especialista (TEP de alto riesgo, SCA, neumotórax, sepsis)'}
+    ],
+    calc:function(v){
+      const has = x => !isNaN(x);
+      const out = [];
+      const SEL = ['iot', 'o2', 'mental', 'disAct'];
+      if (!Object.keys(v).some(k => k !== 'iot' && (v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !(SEL.includes(k) && v[k] === 0))))) return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, gasometría y criterios: la gravedad, la clasificación, el tratamiento y el destino se calculan al momento.'}];
+      const gas = has(v.ph) && has(v.pco2);
+      const acidHiper = gas && v.pco2 > 45 && v.ph < 7.35;
+
+      /* 1. Roma (GOLD 2026, fig. 4.2; Celli 2021) */
+      const crit = [
+        ['disnea EVA ≥5', has(v.eva) ? v.eva >= 5 : null],
+        ['FR ≥24', has(v.fr) ? v.fr >= 24 : null],
+        ['FC ≥95', has(v.fc) ? v.fc >= 95 : null],
+        ['SpO₂ &lt;92 % o descenso &gt;3 puntos', has(v.spo2) ? (v.spo2 < 92 || (has(v.spo2b) && v.spo2b - v.spo2 > 3)) : null],
+        ['PCR ≥10 mg/L', has(v.pcr) ? v.pcr >= 10 : null]
+      ];
+      const n = crit.filter(c => c[1] === true).length;
+      const falta = crit.filter(c => c[1] === null).length;
+      const cumple = crit.filter(c => c[1]).map(c => c[0]).join(' · ') || 'ninguno';
+      let roma, romaC, romaD;
+      if (falta === 5 && !gas) { roma = 'sin datos'; romaC = ''; romaD = 'Introduce las constantes y, si la hay, la gasometría.'; }
+      const hipox60 = has(v.po2) && v.po2 <= 60;
+      const gasGrave = [hipox60 ? 'PaO₂ ≤60 mmHg' : '', acidHiper ? 'hipercapnia con acidosis (PaCO₂ &gt;45 y pH &lt;7,35)' : ''].filter(Boolean).join(' y ');
+      if (acidHiper || (hipox60 && n >= 3)) { roma = 'GRAVE'; romaC = 'high'; romaD = n + '/5 criterios (' + cumple + ') + gasometría con ' + gasGrave + '.' + (n < 3 ? ' Con acidosis hipercápnica se trata como grave aunque no llegue a 3 criterios.' : ''); }
+      else if (n >= 3) { roma = 'MODERADA'; romaC = 'mid'; romaD = n + '/5 criterios (' + cumple + ')' + (gas || has(v.po2) ? ', sin PaO₂ ≤60 ni acidosis hipercápnica.' : '. <b>Falta gasometría</b>: con PaO₂ ≤60 o hipercapnia con acidosis sería GRAVE.'); }
+      else { roma = n + falta >= 3 ? 'LEVE (provisional)' : 'LEVE'; romaC = 'low'; romaD = n + '/5 criterios (' + cumple + ')' + (n + falta >= 3 ? '. Faltan ' + falta + ' dato(s) que podrían convertirla en moderada.' : '.') + (hipox60 ? ' PaO₂ ≤60 sin 3 criterios clínicos: revisar los datos.' : ''); }
+      out.push({t:'Criterios de Roma (GOLD 2026): exacerbación ' + roma, c:romaC, h:'<b>Criterios que cumple:</b> ' + romaD});
+
+      /* 1b. Gravedad del SAE según GesEPOC 2021 (riesgo basal + episodio agudo) */
+      const alto = v.fev1 || v.mmrc || v.exac;
+      const ges = [];
+      if (v.mental === 2) ges.push(['MUY GRAVE', 'estupor o coma']);
+      if (gas && v.ph < 7.30) ges.push(['MUY GRAVE', 'pH &lt;7,30']);
+      if (has(v.pco2) && v.pco2 >= 60) ges.push(['MUY GRAVE', 'PaCO₂ ≥60 mmHg']);
+      if (v.disAct === 1) ges.push(['GRAVE', 'disnea mMRC ≥3']);
+      if (v.mental === 1) ges.push(['GRAVE', 'somnolencia o confusión']);
+      if (has(v.fr) && v.fr >= 30) ges.push(['GRAVE', 'FR ≥30']);
+      if (has(v.po2) && v.po2 < 60) ges.push(['GRAVE', 'PaO₂ &lt;60 mmHg']);
+      if (has(v.spo2) && v.spo2 < 90) ges.push(['GRAVE', 'SpO₂ &lt;90 %']);
+      if (alto) ges.push(['MODERADA', 'riesgo basal alto']);
+      if (has(v.fr) && v.fr >= 24 && v.fr < 30) ges.push(['MODERADA', 'FR 24–29']);
+      if (has(v.spo2) && v.spo2 >= 90 && v.spo2 < 95) ges.push(['MODERADA', 'SpO₂ 90–94 %']);
+      const gesNivel = ['MUY GRAVE', 'GRAVE', 'MODERADA'].find(g => ges.some(x => x[0] === g));
+      const gesFalta = !has(v.fr) || !has(v.spo2);
+      out.push({t:'Gravedad del SAE (GesEPOC 2021): ' + (gesNivel || (gesFalta ? 'LEVE (provisional)' : 'LEVE')),
+        c:gesNivel === 'MUY GRAVE' || gesNivel === 'GRAVE' ? 'high' : gesNivel ? 'mid' : 'low',
+        h:gesNivel ? '<b>Criterios que cumple:</b> ' + ['MUY GRAVE', 'GRAVE', 'MODERADA'].map(g => { const l = ges.filter(x => x[0] === g).map(x => x[1]); return l.length ? g.toLowerCase() + ': ' + l.join(', ') : ''; }).filter(Boolean).join(' · ') + '. Basta un criterio del nivel más alto, sea cual sea el riesgo basal.' :
+          'Bajo riesgo basal, disnea mMRC ≤2, conciencia normal, FR &lt;24 y SpO₂ ≥95 %: se deben cumplir todos.' + (gesFalta ? ' <b>Faltan FR o SpO₂.</b>' : '')});
+
+      /* 2. GOLD 2026 en el paciente hospitalizado + tipo gasométrico del flujograma */
+      const vital = v.vital || v.mental || v.o2 === 3 || (gas && v.ph <= 7.25);
+      const ir = v.musc || v.o2 >= 2 || (gas && v.pco2 > 45) || (has(v.fr) && has(v.fc) && v.fr > 24 && v.fc > 95);
+      const gold = vital ? ['insuficiencia respiratoria CON riesgo vital', 'high'] : ir ? ['insuficiencia respiratoria SIN riesgo vital', 'mid'] : ['sin insuficiencia respiratoria', 'low'];
+      const goldCrit = vital ? [v.vital ? 'riesgo vital inmediato' : '', v.mental ? 'alteración aguda del estado mental' : '', v.o2 === 3 ? 'FiO₂ &gt;40 % o no corrige con Venturi' : '', gas && v.ph <= 7.25 ? 'acidosis con pH ≤7,25' : ''] :
+        ir ? [v.musc ? 'musculatura accesoria' : '', v.o2 >= 2 ? 'necesita Venturi &gt;35 %' : '', gas && v.pco2 > 45 ? 'PaCO₂ elevada (' + v.pco2 + ' mmHg)' : '', has(v.fr) && has(v.fc) && v.fr > 24 && v.fc > 95 ? 'FR &gt;24 y FC &gt;95' : ''] :
+        ['FR ≤24 o FC ≤95, sin musculatura accesoria, conciencia normal, corrige con Venturi ≤35 %, sin hipercapnia'];
+      const gasC = gas && v.ph <= 7.35 && v.pco2 >= 45;
+      const tipoC = gasC || v.musc;
+      const tipo = v.vital ? 'riesgo vital inmediato' :
+        tipoC ? 'C · acidosis respiratoria hipercápnica' + (gasC ? '' : ' (por fatiga muscular)') :
+        v.o2 >= 2 ? 'B · insuficiencia respiratoria hipoxémica (no corrige con Venturi ≤35 %)' :
+        'A · sin insuficiencia respiratoria o hipoxemia que corrige con Venturi ≤35 %';
+      const pendGas = !gas && !v.vital && !tipoC && (romaC === 'mid' || v.o2 >= 1 || (has(v.fr) && v.fr >= 24));
+      out.push({t:'Clasificación GOLD 2026 del paciente hospitalizado: ' + gold[0], c:gold[1],
+        h:'<b>Criterios que cumple:</b> ' + goldCrit.filter(Boolean).join(' · ') + '.' +
+          '<br><b>Tipo según la gasometría (flujograma Campdevànol, tras el tratamiento inicial):</b> ' + tipo + '.' +
+          (pendGas ? '<br><b>Pendiente de gasometría</b> para descartar acidosis hipercápnica (tipo C).' : '')});
+
+      /* 3. Riesgo basal GesEPOC */
+      out.push({t:'Estratificación del riesgo basal (GesEPOC): riesgo ' + (alto ? 'ALTO' : 'BAJO'), c:alto ? 'mid' : 'low',
+        h:alto ? '<b>Criterios que cumple:</b> ' + [v.fev1 ? 'FEV₁ &lt;50 %' : '', v.mmrc ? 'disnea basal mMRC ≥2' : '', v.exac ? '≥2 agudizaciones o 1 ingreso el último año' : ''].filter(Boolean).join(' · ') + ' (basta uno).' : 'Bajo riesgo solo si FEV₁ ≥50 %, mMRC 0–1 y 0–1 agudización sin ingreso (marca lo que cumpla).'});
+
+      /* 4. Tratamiento */
+      const vm = tipoC || v.vital;
+      const nSint = [v.vol, v.disnea, v.fiebre].filter(Boolean).length;
+      const atbInd = (v.purul && nSint >= 1) || v.cultivo || vm;
+      const graveAtb = romaC === 'high' || vital || vm || v.o2 >= 2;
+      let atb;
+      if (!atbInd) atb = '<b>Antibiótico: no indicado</b> con los criterios actuales (≥2 de aumento de disnea, fiebre, volumen o purulencia siendo uno la purulencia; cultivo previo positivo; o ventilación mecánica). Procalcitonina: no recomendada.';
+      else {
+        const motivo = [v.purul && nSint >= 1 ? 'purulencia + ' + nSint + ' síntoma(s) más' : '', v.cultivo ? 'cultivo previo positivo' : '', vm ? 'ventilación mecánica (VMNI/IOT)' : ''].filter(Boolean).join(' · ');
+        atb = '<b>Antibiótico 5 días</b> (' + motivo + '). ' + (v.pseudo || graveAtb ? 'Cultivo de esputo antes de iniciarlo. ' : '') +
+          (v.pseudo ? 'Con riesgo de <i>Pseudomonas</i>, β-lactámico antipseudomónico IV: piperacilina-tazobactam 4/0,5 g/6 h, cefepima 2 g/8 h, ceftazidima 2 g/8 h o meropenem 1 g/8 h. Alternativa: ciprofloxacino 750 mg/12 h VO o 400 mg/8 h IV (GesEPOC: 500–750 mg/12 h) o levofloxacino 500 mg/12 h (GesEPOC; otras guías usan 750 mg/24 h).' :
+           graveAtb ? 'Grave sin riesgo de <i>Pseudomonas</i>: amoxicilina-clavulánico 1 g/200 mg/8 h IV (hasta 2 g/200 mg/8 h), ceftriaxona 1–2 g/24 h IV o cefotaxima 1–2 g/8 h IV. Alergia a β-lactámicos: levofloxacino 500 mg/24 h IV/VO o moxifloxacino 400 mg/24 h.' :
+           'Leve-moderada: amoxicilina-clavulánico 875/125 mg/8 h VO. Alternativas: cefditoreno 400 mg/12 h VO, doxiciclina 100 mg/12 h VO (200 mg el 1.er día) o azitromicina 500 mg/24 h VO 3 días; levofloxacino 500 mg/24 h o moxifloxacino 400 mg/24 h VO solo si no hay alternativa (aviso FDA/EMA).') +
+          ' Dosis de adulto con función renal normal: ajustar al filtrado glomerular.';
+      }
+      const o2txt = (v.o2 === 0 && (!has(v.spo2) || v.spo2 >= 88)) ? '<b>O₂:</b> no precisa si SpO₂ ≥88 %. Si lo necesita, objetivo 88–92 %.' :
+        '<b>O₂ controlado</b> con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 % (PaO₂ 60–65). Evitar la hiperoxia. Gasometría a los 30–60 min si hay hipercapnia o se cambia la FiO₂.';
+      const soporte = v.vital ? (v.iot === 1 ? '<b>SVA e IOT</b> (candidato).' : v.iot === 0 ? '<b>VMNI como techo terapéutico</b> o medidas de confort.' : '<b>Decidir YA la candidatura a IOT/UCI</b>: IOT si es candidato; si no, VMNI como techo.') :
+        tipoC ? '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25). Objetivo FR &lt;25 y Vt 6–8 mL/kg; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h.' :
+        v.o2 >= 2 ? '<b>OAF</b> (primera modalidad en la hipoxémica, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ para SpO₂ 88–92 %. Gasometría a 1–2 h; si aparece hipercapnia con acidosis → VMNI (tipo C). Descartar neumonía, IC y TEP.' : '';
+      const corti = romaC === 'low' && !ir ? '<b>Corticoide:</b> reservarlo para exacerbaciones significativas (incluso los ciclos cortos se asocian a neumonía, sepsis y muerte). Si se indica: prednisona 40 mg/día VO 5 días.' :
+        '<b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral).';
+      out.push({t:'Tratamiento en urgencias', c:'', h:[
+        o2txt,
+        '<b>Broncodilatadores:</b> salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE (no con O₂), 1 dosis cada hora × 2–3 y después cada 2–4 h según respuesta; evitar dosis altas de SABA. Alternativa: MDI con cámara, salbutamol 400–600 µg (4–6 pulsaciones) + ipratropio 80–120 µg con la misma pauta. No suspender los LABD. Metilxantinas IV: no.',
+        corti, atb, soporte,
+        '<b>Siempre:</b> ECG, troponina, NT-proBNP, Rx de tórax, hemograma con eosinófilos, PCR; dímero D si se sospecha TEP. Descartar neumonía, IC, SCA/arritmia, TEP y neumotórax. Si ingresa: HBPM profiláctica y balance hídrico. Reevaluar a los 30–60 min con clínica y gasometría.'
+      ].filter(Boolean).map(x => '• ' + x).join('<br>')});
+
+      /* 5. Destino inicial (flujograma Campdevànol → HUV) */
+      let dest, dc;
+      if (v.vital) { dest = v.iot === 1 ? 'IOT + SVA y <b>traslado a UCI de HUV</b> (llamada médico a médico; SEM con SVA).' : v.iot === 0 ? 'VMNI como techo o confort; ubicación según acuerdo local (PADES si procede).' : 'Decidir candidatura: si es candidato, IOT y <b>traslado a UCI de HUV</b>; si no, VMNI como techo.'; dc = 'high'; }
+      else if (tipoC) {
+        dest = (v.iot === 1 ? '<b>Avisar a HUV al iniciar la VMNI → traslado con VMNI.</b> pH &lt;7,25 que no mejora o fracaso → IOT + traslado.' :
+                v.iot === 0 ? '<b>VMNI como techo terapéutico</b>, decisión compartida; ubicación según acuerdo local; confort/PADES si fracasa.' :
+                '<b>Decidir candidatura a IOT/UCI.</b> Candidato: avisar a HUV al iniciar la VMNI y trasladar con VMNI. No candidato: VMNI como techo.') +
+          '<br>Excepción: corrección rápida (pH ≥7,35) y tolera ≥4 h sin VMNI en urgencias → puede ir a planta. La VMNI se retira directamente, sin destete.';
+        dc = 'high';
+      }
+      else if (v.compl) { dest = '<b>Traslado a HUV</b> por complicación que requiere UCI o especialista.'; dc = 'high'; }
+      else if (v.o2 >= 2) { dest = 'OAF en urgencias. <b>A las 2 h:</b> si FiO₂ ≤40 %, FR &lt;25 y puede pasar a Venturi → <b>ingreso en planta (Campdevànol)</b>. Si no, o necesita OAF mantenida → <b>traslado a HUV</b>.'; dc = 'mid'; }
+      else if (v.social) { dest = '<b>Ingreso en planta (Campdevànol)</b>: sin apoyo domiciliario suficiente o con comorbilidad descompensada. Si empeora (FR &gt;25, SpO₂ &lt;88 % con O₂, somnolencia) → gasometría y reclasificar (B/C).'; dc = 'mid'; }
+      else if (romaC) {
+        const pesan = [gesNivel === 'GRAVE' || gesNivel === 'MUY GRAVE' ? 'SAE ' + gesNivel.toLowerCase() + ' según GesEPOC' : '', alto ? 'riesgo basal alto' : '', romaC === 'high' ? 'exacerbación grave por Roma' : ''].filter(Boolean);
+        dest = 'Tipo A: continuar tratamiento y reevaluar a las 2–4 h (disnea, FR, SpO₂, tolerancia al esfuerzo). ¿Buena respuesta, estable y con apoyo domiciliario? <b>Sí → alta</b> (AP en 48–72 h). <b>No → ingreso en planta (Campdevànol)</b>.' +
+          (pesan.length ? '<br>A tener en cuenta al decidir: ' + pesan.join(' · ') + '.' : '');
+        dc = romaC === 'low' && !pesan.length ? 'low' : 'mid';
+      }
+      else { dest = '—'; dc = ''; }
+      out.push({t:'Destino inicial', c:dc, h:dest + (dest !== '—' ? '<br><span class="pe-nota">Umbrales locales propuestos (Campdevànol/HUV), a consensuar con la Dirección Asistencial y con UCI/Neumología de HUV.</span>' : '')});
+      return out;
+    }
+  },
+  steps:[
+  {type:'info', text:'Recursos locales (Hospital de Campdevànol): OAF y VMNI en el box de urgencias. Sin observación con monitorización continua ni UCI/semicríticos. Centro de referencia: Hospital Universitari de Vic (HUV)'},
+  {type:'action', text:'LLEGADA (primeros 15 min): triaje, monitorizar SpO₂, FC, FR, PA, temperatura, nivel de conciencia y disnea EVA 0–10'},
+  {type:'action', text:'O₂ controlado con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 %. Evitar la hiperoxia'},
+  {type:'action', text:'Vía venosa · gasometría arterial (venosa si es menos grave) · ECG · hemograma con eosinófilos, bioquímica, PCR, troponina, NT-proBNP; dímero D si se sospecha TEP · Rx de tórax'},
+  {type:'action', text:'Fijar desde el inicio el nivel de intensidad terapéutica: ¿candidato a IOT/UCI? (PIIC/PCC, voluntades anticipadas, situación basal, opinión del paciente y la familia)'},
+  {type:'decision', text:'¿Riesgo vital inmediato? (parada o preparada respiratoria, estupor/coma o agitación incontrolable, inestabilidad hemodinámica o arritmia grave, pH <7,20 con deterioro rápido)', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'SVA · IOT si es candidato y activar el traslado a UCI de HUV. Si no es candidato: VMNI como techo terapéutico o medidas de confort'},
+  {type:'action', branch:'no', text:'Gravedad por criterios de Roma (GOLD 2026): LEVE si EVA <5, FR <24, FC <95, SpO₂ ≥92 % (descenso ≤3) y PCR <10 · MODERADA si ≥3 de 5 (EVA ≥5, FR ≥24, FC ≥95, SpO₂ <92 % o descenso >3, PCR ≥10) · GRAVE si además la gasometría muestra PaO₂ ≤60 y/o hipercapnia con acidosis (PaCO₂ >45 y pH <7,35)'},
+  {type:'action', text:'Descartar lo que simula o agrava el SAE: neumonía, IC descompensada, SCA/arritmia, TEP (hasta el 5,9 % de los ingresados) y neumotórax. El riesgo cardiovascular es máximo los primeros 30 días'},
+  {type:'action', text:'TRATAMIENTO INICIAL: salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE, 1 dosis/h × 2–3, luego cada 2–4 h · prednisona 40 mg/día 5 días · antibiótico 5 días si ≥2 de (↑disnea, fiebre, ↑volumen, ↑purulencia) siendo uno la purulencia, cultivo previo positivo o VMNI/IOT'},
+  {type:'decision', text:'Reevaluar a los 30–60 min con clínica y gasometría: ¿qué tipo de insuficiencia respiratoria?', yes:'B / C', no:'A'},
+  {type:'action', branch:'no', text:'A · Sin IR o hipoxemia que corrige con Venturi ≤35 %, pH ≥7,35, PaCO₂ ≤45 o basal: continuar y reevaluar a las 2–4 h → ALTA si buena respuesta, estable y con apoyo; si no, INGRESO EN PLANTA'},
+  {type:'action', branch:'yes', text:'B · Hipoxémica (SpO₂ <88 % / PaO₂ <60 con Venturi ≥35 %, pH ≥7,35): OAF 30–60 L/min, 31–37 °C. A las 2 h: FiO₂ ≤40 %, FR <25 y pasa a Venturi → PLANTA; si no → TRASLADO A HUV'},
+  {type:'action', branch:'yes', text:'C · Hipercápnica (pH ≤7,35 y PaCO₂ ≥45, o fatiga muscular): VMNI en el box, EPAP 4–6 / IPAP 10–12 subiendo hasta 18–20. Candidato → avisar a HUV al iniciar la VMNI y trasladar con VMNI. No candidato → VMNI como techo'},
+  {type:'info', text:'Criterios de traslado a HUV: VMNI u OAF mantenidas, pH ≤7,25, PaCO₂ >60, FiO₂ >40 %, alteración del estado mental, necesidad de IOT, inestabilidad hemodinámica o arritmia grave, TEP de alto riesgo, SCA, neumotórax o sepsis'},
+  {type:'info', text:'Al alta: LABA+LAMA (añadir CI si hay eosinofilia; eos ≥300 → triple terapia), revisar la técnica inhalatoria, completar prednisona y antibiótico 5 días, plan escrito, tabaco y vacunas (gripe, neumococo, COVID, VRS, dTpa, zóster). AP a las 48–72 h, revisión a las 1–4 semanas y a las 12–16 semanas con FEV₁, rehabilitación en <4 semanas'}],
+  src:'Protocolo SAE Hospital de Campdevànol v2.2 (oct 2026) · GOLD 2026 Report v1.3 (figs. 4.2–4.10) · Criterios de Roma: Celli 2021, AJRCCM, doi:10.1164/rccm.202108-1819PP · GesEPOC 2021 SAE: Soler-Cataluña 2022, Arch Bronconeumol 58:159 · GesEPOC 2025: Miravitlles 2025, doi:10.1016/j.arbres.2025.10.008 · Dosis de antibiótico: ATS/IDSA NAC 2019 · PMID 31573350; MAESTRAL, Wilson 2012 · PMID 22135277; antibiótico 5 días: ACP 2021 · PMID 33819054'},
+
 ];
