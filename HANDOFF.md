@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 13 | **Rama:** main | **HEAD:** `c88e828` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 13 | **Rama:** main | **HEAD:** `26ee707` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -70,6 +70,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Descartado: fuentes web (CSP solo origen propio y la UI de producto no las necesita); escala fluida `clamp()` (UI de herramienta: escala fija)
 - Modificado: `registro-utstein.html` -> misma escala `--fs-*` (texto 16px, etiquetas 14px, campos 16px); `@media print` redefine los tokens en pt para conservar la densidad en papel (4 paginas antes y despues, PDF headless); <=600px padding y tablas a 12px. Sin desborde 360-1440px; a 320px desborda 11px (original 22px)
 - Commits: `c88e828` feat(ui): registro Utstein con la misma escala tipografica en rem
+- Modificado: `index.html` -> boton «Registro Utstein» del tab PCR abre `registro-utstein.html` en capa a pantalla completa (`#utstein-overlay` + `#utstein-frame`, iframe mismo origen) en vez de `window.open`: en la app instalada (pantalla de inicio de iOS) `window.open` saltaba al navegador sin el `sessionStorage` y el registro salia vacio [INFERIDO, no probado en iPhone]. Probado en Chrome local: datos llegan, `sessionStorage` queda vacio, PCR intacto al volver, reabrir recarga datos nuevos, Escape cierra
+- Commits: `26ee707` feat(pcr): registro Utstein en capa con iframe dentro de la app
 
 ### Sesion 12 - 2026-11-01
 - Commit `70d9068`. **Protocolo nuevo EPOC agudizado (SAE)** desde el Word del usuario (protocolo Campdevanol v2.2) y su flujograma. Evaluador interactivo generico: campo `eval` en `PROTOCOLS` (items `num`/`chk`/`sel`/`h` + `calc(v)` → `[{t,c,h}]`), pintado por `_protoEvalHtml`/`calcProtoEval`/`resetProtoEval`/`copyProtoEval` (`index.html`, CSS `.pe-*`). Reutilizable por otros protocolos.
@@ -250,9 +252,10 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Protocolo EPOC: el destino debe seguir el flujograma de Campdevanol** y, en dosis/umbrales, **GOLD 2026 prevalece** sobre el Word y el flujograma (decisiones del usuario, sesion 12). Si se cambia el flujograma, regenerar el PDF desde la fuente HTML (Chrome headless `--print-to-pdf`, 1 pagina A4) y sustituir tambien la imagen `word/media/flujograma_campdevanol.png` del Word.
 
 - **Tamanos de letra: usar SOLO los tokens `--fs-*`**, nunca px (el detector `impeccable --scope type` lo vigila). Campos de formulario >= `--fs-base` o iOS hace zoom. Al final del `<style>` hay un bloque "Escala tipografica: ajustes de rol" que sobrescribe reglas anteriores: mirar ahi antes de cambiar un tamano.
+- **Registro Utstein en iframe**: cada pulsacion del boton recarga el iframe (se pierde lo escrito a mano en el registro); cerrar solo oculta la capa. `src` sin query a proposito (SW precachea `/registro-utstein.html`). Requiere `X-Frame-Options: SAMEORIGIN` y `frame-ancestors 'self'` en `_headers`: no endurecerlos a `DENY`/`'none'`.
 - `registro-utstein.html`: Cloudflare Pages redirige `.html` -> `/registro-utstein` (308); para verificar produccion con curl usar `-L` o la URL limpia. Sus tamanos de impresion viven en los tokens dentro de `@media print`, no en las reglas.
 - `.nav { top: 81px }` (>600px) = altura real de `.header`. Si cambia la cabecera (texto, padding, tamano de h1/p), medir `document.querySelector('.header').offsetHeight` y actualizarlo.
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Abrir en el movil `https://urgencias.doctorhiguera.com/` (comprobar de paso la nueva tipografia y que no hay zoom al tocar campos) → Protocolos → EPOC agudizado y pasar un caso real por el evaluador (y de paso la gasometria pegada, #12); anotar cualquier clasificacion o destino que no coincida con el juicio clinico.
+Abrir en el movil `https://urgencias.doctorhiguera.com/` (comprobar de paso la nueva tipografia, que no hay zoom al tocar campos y que PCR → «Registro Utstein» se abre dentro de la app con los datos y permite imprimir/descargar) → Protocolos → EPOC agudizado y pasar un caso real por el evaluador (y de paso la gasometria pegada, #12); anotar cualquier clasificacion o destino que no coincida con el juicio clinico.
