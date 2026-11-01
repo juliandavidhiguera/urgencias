@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-10-27 | **Sesion #:** 11 | **Rama:** main | **HEAD:** `46fc720` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 12 | **Rama:** main | **HEAD:** `70d9068` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -10,7 +10,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 |---|---|---|---|
 | Frontend | HTML/CSS/JS vanilla, sin build ni framework | - | `index.html` (2388 lineas, monolito con CSS+JS embebidos) |
 | Datos | Modulos JS `window.X = [...]` cargados como `<script>` | - | `data/{cheatsheets,scales,formulas,protocols,drugs,infusions,intubacion,fichas,bibliografia}.js` |
-| Offline | Service Worker network-first (cache solo como respaldo sin conexion) | `CACHE = 'urg-v64'` | `sw.js` |
+| Offline | Service Worker network-first (cache solo como respaldo sin conexion) | `CACHE = 'urg-v65'` | `sw.js` |
 | PWA | Manifest | - | `manifest.json`, `icon.svg` |
 | Hosting | Cloudflare Pages, deploy automatico en push a `main` | - | (integracion nativa GitHub, sin paso de build) |
 | CI | **Ninguno.** No hay GitHub Actions en el repo (ver decision de sesion 4 continuacion 9) | - | - |
@@ -35,11 +35,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `data/scales.js` | 73 escalas clinicas agrupadas por sistema (sesion 8: +ADD-RS, Padua, IMPROVE VTE, IMPROVE Bleeding, Ottawa SAH, ICH score, LRINEC, CIWA-Ar; sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
 | `data/formulas.js` | 48 formulas (sesion 9: -f-naloxona, pasada a la ficha; sesion 8: +indice ROX, regla de los 9; sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
 | `data/infusions.js` | Perfusiones IV (fuente unica de mL/h); sesion 7: +Urapidilo, +Naloxona | ESTABLE |
-| `data/protocols.js` | Protocolos de codigos de activacion + toxindromes/intoxicaciones | ESTABLE |
+| `data/protocols.js` | Protocolos de codigos de activacion + toxindromes/intoxicaciones + EPOC agudizado (SAE) con evaluador interactivo (`eval`, sesion 12) | ESTABLE (EPOC: EN_CURSO, umbrales locales sin consensuar) |
+| `protocolos/Flujograma_SAE_Campdevanol.pdf` | Flujograma SAE v1.1 (Campdevanol → HUV), boton «Ver flujograma» del protocolo EPOC. Fuente HTML editable fuera del repo: `Downloads/Flujograma_SAE_Campdevanol_v1.1_fuente.html` | ESTABLE |
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
 | `codigos/patrones iam nuevos/*.jpg` | Galeria de patrones ECG de oclusion coronaria (OMI) usada en tab codi-IAM | ESTABLE |
 | `medicamentos/*.md` (75 archivos) | Texto fuente en catalan extraido de PDF de Guies Cliniques — input de `parse_fichas.js` | ESTABLE (fuente, no se edita a mano salvo error de OCR) |
-| `sw.js` | Service worker network-first, `CACHE='urg-v64'`, precachea tambien `codigos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
+| `sw.js` | Service worker network-first, `CACHE='urg-v65'`, precachea tambien `codigos/*.pdf`, `protocolos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
 | `Calculadora_Index_Fragil_VIG.md` | Plantilla original (catalan) del Index Fragil-VIG, trackeada como referencia | ESTABLE |
 
 ## 4. ESTADO ACTUAL - QUE FUNCIONA
@@ -53,7 +54,19 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Escalas/formulas de la sesion 7: logica probada con scripts Node contra valores de referencia (CKD-EPI H60 Cr1,0 -> 86; GRACE suma 191 del caso de prueba; gasometria 14 casos clasicos; lector de informe 4 formatos) y render/botones/reset/copia probados en Chrome contra servidor local; en produccion `https://urgencias.doctorhiguera.com/` ya sirve `onScalePaste` y `data/scales.js` con `csrs` (curl 2026-10-20).
 - Cabeceras de seguridad desde 2026-09-22: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` en `/*` — verificado con `curl -I` en produccion (ver seccion 5). CSP desde 2026-10-21 (`ddbefcc`): solo origen propio, `'unsafe-inline'` en script/style — verificado con `curl -I` en produccion y carga sin violaciones en consola.
 
+- EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
+
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 12 - 2026-11-01
+- Commit `70d9068`. **Protocolo nuevo EPOC agudizado (SAE)** desde el Word del usuario (protocolo Campdevanol v2.2) y su flujograma. Evaluador interactivo generico: campo `eval` en `PROTOCOLS` (items `num`/`chk`/`sel`/`h` + `calc(v)` → `[{t,c,h}]`), pintado por `_protoEvalHtml`/`calcProtoEval`/`resetProtoEval`/`copyProtoEval` (`index.html`, CSS `.pe-*`). Reutilizable por otros protocolos.
+- Salida: (1) **Criterios de Roma, GOLD 2026 fig. 4.2** — grave = ≥3 criterios + PaO2 ≤60 y/o hipercapnia con acidosis; acidosis hipercapnica sola se trata como grave; (2) **gravedad SAE GesEPOC 2021** (tabla del Word); (3) **GOLD 2026 hospitalizado** + tipo A/B/C del flujograma; (4) riesgo basal GesEPOC; (5) tratamiento con dosis; (6) destino. Cada clasificacion lista los criterios que cumple el paciente.
+- Destino = flujograma de Campdevanol estricto (decision del usuario): A → alta si buena respuesta/estable/apoyo, si no planta; B → OAF y a las 2 h planta o traslado a HUV; C → VMNI, traslado a HUV si candidato o techo si no. GesEPOC grave y riesgo basal alto solo como «a tener en cuenta».
+- Revision de dosis (skill md-urg-hosp) contra GOLD 2026 v1.3 (PDF del usuario), GOLD 2026 en espanol, Vera y Perplexity. Regla del usuario: **GOLD 2026 prevalece** sobre el Word y el flujograma. Broncodilatador → pauta GOLD (1 dosis/h × 2–3, luego cada 2–4 h); antibioticos con dosis (GesEPOC 2021 + Vera, PMID 31573350, 22135277, 33819054).
+- Boton «🗺️ Ver flujograma» (campo `flujograma`, comparte `btn-row` con `folleto`), pedido desde otra sesion del usuario. PDF v1.1 en `protocolos/`, precacheado, `CACHE` → `urg-v65`.
+- Fuera del repo (en `Downloads`): Word corregido `PROTOCOLO EPOC 2026 (corregido GOLD 2026 v1.3).docx` (Tabla B grave/moderada, antibiotico 5 dias, descenso >3 %, flujograma nuevo en el Anexo I); `Flujograma_SAE_Campdevanol_v1.1.pdf` + su fuente HTML. Originales intactos.
+- Decisiones: GesEPOC «muy grave» con pH <7,30 **o** PaCO2 ≥60 (la tabla no dice si basta uno; se eligio el criterio mas prudente). Levofloxacino antipseudomonico: se muestran 500 mg/12 h (GesEPOC) y 750 mg/24 h (Vera). Amoxicilina-clavulanico VO 875/125 mg/8 h (practica espanola; Vera cita /12 h).
+- Descartado: Perplexity negaba que la OAF fuera primera modalidad en la hipoxemica; GOLD 2026 fig. 4.6 lo afirma (evidencia A). Reglas propias de destino (moderada + alto riesgo → planta) retiradas por no estar en el flujograma.
 
 ### Sesion 11 - 2026-10-27
 - Perfusion IV: campo opcional `info` en `data/infusions.js` (secciones clinicas) que `_infuInfoHtml(d)` pinta en `#inf-info` debajo del calculo. Lidocaina: pauta, otras indicaciones (PCR, TV con SCA, premedicacion, anestesia local), efectos secundarios, signos de alarma (toxicidad por anestesico local + lipidos), contraindicaciones, monitorizacion.
@@ -160,6 +173,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 12 | Probar en movil real: pegado de gasometria del gasometro del hospital, dosis en mL de fichas con presentaciones reales y metronomo PCR (sonido con iPhone en silencio, pantalla bloqueada) | `data/formulas.js`, `index.html` | P2 | Usuario (movil + presentaciones) | Sin campos no reconocidos ni presentaciones mal parseadas |
 | ~~7~~ | ~~Configurar los secrets `CF_URGENCIAS_PURGE_TOKEN` y `CF_ZONE_ID` para la purga de cache~~ — CERRADO por decision del usuario (2026-09-04): en vez de crear el token de Cloudflare, se elimino el workflow. Los 5 min de `Cache-Control` le bastan. Ver BUG-6 y continuacion 9 | (workflow eliminado) | - | - | Resuelto: no hay workflow que falle |
 | ~~13~~ | ~~Confirmar la dilucion fija de lidocaina~~ — HECHO sesion 11 (`9fc327c`): 500 mg/50 mL (10 mg/mL) = 2% 25 mL + 25 mL SF o 5% 10 mL + 40 mL SF, confirmada por el usuario y desplegada | `data/infusions.js` | - | - | Resuelto |
+| 14 | Consensuar los umbrales locales del protocolo EPOC (FiO2 >40 % para trasladar, tiempos de reevaluacion, VMNI como techo en planta) con la Direccion Asistencial y UCI/Neumologia de HUV | `data/protocols.js` (`epoc-agudizado`), flujograma | P2 | Usuario (reunion con HUV) | Umbrales confirmados y la nota «a consensuar» retirada del destino y del flujograma |
+| 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
+| 16 | Probar el evaluador EPOC en movil real y en modo oscuro | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -217,5 +233,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Texto rojo: usar `var(--red-text)`, no `var(--red)` (este queda para bordes y fondos; AA justo como color de letra). En `#tab-perfusiones` las reglas `#tab-perfusiones .tile-aux` y `.scale-pts` fuerzan `color: var(--text)`: cualquier color propio ahi necesita selector con `#tab-perfusiones`.
 - `info` en `data/infusions.js` es opcional por farmaco; se pinta con `innerHTML` (datos estaticos del repo, no entrada de usuario).
 
+- **Evaluador de protocolos (`eval`)**: los ids son `pe-<protocolo>-<k>`; `chk` → booleano, `sel` y `num` → numero (`NaN` si vacio; acepta coma decimal). En `calc`, los `sel` con valor 0 por defecto (`iot` excluido, `o2`, `mental`, `disAct`) NO cuentan como «datos introducidos» (lista `SEL` del guard): si se anade un `sel` nuevo, incluirlo ahi o el evaluador saldra de «Introduce los datos» con el formulario vacio. `renderProtocols()` re-renderiza al marcar favorito y se pierden los datos escritos (igual que en escalas).
+- **Protocolo EPOC: el destino debe seguir el flujograma de Campdevanol** y, en dosis/umbrales, **GOLD 2026 prevalece** sobre el Word y el flujograma (decisiones del usuario, sesion 12). Si se cambia el flujograma, regenerar el PDF desde la fuente HTML (Chrome headless `--print-to-pdf`, 1 pagina A4) y sustituir tambien la imagen `word/media/flujograma_campdevanol.png` del Word.
+
 ## 10. SIGUIENTE ACCION INMEDIATA
-Abrir en el movil `https://urgencias.doctorhiguera.com/` y probar con un caso real la gasometria pegando el informe del gasometro del hospital (si algun campo no se reconoce, anadir su etiqueta al parser de `f-gasometria` en `data/formulas.js`).
+Abrir en el movil `https://urgencias.doctorhiguera.com/` → Protocolos → EPOC agudizado y pasar un caso real por el evaluador (y de paso la gasometria pegada, #12); anotar cualquier clasificacion o destino que no coincida con el juicio clinico.
