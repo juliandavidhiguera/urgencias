@@ -224,6 +224,7 @@ window.DRUGS = [
         ' · Ictus, alternativa tenecteplasa: ' + tnk + ' mg en bolo único (0.25 mg/kg, máx 25)' +
         ' · TEP: ' + tep + ' · PCR por TEP: 50 mg bolo';
     },
+    ficha: 'Alteplasa.md',
     alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas', 'Ictus: no dar antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control)', 'Tenecteplasa en ictus (0.25 mg/kg, máx 25 mg) ≠ tenecteplasa en IAM (por tramos de peso, hasta 50 mg)'],
     src: 'IAM: ACC/AHA 2025 SCA · PMID 40013746 · Ictus: AHA/ASA 2026; ESO 2023 tenecteplasa; metaanálisis TNK vs rtPA · PMID 39413337 · TEP: ESC 2019 · PMID 31504429; ficha técnica Actilyse (CIMA) · PCR por TEP: OUH Medicines Information Leaflet 2026; Resuscitation Council UK'
   }

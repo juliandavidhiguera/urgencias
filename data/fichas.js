@@ -66,6 +66,25 @@ window.FICHAS = [
     "id": "adrenalina"
   },
   {
+    "file": "Alteplasa.md",
+    "nombre": "Alteplasa",
+    "altoRiesgo": true,
+    "fuente": "https://cima.aemps.es/cima/publico/home.html",
+    "subtitulo": "Ficha propia (no está en la guía del SEM): ficha técnica de Actilyse® y guías citadas",
+    "alerta": "Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas.",
+    "presentacion": "Actilyse®: vial de polvo de 10, 20 o 50 mg + disolvente. Una vez reconstituido, contiene 1 mg/ml.",
+    "propiedades": "Fibrinolítico fibrinoespecífico (activador tisular del plasminógeno recombinante, rt-PA). Vida media de 4–5 min.",
+    "indicaciones": "IAM con elevación del ST cuando la ICP primaria no es posible en plazo (en este escenario se prefiere la tenecteplasa en bolo). Ictus isquémico agudo en las primeras 4,5 h. TEP de alto riesgo con inestabilidad hemodinámica. Parada cardiaca por TEP sospechado o confirmado.",
+    "dosis": "Reconstituir con el disolvente del envase (1 mg/ml) sin agitar. Las dosis por peso se calculan con el peso real.\n• IAM con elevación del ST, bolo: 15 mg IV en 1–2 min.\n• IAM con elevación del ST, 1.ª perfusión: 0,75 mg/kg IV en 30 min, máximo 50 mg.\n• IAM con elevación del ST, 2.ª perfusión: 0,5 mg/kg IV en 60 min, máximo 35 mg. Dosis total máxima 100 mg (≥67 kg: 15 + 50 + 35 mg).\n• Ictus isquémico (<4,5 h), dosis total: 0,9 mg/kg IV, máximo 90 mg. El 10 % en bolo en 1 min y el 90 % restante en perfusión de 60 min.\n• TEP de alto riesgo (con pulso): 100 mg IV en 2 h, 10 mg en bolo en 1–2 min + 90 mg en perfusión. Con menos de 65 kg, la dosis total no debe superar 1,5 mg por kilo (ficha técnica).\n• Parada cardiaca por TEP: 50 mg IV en bolo en 2 min; si no hay ROSC a los 15–30 min, segunda dosis de 50 mg (máximo total 100 mg). Mantener la RCP 60–90 min tras la lisis (ERC 2025; OUH 2026).",
+    "contraindicaciones": "En el ictus se aplican los criterios de inclusión y exclusión de la trombólisis del Codi Ictus. En la parada cardiaca por TEP las contraindicaciones pueden no ser absolutas: decide quien lidera la reanimación.\n• Absolutas (TEP, ESC 2019):\n   ◦ Ictus hemorrágico o de origen desconocido previo.\n   ◦ Ictus isquémico en los últimos 6 meses.\n   ◦ Neoplasia o malformación del SNC.\n   ◦ Traumatismo mayor, cirugía o TCE en las últimas 3 semanas.\n   ◦ Diátesis hemorrágica.\n   ◦ Sangrado activo.\n   ◦ Sospecha de disección aórtica.\n• Relativas:\n   ◦ AIT en los últimos 6 meses.\n   ◦ Anticoagulación oral.\n   ◦ Embarazo o primera semana posparto.\n   ◦ Punción en un lugar no compresible.\n   ◦ RCP traumática.\n   ◦ PAS >180 mmHg refractaria.\n   ◦ Hepatopatía avanzada, endocarditis infecciosa, úlcera péptica activa.",
+    "efectosSecundarios": "Hemorragia (incluida la intracraneal), angioedema orolingual (más frecuente con IECA), reacciones alérgicas, arritmias de reperfusión, embolia de colesterol.",
+    "observaciones": "• IAM: anticoagulación y doble antiagregación según el protocolo de SCACEST (Codi IAM).\n• Ictus: sin antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control). PA <180/105 mmHg durante y 24 h después. Alternativa: tenecteplasa en bolo (ver su ficha).\n• TEP: seguir el protocolo local para la HNF durante la alteplasa (ESC 2019 permite mantenerla). Al terminar, TTPa cada 2–4 h y reiniciar sin bolo cuando el TTPa sea <2 × LSN.\n• Parada por TEP: suspender la heparina durante la lisis; después, HNF sin bolo cuando el TTPa sea <2 × LSN.\n• Vigilancia neurológica y de sangrado las primeras 24 h. Cefalea intensa, déficit neurológico o sangrado mayor → parar la alteplasa y la heparina y TC craneal urgente.",
+    "embarazo": "Contraindicación relativa: valorar riesgo y beneficio según la gravedad.",
+    "lactancia": null,
+    "pediatria": null,
+    "id": "alteplasa"
+  },
+  {
     "file": "Amiodarona.md",
     "nombre": "Amiodarona",
     "altoRiesgo": true,
