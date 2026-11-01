@@ -679,21 +679,30 @@ body {
 .fl-inputs label { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-sm); color: var(--text2); }
 .fl-inputs input { width: 110px; }
 .fl-hint { font-size: var(--fs-xs); color: var(--text2); padding: 2px 0 6px; }
-.fl-card { margin-top: 10px; }
-.fl-q { margin-top: 14px; padding: 10px 12px; border-radius: 6px; background: var(--amber-bg); font-weight: 600; font-size: var(--fs-base); }
-.fl-help { margin-top: 6px; font-size: var(--fs-sm); color: var(--text2); }
-.fl-opts { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-.fl-opt { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; font-size: var(--fs-base); cursor: pointer; }
-.fl-opt:hover { background: var(--bg3); }
+.fl-card { margin-top: 14px; }
+.fl-ask { margin-top: 18px; padding: 12px 14px 14px; border: 1px solid var(--amber); border-radius: 8px; background: var(--bg2); }
+.fl-ask-n { font-size: var(--fs-xs); font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; }
+.fl-q { margin-top: 4px; font-weight: 700; font-size: var(--fs-md); line-height: 1.35; color: var(--text); }
+.fl-help { margin-top: 6px; padding: 8px 10px; border-radius: 6px; background: var(--bg3); font-size: var(--fs-sm); color: var(--text2); }
+.fl-ask-hint { margin-top: 12px; font-size: var(--fs-sm); color: var(--text2); }
+.fl-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.fl-opt { display: flex; align-items: center; gap: 12px; text-align: left; min-height: 48px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: var(--fs-base); cursor: pointer; }
+.fl-opt:hover, .fl-opt:focus-visible { border-color: var(--blue); background: var(--blue-bg); }
+.fl-opt-l { flex: 1; min-width: 0; }
+.fl-radio { flex-shrink: 0; width: 18px; height: 18px; border: 2px solid var(--text2); border-radius: 50%; }
+.fl-opt:hover .fl-radio, .fl-opt:focus-visible .fl-radio { border-color: var(--blue); }
 .fl-opt.fl-sug { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
 .fl-sug-tag { flex-shrink: 0; font-size: var(--fs-xs); color: var(--blue); font-weight: 600; }
 .fl-done { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; width: 100%; margin-top: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg3); color: var(--text2); font: inherit; font-size: var(--fs-sm); text-align: left; cursor: pointer; }
-.fl-done-q { flex: 1 1 260px; min-width: 0; }
+.fl-done-n { flex-shrink: 0; font-size: var(--fs-xs); font-weight: 700; color: var(--text2); }
+.fl-done-q { flex: 1 1 240px; min-width: 0; }
 .fl-done-a { color: var(--green); font-weight: 600; }
 .fl-done-edit { font-size: var(--fs-xs); color: var(--blue); text-decoration: underline; }
-.fl-extras { margin-top: 18px; padding-top: 4px; border-top: 1px dashed var(--border); }
-.fl-ex { width: 100%; margin-top: 6px; }
-.fl-ex-on { border-color: var(--red); }
+.fl-extras { margin-top: 24px; padding-top: 6px; border-top: 1px dashed var(--border); }
+.fl-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.fl-chip { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg3); color: var(--text); font: inherit; font-size: var(--fs-sm); cursor: pointer; }
+.fl-chip:hover { border-color: var(--red); }
+.fl-chip-on { border-color: var(--red); background: var(--red-bg); color: var(--red-text); font-weight: 600; }
 .fl-full { border-top: 2px solid var(--border); }
 .fl-full > summary { padding: 10px 14px; font-size: var(--fs-sm); font-weight: 600; color: var(--text2); cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .pe-nota { color: var(--text2); font-size: var(--fs-sm); }
@@ -2143,7 +2152,7 @@ function _flowHtml(p) {
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
       '</div><div class="fl-hint">Los datos solo se usan para calcular las dosis; no se guardan.</div>' : '') +
     '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
-    (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-help">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
+    (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
     '<button class="btn btn-copy" onclick="copyFlow(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resumen</button>' +
     '</div>';
@@ -2163,30 +2172,38 @@ function renderFlow(pid) {
   const path = _flowPath[pid] || (_flowPath[pid] = [{ n: p.flow.start, o: null }]);
   const v = _flowVals(p);
   v.ruta = path.map(st => st.n);
+  let nq = 0;
   body.innerHTML = path.map((st, i) => {
     const n = p.flow.nodes[st.n];
     let h = _flowShow(n, v);
     if (!n.q) return h;
+    nq++;
     if (st.o !== null) {
-      return h + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta">' +
-        '<span class="fl-done-q">' + n.q + '</span><span class="fl-done-a">✓ ' + n.opts[st.o].l + '</span><span class="fl-done-edit">cambiar</span></button>';
+      return h + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta a la pregunta ' + nq + '">' +
+        '<span class="fl-done-n">' + nq + '</span><span class="fl-done-q">' + n.q + '</span>' +
+        '<span class="fl-done-a">✓ ' + n.opts[st.o].l + '</span><span class="fl-done-edit">cambiar</span></button>';
     }
-    return h + '<div class="fl-q">' + n.q + '</div>' +
+    const qid = 'fl-' + pid + '-q' + i;
+    return h + '<div class="fl-ask" role="group" aria-labelledby="' + qid + '">' +
+      '<div class="fl-ask-n">Pregunta ' + nq + '</div>' +
+      '<div class="fl-q" id="' + qid + '">' + n.q + '</div>' +
       (n.help ? '<div class="fl-help">' + (typeof n.help === 'function' ? n.help(v) : n.help) + '</div>' : '') +
+      '<div class="fl-ask-hint">Elige una opción:</div>' +
       '<div class="fl-opts">' + n.opts.map((o, j) => {
         const sug = o.sug && o.sug(v);
-        return '<button class="fl-opt' + (sug ? ' fl-sug' : '') + '" onclick="flowGo(\'' + pid + '\',' + i + ',' + j + ')">' + o.l +
+        return '<button class="fl-opt' + (sug ? ' fl-sug' : '') + '" onclick="flowGo(\'' + pid + '\',' + i + ',' + j + ')">' +
+          '<span class="fl-radio" aria-hidden="true"></span><span class="fl-opt-l">' + o.l + '</span>' +
           (sug ? '<span class="fl-sug-tag">según los datos</span>' : '') + '</button>';
-      }).join('') + '</div>';
+      }).join('') + '</div></div>';
   }).join('');
   const ex = document.getElementById('fl-' + pid + '-extras');
   if (ex) {
     const abiertos = _flowExtra[pid] || [];
-    ex.innerHTML = p.flow.extras.items.map((it, k) => {
+    ex.innerHTML = '<div class="fl-chips">' + p.flow.extras.items.map((it, k) => {
       const on = abiertos.includes(k);
-      return '<button class="fl-opt fl-ex' + (on ? ' fl-ex-on' : '') + '" aria-expanded="' + on + '" onclick="flowExtra(\'' + pid + '\',' + k + ')">' + it.l +
-        '<span class="fl-sug-tag">' + (on ? 'ocultar' : 'ver') + '</span></button>' + (on ? _flowShow(it, v) : '');
-    }).join('');
+      return '<button class="fl-chip' + (on ? ' fl-chip-on' : '') + '" aria-pressed="' + on + '" onclick="flowExtra(\'' + pid + '\',' + k + ')">' +
+        '<span aria-hidden="true">' + (on ? '−' : '+') + '</span> ' + it.l + '</button>';
+    }).join('') + '</div>' + abiertos.map(k => _flowShow(p.flow.extras.items[k], v)).join('');
   }
 }
 
