@@ -204,11 +204,11 @@ window.DRUGS = [
   }
 ]},
 
-{group: 'Fibrinolíticos', badge: 'red', tag: 'IAM/Ictus', drugs: [
+{group: 'Fibrinolíticos', badge: 'red', tag: 'IAM/Ictus/TEP', drugs: [
   {
     name: 'Alteplasa (rtPA)',
     dilution: 'Reconstituir según ficha técnica',
-    doseRange: 'IAM: 15 mg bolo + 0.75 mg/kg (máx 50) en 30 min + 0.5 mg/kg (máx 35) en 60 min · Ictus: 0.9 mg/kg (máx 90 mg), 10% bolo, resto en 60 min',
+    doseRange: 'IAM: 15 mg bolo + 0.75 mg/kg (máx 50) en 30 min + 0.5 mg/kg (máx 35) en 60 min · Ictus: 0.9 mg/kg (máx 90 mg), 10% bolo en 1 min, resto en 60 min · TEP: 10 mg bolo + 90 mg en 2 h (<65 kg: máx 1.5 mg/kg total) · PCR por TEP: 50 mg bolo en 2 min, repetible una vez a los 15–30 min (máx 100 mg)',
     doseCalc: function(peso) {
       var d = Math.min(0.9 * peso, 90).toFixed(1);
       return { min: d, max: d, unit: 'mg (dosis total, ictus)' };
@@ -216,9 +216,16 @@ window.DRUGS = [
     extra: function(peso) {
       var f1 = Math.min(0.75 * peso, 50).toFixed(1);
       var f2 = Math.min(0.5 * peso, 35).toFixed(1);
-      return 'IAM: 15 mg bolo + ' + f1 + ' mg (30 min) + ' + f2 + ' mg (60 min)';
+      var ict = Math.min(0.9 * peso, 90);
+      var tnk = Math.min(0.25 * peso, 25).toFixed(1);
+      var tep = peso < 65 ? '10 mg bolo + ' + (1.5 * peso - 10).toFixed(1) + ' mg en 2 h (máx 1.5 mg/kg)' : '10 mg bolo + 90 mg en 2 h';
+      return 'IAM: 15 mg bolo + ' + f1 + ' mg (30 min) + ' + f2 + ' mg (60 min)' +
+        ' · Ictus: ' + (ict * 0.1).toFixed(1) + ' mg bolo (1 min) + ' + (ict * 0.9).toFixed(1) + ' mg (60 min)' +
+        ' · Ictus, alternativa tenecteplasa: ' + tnk + ' mg en bolo único (0.25 mg/kg, máx 25)' +
+        ' · TEP: ' + tep + ' · PCR por TEP: 50 mg bolo';
     },
-    alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM y de ictus son distintas: no intercambiarlas']
+    alerts: ['Confirmar ausencia de contraindicaciones antes de administrar', 'Las dosis de IAM, ictus y TEP son distintas: no intercambiarlas', 'Ictus: no dar antiagregantes ni anticoagulantes en las 24 h siguientes (hasta la TC de control)', 'Tenecteplasa en ictus (0.25 mg/kg, máx 25 mg) ≠ tenecteplasa en IAM (por tramos de peso, hasta 50 mg)'],
+    src: 'IAM: ACC/AHA 2025 SCA · PMID 40013746 · Ictus: AHA/ASA 2026; ESO 2023 tenecteplasa; metaanálisis TNK vs rtPA · PMID 39413337 · TEP: ESC 2019 · PMID 31504429; ficha técnica Actilyse (CIMA) · PCR por TEP: OUH Medicines Information Leaflet 2026; Resuscitation Council UK'
   }
 ]},
 
