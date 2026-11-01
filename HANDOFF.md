@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `c70f885` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `0bd9784` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -69,6 +69,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Descartado: rehacer los flujogramas desde HTML como en EPOC (se usan las imagenes de los Word tal cual)
 - Verificacion de dosis (Vera + Perplexity, /md-urg-hosp) → `c70f885` fix(protocolos): asma prednisona fija 40–50 mg/dia (GINA/GEMA; SEMES mg/kg como nota); salbutamol IV solo rescate refractario; notas de evidencia (budesonida NEB 0,5 mg = pauta SEMES, ensayo adulto uso 9 mg; VMNI/VMI = pauta SEMES; noradrenalina inicio = pauta local). TEP: alteplasa en PCR 50 mg bolo + 2.a dosis 50 mg a los 15–30 min sin ROSC (max 100 mg) segun OUH Medicines Information Leaflet ene 2026 (PDF del usuario en Downloads), se mantiene 0,3–0,5 mg/kg; HNF preferente con ClCr ≤30 en C1–C2 (ESC), enoxaparina c/24 h + anti-Xa como alternativa (AHA 2026); fibrinolisis «a considerar» en D (AHA 2026)
 - No verificable con Vera/Perplexity: subcategorias C1–E2 AHA 2026, NT-proBNP ≥600, VD/VI ≥1,0, tope 1,5 mg/kg <65 kg de la ficha tecnica. OUH da tabla por peso para TEP con pulso (<50 kg 10+50; 50–64 kg 10+70; ≥65 kg 10+90) distinta del 1,5 mg/kg: no aplicada, pendiente de decision del usuario
+- `0bd9784` feat(farmacos): tarjeta Alteplasa en `data/drugs.js` — IAM sin cambios (ACC/AHA 2025, PMID 40013746); ictus con bolo 10 % + perfusion calculados y aviso sin antitromboticos 24 h; alternativa tenecteplasa ictus 0,25 mg/kg max 25 mg (AHA/ASA 2026 la recomienda al nivel de alteplasa; ESO 2023; PMID 39413337); TEP 10 + 90 mg/2 h (<65 kg max 1,5 mg/kg) y PCR por TEP 50 mg. La ficha Tenecteplasa de `data/fichas.js` sigue solo con SCACEST/TEP (sin dosis de ictus)
 
 ### Sesion 13 - 2026-11-01
 - Modificado: `index.html` (solo `<style>` + 4 `style` inline de textarea/select) -> tipografia y contraste (`/impeccable` typeset: evaluacion + detector en paralelo, vista previa `preview.html` aprobada por el usuario antes de aplicar)
