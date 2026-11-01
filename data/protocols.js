@@ -391,7 +391,151 @@ window.PROTOCOLS = [
 ], src:'Codi IAM — SEM Catalunya, Grup de Treball SCA, v.03 abril 2023 · Fibrinólisis completada con ACC/AHA 2025 SCA (Rao SV, PMID 40013746) y ESC 2023 SCA (Byrne RA, Eur Heart J 2023;44:3720) · STREAM (Armstrong 2013, PMID 23473396) y STREAM-1/2 ≥75 años (Bainey 2024, PMID 39689189)'},
 
 {id:'codi-ictus', title:'Codi Ictus', sub:'Test RAPID/RANCOM, escala RACE y activación', badge:'red', tag:'Crítico', rank:2, codigo:true,
-  folleto:'codigos/C02._Codi_ictus.pdf', steps:[
+  folleto:'codigos/C02._Codi_ictus.pdf',
+  flow:(() => {
+    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    const hay = x => !isNaN(x) && x > 0;
+    const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular la dosis.</span>';
+    const taOk = v => hay(v.tas) && hay(v.tad) && v.tas < 185 && v.tad < 110;
+    const taAlta = v => (hay(v.tas) && v.tas >= 185) || (hay(v.tad) && v.tad >= 110);
+    const CI = {
+      q: '¿Alguna contraindicación para la trombólisis?',
+      help: v => 'Hemorragia en la TC · hemorragia intracraneal previa · ictus isquémico o TCE grave &lt;3 meses · cirugía intracraneal o espinal &lt;3 meses · cirugía mayor &lt;14 días · hemorragia digestiva &lt;21 días · glucemia &lt;50 mg/dl (corregir y reevaluar) · plaquetas &lt;100.000 · INR >1,7 · HBPM a dosis plenas &lt;24 h · anticoagulante oral directo &lt;48 h (caso a caso; dabigatrán: idarucizumab 5 g IV) · disección aórtica · endocarditis (AHA/ASA 2026). La TA no controlable se valora en el paso siguiente.' +
+        (hay(v.gluc) && v.gluc < 50 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: corregir y reevaluar antes de decidir.</b>' : ''),
+      opts: [{ l: 'Sí, alguna', go: 'contra', sug: v => hay(v.gluc) && v.gluc < 50 }, { l: 'No', go: 'ta' }]
+    };
+    const ext = v => v.ruta.includes('ventana2');
+    return {
+      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'tad', l: 'TAD', u: 'mmHg' }, { k: 'gluc', l: 'Glucemia', u: 'mg/dl' }],
+      start: 'rapid',
+      nodes: {
+        rapid: {
+          t: 'Test RAPID — estado clínico actual',
+          show: '¿Ríe asimétrico? · ¿Dificultad para levantar o mantener los brazos? · ¿Disartria?',
+          q: '¿RAPID positivo (algún ítem alterado)?',
+          opts: [{ l: 'Sí', go: 'rancom' }, { l: 'No', go: 'atipico' }]
+        },
+        atipico: {
+          q: '¿Sospecha de ictus de territorio posterior (vértigo, diplopía, ataxia) o paciente pediátrico?',
+          opts: [{ l: 'Sí', go: 'tiempo', sug: v => hay(v.edad) && v.edad < 15 }, { l: 'No', go: 'nocodi' }]
+        },
+        nocodi: { t: 'No cumple criterios de Codi Ictus', c: 'mid', show: 'Valoración habitual. La sospecha de hemorragia subaracnoidea NO es Codi Ictus: tiene circuito específico.' },
+        rancom: {
+          t: 'Test RANCOM — estado clínico previo', show: '¿Necesitaba ayuda para vestirse, moverse o ir al baño?',
+          q: '¿Era independiente antes del ictus (RANCOM negativo)?',
+          opts: [{ l: 'Sí, independiente', go: 'tiempo' }, { l: 'No, necesitaba ayuda', go: 'nodep' }]
+        },
+        nodep: { t: 'RANCOM positivo', c: 'mid', show: 'Dependencia previa: no cumple los criterios de activación del Codi Ictus del SEM.' },
+        tiempo: {
+          q: '¿Síntomas de menos de 24 h (incluido AIT), inicio incierto o ictus del despertar?',
+          opts: [{ l: 'Sí', go: 'activar' }, { l: 'No, más de 24 h', go: 'notiempo' }]
+        },
+        notiempo: { t: 'Más de 24 h de evolución', c: 'mid', show: 'No cumple los criterios de activación del Codi Ictus del SEM.' },
+        activar: {
+          t: 'ACTIVAR CODI ICTUS', c: 'high',
+          show: 'Comunicar la puntuación RACE a CECOS, sea cual sea.<br>Datos para CECOS (SITREM): CIP/DNI, hora de inicio, anticoagulantes, RAPID/RANCOM, RACE, glucemia capilar, TA, FC y temperatura.',
+          q: '¿Adulto o pediátrico?',
+          opts: [{ l: 'Adulto (≥15 años)', go: 'race', sug: v => hay(v.edad) && v.edad >= 15 }, { l: 'Pediátrico (&lt;15 años)', go: 'ped', sug: v => hay(v.edad) && v.edad < 15 }]
+        },
+        ped: { t: 'Ictus pediátrico', c: 'high', show: 'Activar SIEMPRE el Codi Ictus, con cualquier RACE → centro de referencia pediátrico más cercano.' },
+        race: {
+          q: 'Puntuación de la escala RACE (0–9)',
+          help: 'Paresia facial (0–2) · brazo (0–2) · pierna (0–2) · desviación oculocefálica (0–1) · afasia si la debilidad es derecha o agnosia si es izquierda (0–2). ≥5 = alta probabilidad de oclusión de gran vaso.',
+          opts: [{ l: 'RACE 0–4', go: 'race_lo' }, { l: 'RACE 5–9', go: 'race_hi' }]
+        },
+        race_lo: {
+          t: 'RACE 0–4', show: 'Trasladar al centro de referencia de ictus más cercano (CTI, CPI o C-TI).',
+          q: '¿Está en el Hospital de Campdevànol (fase hospitalaria con teleictus)?',
+          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp' }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
+        },
+        race_hi: {
+          t: 'RACE 5–9: probable oclusión de gran vaso', c: 'high',
+          show: 'Llamar al neurólogo referente. Si el centro de referencia hace trombectomía → trasladar allí. Si no, y es candidato a trombólisis → centro de referencia; si no es candidato → centro más cercano con trombectomía.<br><b>La trombólisis no debe retrasar el traslado a trombectomía.</b>',
+          q: '¿Está en el Hospital de Campdevànol (fase hospitalaria con teleictus)?',
+          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp' }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
+        },
+        traslado: { t: 'Traslado', show: 'Transmitir los datos a CECOS y trasladar al centro indicado. Tratar las complicaciones (panel de abajo) durante el traslado.' },
+        hosp: {
+          t: 'Llegada al hospital', c: 'high',
+          show: v => 'Activar el <b>teleictus</b> (el neurólogo valora por videoconsulta y decide la trombólisis) · TC craneal sin contraste ± angio-TC (perfusión si se dispone) · glucemia capilar · peso real · 2 vías. No esperar plaquetas, INR ni TTPa salvo sospecha (anticoagulante, hepatopatía, hemopatía). <b>Objetivo puerta-aguja &lt;60 min.</b>' +
+            (hay(v.gluc) && v.gluc < 60 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: glucosa IV y mantener >70.</b>' : '') +
+            (hay(v.gluc) && v.gluc > 180 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: insulina rápida IV según glucemia capilar.</b>' : ''),
+          q: 'Tiempo desde la última vez que se le vio bien',
+          opts: [{ l: '0–4,5 h', go: 'ventana1' }, { l: '4,5–9 h, o ictus del despertar / inicio incierto', go: 'ventana2' }, { l: 'Más de 9 h', go: 'fuera' }]
+        },
+        fuera: { t: 'Fuera de la ventana de trombólisis IV', c: 'mid', show: 'Sin trombólisis IV. Si hay oclusión de gran vaso, comentar con el neurólogo de teleictus el traslado a trombectomía.' },
+        ventana1: { ...CI },
+        ventana2: {
+          q: '¿Hay mismatch en la TC de perfusión o difusión-FLAIR en la RM?',
+          help: '4,5–9 h o ictus del despertar: solo con imagen avanzada y solo ALTEPLASA (EXTEND, WAKE-UP). No tenecteplasa si solo hay TC sin contraste (TWIST).',
+          opts: [{ l: 'Sí, hay mismatch', go: 'ventana2ci' }, { l: 'No, o solo hay TC sin contraste', go: 'sinimagen' }]
+        },
+        sinimagen: { t: 'Sin trombólisis IV', c: 'mid', show: 'Fuera de las 4,5 h sin imagen avanzada no hay indicación de trombólisis IV. Si hay oclusión de gran vaso, comentar la trombectomía con el neurólogo de teleictus.' },
+        ventana2ci: { ...CI },
+        contra: { t: 'Trombólisis contraindicada', c: 'high', show: 'Sin trombólisis IV. Si hay oclusión de gran vaso (RACE ≥5 o angio-TC), traslado a trombectomía según el neurólogo de teleictus.' },
+        ta: {
+          q: '¿TA &lt;185/110 mmHg?',
+          help: v => hay(v.tas) && hay(v.tad) ? 'TA introducida: ' + v.tas + '/' + v.tad + ' mmHg.' : 'Introduce la TAS y la TAD arriba para que se marque la opción.',
+          opts: [{ l: 'Sí', go: 'dosis', sug: taOk }, { l: 'No, ≥185/110', go: 'tactl', sug: taAlta }]
+        },
+        tactl: {
+          t: 'Bajar la TA antes de trombolisar', c: 'high',
+          show: 'Objetivo &lt;185/110 antes de empezar y &lt;180/105 las 24 h siguientes (AHA/ASA 2026).<br><b>Labetalol IV</b> 10 mg en 1–2 min, repetible (máx. 150 mg), o <b>urapidilo</b> si hay contraindicación a los betabloqueantes.',
+          q: '¿Se consigue &lt;185/110?',
+          opts: [{ l: 'Sí', go: 'dosis' }, { l: 'No, TA no controlable', go: 'contra' }]
+        },
+        dosis: {
+          t: 'TROMBÓLISIS (dosis con el peso real)', c: 'high',
+          show: v => {
+            let h = '';
+            if (hay(v.peso)) {
+              const tot = Math.min(0.9 * v.peso, 90), bolo = tot / 10, resto = tot - bolo;
+              h += '<b>Alteplasa</b> 0,9 mg/kg, máx. 90 mg: <b>' + f(Math.round(tot * 10) / 10) + ' mg</b> en total (1 mg/ml) → <b>bolo de ' + f(Math.round(bolo * 10) / 10) + ' mg IV en 1 min</b> + <b>' + f(Math.round(resto * 10) / 10) + ' mg con bomba en 60 min (' + f(Math.round(resto * 10) / 10) + ' ml/h)</b>. Desechar antes lo que sobre del vial; al final, lavar con SF al mismo ritmo.';
+            } else h += '<b>Alteplasa</b> 0,9 mg/kg, máx. 90 mg: 10 % en bolo IV en 1 min y 90 % con bomba en 60 min. ' + faltaPeso;
+            if (ext(v)) h += '<br><b>Ventana 4,5–9 h: solo alteplasa</b> (no tenecteplasa).';
+            else if (hay(v.peso)) {
+              const t = v.peso < 60 ? 15 : v.peso < 70 ? 17.5 : v.peso < 80 ? 20 : v.peso < 90 ? 22.5 : 25;
+              h += '<br><b>O tenecteplasa</b> (misma eficacia en &lt;4,5 h): <b>' + f(t) + ' mg = ' + f(t / 5) + ' ml</b> en bolo IV único en 5–10 s (tabla de la ficha técnica). No usar la dosis del IAM.';
+            } else h += '<br><b>O tenecteplasa</b>: bolo único por peso, &lt;60 kg 15 mg · 60–69 kg 17,5 mg · 70–79 kg 20 mg · 80–89 kg 22,5 mg · ≥90 kg 25 mg.';
+            return h + '<br>La decide el neurólogo de teleictus. Ver Fichas → Alteplasa / Tenecteplasa.<br><span class="pe-nota">AHA/ASA 2026; ESO 2021 y 2023; fichas técnicas Actilyse y Metalyse 25 mg.</span>';
+          },
+          q: 'Después de la trombólisis',
+          opts: [{ l: 'Ver la vigilancia de las primeras 24 h', go: 'post' }]
+        },
+        post: {
+          t: 'Vigilancia tras la trombólisis',
+          show: 'NIHSS y TA cada 15 min durante 2 h, cada 30 min hasta las 6 h y cada hora hasta las 24 h · <b>TA &lt;180/105</b> · sin antiagregantes ni anticoagulantes 24 h (heparina SC máx. 10.000 UI/día si es imprescindible) · evitar sondas y vías centrales las primeras horas · TC de control a las 24 h antes de los antitrombóticos.<br>Si aparece deterioro neurológico, cefalea, vómitos, HTA brusca o hinchazón de lengua o labios: panel de complicaciones.'
+        }
+      },
+      extras: {
+        t: 'Complicaciones',
+        help: 'Ábrelas cuando aparezcan, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'Hemorragia tras la trombólisis', t: 'Sospecha de hemorragia', c: 'high',
+            show: 'Deterioro neurológico, cefalea intensa, vómitos o HTA brusca: <b>parar la perfusión</b>, TC urgente, hemograma, coagulación y fibrinógeno.<br><b>Crioprecipitado 10 U IV</b> en 10–30 min, repitiendo hasta fibrinógeno ≥150 mg/dl (AHA/ASA 2026), o, si no hay o está contraindicado, <b>ácido tranexámico 1 g IV</b> en 10 min. Contactar con neurocirugía o la UCI de referencia.'
+          },
+          {
+            l: 'Angioedema orolingual', t: 'Angioedema orolingual', c: 'high',
+            show: 'Más frecuente con IECA. <b>Parar la perfusión</b>, suspender los IECA y vigilar la vía aérea: intubación precoz (idealmente despierto y con fibroscopio) si afecta a laringe, paladar, suelo de la boca u orofaringe, o progresa en ~30 min.<br><b>Metilprednisolona 125 mg IV</b> + antihistamínico H1 IV (AHA: difenhidramina 50 mg; en España, dexclorfeniramina 5 mg IV) · famotidina 20 mg IV si está disponible.<br>Si progresa: <b>adrenalina 0,3 mg SC o 0,5 mg nebulizada</b>. Si no cede: icatibant 30 mg SC (cada 6 h, máx. 3 dosis/24 h) o inhibidor de la C1 esterasa 20 UI/kg IV (evidencia limitada).'
+          },
+          {
+            l: 'Tensión arterial alta', t: 'Tensión arterial', c: 'mid',
+            show: '<b>Candidato a trombólisis o ya trombolisado:</b> &lt;185/110 antes y &lt;180/105 las 24 h siguientes.<br><b>No candidato:</b> tratar solo si TAS >220 y/o TAD >120, bajando ~10 % y evitando descensos >15 %.<br>Labetalol IV 10 mg en 1–2 min (máx. 150 mg) o urapidilo si hay contraindicación a los betabloqueantes.'
+          },
+          {
+            l: 'Agitación, coma o crisis comicial', t: 'Complicaciones neurológicas', c: 'mid',
+            show: 'Agitación → <b>haloperidol 2,5–5 mg IV</b> (evitar benzodiacepinas) · coma con GCS &lt;9 → valorar aislar la vía aérea · crisis comicial → benzodiacepinas IV (no profilácticas).'
+          },
+          {
+            l: 'Glucemia o fiebre', t: 'Glucemia y temperatura', c: 'mid',
+            show: 'Hiperglucemia >180 mg/dl → insulina rápida IV según glucemia capilar · hipoglucemia &lt;60 → glucosa IV y mantener >70 · hipertermia >37,5 °C → paracetamol 1 g IV, evitar AAS.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'Test RAPID — estado clínico actual: ¿ríe asimétrico? ¿dificultad para levantar o mantener los brazos? ¿disartria?'},
   {type:'decision', text:'¿RAPID positivo (algún ítem alterado)?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Test RANCOM — estado clínico previo: ¿necesitaba ayuda para vestirse, moverse o ir al baño?'},

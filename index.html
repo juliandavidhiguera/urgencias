@@ -2119,7 +2119,8 @@ function copyProtoEval(pid) {
 
 /* Flujograma paso a paso dentro de un protocolo (p.flow).
    p.flow = { inputs:[{k,l,u}], start:'id', nodes:{ id:{ t, c, show, q, help, opts:[{l, go, sug}] } } }
-   - show: HTML o función (v) => HTML, que se pinta al llegar al nodo (v = datos del paciente).
+   - show: HTML o función (v) => HTML, que se pinta al llegar al nodo (v = datos del paciente;
+     v.ruta = ids de los nodos recorridos, para variar el contenido según la rama).
    - q/opts: pregunta con botones; sin opts el nodo es final. sug(v) marca la opción que sugieren los datos.
    El estado vive solo en memoria (nunca en localStorage: son datos de paciente). */
 const _flowPath = {};
@@ -2161,6 +2162,7 @@ function renderFlow(pid) {
   if (!p || !body) return;
   const path = _flowPath[pid] || (_flowPath[pid] = [{ n: p.flow.start, o: null }]);
   const v = _flowVals(p);
+  v.ruta = path.map(st => st.n);
   body.innerHTML = path.map((st, i) => {
     const n = p.flow.nodes[st.n];
     let h = _flowShow(n, v);
@@ -2221,6 +2223,7 @@ function resetFlow(pid) {
 function copyFlow(pid) {
   const p = PROTOCOLS.find(x => x.id === pid);
   const v = _flowVals(p);
+  v.ruta = (_flowPath[pid] || []).map(st => st.n);
   const datos = (p.flow.inputs || []).filter(it => !isNaN(v[it.k])).map(it => it.l + ' ' + v[it.k] + (it.u ? ' ' + it.u : '')).join(' · ');
   const tmp = document.createElement('div');
   const txt = h => { tmp.innerHTML = String(h).replace(/<br\s*\/?>/g, '\n'); return tmp.textContent; };
