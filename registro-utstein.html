@@ -9,33 +9,44 @@
   :root {
     --text: #111; --text2: #555; --border: #999; --bg: #fff; --bg2: #f4f4f4;
     --accent: #b91c1c; --accent-bg: #fdecec;
+    /* Misma escala que index.html; nada por debajo de --fs-xs (12px) */
+    --fs-xs: 0.75rem; --fs-sm: 0.875rem; --fs-base: 1rem; --fs-lg: 1.375rem;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg2); color: var(--text); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { margin: 0; background: var(--bg2); color: var(--text); font: var(--fs-base)/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   .sheet { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 24px 28px 40px; }
-  h1 { font-size: 21px; margin: 0 0 2px; }
-  .subtitle { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .provenance { font-size: 10.5px; color: var(--text2); border-bottom: 2px solid var(--text); padding-bottom: 10px; margin-bottom: 14px; }
-  h2.sec { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; background: var(--bg2); padding: 5px 8px; margin: 18px 0 8px; }
+  h1 { font-size: var(--fs-lg); margin: 0 0 2px; }
+  .subtitle { font-size: var(--fs-sm); color: var(--text2); margin-bottom: 4px; }
+  .provenance { font-size: var(--fs-xs); color: var(--text2); border-bottom: 2px solid var(--text); padding-bottom: 10px; margin-bottom: 14px; }
+  h2.sec { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; background: var(--bg2); padding: 5px 8px; margin: 18px 0 8px; }
   .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 14px; margin-bottom: 8px; }
   .f { display: flex; flex-direction: column; gap: 2px; }
-  .f label { font-size: 10.5px; color: var(--text2); }
-  .f input, .f select, .f textarea { border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; font-size: 12.5px; font-family: inherit; background: #fff; }
+  .f label { font-size: var(--fs-sm); color: var(--text2); }
+  .f input, .f select, .f textarea { border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px; font-size: var(--fs-base); font-family: inherit; background: #fff; min-height: 40px; }
   .chkgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 4px 12px; margin-bottom: 6px; }
-  .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; }
-  .chk input { width: 14px; height: 14px; }
-  table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 8px; }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: var(--fs-base); }
+  .chk input { width: 18px; height: 18px; flex-shrink: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); margin-bottom: 8px; }
   th, td { border: 1px solid var(--border); padding: 4px; text-align: center; }
   th { background: var(--bg2); font-weight: 600; }
-  td input[type=time], td input[type=text] { width: 100%; border: none; text-align: center; font-size: 11.5px; font-family: inherit; }
-  .note { font-size: 10.5px; color: var(--text2); font-style: italic; margin: 2px 0 6px; }
-  .tile { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 4px; padding: 6px 8px; font-size: 12px; margin-bottom: 10px; }
+  td input[type=time], td input[type=text] { width: 100%; border: none; text-align: center; font-size: var(--fs-base); font-family: inherit; }
+  .note { font-size: var(--fs-xs); color: var(--text2); font-style: italic; margin: 2px 0 6px; }
+  .tile { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 4px; padding: 8px 10px; font-size: var(--fs-sm); margin-bottom: 10px; }
   textarea { width: 100%; resize: vertical; }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 4px; }
-  .actions button, .actions a.btn { border: 1px solid var(--text); background: #fff; color: var(--text); border-radius: 4px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .actions button, .actions a.btn { border: 1px solid var(--text); background: #fff; color: var(--text); border-radius: 4px; padding: 8px 14px; font-size: var(--fs-sm); min-height: 44px; cursor: pointer; text-decoration: none; }
   .actions button:hover, .actions a.btn:hover { background: var(--bg2); }
+  @media (max-width: 600px) {
+    .sheet { padding: 16px 14px 32px; }
+    table { font-size: var(--fs-xs); }
+    th, td { padding: 3px; }
+  }
   @media print {
-    body { background: #fff; }
+    /* En papel se conserva la densidad anterior para que el registro quepa igual */
+    :root { --fs-xs: 8pt; --fs-sm: 9pt; --fs-base: 9.5pt; --fs-lg: 15pt; }
+    body { background: #fff; line-height: 1.4; }
+    .f input, .f select, .f textarea { min-height: 0; padding: 3px 5px; }
+    .chk input { width: 12px; height: 12px; }
     .sheet { max-width: none; padding: 0; }
     .no-print { display: none !important; }
     h2.sec { break-inside: avoid; }
