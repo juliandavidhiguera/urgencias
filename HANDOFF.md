@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 13 | **Rama:** main | **HEAD:** `26ee707` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `53d6aca` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -10,7 +10,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 |---|---|---|---|
 | Frontend | HTML/CSS/JS vanilla, sin build ni framework | - | `index.html` (2388 lineas, monolito con CSS+JS embebidos) |
 | Datos | Modulos JS `window.X = [...]` cargados como `<script>` | - | `data/{cheatsheets,scales,formulas,protocols,drugs,infusions,intubacion,fichas,bibliografia}.js` |
-| Offline | Service Worker network-first (cache solo como respaldo sin conexion) | `CACHE = 'urg-v66'` | `sw.js` |
+| Offline | Service Worker network-first (cache solo como respaldo sin conexion) | `CACHE = 'urg-v67'` | `sw.js` |
 | PWA | Manifest | - | `manifest.json`, `icon.svg` |
 | Hosting | Cloudflare Pages, deploy automatico en push a `main` | - | (integracion nativa GitHub, sin paso de build) |
 | CI | **Ninguno.** No hay GitHub Actions en el repo (ver decision de sesion 4 continuacion 9) | - | - |
@@ -40,7 +40,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
 | `codigos/patrones iam nuevos/*.jpg` | Galeria de patrones ECG de oclusion coronaria (OMI) usada en tab codi-IAM | ESTABLE |
 | `medicamentos/*.md` (75 archivos) | Texto fuente en catalan extraido de PDF de Guies Cliniques — input de `parse_fichas.js` | ESTABLE (fuente, no se edita a mano salvo error de OCR) |
-| `sw.js` | Service worker network-first, `CACHE='urg-v66'`, precachea tambien `codigos/*.pdf`, `protocolos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
+| `sw.js` | Service worker network-first, `CACHE='urg-v67'`, precachea tambien `codigos/*.pdf`, `protocolos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
 | `Calculadora_Index_Fragil_VIG.md` | Plantilla original (catalan) del Index Fragil-VIG, trackeada como referencia | ESTABLE |
 
 ## 4. ESTADO ACTUAL - QUE FUNCIONA
@@ -57,6 +57,16 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 14 - 2026-11-01
+- Anadido: `data/protocols.js` -> `asma-crisis` y `tep-agudo` con evaluador `eval` (mismo motor que EPOC). Fuentes: Word «Asma_en_Urgencias_2026_v3.docx» y «Protocolo_TEP_Campdevanol_2026_1.docx» (Downloads)
+  - Asma: gravedad SEMES 2026 / GEMA 5.5 / ALAT-SEPAR 2025 con criterios cumplidos; tratamiento por nivel; respuesta A/B/C → alta / planta Campdevanol / traslado UCI HUV (VMNI solo puente)
+  - TEP: Wells/PERC/dimero D ajustado por edad (solo si no confirmado); PESI/sPESI/Hestia; categoria A–E AHA/ACC 2026 + modificador R + riesgo ESC 2019; enoxaparina/HNF (mL/h)/alteplasa/ACOD por peso real y ClCr; destino red Campdevanol–CHV Vic–PERT Clinic
+- Anadido: `protocolos/Flujograma_Asma_Campdevanol.pdf` (1 pag, 1,5 MB) y `Flujograma_TEP_Campdevanol.pdf` (3 pags): imagenes de los Word impresas con Chrome headless (PIL sin JPEG en este equipo). Precacheados; `sw.js` `CACHE` `urg-v67`
+- Verificado: 13 casos con node (vacio, leve→vital, A→E2); navegador local sin errores de consola ni desbordes; produccion sirve ambos ids, `urg-v67` y los 2 PDF (200)
+- Commits: `53d6aca` feat(protocolos): crisis de asma y TEP agudo con evaluador, dosis y destino Campdevanol
+- Decisiones: prednisona asma con peso REAL (SEMES dice peso ideal; tope 50 mg); TEP sPESI 0 con VD o biomarcador + → C2 (Word no lo define); C3 con ClCr <30 → HNF (Word contradice 4.2 vs tabla 6); PERC usa el item Wells «inmovilizacion/cirugia 4 sem» (mas conservador)
+- Descartado: rehacer los flujogramas desde HTML como en EPOC (se usan las imagenes de los Word tal cual)
 
 ### Sesion 13 - 2026-11-01
 - Modificado: `index.html` (solo `<style>` + 4 `style` inline de textarea/select) -> tipografia y contraste (`/impeccable` typeset: evaluacion + detector en paralelo, vista previa `preview.html` aprobada por el usuario antes de aplicar)
@@ -191,6 +201,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 14 | Consensuar los umbrales locales del protocolo EPOC (FiO2 >40 % para trasladar, tiempos de reevaluacion, VMNI como techo en planta) con la Direccion Asistencial y UCI/Neumologia de HUV | `data/protocols.js` (`epoc-agudizado`), flujograma | P2 | Usuario (reunion con HUV) | Umbrales confirmados y la nota «a consensuar» retirada del destino y del flujograma |
 | 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
+| 17 | Verificar con Vera + Perplexity las dosis de asma y TEP (no hecho, a diferencia de EPOC): alteplasa en PCR 0,3–0,5 mg/kg (ERC 2025), prednisona peso real vs ideal, hidrocortisona 250 mg, salbutamol IV, HNF en C3 con FG <30 | `data/protocols.js` (`asma-crisis`, `tep-agudo`) | P2 | - | Cada dosis con cita o discrepancia anotada en `src` |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -258,4 +269,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Abrir en el movil `https://urgencias.doctorhiguera.com/` (comprobar de paso la nueva tipografia, que no hay zoom al tocar campos y que PCR → «Registro Utstein» se abre dentro de la app con los datos y permite imprimir/descargar) → Protocolos → EPOC agudizado y pasar un caso real por el evaluador (y de paso la gasometria pegada, #12); anotar cualquier clasificacion o destino que no coincida con el juicio clinico.
+En el movil, Protocolos → «Crisis de asma (adulto)» y «TEP agudo»: pasar un caso real por cada evaluador y abrir «Ver flujograma» (PDF de asma 1,5 MB); anotar clasificaciones, dosis o destinos que no coincidan con el juicio clinico. Despues, #17 (verificacion de dosis).
