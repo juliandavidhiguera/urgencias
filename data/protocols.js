@@ -486,4 +486,374 @@ window.PROTOCOLS = [
   {type:'info', text:'Al alta: LABA+LAMA (añadir CI si hay eosinofilia; eos ≥300 → triple terapia), revisar la técnica inhalatoria, completar prednisona y antibiótico 5 días, plan escrito, tabaco y vacunas (gripe, neumococo, COVID, VRS, dTpa, zóster). AP a las 48–72 h, revisión a las 1–4 semanas y a las 12–16 semanas con FEV₁, rehabilitación en <4 semanas'}],
   src:'Protocolo SAE Hospital de Campdevànol v2.2 (oct 2026) · GOLD 2026 Report v1.3 (figs. 4.2–4.10) · Criterios de Roma: Celli 2021, AJRCCM, doi:10.1164/rccm.202108-1819PP · GesEPOC 2021 SAE: Soler-Cataluña 2022, Arch Bronconeumol 58:159 · GesEPOC 2025: Miravitlles 2025, doi:10.1016/j.arbres.2025.10.008 · Dosis de antibiótico: ATS/IDSA NAC 2019 · PMID 31573350; MAESTRAL, Wilson 2012 · PMID 22135277; antibiótico 5 días: ACP 2021 · PMID 33819054'},
 
+{id:'asma-crisis', title:'Crisis de asma (adulto)', sub:'Gravedad (SEMES 2026 · GEMA 5.5 · ALAT-SEPAR 2025), tratamiento en urgencias y destino inicial', badge:'amber', tag:'Urgente', rank:12.6,
+  flujograma:'protocolos/Flujograma_Asma_Campdevanol.pdf',
+  eval:{
+    items:[
+      {t:'h', l:'Situación inicial'},
+      {k:'anafil', t:'chk', l:'Sospecha de anafilaxia (urticaria, angioedema, hipotensión, desencadenante alérgico)'},
+      {k:'emb', t:'chk', l:'Embarazo'},
+      {k:'peso', t:'num', l:'Peso real (para las dosis)', u:'kg'},
+      {t:'h', l:'Gravedad a la llegada (antes de tratar)'},
+      {k:'habla', t:'sel', l:'Disnea y habla', o:[['Leve: habla en párrafos',0],['Moderada: habla en frases',1],['Intensa: habla en palabras',2],['Agónica: no puede hablar',3]]},
+      {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
+      {k:'fc', t:'num', l:'Frecuencia cardiaca', u:'lpm'},
+      {k:'spo2', t:'num', l:'SpO₂ con aire ambiente', u:'%'},
+      {k:'pef', t:'num', l:'PEF o FEV₁ (% del mejor personal o del teórico)', u:'%'},
+      {k:'musc', t:'sel', l:'Musculatura accesoria', o:[['Ausente',0],['Presente',1],['Muy evidente',2],['Movimiento paradójico',3]]},
+      {k:'mental', t:'sel', l:'Nivel de conciencia', o:[['Normal',0],['Agitación, somnolencia o confusión',1],['Estupor o coma',2]]},
+      {k:'silencio', t:'chk', l:'Silencio auscultatorio'},
+      {k:'fatiga', t:'chk', l:'Fatiga muscular: la FR baja sin mejoría clínica'},
+      {k:'hemo', t:'chk', l:'Hipotensión, bradicardia o arritmia'},
+      {t:'h', l:'Gasometría (si SpO₂ no mejora con tratamiento y O₂)'},
+      {k:'ph', t:'num', l:'pH', u:'7,xx'},
+      {k:'pco2', t:'num', l:'PaCO₂', u:'mmHg'},
+      {k:'po2', t:'num', l:'PaO₂ (opcional)', u:'mmHg'},
+      {t:'h', l:'Respuesta tras 1–3 h de tratamiento'},
+      {k:'pef2', t:'num', l:'PEF o FEV₁ tras el tratamiento', u:'%'},
+      {k:'spo2b', t:'num', l:'SpO₂ tras el tratamiento, sin O₂', u:'%'},
+      {k:'resc', t:'chk', l:'Sigue sintomático y necesita rescate más a menudo que cada 4 h'},
+      {k:'o2', t:'chk', l:'Necesita O₂ para mantener SpO₂ ≥93 %'},
+      {k:'persist', t:'chk', l:'Tras el tratamiento persisten FR &gt;25, FC &gt;110 o musculatura accesoria'},
+      {t:'h', l:'Factores de riesgo y entorno'},
+      {k:'rapida', t:'chk', l:'Instauración rápida (&lt;3 h)'},
+      {k:'vital', t:'chk', l:'Antecedente de crisis vital, ingreso en UCI o IOT'},
+      {k:'visitas', t:'chk', l:'≥2 visitas a urgencias u hospitalizaciones en el último año'},
+      {k:'nogci', t:'chk', l:'Sin GCI, mala adherencia o ≥3 inhaladores de SABA al año'},
+      {k:'cortiPrev', t:'chk', l:'Empeora pese a corticoide sistémico ya iniciado'},
+      {k:'comorb', t:'chk', l:'Comorbilidad cardiovascular, EPOC, edad avanzada o alergia alimentaria'},
+      {k:'compl', t:'chk', l:'Complicación: neumonía, neumotórax o neumomediastino'},
+      {k:'social', t:'chk', l:'No se garantizan el tratamiento o la vigilancia en el domicilio'}
+    ],
+    calc:function(v){
+      const has = x => !isNaN(x);
+      const out = [];
+      const datos = ['fr', 'fc', 'spo2', 'pef', 'ph', 'pco2', 'po2', 'pef2', 'spo2b'].some(k => has(v[k])) || v.habla || v.musc || v.mental ||
+        ['anafil', 'emb', 'silencio', 'fatiga', 'hemo', 'resc', 'o2', 'persist', 'compl'].some(k => v[k]);
+      if (!datos) return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, PEF y signos de gravedad: la clasificación, el tratamiento y el destino se calculan al momento. Mide el PEF antes de tratar (salvo crisis vital).'}];
+      const gas = has(v.ph) && has(v.pco2);
+      const hiperc = has(v.pco2) && v.pco2 > 45;
+      const acidemia = has(v.ph) && v.ph < 7.35;
+      const pesoOk = has(v.peso) && v.peso > 0;
+
+      /* 1. SEMES 2026 (3 niveles, orienta el tratamiento) */
+      const mg = [];
+      if (v.mental) mg.push('alteración del estado mental');
+      if (v.fatiga) mg.push('fatiga muscular');
+      if (v.silencio) mg.push('silencio auscultatorio');
+      if (v.o2 && has(v.spo2b) && v.spo2b < 90) mg.push('hipoxemia refractaria');
+      if (hiperc) mg.push('hipercapnia (PaCO₂ ' + v.pco2 + ')');
+      if (acidemia) mg.push('acidemia (pH ' + String(v.ph).replace('.', ',') + ')');
+      if (v.musc === 3) mg.push('respiración paradójica');
+      if (v.hemo) mg.push('hipotensión, bradicardia o arritmia');
+      const gr = [];
+      if (v.habla >= 2) gr.push('empeoramiento importante (habla en palabras o menos)');
+      if (has(v.pef) && v.pef < 50) gr.push('PEF &lt;50 %');
+      if (has(v.fr) && v.fr > 25) gr.push('FR &gt;25');
+      if (v.emb) gr.push('embarazo (toda crisis es grave)');
+      const ng = [has(v.pef) ? v.pef > 50 : null, has(v.fr) ? v.fr < 25 : null, has(v.spo2) ? v.spo2 > 93 : null];
+      const ngNo = [has(v.pef) && v.pef <= 50 ? 'PEF ≤50 %' : '', has(v.fr) && v.fr >= 25 ? 'FR ≥25' : '', has(v.spo2) && v.spo2 <= 93 ? 'SpO₂ ≤93 %' : ''].filter(Boolean);
+      let semes, sc, sd;
+      if (mg.length) { semes = 'MUY GRAVE'; sc = 'high'; sd = mg.join(' · '); }
+      else if (gr.length || ngNo.length) { semes = 'GRAVE'; sc = 'high'; sd = gr.concat(gr.length ? [] : ['no cumple todos los criterios de no grave: ' + ngNo.join(', ')]).join(' · '); }
+      else { const falta = ng.filter(x => x === null).length; semes = falta ? 'NO GRAVE (provisional)' : 'NO GRAVE'; sc = 'low';
+        sd = 'PEF &gt;50 %, FR &lt;25 y SpO₂ &gt;93 % con empeoramiento moderado: deben cumplirse todos' + (falta ? ' <b>Faltan ' + ['PEF', 'FR', 'SpO₂'].filter((x, i) => ng[i] === null).join(', ') + '.</b>' : ''); }
+      out.push({t:'Gravedad SEMES 2026: crisis ' + semes, c:sc, h:'<b>Criterios que cumple:</b> ' + sd + '.'});
+
+      /* 2. GEMA 5.5 (4 niveles: manda el parámetro más grave) */
+      const g = [];
+      const add = (n, txt) => g.push([n, txt]);
+      if (v.habla === 3) add(3, 'disnea agónica, no habla'); else if (v.habla === 2) add(2, 'habla en palabras'); else if (v.habla === 1) add(1, 'habla en frases');
+      if (has(v.fr)) { if (v.fatiga) add(3, 'bradipnea/fatiga'); else if (v.fr > 25) add(2, 'FR &gt;25'); else if (v.fr > 20) add(1, 'FR &gt;20'); }
+      if (has(v.fc)) { if (v.fc > 120) add(2, 'FC &gt;120'); else if (v.fc > 100) add(1, 'FC &gt;100'); }
+      if (v.hemo) add(3, 'bradicardia, hipotensión o arritmia');
+      if (v.musc === 3) add(3, 'movimiento paradójico'); else if (v.musc === 2) add(2, 'musculatura accesoria muy evidente'); else if (v.musc === 1) add(1, 'musculatura accesoria');
+      if (v.silencio) add(3, 'silencio auscultatorio');
+      if (v.mental) add(3, 'conciencia disminuida');
+      if (has(v.pef)) { if (v.pef < 50) add(2, 'PEF &lt;50 %'); else if (v.pef < 70) add(1, 'PEF &lt;70 %'); }
+      if (has(v.spo2)) { if (v.spo2 < 90) add(2, 'SaO₂ &lt;90 %'); else if (v.spo2 < 95) add(1, 'SaO₂ &lt;95 %'); }
+      if (hiperc) add(3, 'PaCO₂ &gt;45');
+      if (has(v.po2)) { if (v.po2 < 60) add(2, 'PaO₂ &lt;60'); else if (v.po2 < 80) add(1, 'PaO₂ &lt;80'); }
+      const gN = g.length ? Math.max(...g.map(x => x[0])) : 0;
+      const gName = ['LEVE', 'MODERADA', 'GRAVE', 'VITAL (riesgo vital)'][gN];
+      out.push({t:'Gravedad GEMA 5.5: crisis ' + gName, c:gN >= 2 ? 'high' : gN === 1 ? 'mid' : 'low',
+        h:g.length ? '<b>Criterios que cumple:</b> ' + [3, 2, 1].map(n => { const l = g.filter(x => x[0] === n).map(x => x[1]); return l.length ? ['', 'moderada', 'grave', 'vital'][n] + ': ' + l.join(', ') : ''; }).filter(Boolean).join(' · ') + '. Clasifica el parámetro más grave.' :
+          'Disnea leve, habla en párrafos, FC &lt;100, sin musculatura accesoria, PEF &gt;70 % y SaO₂ &gt;95 %.'});
+
+      /* 3. ALAT-SEPAR 2025 */
+      const am = [], ag = [];
+      if (v.musc === 3) am.push('respiración paradójica');
+      if (v.mental) am.push('disminución de la conciencia');
+      if (v.hemo) am.push('inestabilidad hemodinámica');
+      if (hiperc) am.push('PaCO₂ &gt;45');
+      if (has(v.ph) && v.ph < 7.30) am.push('pH &lt;7,30');
+      if (has(v.fr) && v.fr > 30) ag.push('FR &gt;30');
+      if (has(v.fc) && v.fc > 120) ag.push('FC &gt;120');
+      if (has(v.pef) && v.pef < 50) ag.push('PEF/FEV₁ &lt;50 %');
+      if (has(v.spo2) && v.spo2 < (v.emb ? 92 : 90)) ag.push('SpO₂ &lt;' + (v.emb ? '92 % (embarazo)' : '90 %'));
+      if (has(v.po2) && v.po2 < 60) ag.push('PaO₂ &lt;60');
+      if (v.habla >= 2) ag.push('habla en palabras');
+      if (v.musc >= 1 && v.musc <= 2) ag.push('musculatura accesoria');
+      const alat = am.length ? ['MUY GRAVE', 'high', am] : ag.length ? ['GRAVE', 'high', ag] : ['NO GRAVE', 'low', []];
+      out.push({t:'Gravedad ALAT-SEPAR 2025: exacerbación ' + alat[0], c:alat[1],
+        h:alat[2].length ? '<b>Criterios que cumple:</b> ' + alat[2].join(' · ') + ' (basta uno). Umbrales distintos de SEMES/GEMA (FR &gt;30, FC &gt;120, SpO₂ &lt;90 %, pH &lt;7,30).' : 'Ningún criterio de grave ni muy grave.'});
+
+      /* 4. Tratamiento en urgencias (SEMES 2026 + GEMA 5.5 + GINA 2026) */
+      const nivel = mg.length ? 3 : sc === 'high' ? 2 : 1;
+      const pd = pesoOk ? Math.min(50, Math.round(v.peso * 0.5)) + '–' + Math.min(50, Math.round(v.peso)) + ' mg' : '0,5–1 mg/kg';
+      const t = [];
+      if (v.anafil) t.push('<b>Anafilaxia primero:</b> adrenalina 0,5 mg IM (1 mg/mL) en el vasto lateral, repetible cada 5–15 min; después los broncodilatadores. Triptasa a las 0, 2 y 24 h. Shock: perfusión IV titulada (GALAXIA).');
+      const o2obj = v.emb ? '≥95 % (embarazo)' : '93–95 % (sin superar el 95 %)';
+      t.push(nivel === 1 ? '<b>O₂</b> solo si SpO₂ &lt;92 %; objetivo ' + o2obj + '.' : nivel === 2 ? '<b>O₂</b> con FiO₂ &lt;40 % → SpO₂ ' + o2obj + '.' : '<b>O₂</b> a la FiO₂ necesaria hasta el soporte ventilatorio.');
+      if (nivel === 1) t.push('<b>Salbutamol</b> MDI + cámara 4–10 inh (100 µg/inh) cada 20 min en la 1.ª hora; reevaluar tras la 1.ª dosis. Alternativa: budesonida-formoterol 160/4,5 µg (hasta 12 inh/24 h), puente a MART. Agitar el MDI antes de cada pulsación; cámara con 5–6 respiraciones a volumen corriente.');
+      else if (nivel === 2) t.push('<b>Salbutamol + ipratropio:</b> MDI + cámara 4–10 inh de salbutamol + 4–8 inh de ipratropio (20 µg/inh) cada 10–15 min en la 1.ª hora, o NEB cada 20 min: salbutamol 2,5–5 mg + ipratropio 0,5 mg.');
+      else t.push('<b>NEB continua:</b> salbutamol 10–15 mg/h + ipratropio 0,5 mg.');
+      if (nivel >= 2) t.push('<b>GCI a dosis altas en la 1.ª hora:</b> budesonida NEB 0,5 mg cada 20 min, o fluticasona propionato 2 inh × 250 µg / budesonida 4 inh × 200 µg MDI + cámara cada 10–15 min.');
+      t.push(nivel === 3 ? '<b>Hidrocortisona 250 mg IV</b> (SEMES).' :
+        nivel === 2 ? '<b>Prednisona ' + pd + ' VO</b> (0,5–1 mg/kg, máx. 50 mg; dosis matutina, 5–7 días sin descenso) o hidrocortisona 100–200 mg IV si no tolera la VO. GEMA: prednisolona 50 mg/24 h.' :
+        '<b>Corticoide sistémico</b> si no hay buena respuesta inmediata, lleva días mal, PEF &lt;60 %, instauración rápida o crisis graves previas: prednisona ' + pd + ' VO (máx. 50 mg).');
+      if (nivel >= 2) t.push((nivel === 3 ? '<b>Ya, sin esperar:</b> ' : '<b>Si no mejora en 1 h</b> (hipoxemia persistente o PEF &lt;60 %): ') + '<b>sulfato de magnesio 2 g IV</b> en 50–100 mL de SSF en 20 min, dosis única (reflejos, PA, FR; ajustar con IR grave). Después, <b>salbutamol IV 200 µg en 30 min → 0,1–0,2 µg/kg/min</b>' + (pesoOk ? ' (' + (v.peso * 0.1).toFixed(0) + '–' + (v.peso * 0.2).toFixed(0) + ' µg/min)' : '') + ' con ECG, K⁺ y lactato. Mg²⁺ nebulizado no recomendado de rutina.');
+      if (nivel === 3) t.push('<b>Preparar la IOT</b> y avisar a la UCI de HUV. VMI: Vt 6–8 mL/kg de peso ideal, FR 10–12, I:E 1:3–1:5, PEEP 0, Pplat &lt;30; hipercapnia permisiva con pH &gt;7,20.');
+      else if (nivel === 2) t.push('<b>Soporte:</b> VMNI solo como puente en el box (IPAP 8 subiendo, EPAP 4–6, I:E 1:4–1:5) si persisten FR &gt;25, FC &gt;110, musculatura accesoria o PEF &lt;50 % con PaO₂/FiO₂ &gt;200 y PaCO₂ &lt;60. OAF: sin evidencia sólida, solo puente ante hipoxemia. Nunca retrasar la IOT.');
+      t.push('<b>Pruebas:</b> PEF seriado' + (nivel >= 2 ? ', gasometría si SpO₂ no mejora, K⁺ y lactato (β2 a dosis altas)' : '') + '. Rx/ecografía si evolución atípica (neumotórax, neumonía). Disnea sin caída del PEF → descartar TEP (dímero D), IC (NT-proBNP) y obstrucción laríngea inducible. Taquipnea creciente pese a SABA → lactato: <b>más SABA no siempre es mejor</b>.');
+      out.push({t:'Tratamiento en urgencias (' + ['', 'no grave', 'grave', 'muy grave'][nivel] + ')', c:'', h:t.map(x => '• ' + x).join('<br>')});
+
+      /* 5. Respuesta y destino (flujograma Campdevànol → HUV) */
+      const fr = [v.rapida ? 'instauración rápida' : '', v.vital ? 'crisis vital/UCI previa' : '', v.visitas ? 'visitas o ingresos frecuentes' : '', v.nogci ? 'sin GCI o abuso de SABA' : '',
+        v.cortiPrev ? 'empeora con corticoide ya iniciado' : '', v.comorb ? 'comorbilidad o edad avanzada' : ''].filter(Boolean);
+      let dest, dc, resp = '';
+      const pef2 = has(v.pef2) ? v.pef2 : NaN;
+      const uciCrit = nivel === 3 || (has(v.spo2b) && v.spo2b < 90 && v.o2) || hiperc || acidemia;
+      if (uciCrit) {
+        resp = 'C · mala respuesta o crisis vital';
+        dest = '<b>Traslado a la UCI de HUV.</b> ¿Criterios de IOT (conciencia ↓, agitación, PaO₂/FiO₂ &lt;200, PaCO₂ &gt;60, inestabilidad)? <b>Sí</b> → IOT y traslado. <b>No</b> → avisar a HUV al iniciar la VMNI y trasladar con VMNI. Circuito: llamada médico a médico → SEM con SVA → mantener NEB/VMNI → informe con PEF, gasometrías, dosis y hora del corticoide.';
+        dc = 'high';
+      } else if (!has(pef2) && !v.resc && !v.o2 && !v.persist && !has(v.spo2b)) {
+        dest = 'Reevaluar con PEF, SpO₂ y clínica: ' + (nivel === 1 ? 'cada 30 min, decidir en ~1 h' : 'de forma continua, decidir en ~3 h') + '. Introduce la respuesta al tratamiento para calcular el destino.';
+        dc = '';
+      } else {
+        const malo = (has(pef2) && pef2 < 40) || (has(v.pef) && v.pef < 25) || v.persist;
+        const bueno = has(pef2) && pef2 > 60 && !v.persist && !v.resc && !v.o2 && (!has(v.spo2b) || v.spo2b > 93);
+        if (malo) { resp = 'C · mala respuesta (' + [has(pef2) && pef2 < 40 ? 'PEF &lt;40 % tras tratar' : '', has(v.pef) && v.pef < 25 ? 'PEF &lt;25 % a la llegada' : '', v.persist ? 'persisten FR &gt;25, FC &gt;110 o tiraje' : ''].filter(Boolean).join(', ') + ')'; dest = 'Intensificar: Mg IV, salbutamol IV, <b>VMNI en el box solo como PUENTE</b> y <b>traslado a la UCI de HUV</b> (SEMES: cualquier soporte ventilatorio = UCI).'; dc = 'high'; }
+        else if (bueno) {
+          resp = 'A · buena respuesta (PEF ' + pef2 + ' %' + (pef2 < 70 ? ', zona gris GEMA 50–70 %' : '') + ')';
+          const alta = !v.social && !v.compl && !fr.length && !v.emb;
+          dest = alta ? '<b>Alta</b> tras 1 h más sin broncodilatador para comprobar la estabilidad: tolera el decúbito, SpO₂ basal &gt;93 %, entiende el plan de acción.' :
+            '<b>Ingreso en planta (Campdevànol)</b> o alta muy individualizada: ' + [fr.length ? 'factores de riesgo (' + fr.join(', ') + ')' : '', v.social ? 'sin garantía de tratamiento/vigilancia en domicilio' : '', v.compl ? 'complicación' : '', v.emb ? 'embarazo' : ''].filter(Boolean).join(' · ') + '.';
+          dc = alta ? 'low' : 'mid';
+        } else {
+          resp = 'B · respuesta incompleta' + (has(pef2) ? ' (PEF ' + pef2 + ' %)' : '');
+          dest = 'Intensificar (salbutamol + ipratropio, GCI a dosis altas, corticoide sistémico; Mg IV si hipoxemia o PEF &lt;60 % tras 1 h; gasometría si SpO₂ &lt;92 %). ¿Mejora en 2–3 h, sin hipercapnia y con SpO₂ ≥93 % con O₂ convencional? <b>Sí → ingreso en planta (Campdevànol)</b>: PEF y SpO₂ cada 4–6 h. <b>No → pasar a C</b> (traslado a HUV).';
+          dc = 'mid';
+        }
+      }
+      if (v.compl && dc !== 'high') dest += '<br>Complicación (neumonía, neumotórax, neumomediastino): mínimo ingreso; traslado si compromiso o neumotórax que precisa drenaje sin recursos.';
+      out.push({t:'Respuesta y destino inicial' + (resp ? ': ' + resp : ''), c:dc, h:dest +
+        (fr.length ? '<br>Factores de riesgo de mala evolución: ' + fr.join(' · ') + '.' : '') +
+        '<br><b>Al alta:</b> todo paciente se va con GCI; MART preferente (budesonida-formoterol 160/4,5 µg 1–2 inh/12 h + 1 a demanda, máx. 12 inh/24 h); prednisona ' + pd + ' 5–7 días; técnica inhalatoria y plan escrito; AP en ~7 días; Neumología/Alergología en &lt;2 semanas si crisis vital, embarazo o anafilaxia.' +
+        '<br><span class="pe-nota">Circuito local (sin observación monitorizada ni UCI en Campdevànol) pendiente de consenso con la Dirección Asistencial y la UCI de HUV.</span>'});
+      return out;
+    }
+  },
+  steps:[
+  {type:'info', text:'Recursos locales (Hospital de Campdevànol): VMNI en el box solo como puente y OAF (evidencia limitada en asma). Sin observación con monitorización continua ni UCI. Centro de referencia: Hospital Universitari de Vic (HUV)'},
+  {type:'action', text:'LLEGADA (primeros 15 min): SpO₂, FR, FC, PA, conciencia, capacidad para hablar, musculatura accesoria. PEF o FEV₁ antes de tratar (salvo crisis vital): mejor de 3 intentos, mismo medidor'},
+  {type:'decision', text:'¿Anafilaxia? (urticaria, angioedema, hipotensión, desencadenante alérgico)', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'Adrenalina 0,5 mg IM en el vasto lateral (repetible cada 5–15 min) PRIMERO, broncodilatadores después. Triptasa a las 0, 2 y 24 h'},
+  {type:'decision', text:'¿Crisis vital (muy grave)? Somnolencia/confusión, fatiga (FR que baja), silencio auscultatorio, paradójica, bradicardia/hipotensión, SpO₂ <90 % con O₂, PaCO₂ ≥45 o acidemia', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'O₂ + salbutamol 10–15 mg/h NEB continua + ipratropio 0,5 mg · hidrocortisona 250 mg IV · Mg 2 g IV · preparar IOT y avisar a la UCI de HUV'},
+  {type:'action', branch:'no', text:'Gravedad SEMES 2026: NO GRAVE si PEF >50 %, FR <25 y SpO₂ >93 % · GRAVE si PEF <50 %, FR >25, habla en palabras o embarazo'},
+  {type:'action', text:'O₂ solo si SpO₂ <92 %; objetivo 93–95 % (gestante ≥95 %). No grave: salbutamol MDI + cámara 4–10 inh cada 20 min la 1.ª hora. Grave: + ipratropio, GCI a dosis altas y prednisona 0,5–1 mg/kg (máx. 50 mg) VO'},
+  {type:'action', text:'Descartar causa alternativa o añadida: neumotórax/neumomediastino, neumonía, TEP (disnea sin caída del PEF), IC, obstrucción laríngea inducible, acidosis láctica por β2'},
+  {type:'decision', text:'Reevaluar (no grave cada 30 min, decidir en ~1 h; grave de forma continua, decidir en ~3 h): ¿respuesta?', yes:'A buena', no:'B / C'},
+  {type:'action', branch:'yes', text:'A · PEF >60–70 %, SpO₂ >93 % sin O₂, asintomático: 1 h más sin broncodilatador → ALTA si estable, sin factores de riesgo y con apoyo; si no, PLANTA'},
+  {type:'action', branch:'no', text:'B · PEF 40–60 %, rescate < cada 4 h, O₂ para SpO₂ ≥93 %: intensificar + Mg 2 g IV en 20 min → si mejora en 2–3 h → PLANTA; si no → C'},
+  {type:'action', branch:'no', text:'C · PEF <40 % (o <25 % a la llegada), FR >25, FC >110, musculatura accesoria, hipercapnia: Mg IV, salbutamol IV 200 µg en 30 min → 0,1–0,2 µg/kg/min, VMNI como PUENTE → TRASLADO A UCI DE HUV'},
+  {type:'info', text:'Traslado a HUV: necesidad de VMNI/VMI o soporte hemodinámico, parada respiratoria, disminución de conciencia, deterioro pese al tratamiento, SpO₂ <90 % con O₂, PaCO₂ >45 o acidemia, neumotórax con compromiso, anafilaxia refractaria. Llamada médico a médico → SEM con SVA'},
+  {type:'info', text:'Al alta: siempre con GCI (MART preferente), prednisona 0,5–1 mg/kg (máx. 50 mg) 5–7 días sin descenso, técnica inhalatoria y plan escrito, AP en ~7 días, Neumología/Alergología <2 semanas si crisis vital, embarazo o anafilaxia. Vacunas: gripe, neumococo, COVID-19; VRS ≥65 años'}],
+  src:'Protocolo Asma en Urgencias Hospital de Campdevànol v3.0 (nov 2026) · GEMA 5.5 (2025) · GINA 2026 · SEMES/REUE 2026: Piñera Salmerón P, Rev Esp Urg Emerg 2026;5:134-43, doi:10.55633/s3me/REUE014.2026 · ALAT-SEPAR 2025: Stok AM, Open Respir Arch 2025;7:100469, doi:10.1016/j.opresp.2025.100469 · Mg IV: Kew 2014, Cochrane CD010909 · GALAXIA 2022'},
+
+{id:'tep-agudo', title:'TEP agudo', sub:'Probabilidad, categoría A–E (AHA/ACC 2026) y riesgo ESC 2019, anticoagulación, fibrinólisis y destino', badge:'red', tag:'Crítico', rank:12.7,
+  flujograma:'protocolos/Flujograma_TEP_Campdevanol.pdf',
+  eval:{
+    items:[
+      {t:'h', l:'Hemodinámica'},
+      {k:'hemo', t:'sel', l:'Situación hemodinámica', o:[['Estable (PAS ≥90 sin vasopresores)',0],['Hipotensión transitoria que responde a fluidos',1],['Hipotensión persistente o recurrente / shock cardiogénico',2],['Shock refractario o PCR',3]]},
+      {k:'lact', t:'num', l:'Lactato', u:'mmol/L'},
+      {k:'olig', t:'chk', l:'Oliguria o lesión renal aguda'},
+      {k:'mental', t:'chk', l:'Alteración del estado mental'},
+      {k:'pam', t:'num', l:'PAM', u:'mmHg'},
+      {k:'resp', t:'chk', l:'Compromiso respiratorio: hipoxemia, FiO₂ creciente o trabajo respiratorio (modificador R)'},
+      {t:'h', l:'Probabilidad clínica — Wells (si aún no está confirmado)'},
+      {k:'wTvp', t:'chk', l:'Signos clínicos de TVP'},
+      {k:'wAlt', t:'chk', l:'Diagnóstico alternativo menos probable que TEP'},
+      {k:'wInm', t:'chk', l:'Inmovilización ≥3 días o cirugía/traumatismo en las 4 semanas previas'},
+      {k:'wPrev', t:'chk', l:'TVP o TEP previo'},
+      {k:'wHemop', t:'chk', l:'Hemoptisis'},
+      {k:'estrog', t:'chk', l:'Estrógenos u hormonas (solo PERC)'},
+      {k:'dd', t:'num', l:'Dímero D', u:'µg/L FEU'},
+      {t:'h', l:'Gravedad — PESI / sPESI'},
+      {k:'edad', t:'num', l:'Edad', u:'años'},
+      {k:'varon', t:'chk', l:'Sexo masculino'},
+      {k:'cancer', t:'chk', l:'Cáncer activo'},
+      {k:'ic', t:'chk', l:'Insuficiencia cardiaca crónica'},
+      {k:'epc', t:'chk', l:'Enfermedad pulmonar crónica'},
+      {k:'fc', t:'num', l:'Frecuencia cardiaca', u:'lpm'},
+      {k:'pas', t:'num', l:'PAS', u:'mmHg'},
+      {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
+      {k:'temp', t:'num', l:'Temperatura', u:'°C'},
+      {k:'spo2', t:'num', l:'SpO₂ con aire ambiente', u:'%'},
+      {t:'h', l:'Ventrículo derecho y biomarcadores (TEP confirmado)'},
+      {k:'conf', t:'chk', l:'TEP confirmado por angio-TC (o TVP proximal en ecografía con sospecha de TEP)'},
+      {k:'incid', t:'chk', l:'TEP incidental asintomático'},
+      {k:'vd', t:'chk', l:'VD alterado: VD/VI ≥1,0 en angio-TC o criterio POCUS (septo en D, TAPSE &lt;16, McConnell)'},
+      {k:'trop', t:'chk', l:'Troponina hs &gt; p99 del laboratorio'},
+      {k:'bnp', t:'num', l:'NT-proBNP', u:'pg/mL'},
+      {t:'h', l:'Hestia, dosis y lisis'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'clcr', t:'num', l:'Aclaramiento de creatinina', u:'mL/min'},
+      {k:'sangr', t:'chk', l:'Sangrado activo o alto riesgo de sangrado'},
+      {k:'ciLisis', t:'chk', l:'Contraindicación ABSOLUTA de fibrinólisis (ictus hemorrágico o desconocido, isquémico &lt;6 m, neoplasia SNC, trauma/cirugía/TCE &lt;3 sem, diátesis, sangrado activo, disección)'},
+      {k:'o2dia', t:'chk', l:'Necesitará O₂ &gt;24 h para SpO₂ &gt;90 %'},
+      {k:'enAco', t:'chk', l:'TEP diagnosticado durante anticoagulación'},
+      {k:'dolor', t:'chk', l:'Dolor que requiere analgesia IV &gt;24 h'},
+      {k:'social', t:'chk', l:'Razón médica o social para ingreso &gt;24 h'},
+      {k:'hepat', t:'chk', l:'Insuficiencia hepática grave'},
+      {k:'emb', t:'chk', l:'Embarazo'},
+      {k:'tih', t:'chk', l:'Antecedente de trombocitopenia inducida por heparina'}
+    ],
+    calc:function(v){
+      const has = x => !isNaN(x);
+      const out = [];
+      const any = Object.keys(v).some(k => v[k] === true || (k !== 'hemo' && typeof v[k] === 'number' && has(v[k])) || (k === 'hemo' && v[k] > 0));
+      if (!any) return [{t:'Introduce los datos del paciente', c:'', h:'Hemodinámica, Wells/PERC y dímero D si aún se sospecha; PESI, VD y biomarcadores si ya está confirmado. La categoría A–E, el tratamiento y el destino se calculan al momento.'}];
+      const pesoOk = has(v.peso) && v.peso > 0;
+      const P = n => pesoOk ? Math.round(v.peso * n) : null;
+      const fc = has(v.fc) ? v.fc : NaN;
+
+      /* 1. Probabilidad clínica (solo si no está confirmado) */
+      if (!v.conf && !v.incid && v.hemo < 2) {
+        const w = (v.wTvp ? 3 : 0) + (v.wAlt ? 3 : 0) + (has(fc) && fc > 100 ? 1.5 : 0) + (v.wInm ? 1.5 : 0) + (v.wPrev ? 1.5 : 0) + (v.wHemop ? 1 : 0) + (v.cancer ? 1 : 0);
+        const w3 = w < 2 ? 'baja' : w <= 6 ? 'intermedia' : 'alta';
+        const perc = [has(v.edad) ? v.edad >= 50 : null, has(fc) ? fc >= 100 : null, has(v.spo2) ? v.spo2 < 95 : null, v.wTvp, v.wHemop, v.wInm, v.wPrev, v.estrog];
+        const percPos = perc.filter(x => x === true).length, percFalta = perc.filter(x => x === null).length;
+        const corte = has(v.edad) && v.edad > 50 ? v.edad * 10 : 500;
+        let conducta;
+        if (w > 6) conducta = '<b>Probabilidad alta → angio-TC directo, sin dímero D.</b> Si hay demora de imagen y el riesgo hemorrágico es aceptable: HBPM empírica.';
+        else if (w < 2 && percPos === 0 && percFalta === 0) conducta = '<b>PERC 8/8 negativos → TEP descartado</b> sin dímero D.';
+        else if (has(v.dd)) conducta = v.dd < corte ? '<b>Dímero D ' + v.dd + ' &lt; ' + corte + ' µg/L (ajustado por edad) → TEP descartado.</b>' : '<b>Dímero D ' + v.dd + ' ≥ ' + corte + ' µg/L → angio-TC</b> (informe con cociente VD/VI).';
+        else conducta = (w < 2 ? 'PERC ' + (percFalta ? 'incompleto (faltan edad, FC o SpO₂)' : 'positivo (' + percPos + ' criterio/s)') + ' → ' : '') + '<b>dímero D</b> con corte ajustado por edad: ' + corte + ' µg/L FEU.';
+        out.push({t:'Probabilidad clínica (Wells ' + String(w).replace('.', ',') + '): ' + w3.toUpperCase() + ' · ' + (w <= 4 ? 'TEP improbable' : 'TEP probable'), c:w > 6 ? 'high' : w >= 2 ? 'mid' : 'low',
+          h:conducta + '<br><span class="pe-nota">PERC solo con probabilidad baja. El dímero D pierde utilidad con anticoagulación, cáncer, embarazo, infección, hospitalización o edad avanzada. YEARS es alternativa (0 ítems + DD &lt;1000; ≥1 ítem + DD &lt;500).</span>'});
+      }
+
+      /* 2. PESI, sPESI y Hestia (solo con TEP confirmado o inestable) */
+      const confirmado = v.conf || v.incid || v.hemo > 0;
+      const pesiOk = has(v.edad);
+      const pesi = pesiOk ? v.edad + (v.varon ? 10 : 0) + (v.cancer ? 30 : 0) + (v.ic ? 10 : 0) + (v.epc ? 10 : 0) + (has(fc) && fc >= 110 ? 20 : 0) +
+        (has(v.pas) && v.pas < 100 ? 30 : 0) + (has(v.fr) && v.fr >= 30 ? 20 : 0) + (has(v.temp) && v.temp < 36 ? 20 : 0) + (v.mental ? 60 : 0) + (has(v.spo2) && v.spo2 < 90 ? 20 : 0) : NaN;
+      const pesiCl = !pesiOk ? null : pesi <= 65 ? 'I' : pesi <= 85 ? 'II' : pesi <= 105 ? 'III' : pesi <= 125 ? 'IV' : 'V';
+      const spesiItems = [has(v.edad) && v.edad > 80 ? 'edad &gt;80' : '', v.cancer ? 'cáncer' : '', v.ic || v.epc ? 'enfermedad cardiopulmonar crónica' : '', has(fc) && fc >= 110 ? 'FC ≥110' : '', has(v.pas) && v.pas < 100 ? 'PAS &lt;100' : '', has(v.spo2) && v.spo2 < 90 ? 'SpO₂ &lt;90 %' : ''].filter(Boolean);
+      const spesi = spesiItems.length;
+      const hestia = [v.hemo > 0 ? 'inestabilidad hemodinámica' : '', v.hemo >= 2 ? 'necesita trombólisis' : '', v.sangr ? 'sangrado o alto riesgo' : '', v.o2dia ? 'O₂ &gt;24 h' : '', v.enAco ? 'TEP con anticoagulación' : '', v.dolor ? 'analgesia IV &gt;24 h' : '',
+        v.social ? 'razón médica/social' : '', has(v.clcr) && v.clcr < 30 ? 'ClCr &lt;30' : '', v.hepat ? 'insuficiencia hepática grave' : '', v.emb ? 'embarazo' : '', v.tih ? 'TIH previa' : ''].filter(Boolean);
+      const bajoEscala = (pesiOk ? (pesiCl === 'I' || pesiCl === 'II') : true) && spesi === 0;
+      if (confirmado) out.push({t:'Escalas: ' + (pesiOk ? 'PESI ' + pesi + ' (clase ' + pesiCl + ')' : 'PESI sin edad') + ' · sPESI ' + spesi + ' · Hestia ' + hestia.length, c:bajoEscala && !hestia.length ? 'low' : 'mid',
+        h:(pesiOk ? 'Mortalidad a 30 d PESI clase ' + pesiCl + ': ' + {I:'0–1,6 %', II:'1,7–3,5 %', III:'3,2–7,1 %', IV:'4,0–11,4 %', V:'10,0–24,5 %'}[pesiCl] + '. ' : '') +
+          'sPESI ' + (spesi ? '≥1 (' + spesiItems.join(', ') + '): riesgo no bajo (≈10,9 %)' : '0: bajo riesgo (≈1 %)') + '. ' +
+          'Hestia ' + (hestia.length ? 'positivo (' + hestia.join(', ') + '): no tratar en domicilio' : '0: candidato a tratamiento ambulatorio si el resto lo permite') + '.'});
+
+      /* 3. Categoría A–E (AHA/ACC 2026) y riesgo ESC 2019 */
+      const bnpPos = has(v.bnp) && v.bnp >= 600;
+      const bio = [v.trop ? 'troponina +' : '', bnpPos ? 'NT-proBNP ≥600' : ''].filter(Boolean);
+      const shockN = [has(v.lact) && v.lact > 2 ? 'lactato &gt;2' : '', v.olig ? 'oliguria/LRA' : '', v.mental ? 'alteración mental' : '', has(v.pam) && v.pam < 60 ? 'PAM &lt;60' : ''].filter(Boolean);
+      let cat, cc, why;
+      if (v.hemo === 3) { cat = 'E2'; cc = 'high'; why = 'shock refractario o PCR'; }
+      else if (v.hemo === 2) { cat = 'E1'; cc = 'high'; why = 'hipotensión persistente o shock cardiogénico'; }
+      else if (shockN.length && v.hemo === 0) { cat = 'D2'; cc = 'high'; why = 'shock normotenso: PAS ≥90 + ' + shockN.join(', '); }
+      else if (v.hemo === 1) { cat = 'D1'; cc = 'high'; why = 'hipotensión transitoria que responde a fluidos' + (shockN.length ? ' (con ' + shockN.join(', ') + ': valorar D2)' : ''); }
+      else if (!v.conf && !v.incid) { cat = null; }
+      else if (v.vd && bio.length) { cat = 'C3'; cc = 'high'; why = 'VD alterado + ' + bio.join(' y '); }
+      else if (v.vd || bio.length) { cat = 'C2'; cc = 'mid'; why = (v.vd ? 'VD alterado' : bio.join(' y ')) + (bajoEscala ? ' con escala baja (el protocolo no define este caso: se clasifica como C2, en línea con Barco 2019)' : ' + escala elevada'); }
+      else if (v.incid && !v.resp) { cat = 'A'; cc = 'low'; why = 'TEP incidental asintomático'; }
+      else if (!bajoEscala) { cat = 'C1'; cc = 'mid'; why = (pesiOk && !(pesiCl === 'I' || pesiCl === 'II') ? 'PESI ' + pesiCl : '') + (spesi ? (pesiOk && !(pesiCl === 'I' || pesiCl === 'II') ? ' · ' : '') + 'sPESI ' + spesi : '') + ' con VD y biomarcadores normales'; }
+      else { cat = 'B'; cc = 'low'; why = 'PESI I–II / sPESI 0, VD y biomarcadores normales' + (hestia.length ? ' (Hestia positivo: no apto para alta precoz)' : ''); }
+      const vdFalta = v.conf && cat && /^[BC]/.test(cat) && (!v.vd && !v.trop && !has(v.bnp));
+      if (cat) {
+        let esc;
+        if (v.hemo >= 2) esc = 'ALTO';
+        else if (!bajoEscala) esc = v.vd && v.trop ? 'INTERMEDIO-ALTO (VD + troponina)' : 'INTERMEDIO-BAJO';
+        else esc = v.vd || v.trop ? 'INTERMEDIO-BAJO (escala baja con VD o troponina alterados)' : 'BAJO';
+        out.push({t:'Categoría AHA/ACC 2026: ' + cat + (v.resp ? ' + R' : '') + ' · Riesgo ESC 2019: ' + esc.split(' (')[0], c:cc,
+          h:'<b>Criterios:</b> ' + why + '.' + (v.resp ? ' <b>Modificador R:</b> compromiso respiratorio → más vigilancia aunque la categoría sea baja.' : '') +
+            '<br><b>ESC 2019:</b> riesgo ' + esc + '.' + (/^D/.test(cat) ? ' ESC solo llama «alto» a la hipotensión persistente o el shock obstructivo; la categoría D de la AHA marca la urgencia aunque el riesgo ESC salga menor.' : '') + (cat === 'C3' && !v.trop ? ' C3 ≠ intermedio-alto ESC (ESC exige VD + troponina): documentar ambos.' : '') +
+            (vdFalta ? '<br><b>Faltan VD/VI y biomarcadores</b> (troponina, NT-proBNP, lactato) antes de categorizar.' : '')});
+      }
+
+      /* 4. Tratamiento */
+      const t = [];
+      const renal = has(v.clcr) ? v.clcr : NaN;
+      const enox = pesoOk ? P(1) + ' mg' : '1 mg/kg';
+      const enoxTxt = has(renal) && renal < 15 ? 'ClCr &lt;15: <b>HNF</b> (HBPM contraindicada)' : has(renal) && renal < 30 ? '<b>Enoxaparina ' + enox + ' SC cada 24 h</b> (ClCr 15–30)' : '<b>Enoxaparina ' + enox + ' SC cada 12 h</b>';
+      const hnf = '<b>HNF</b> bolo 80 U/kg' + (pesoOk ? ' (' + P(80) + ' U)' : '') + ' IV + perfusión 18 U/kg/h' + (pesoOk ? ' (' + P(18) + ' U/h = ' + (v.peso * 0.18).toFixed(1).replace('.', ',') + ' mL/h con 25.000 U en 250 mL)' : '') + '; TTPa a las 6 h y tras cada cambio (≈1,5–2,5 × control)';
+      if (v.tih) t.push('<b>TIH previa:</b> evitar HNF y HBPM → anticoagulante no heparínico.');
+      if (v.sangr && cat !== 'E1' && cat !== 'E2') t.push('<b>Sangrado activo / contraindicación absoluta de anticoagular:</b> no anticoagular; filtro de VCI recuperable en casos seleccionados y reevaluar a diario.');
+      const wells = (v.wTvp ? 3 : 0) + (v.wAlt ? 3 : 0) + (has(fc) && fc > 100 ? 1.5 : 0) + (v.wInm ? 1.5 : 0) + (v.wPrev ? 1.5 : 0) + (v.wHemop ? 1 : 0) + (v.cancer ? 1 : 0);
+      if (!confirmado) { if (wells > 6) t.push('Probabilidad alta: si hay demora de imagen y el riesgo hemorrágico es aceptable, ' + enoxTxt + ' empírica.'); else if (wells > 4) t.push('TEP probable: si la imagen se va a demorar, valorar anticoagulación empírica (' + enoxTxt + ') según el riesgo hemorrágico.'); }
+      if (cat === 'E1' || cat === 'E2') {
+        const alt = pesoOk && v.peso < 65 ? 'total máx. ' + Math.round(v.peso * 1.5) + ' mg (1,5 mg/kg, bolo incluido): 10 mg en bolo + ' + (Math.round(v.peso * 1.5) - 10) + ' mg en 2 h' : '100 mg IV en 2 h: 10 mg en bolo (1–2 min) + 90 mg en 2 h' + (pesoOk ? '' : ' (&lt;65 kg: máx. 1,5 mg/kg total)');
+        t.push(hnf.replace(' + perfusión', ' en cuanto se sospecha; perfusión') + '.');
+        t.push(v.ciLisis ? '<b>Contraindicación absoluta → PERT del Clínic de inmediato</b> (catéter, embolectomía, ECMO-VA).' :
+          cat === 'E2' && v.hemo === 3 ? '<b>Alteplasa</b> — en PCR: 0,3–0,5 mg/kg' + (pesoOk ? ' (' + Math.min(50, P(0.3)) + '–' + Math.min(50, P(0.5)) + ' mg)' : '') + ', máx. 50 mg, IV en 2 min, repetible a los 15 min sin ROSC; RCP 60–90 min tras la lisis (ERC 2025). Shock refractario con pulso: pauta estándar ' + alt + '.' :
+          '<b>Alteplasa estándar:</b> ' + alt + '. Acelerada solo en inestabilidad extrema (fuera de ficha): 0,6 mg/kg' + (pesoOk ? ' (' + Math.min(50, P(0.6)) + ' mg)' : '') + ' en 15 min, máx. 50 mg.');
+        if (!v.ciLisis) t.push('<b>Parar la HNF durante la alteplasa</b> (criterio CHV; ESC permite mantenerla); al terminar, TTPa cada 2–4 h y reiniciar sin bolo cuando TTPa &lt;2 × LSN. Contraindicaciones relativas: se individualizan.');
+      } else if (cat === 'D1' || cat === 'D2') {
+        t.push(has(renal) && renal < 30 ? hnf + ' (FG &lt;30).' : enoxTxt + ' por defecto. Si se prevé reperfusión o procedimiento: ' + hnf + '.');
+      } else if (cat === 'C3') t.push((has(renal) && renal < 30 ? hnf + ' (FG &lt;30).' : enoxTxt + '; ' + hnf.replace('<b>HNF</b>', 'HNF') + ' si se prevé procedimiento.') + ' Reperfusión no rutinaria. Paso a ACOD tras 2–3 días de anticoagulación parenteral si está estable.');
+      else if (cat === 'C1' || cat === 'C2') t.push(enoxTxt + ' → ACOD a las 24–48 h si está estable y sin procedimiento previsto.');
+      else if (cat === 'A' || cat === 'B') t.push('<b>ACOD:</b> apixabán 10 mg/12 h VO × 7 días → 5 mg/12 h, o rivaroxabán 15 mg/12 h VO × 21 días → 20 mg/24 h con comida' + (has(renal) && renal < 15 ? ' (<b>ClCr &lt;15: evitar rivaroxabán</b>)' : '') + '.');
+      if (v.emb) t.push('<b>Embarazo:</b> HBPM o HNF; ACOD y AVK no recomendados.');
+      if (v.cancer && cat && !/^E/.test(cat)) t.push('<b>Cáncer activo:</b> ACOD o HBPM individualizados (localización, riesgo GI/GU, interacciones).');
+      if (cat && /^[DE]/.test(cat)) t.push('<b>Soporte:</b> cristaloide ≤500 mL en 15–30 min solo sin congestión · noradrenalina 0,05–0,1 µg/kg/min' + (pesoOk ? ' (' + (v.peso * 0.05).toFixed(1).replace('.', ',') + '–' + (v.peso * 0.1).toFixed(1).replace('.', ',') + ' µg/min)' : '') + ' si PAM &lt;65, titular sin techo fijo · dobutamina 2–10 µg/kg/min si bajo gasto con PA conservada · O₂ para SpO₂ ≥90 %; evitar la IOT (si es imprescindible: ketamina/etomidato, vasopresor en marcha, Vt 6 mL/kg, PEEP baja).');
+      if (confirmado) t.push('<b>Siempre:</b> anticoagulación ≥3 meses. Hemograma, creatinina/FG (CKD-EPI), coagulación y perfil hepático' + (cat && /^[DE]/.test(cat) ? '; grupo y pruebas cruzadas' : '') + '.');
+      if (t.length) out.push({t:'Tratamiento' + (cat ? ' (' + cat + ')' : ''), c:'', h:t.map(x => '• ' + x).join('<br>') + (pesoOk ? '' : '<br><span class="pe-nota">Introduce el peso real para calcular las dosis.</span>')});
+
+      /* 5. Destino (red Campdevànol – CHV Vic – PERT Clínic) */
+      const dest = {
+        A:'<b>Ambulatorio</b> con ACOD.',
+        B:hestia.length ? '<b>Ingreso en planta (Campdevànol)</b>: Hestia positivo.' : '<b>Alta precoz u observación corta.</b> Requisitos: estable, bajo riesgo hemorrágico, sin barreras sociales, anticoagulante disponible y comprendido, control a las 48 h–7 días.',
+        C1:'<b>Planta Campdevànol.</b> PERT recomendable (AHA 2026: PERT en C–E).',
+        C2:'<b>Planta Campdevànol</b> con NEWS2 cada 4 h. PERT recomendable.',
+        C3:'<b>Observación de urgencias con monitor</b> → planta solo con estabilidad confirmada (no por plazo fijo); NEWS2 cada 2 h; troponina/lactato a las 6–12 h. <b>PERT obligado</b> (clase 1). Traslado precoz a Vic si no hay box monitorizado o la tendencia empeora. <i>Discrepancia abierta: traslado precoz de todo C3 estable, pendiente de acuerdo de red.</i>',
+        D1:'<b>Llamar al PERT del Clínic en ≤30 min</b> → Clínic o Medicina Interna monitorizada de Vic. Si no es candidato: guardia del CHV. Ningún D sale sin anticoagulación parenteral en curso. Si pasa a E: fibrinólisis local antes del traslado.',
+        D2:'<b>PERT del Clínic en ≤30 min + UCI de Vic</b> → Clínic o UCI Vic. Si pasa a E: fibrinólisis local antes del traslado.',
+        E1:'<b>Fibrinólisis en Campdevànol sin esperar traslado.</b> Llamada simultánea a PERT Clínic + UCI Vic (no retrasa la lisis). <b>No trasladar antes de estabilizar</b> (AHA 2026, clase 3: daño). Post-lisis: PERT decide Clínic (SEM 061, SVA); si no → UCI Vic.',
+        E2:'<b>Fibrinólisis en Campdevànol sin esperar traslado</b> (en PCR con sospecha fundada, sin imagen). PERT Clínic + UCI Vic de inmediato. No trasladar antes de estabilizar.'
+      };
+      if (cat) {
+        let d = dest[cat];
+        const extra = [];
+        if (/^[ABC]/.test(cat)) extra.push('Traslado a Vic al margen de la categoría: arritmia significativa · hipoxemia que no se controla con Ventimask/reservorio con deterioro rápido · cualquier C que evoluciona a D (↑FC, ↓PA, ↓SpO₂ o ↑FiO₂, oliguria, confusión, ↑lactato o troponina).');
+        out.push({t:'Destino inicial', c:cc, h:d + (extra.length ? '<br>' + extra.join('<br>') : '') +
+          '<br>PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E.' +
+          '<br><span class="pe-nota">Adaptación local (red Campdevànol–Vic–Clínic) pendiente de validación con UCI CHV, PERT Clínic, Farmacia y Dirección médica.</span>'});
+      }
+      return out;
+    }
+  },
+  steps:[
+  {type:'info', text:'Recursos locales (Hospital de Campdevànol): angio-TC, troponina, NT-proBNP, lactato 24 h y alteplasa en stock; POCUS si hay urgenciólogo formado. Sin UCI ni ecocardiografía reglada. Red: CHV Vic (~30 min: UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO)'},
+  {type:'action', text:'ABC, constantes, ECG y monitor; dos vías si hay compromiso hemodinámico. O₂ para SpO₂ ≥90 %; VMNI/IOT con precaución (la presión positiva puede precipitar el fallo del VD)'},
+  {type:'decision', text:'¿PCR, hipotensión persistente o shock?', yes:'Sí', no:'No'},
+  {type:'action', branch:'yes', text:'HNF bolo 80 U/kg. Trasladable a TC → angio-TC inmediato acompañado. No trasladable → POCUS: VD alterado sin otra causa → tratar como E (lisis); VD normal → buscar otra causa. PCR con sospecha fundada → fibrinólisis sin imagen (ERC 2025)'},
+  {type:'action', branch:'no', text:'Probabilidad clínica (Wells, Ginebra o YEARS): baja → PERC (8/8 negativos descarta) → dímero D ajustado por edad (edad × 10 µg/L si >50 a) · intermedia → dímero D · alta → angio-TC directo (HBPM si demora)'},
+  {type:'action', text:'TEP confirmado: VD (VD/VI ≥1,0 en angio-TC o POCUS) + troponina, NT-proBNP y lactato + PESI/sPESI/Hestia → categoría A–E escrita en la historia antes de decidir el destino'},
+  {type:'action', text:'A–B (incidental o PESI I–II/sPESI 0/Hestia 0, VD y biomarcadores normales): ACOD (apixabán 10 mg/12 h × 7 d → 5 mg/12 h o rivaroxabán 15 mg/12 h × 21 d → 20 mg/24 h) y alta precoz, control 48 h–7 d'},
+  {type:'action', text:'C1–C3: enoxaparina 1 mg/kg/12 h SC (ClCr 15–30 → cada 24 h; <15 → HNF) → planta Campdevànol. C3 (VD + biomarcador): monitor en observación y PERT obligado'},
+  {type:'action', text:'D1 (hipotensión transitoria) / D2 (shock normotenso: lactato >2, oliguria, alteración mental o PAM <60): HBPM (HNF si reperfusión prevista o FG <30) + PERT Clínic en ≤30 min; no candidato → guardia CHV'},
+  {type:'action', text:'E (hipotensión persistente, shock, PCR): HNF 80 U/kg + llamada PERT + UCI Vic. Sin contraindicación absoluta → ALTEPLASA 100 mg en 2 h (10 mg bolo + 90 mg; <65 kg máx. 1,5 mg/kg) o en PCR 0,3–0,5 mg/kg (máx. 50 mg) en 2 min. Contraindicación absoluta → PERT (catéter/ECMO)'},
+  {type:'info', text:'Nunca trasladar un E antes de estabilizarlo (AHA 2026, clase 3) ni un D sin anticoagulación parenteral en curso. Parar la HNF durante la alteplasa (criterio CHV); reiniciar sin bolo cuando TTPa <2 × LSN'},
+  {type:'info', text:'Al alta: anticoagulación ≥3 meses, control a las 48 h–7 d y a los ~3 meses; signos de alarma (sangrado, disnea súbita, síncope); evitar AINE. Disnea o intolerancia persistente → estudio de HPTEC'}],
+  src:'Protocolo TEP agudo Hospital de Campdevànol v1.1 (oct 2026) · 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN PE Guideline (Creager MA, Circulation 2026) · ESC/ERS 2019: Konstantinides SV, Eur Heart J 2020;41:543-603 · ERC 2025 · CHEST 2021: Stevens SM, Chest 2021;160:e545 · HOME-PE: Roy PM, Eur Heart J 2021;42:3146 · Barco S, Eur Heart J 2019;40:902 · Ficha técnica de alteplasa (CIMA)'},
+
 ];
