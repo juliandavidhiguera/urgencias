@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 13 | **Rama:** main | **HEAD:** `34725ba` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-01 | **Sesion #:** 13 | **Rama:** main | **HEAD:** `c88e828` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -68,7 +68,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Commits: `34725ba` feat(ui): escala tipografica en rem, fuente mono legible y mas contraste
 - Verificado: 0 elementos fuera de su tarjeta en las 10 pestanas a 390/768/1440px (iframe del ancho dado, todos los `<details>` abiertos); detector impeccable solo marca los 13px de las plantillas `<pre>` de informe impreso (excepcion deliberada); produccion sirve `urg-v66` y `--fs-xs`
 - Descartado: fuentes web (CSP solo origen propio y la UI de producto no las necesita); escala fluida `clamp()` (UI de herramienta: escala fija)
-- No tocado: `registro-utstein.html` (estilos propios, 10.5-11.5px)
+- Modificado: `registro-utstein.html` -> misma escala `--fs-*` (texto 16px, etiquetas 14px, campos 16px); `@media print` redefine los tokens en pt para conservar la densidad en papel (4 paginas antes y despues, PDF headless); <=600px padding y tablas a 12px. Sin desborde 360-1440px; a 320px desborda 11px (original 22px)
+- Commits: `c88e828` feat(ui): registro Utstein con la misma escala tipografica en rem
 
 ### Sesion 12 - 2026-11-01
 - Commit `70d9068`. **Protocolo nuevo EPOC agudizado (SAE)** desde el Word del usuario (protocolo Campdevanol v2.2) y su flujograma. Evaluador interactivo generico: campo `eval` en `PROTOCOLS` (items `num`/`chk`/`sel`/`h` + `calc(v)` → `[{t,c,h}]`), pintado por `_protoEvalHtml`/`calcProtoEval`/`resetProtoEval`/`copyProtoEval` (`index.html`, CSS `.pe-*`). Reutilizable por otros protocolos.
@@ -249,6 +250,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Protocolo EPOC: el destino debe seguir el flujograma de Campdevanol** y, en dosis/umbrales, **GOLD 2026 prevalece** sobre el Word y el flujograma (decisiones del usuario, sesion 12). Si se cambia el flujograma, regenerar el PDF desde la fuente HTML (Chrome headless `--print-to-pdf`, 1 pagina A4) y sustituir tambien la imagen `word/media/flujograma_campdevanol.png` del Word.
 
 - **Tamanos de letra: usar SOLO los tokens `--fs-*`**, nunca px (el detector `impeccable --scope type` lo vigila). Campos de formulario >= `--fs-base` o iOS hace zoom. Al final del `<style>` hay un bloque "Escala tipografica: ajustes de rol" que sobrescribe reglas anteriores: mirar ahi antes de cambiar un tamano.
+- `registro-utstein.html`: Cloudflare Pages redirige `.html` -> `/registro-utstein` (308); para verificar produccion con curl usar `-L` o la URL limpia. Sus tamanos de impresion viven en los tokens dentro de `@media print`, no en las reglas.
 - `.nav { top: 81px }` (>600px) = altura real de `.header`. Si cambia la cabecera (texto, padding, tamano de h1/p), medir `document.querySelector('.header').offsetHeight` y actualizarlo.
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
