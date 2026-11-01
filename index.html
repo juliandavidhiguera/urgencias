@@ -622,6 +622,29 @@ body {
 .ficha-list-btn:hover { background: var(--bg3); border-color: var(--blue); }
 .ficha-list-btn .badge { margin-left: 8px; }
 
+/* REGISTRO UTSTEIN — capa a pantalla completa con iframe */
+.utstein-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2);
+}
+.utstein-overlay[hidden] { display: none; }
+.utstein-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  padding-top: max(8px, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.utstein-bar .btn { color: var(--text); font-weight: 600; }
+.utstein-bar-title { font-size: var(--fs-base); font-weight: 600; color: var(--text); }
+#utstein-frame { flex: 1; width: 100%; border: 0; background: #f4f4f4; }
+
 /* PROTOCOLS */
 .protocol-card {
   background: var(--bg2);
@@ -1340,6 +1363,16 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 <div class="ficha-overlay" id="ficha-overlay" style="display:none" onclick="if(event.target===this) closeFicha()">
   <div class="ficha-modal" id="ficha-modal" role="dialog" aria-modal="true" aria-labelledby="ficha-modal-title" tabindex="-1"></div>
   <aside class="ficha-calc-panel" id="ficha-calc-panel" style="display:none" aria-label="Calculadora de dosis"></aside>
+</div>
+
+<!-- Registro Utstein dentro de la app (iframe del mismo origen): el tab PCR
+     sigue intacto debajo y la app instalada no salta al navegador. -->
+<div class="utstein-overlay" id="utstein-overlay" role="dialog" aria-modal="true" aria-label="Registro Utstein" hidden>
+  <div class="utstein-bar">
+    <button class="btn" id="utstein-close" onclick="cerrarRegistroUtstein()">← Volver al PCR</button>
+    <span class="utstein-bar-title">Registro Utstein</span>
+  </div>
+  <iframe id="utstein-frame" title="Registro Utstein de este evento"></iframe>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
@@ -3339,10 +3372,31 @@ function pcrHandoffPayload() {
   };
 }
 
+/* Se abre en una capa con iframe dentro de la misma app: en la app instalada
+   (pantalla de inicio) window.open saltaba al navegador, que no comparte el
+   sessionStorage, y el registro salía vacío. Cada pulsación recarga el
+   registro con los datos actuales del PCR; cerrar solo oculta la capa. */
 function abrirRegistroUtstein() {
   try { sessionStorage.setItem('urg-pcr-handoff', JSON.stringify(pcrHandoffPayload())); } catch (e) {}
-  window.open('registro-utstein.html', '_blank');
+  const overlay = document.getElementById('utstein-overlay');
+  /* Sin query: el SW precachea '/registro-utstein.html' y debe encontrarlo
+     sin conexión. Asignar src siempre vuelve a cargar el iframe. */
+  document.getElementById('utstein-frame').src = 'registro-utstein.html';
+  overlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('utstein-close').focus();
 }
+
+function cerrarRegistroUtstein() {
+  document.getElementById('utstein-overlay').hidden = true;
+  document.body.style.overflow = '';
+  const btn = document.querySelector('[onclick="abrirRegistroUtstein()"]');
+  if (btn) btn.focus({ preventScroll: true });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !document.getElementById('utstein-overlay').hidden) cerrarRegistroUtstein();
+});
 
 /* ==================================================================
    FICHAS TÉCNICAS — modal de medicamento
