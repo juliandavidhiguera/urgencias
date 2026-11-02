@@ -3,6 +3,65 @@
    steps: {type:'action'|'decision'|'info', text, yes, no, branch:'yes'|'no'}
    Referencias: guías ERC/AHA, DAS (vía aérea difícil), SEM Gencat
    ================================================================== */
+/* Patrones ECG de oclusión coronaria (OMI): galería del Codi IAM y desplegable de su flujograma. */
+const PATRONES_OMI = [
+      {file:'Ondas T hiperagudas.jpg', label:'Ondas T hiperagudas',
+        criterios:'Ondas T altas, de base ancha, simétricas y desproporcionadas respecto al QRS precedente, en ≥2 derivaciones contiguas. Suelen preceder a la elevación del ST. Excluir hiperpotasemia, HVI y repolarización precoz.',
+        arteria:'Según distribución: V1–V4 → DA · II/III/aVF → CD o Cx · I/aVL/V5–V6 → Cx o diagonal',
+        significado:'Sin criterios STEMI, hasta 84% tienen lesión culpable de IAM (especificidad 98%) — angiografía urgente.',
+        fuente:'Meyers 2025, JACC Adv · PMID 40892623'},
+      {file:'Patron de Winter.jpg', label:'Patrón de Winter',
+        criterios:'Depresión del ST ≥1 mm ascendente en el punto J en V1–V6 con ondas T altas y simétricas, sin elevación del ST precordial · ST elevado 1–3 mm en aVR',
+        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
+        significado:'Equivalente OMI formalmente reconocido — indicación de angiografía inmediata.',
+        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
+      {file:'Patron Wellens.jpg', label:'Patrón de Wellens',
+        criterios:'Tipo A: T bifásica en V2–V3. Tipo B: T invertida profunda y simétrica (≥2 mm) en V2–V3. Progresión de onda R conservada, registrado en fase asintomática (post-reperfusión).',
+        arteria:'DA proximal — estenosis crítica (sin oclusión total en el momento del registro)',
+        significado:'Patrón de preinfarto: >75% de IAM anterior en días–semanas sin revascularización. NO realizar ergometría — riesgo de oclusión completa.',
+        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
+      {file:'Patron Aslanger.jpg', label:'Patrón de Aslanger',
+        criterios:'Elevación del ST aislada en III (≥1 mm) sin cumplir criterios STEMI inferior (no ≥1 mm en ≥2 de II/III/aVF) + depresión del ST en V4–V6 que enmascara la elevación inferior',
+        arteria:'CD, con enfermedad concomitante de la DA (multivaso)',
+        significado:'Muy específico de OMI inferior en enfermedad multivaso; frecuentemente mal clasificado como NSTEMI con manejo diferido — mortalidad hospitalaria elevada.',
+        fuente:'Aslanger 2020, J Electrocardiol; serie de casos 2025 · PMID 41445864'},
+      {file:'Patron de remolino - swirl.jpg', label:'Patrón de remolino (swirl sign)',
+        criterios:'Elevación del ST y/o T hiperagudas en V1–V2 con depresión recíproca del ST y/o inversión de T en V5–V6 (rotación horaria del vector ST en el precordio)',
+        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
+        significado:'Alta especificidad para OMI por oclusión de DA proximal.',
+        fuente:'Verificado con Perplexity 2025 · PMID 40319770 — Vera Health expresó incertidumbre sobre la definición exacta; se prioriza esta fuente'},
+      {file:'OMI inferobasal - posterior.jpg', label:'OMI inferobasal-posterior',
+        criterios:'Depresión del ST máxima en V1–V4 (STDmaxV1–4) de cualquier magnitud, no explicada por causa no isquémica · confirmar con derivaciones posteriores V7–V9 (STE ≥0,5 mm)',
+        arteria:'CD (más frecuente), Cx, ramas obtusas marginales o descendente posterior',
+        significado:'Más de la mitad de los IAM posteriores son "STEMI-negativos" — se pierden si no se buscan activamente. Solicitar V7–V9 si hay STD en V1–V3.',
+        fuente:'Meyers 2021, JAHA · PMID 34775811'},
+      {file:'Northen OMI.jpg', label:'Patrón «Northern OMI» (North sign)',
+        criterios:'Elevación del ST en aVR y aVL con onda T negativa + depresión del ST en derivaciones inferiores y laterales (II, III, aVF, V4–V6) con onda T positiva o bifásica',
+        arteria:'Oclusión de la bifurcación de la primera diagonal de la DA (también en enfermedad multivaso)',
+        significado:'Patrón OMI anterior alto/proximal — terminología reciente de expertos OMI, aún fuera de guías mayores clásicas.',
+        fuente:'Verificado con Perplexity 2025 — terminología reciente, fuera de guías formales'},
+      {file:'Distorsion terminal QRS.jpg', label:'Distorsión terminal del QRS',
+        criterios:'Ausencia simultánea de onda S y de muesca en el punto J, en V5 o V6',
+        arteria:'DA proximal o media',
+        significado:'Marcador de isquemia transmural grave y completa; distingue oclusión verdadera de repolarización precoz benigna en STEMI límite.',
+        fuente:'Birnbaum 1993, Circulation; validado por Meyers 2021 · PMID 34775811'},
+      {file:'Signo de la bandera de sudafrica.jpg', label:'Signo de la bandera de Sudáfrica',
+        criterios:'Elevación del ST en I, aVL y V2 con depresión recíproca en III (a menudo también aVF)',
+        arteria:'Oclusión de la primera diagonal (D1) de la DA — IAM lateral alto/anterolateral',
+        significado:'Discrepancia detectada: Vera Health describió inicialmente otra definición (aVR + depresión difusa, propia del patrón de tronco común/triple vaso). Perplexity y la imagen original confirman que el signo real es I/aVL/V2 + III → D1. No confundir ambos patrones.',
+        fuente:'Verificado con Perplexity 2025 · PMC10413884, PMC12040377'},
+      {file:'criterios Sgarbossa.jpg', label:'Criterios de Sgarbossa modificados (Smith)',
+        criterios:'1) Concordancia STE ≥1 mm en derivación con QRS positivo · 2) Concordancia STD ≥1 mm en V1–V3 · 3) Discordancia excesiva: STE ≥1 mm y cociente ST/S ≤ −0,25 (sustituye el umbral fijo ≥5 mm del Sgarbossa original) — basta 1 criterio positivo',
+        arteria:'Variable — indica oclusión coronaria aguda en presencia de BRIHH o ritmo de marcapasos',
+        significado:'Sensibilidad 91% vs. 52% del Sgarbossa original; validado también en ritmo de marcapasos ventricular. Tratar como equivalente STEMI.',
+        fuente:'Smith 2012 · PMID 22939607; Meyers 2015 · PMID 26678648; Dodd 2021 · PMID 34172301'},
+      {file:'nuevo bloqueo bifascicular.jpg', label:'Bloqueo bifascicular de nueva aparición',
+        criterios:'BRIHH + hemibloqueo anterior (o posterior) izquierdo de nueva aparición en el contexto de SCA',
+        arteria:'DA proximal (las perforantes septales irrigan la rama derecha y el fascículo anterior)',
+        significado:'Riesgo de progresión a bloqueo AV completo (~20–40%) — preparar marcapasos transcutáneo. Predictor independiente de mortalidad. Angiografía urgente + monitorización con capacidad de estimulación.',
+        fuente:'2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline · PMID 40013746'}
+];
+
 window.PROTOCOLS = [
 
 {id:'anafilaxia', title:'Anafilaxia', sub:'Adrenalina IM inmediata — ERC 2025', badge:'red', tag:'Crítico', rank:8, steps:[
@@ -136,63 +195,7 @@ window.PROTOCOLS = [
     titulo:'Patrones ECG de oclusión coronaria (OMI)',
     nota:'Equivalentes de infarto con oclusión coronaria aguda que no cumplen los criterios clásicos de elevación del ST — no descartan activación del Codi IAM.',
     dir:'codigos/patrones iam nuevos/',
-    items:[
-      {file:'Ondas T hiperagudas.jpg', label:'Ondas T hiperagudas',
-        criterios:'Ondas T altas, de base ancha, simétricas y desproporcionadas respecto al QRS precedente, en ≥2 derivaciones contiguas. Suelen preceder a la elevación del ST. Excluir hiperpotasemia, HVI y repolarización precoz.',
-        arteria:'Según distribución: V1–V4 → DA · II/III/aVF → CD o Cx · I/aVL/V5–V6 → Cx o diagonal',
-        significado:'Sin criterios STEMI, hasta 84% tienen lesión culpable de IAM (especificidad 98%) — angiografía urgente.',
-        fuente:'Meyers 2025, JACC Adv · PMID 40892623'},
-      {file:'Patron de Winter.jpg', label:'Patrón de Winter',
-        criterios:'Depresión del ST ≥1 mm ascendente en el punto J en V1–V6 con ondas T altas y simétricas, sin elevación del ST precordial · ST elevado 1–3 mm en aVR',
-        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
-        significado:'Equivalente OMI formalmente reconocido — indicación de angiografía inmediata.',
-        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
-      {file:'Patron Wellens.jpg', label:'Patrón de Wellens',
-        criterios:'Tipo A: T bifásica en V2–V3. Tipo B: T invertida profunda y simétrica (≥2 mm) en V2–V3. Progresión de onda R conservada, registrado en fase asintomática (post-reperfusión).',
-        arteria:'DA proximal — estenosis crítica (sin oclusión total en el momento del registro)',
-        significado:'Patrón de preinfarto: >75% de IAM anterior en días–semanas sin revascularización. NO realizar ergometría — riesgo de oclusión completa.',
-        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
-      {file:'Patron Aslanger.jpg', label:'Patrón de Aslanger',
-        criterios:'Elevación del ST aislada en III (≥1 mm) sin cumplir criterios STEMI inferior (no ≥1 mm en ≥2 de II/III/aVF) + depresión del ST en V4–V6 que enmascara la elevación inferior',
-        arteria:'CD, con enfermedad concomitante de la DA (multivaso)',
-        significado:'Muy específico de OMI inferior en enfermedad multivaso; frecuentemente mal clasificado como NSTEMI con manejo diferido — mortalidad hospitalaria elevada.',
-        fuente:'Aslanger 2020, J Electrocardiol; serie de casos 2025 · PMID 41445864'},
-      {file:'Patron de remolino - swirl.jpg', label:'Patrón de remolino (swirl sign)',
-        criterios:'Elevación del ST y/o T hiperagudas en V1–V2 con depresión recíproca del ST y/o inversión de T en V5–V6 (rotación horaria del vector ST en el precordio)',
-        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
-        significado:'Alta especificidad para OMI por oclusión de DA proximal.',
-        fuente:'Verificado con Perplexity 2025 · PMID 40319770 — Vera Health expresó incertidumbre sobre la definición exacta; se prioriza esta fuente'},
-      {file:'OMI inferobasal - posterior.jpg', label:'OMI inferobasal-posterior',
-        criterios:'Depresión del ST máxima en V1–V4 (STDmaxV1–4) de cualquier magnitud, no explicada por causa no isquémica · confirmar con derivaciones posteriores V7–V9 (STE ≥0,5 mm)',
-        arteria:'CD (más frecuente), Cx, ramas obtusas marginales o descendente posterior',
-        significado:'Más de la mitad de los IAM posteriores son "STEMI-negativos" — se pierden si no se buscan activamente. Solicitar V7–V9 si hay STD en V1–V3.',
-        fuente:'Meyers 2021, JAHA · PMID 34775811'},
-      {file:'Northen OMI.jpg', label:'Patrón «Northern OMI» (North sign)',
-        criterios:'Elevación del ST en aVR y aVL con onda T negativa + depresión del ST en derivaciones inferiores y laterales (II, III, aVF, V4–V6) con onda T positiva o bifásica',
-        arteria:'Oclusión de la bifurcación de la primera diagonal de la DA (también en enfermedad multivaso)',
-        significado:'Patrón OMI anterior alto/proximal — terminología reciente de expertos OMI, aún fuera de guías mayores clásicas.',
-        fuente:'Verificado con Perplexity 2025 — terminología reciente, fuera de guías formales'},
-      {file:'Distorsion terminal QRS.jpg', label:'Distorsión terminal del QRS',
-        criterios:'Ausencia simultánea de onda S y de muesca en el punto J, en V5 o V6',
-        arteria:'DA proximal o media',
-        significado:'Marcador de isquemia transmural grave y completa; distingue oclusión verdadera de repolarización precoz benigna en STEMI límite.',
-        fuente:'Birnbaum 1993, Circulation; validado por Meyers 2021 · PMID 34775811'},
-      {file:'Signo de la bandera de sudafrica.jpg', label:'Signo de la bandera de Sudáfrica',
-        criterios:'Elevación del ST en I, aVL y V2 con depresión recíproca en III (a menudo también aVF)',
-        arteria:'Oclusión de la primera diagonal (D1) de la DA — IAM lateral alto/anterolateral',
-        significado:'Discrepancia detectada: Vera Health describió inicialmente otra definición (aVR + depresión difusa, propia del patrón de tronco común/triple vaso). Perplexity y la imagen original confirman que el signo real es I/aVL/V2 + III → D1. No confundir ambos patrones.',
-        fuente:'Verificado con Perplexity 2025 · PMC10413884, PMC12040377'},
-      {file:'criterios Sgarbossa.jpg', label:'Criterios de Sgarbossa modificados (Smith)',
-        criterios:'1) Concordancia STE ≥1 mm en derivación con QRS positivo · 2) Concordancia STD ≥1 mm en V1–V3 · 3) Discordancia excesiva: STE ≥1 mm y cociente ST/S ≤ −0,25 (sustituye el umbral fijo ≥5 mm del Sgarbossa original) — basta 1 criterio positivo',
-        arteria:'Variable — indica oclusión coronaria aguda en presencia de BRIHH o ritmo de marcapasos',
-        significado:'Sensibilidad 91% vs. 52% del Sgarbossa original; validado también en ritmo de marcapasos ventricular. Tratar como equivalente STEMI.',
-        fuente:'Smith 2012 · PMID 22939607; Meyers 2015 · PMID 26678648; Dodd 2021 · PMID 34172301'},
-      {file:'nuevo bloqueo bifascicular.jpg', label:'Bloqueo bifascicular de nueva aparición',
-        criterios:'BRIHH + hemibloqueo anterior (o posterior) izquierdo de nueva aparición en el contexto de SCA',
-        arteria:'DA proximal (las perforantes septales irrigan la rama derecha y el fascículo anterior)',
-        significado:'Riesgo de progresión a bloqueo AV completo (~20–40%) — preparar marcapasos transcutáneo. Predictor independiente de mortalidad. Angiografía urgente + monitorización con capacidad de estimulación.',
-        fuente:'2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline · PMID 40013746'}
-    ]
+    items: PATRONES_OMI
   },
   flow:(() => {
     const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
@@ -220,6 +223,31 @@ window.PROTOCOLS = [
       q: 'Tiempo estimado desde el ECG hasta la llegada al hospital con ICP',
       opts: [{ l: '&lt;90 min', go: 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana' }, { l: '>120 min', go: 'fibci' }]
     };
+    /* Patrón OMI → nodo: imagen, criterios y conducta según el tipo de patrón. */
+    const OMI_EQUIV = ['OMI inferobasal - posterior.jpg', 'criterios Sgarbossa.jpg'];
+    const omiNodo = it => {
+      const base = '<img class="fl-omi-img" src="' + encodeURI('codigos/patrones iam nuevos/' + it.file) + '" alt="ECG con ' + it.label + '" loading="lazy">' +
+        '<b>Criterios:</b> ' + it.criterios + '<br><b>Arteria:</b> ' + it.arteria + '<br><b>Significado:</b> ' + it.significado +
+        '<br><span class="pe-nota">' + it.fuente + '</span><br>';
+      if (it.file === 'Patron Wellens.jpg') return {
+        t: it.label, c: 'mid',
+        show: base + '<b>No es una oclusión activa: NO fibrinólisis y NO ergometría.</b> Tratar como SCA sin elevación del ST de alto riesgo (ACC/AHA 2025, ESC 2023).',
+        q: '¿Dolor recurrente o refractario, inestabilidad hemodinámica o eléctrica, u otro criterio de muy alto riesgo?',
+        opts: [{ l: 'Sí', go: 'muyalto' }, { l: 'No', go: 'wellens_alto' }]
+      };
+      if (OMI_EQUIV.includes(it.file)) return {
+        t: it.label, c: 'high',
+        show: base + '<b>Equivalente de IAMCEST:</b> misma estrategia de reperfusión, con fibrinólisis si la ICP se retrasa >120 min (ACC/AHA 2025, ESC 2023).' +
+          (it.file === 'OMI inferobasal - posterior.jpg' ? ' Suele acompañar al inferior: aplicar sus precauciones y descartar el VD con V3R–V4R.' : ''),
+        ...TQ
+      };
+      return {
+        t: it.label, c: 'high',
+        show: base + '<b>Posible oclusión sin criterios clásicos:</b> coronariografía o ICP urgente; avisar a hemodinámica. La fibrinólisis no está indicada de rutina: solo si la oclusión es segura y la ICP se retrasa >120 min, decidido con cardiología (ACC/AHA 2025; consenso ACC 2022).',
+        q: 'Estrategia de reperfusión',
+        opts: [{ l: 'Coronariografía o ICP urgente', go: 'icp' }, { l: 'Fibrinólisis consensuada con cardiología (ICP >120 min)', go: 'fibci' }]
+      };
+    };
     const mlh = (dosis, peso, conc) => f(Math.round(dosis * peso * 60 / conc * 10) / 10);
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'clcr', l: 'ClCr (opcional)', u: 'ml/min' }],
@@ -241,6 +269,7 @@ window.PROTOCOLS = [
         activar: { farmacos: ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Nitroglicerina'],
           t: 'ACTIVAR CODI IAM', c: 'high', escalas: ['killip'],
           show: 'Notificar y anotar la hora del ECG.<br><b>Tratamiento inicial:</b> O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg) · <b>AAS 150–300 mg VO masticada</b> (450 mg IV de acetilsalicilato de lisina si no puede VO).<br>Nitroglicerina (SL 0,4 mg o IV): NO si TAS &lt;90, FC &lt;50, sospecha de IAM de VD o inhibidores de la PDE-5 en 24 h, ni como prueba diagnóstica.<br>Killip: I normal · II crepitantes o 3.er ruido · III edema agudo de pulmón · IV shock cardiogénico.',
+          galeria: true,
           q: 'Localización del infarto en el ECG',
           help: 'En todo IAM inferior, y si hay descenso del ST en V1–V3, registrar V3R–V4R y V7–V9.',
           opts: [
@@ -249,7 +278,8 @@ window.PROTOCOLS = [
             { l: 'Lateral (I, aVL, V5–V6)', go: 'loc_lat' },
             { l: 'Posterior (descenso del ST en V1–V3, elevación en V7–V9)', go: 'loc_post' },
             { l: 'Descenso del ST en ≥8 derivaciones + elevación en aVR', go: 'loc_tronco' },
-            { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro' }
+            { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro' },
+            { l: 'Otros: nuevos patrones de IAM (OMI)', go: 'loc_omi' }
           ]
         },
         loc_ant: { farmacos: ['Atropina'],
@@ -285,6 +315,18 @@ window.PROTOCOLS = [
           t: 'Sospecha de TRONCO COMÚN o enfermedad multivaso', c: 'high',
           show: 'Alto riesgo de <b>shock cardiogénico</b>: coronariografía urgente; vigilar TA y perfusión (ver «Shock cardiogénico»).',
           ...TQ
+        },
+        loc_omi: {
+          q: '¿Qué patrón tiene el ECG?',
+          help: 'Equivalentes de oclusión coronaria sin criterios clásicos de elevación del ST. Para compararlos con imagen, abre los patrones.',
+          galeria: true,
+          desplegable: 'Elige un patrón…',
+          opts: PATRONES_OMI.map((it, i) => ({ l: it.label, go: 'omi_' + i }))
+        },
+        ...Object.fromEntries(PATRONES_OMI.map((it, i) => ['omi_' + i, omiNodo(it)])),
+        wellens_alto: {
+          t: 'Wellens sin criterios de muy alto riesgo', c: 'mid',
+          show: 'Ingreso monitorizado y <b>coronariografía precoz (&lt;24 h)</b>. Sin ergometría ni fibrinólisis. Si reaparece el dolor o hay inestabilidad: estrategia invasiva inmediata (&lt;2 h).<br><span class="pe-nota">ACC/AHA 2025; ESC 2023; consenso ACC 2022.</span>'
         },
         loc_otro: {
           t: 'Localización no valorable en el ECG',

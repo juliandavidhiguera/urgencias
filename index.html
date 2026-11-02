@@ -679,6 +679,9 @@ body {
 }
 .fl-esc { display: inline-flex; align-items: center; min-height: 44px; margin: 10px 8px 0 0; padding: 8px 14px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
 .fl-esc:hover, .fl-esc:focus-visible { background: var(--bg2); }
+label.fl-ask-hint { display: block; }
+.fl-sel { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 10px 12px; border: 1px solid var(--blue); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: var(--fs-base); }
+.fl-omi-img { display: block; max-width: 100%; max-height: 280px; margin: 4px 0 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
 .fl-farm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .fl-farm { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
 .fl-farm:hover, .fl-farm:focus-visible { border-color: var(--blue); background: var(--blue-bg); }
@@ -2227,8 +2230,9 @@ function _flowShow(n, v, pid, nid) {
 }
 
 /* n.escalas = ids de SCALES: botón para hacer la escala en el panel lateral sin salir del protocolo. */
-function _flowEscBtns(n) {
-  return (n.escalas || []).map(id => {
+function _flowEscBtns(n, pid) {
+  return (n.galeria ? '<button class="fl-esc" onclick="openGaleria(\'' + pid + '\')">🫀 Ver los nuevos patrones de IAM con imagen</button>' : '') +
+    (n.escalas || []).map(id => {
     const sc = SCALES.find(x => x.id === id);
     return sc ? '<button class="fl-esc" onclick="abrirEscalaLateral(\'' + id + '\', this)">📊 Hacer la escala ' + sc.title + ' al lado</button>' : '';
   }).join('');
@@ -2280,7 +2284,7 @@ function renderFlow(pid) {
   body.innerHTML = path.map((st, i) => {
     const n = p.flow.nodes[st.n];
     let h = _flowShow(n, v, pid, st.n);
-    if (!n.q) return h + _flowEscBtns(n);
+    if (!n.q) return h + _flowEscBtns(n, pid);
     nq++;
     if (st.o !== null) {
       return h + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta a la pregunta ' + nq + '">' +
@@ -2292,14 +2296,18 @@ function renderFlow(pid) {
       '<div class="fl-ask-n">Pregunta ' + nq + '</div>' +
       '<div class="fl-q" id="' + qid + '">' + n.q + '</div>' +
       (n.help ? '<div class="fl-help">' + (typeof n.help === 'function' ? n.help(v) : n.help) + '</div>' : '') +
-      _flowEscBtns(n) +
-      '<div class="fl-ask-hint">Elige una opción:</div>' +
+      _flowEscBtns(n, pid) +
+      (n.desplegable
+        ? '<label class="fl-ask-hint" for="' + qid + '-sel">Elige una opción:</label>' +
+          '<select class="fl-sel" id="' + qid + '-sel" onchange="if (this.value !== \'\') flowGo(\'' + pid + '\',' + i + ',+this.value)">' +
+          '<option value="">' + n.desplegable + '</option>' + n.opts.map((o, j) => '<option value="' + j + '">' + o.l + '</option>').join('') + '</select></div>'
+        : '<div class="fl-ask-hint">Elige una opción:</div>' +
       '<div class="fl-opts">' + n.opts.map((o, j) => {
         const sug = o.sug && o.sug(v);
         return '<button class="fl-opt' + (sug ? ' fl-sug' : '') + '" onclick="flowGo(\'' + pid + '\',' + i + ',' + j + ')">' +
           '<span class="fl-radio" aria-hidden="true"></span><span class="fl-opt-l">' + o.l + '</span>' +
           (sug ? '<span class="fl-sug-tag">según los datos</span>' : '') + '</button>';
-      }).join('') + '</div></div>';
+      }).join('') + '</div></div>');
   }).join('');
   const ex = document.getElementById('fl-' + pid + '-extras');
   if (ex) {
