@@ -238,7 +238,7 @@ window.PROTOCOLS = [
         },
         muyalto: { t: 'SCASEST de muy alto riesgo', c: 'high', show: 'Tratar como muy alto riesgo <b>SIN activar el Codi IAM</b>: estrategia invasiva inmediata (&lt;2 h, ESC 2023).' },
         nosca: { t: 'Sin criterios de Codi IAM', c: 'mid', show: 'Seguir el protocolo de SCASEST específico.' },
-        activar: {
+        activar: { farmacos: ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Nitroglicerina'],
           t: 'ACTIVAR CODI IAM', c: 'high', escalas: ['killip'],
           show: 'Notificar y anotar la hora del ECG.<br><b>Tratamiento inicial:</b> O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg) · <b>AAS 150–300 mg VO masticada</b> (450 mg IV de acetilsalicilato de lisina si no puede VO).<br>Nitroglicerina (SL 0,4 mg o IV): NO si TAS &lt;90, FC &lt;50, sospecha de IAM de VD o inhibidores de la PDE-5 en 24 h, ni como prueba diagnóstica.<br>Killip: I normal · II crepitantes o 3.er ruido · III edema agudo de pulmón · IV shock cardiogénico.',
           q: 'Localización del infarto en el ECG',
@@ -252,7 +252,7 @@ window.PROTOCOLS = [
             { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro' }
           ]
         },
-        loc_ant: {
+        loc_ant: { farmacos: ['Atropina'],
           t: 'IAM ANTERIOR — arteria descendente anterior', c: 'high',
           show: 'Mayor riesgo de <b>insuficiencia cardiaca, shock y arritmias ventriculares</b>: vigilar crepitantes, TA y perfusión (Killip).<br>Los bloqueos AV del IAM anterior suelen ser infranodales (QRS ancho): la <b>atropina suele ser ineficaz</b> → preparar marcapasos transcutáneo.<br>Ecocardiograma precoz: trombo en el VI si hay acinesia apical.',
           ...TQ
@@ -261,12 +261,12 @@ window.PROTOCOLS = [
           q: '¿Elevación del ST en V3R–V4R? (≥0,5 mm; ≥1 mm en hombres &lt;30 años)',
           opts: [{ l: 'Sí: afecta al ventrículo derecho', go: 'loc_vd' }, { l: 'No', go: 'loc_inf' }]
         },
-        loc_inf: {
+        loc_inf: { farmacos: ['Atropina'],
           t: 'IAM INFERIOR — coronaria derecha o circunfleja', c: 'mid',
           show: 'Frecuentes: <b>bradicardia sinusal, hipotensión vagal y BAV nodal</b> (QRS estrecho), que suele responder a la atropina.<br><b>Evitar betabloqueante</b> si hay bradicardia, BAV o hipotensión.<br>Descartado el VD, la nitroglicerina se puede usar con las precauciones habituales.',
           ...TQ
         },
-        loc_vd: {
+        loc_vd: { farmacos: [{ n: 'Dobutamina', mg: 250, vol: 250, dosis: 2.5 }, { n: 'Noradrenalina', mg: 4, vol: 250, dosis: 0.05 }],
           t: 'IAM INFERIOR CON VENTRÍCULO DERECHO', c: 'high',
           show: '<b>Dependiente de la precarga:</b> NO nitratos (ni SL ni IV) · NO diuréticos · opioides con mucha precaución (hipotensión) · evitar betabloqueante.<br>Si hay hipotensión sin congestión pulmonar: <b>cristaloide en bolos de 250–500 ml IV</b>, reevaluando TA, yugulares, auscultación y ecografía tras cada bolo.<br>Si persiste la hipotensión con la precarga optimizada: dobutamina ± noradrenalina (ver «Shock cardiogénico»).<br>Bradicardia y BAV frecuentes (ver «Bradicardia o bloqueo AV»).<br><span class="pe-nota">ESC 2023; ACC/AHA 2025.</span>',
           ...TQ
@@ -295,7 +295,7 @@ window.PROTOCOLS = [
           q: 'Ventana de 90–120 min: decidir según el caso. ¿Qué estrategia se elige?',
           opts: [{ l: 'Angioplastia primaria', go: 'icp' }, { l: 'Fibrinólisis prehospitalaria', go: 'fibci' }]
         },
-        icp: {
+        icp: { farmacos: ['Heparina sódica'],
           t: 'ANGIOPLASTIA PRIMARIA', c: 'high',
           show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + ' UI</b>' : '. ' + faltaPeso),
           q: 'Segundo antiagregante: ¿qué situación aplica?',
@@ -307,9 +307,9 @@ window.PROTOCOLS = [
           ]
         },
         sa_no: { t: 'Segundo antiagregante', show: '<b>Ninguno</b> de momento.' },
-        sa_clopi: { t: 'Segundo antiagregante', show: '<b>Clopidogrel 600 mg VO.</b>' },
-        sa_tica: { t: 'Segundo antiagregante', show: '<b>Ticagrelor 180 mg VO.</b>' },
-        sa_pras: { t: 'Segundo antiagregante', show: '<b>Prasugrel 60 mg VO.</b>' },
+        sa_clopi: { farmacos: ['Clopidogrel'], t: 'Segundo antiagregante', show: '<b>Clopidogrel 600 mg VO.</b>' },
+        sa_tica: { farmacos: ['Ticagrelor'], t: 'Segundo antiagregante', show: '<b>Ticagrelor 180 mg VO.</b>' },
+        sa_pras: { farmacos: ['Prasugrel'], t: 'Segundo antiagregante', show: '<b>Prasugrel 60 mg VO.</b>' },
         fibci: {
           q: '¿Alguna contraindicación absoluta para la fibrinólisis?',
           help: 'Hemorragia cerebral previa o ictus de causa desconocida · ictus isquémico &lt;6 meses · neoplasia o traumatismo del SNC · cirugía o traumatismo &lt;1 mes · sospecha de disección aórtica · sangrado activo o digestivo &lt;1 mes · punciones no compresibles recientes.',
@@ -319,7 +319,7 @@ window.PROTOCOLS = [
           t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
           q: 'Continuar', opts: [{ l: 'Pautar la angioplastia primaria', go: 'icp' }]
         },
-        fib: {
+        fib: { farmacos: ['Tenecteplasa', 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', 'Heparina sódica'],
           t: 'FIBRINÓLISIS CON TENECTEPLASA', c: 'high',
           show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
             '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
@@ -336,13 +336,13 @@ window.PROTOCOLS = [
         help: 'Ábrelas cuando aparezcan, en cualquier momento del flujograma. Las dosis usan el peso de arriba.',
         items: [
           {
-            l: 'Hipertensión arterial', t: 'Hipertensión arterial', c: 'mid',
+            farmacos: ['Nitroglicerina', 'Metoprolol'], l: 'Hipertensión arterial', t: 'Hipertensión arterial', c: 'mid',
             show: 'Tratar antes el dolor y la ansiedad. No bajar la TA de forma brusca.<br>' +
               '<b>Nitroglicerina IV</b>: empezar con 5–10 µg/min y subir cada 3–5 min según TA y dolor (Perfusión IV → Nitroglicerina). NO si IAM de VD, TAS &lt;90, FC &lt;50 o inhibidores de la PDE-5 (sildenafilo o vardenafilo 24 h, tadalafilo 48 h).<br>' +
               '<b>Metoprolol IV</b> 5 mg cada 2 min (máx. 15 mg), solo sin insuficiencia cardiaca, hipotensión, bradicardia ni BAV. La ESC 2023 lo contempla al ingreso si la TAS es >120 mmHg; la ACC/AHA 2025 no lo recomienda de rutina, solo con indicación (HTA, isquemia persistente). Si no, betabloqueante oral en las primeras 24 h.'
           },
           {
-            l: 'Edema agudo de pulmón (Killip III)', t: 'Edema agudo de pulmón (Killip III)', c: 'high',
+            farmacos: ['Nitroglicerina'], l: 'Edema agudo de pulmón (Killip III)', t: 'Edema agudo de pulmón (Killip III)', c: 'high',
             show: 'Sentado. O₂ si SpO₂ &lt;90 %. <b>VMNI (CPAP o BiPAP)</b> si hay trabajo respiratorio, hipoxemia o acidosis.<br>' +
               '<b>Nitroglicerina IV</b> si TAS ≥90 y sin IAM de VD; de elección en el edema hipertensivo.<br>' +
               '<b>Furosemida IV</b> si hay congestión: 20–40 mg si no tomaba diurético; si lo tomaba, 1–2,5 veces su dosis oral diaria.<br>' +
@@ -350,7 +350,7 @@ window.PROTOCOLS = [
               'Ecocardiograma urgente: descartar complicación mecánica (insuficiencia mitral aguda, CIV).'
           },
           {
-            l: 'Shock cardiogénico (Killip IV)', t: 'Shock cardiogénico (Killip IV)', c: 'high',
+            farmacos: [{ n: 'Noradrenalina', mg: 4, vol: 250, dosis: 0.05 }, { n: 'Dobutamina', mg: 250, vol: 250, dosis: 2.5 }], l: 'Shock cardiogénico (Killip IV)', t: 'Shock cardiogénico (Killip IV)', c: 'high',
             show: v => '<b>ICP urgente solo de la arteria culpable</b>, aunque hayan pasado más de 12 h; no tratar otras arterias en el mismo procedimiento (ACC/AHA 2025, ESC 2023).<br>' +
               'Si es IAM de VD, primero volumen en bolos de 250–500 ml.<br>' +
               '<b>Noradrenalina</b> de primera elección, desde 0,05–0,1 µg/kg/min' + (hay(v.peso) ? ' = <b>' + mlh(0.05, v.peso, 16) + '–' + mlh(0.1, v.peso, 16) + ' ml/h</b> con 4 mg en 250 ml (16 µg/ml)' : '') + '; objetivo PAM ≥65 mmHg.<br>' +
@@ -360,7 +360,7 @@ window.PROTOCOLS = [
               'Soporte mecánico (Impella) en pacientes seleccionados y en un centro con experiencia (ACC/AHA 2025, ensayo DanGer Shock); ECMO no de rutina.' + (hay(v.peso) ? '' : ' ' + faltaPeso)
           },
           {
-            l: 'Bradicardia o bloqueo AV', t: 'Bradicardia o bloqueo AV', c: 'mid',
+            farmacos: ['Atropina', { n: 'Adrenalina', inf: false }, 'Isoprenalina'], l: 'Bradicardia o bloqueo AV', t: 'Bradicardia o bloqueo AV', c: 'mid',
             show: '<b>Atropina</b> si es sintomática o hay compromiso hemodinámico: 0,5 mg IV (ERC; la AHA da 1 mg) cada 3–5 min, máx. 3 mg. Menos de 0,5 mg puede causar bradicardia paradójica.<br>' +
               'Si no responde, hay BAV avanzado o QRS ancho (típico del IAM anterior): <b>marcapasos transcutáneo</b>. Como puente: adrenalina 2–10 µg/min IV o isoprenalina (ver Fichas).<br>' +
               'En el IAM inferior el BAV suele ser nodal (QRS estrecho) y responder a la atropina. Evitar betabloqueantes.'
@@ -465,7 +465,7 @@ window.PROTOCOLS = [
         },
         fuera: { t: 'Fuera de la ventana de trombólisis IV', c: 'mid', show: 'Sin trombólisis IV. Si hay oclusión de gran vaso, comentar con el neurólogo de teleictus el traslado a trombectomía.' },
         ventana1: { ...CI },
-        ventana2: {
+        ventana2: { farmacos: ['Alteplasa'],
           q: '¿Hay mismatch en la TC de perfusión o difusión-FLAIR en la RM?',
           help: '4,5–9 h o ictus del despertar: solo con imagen avanzada y solo ALTEPLASA (EXTEND, WAKE-UP). No tenecteplasa si solo hay TC sin contraste (TWIST).',
           opts: [{ l: 'Sí, hay mismatch', go: 'ventana2ci' }, { l: 'No, o solo hay TC sin contraste', go: 'sinimagen' }]
@@ -478,13 +478,13 @@ window.PROTOCOLS = [
           help: v => hay(v.tas) && hay(v.tad) ? 'TA introducida: ' + v.tas + '/' + v.tad + ' mmHg.' : 'Introduce la TAS y la TAD arriba para que se marque la opción.',
           opts: [{ l: 'Sí', go: 'dosis', sug: taOk }, { l: 'No, ≥185/110', go: 'tactl', sug: taAlta }]
         },
-        tactl: {
+        tactl: { farmacos: ['Labetalol', 'Urapidilo'],
           t: 'Bajar la TA antes de trombolisar', c: 'high',
           show: 'Objetivo &lt;185/110 antes de empezar y &lt;180/105 las 24 h siguientes (AHA/ASA 2026).<br><b>Labetalol IV</b> 10 mg en 1–2 min, repetible (máx. 150 mg), o <b>urapidilo</b> si hay contraindicación a los betabloqueantes.',
           q: '¿Se consigue &lt;185/110?',
           opts: [{ l: 'Sí', go: 'dosis' }, { l: 'No, TA no controlable', go: 'contra' }]
         },
-        dosis: {
+        dosis: { farmacos: ['Alteplasa', 'Tenecteplasa'],
           t: 'TROMBÓLISIS (dosis con el peso real)', c: 'high',
           show: v => {
             let h = '';
@@ -512,23 +512,23 @@ window.PROTOCOLS = [
         help: 'Ábrelas cuando aparezcan, en cualquier momento del flujograma.',
         items: [
           {
-            l: 'Hemorragia tras la trombólisis', t: 'Sospecha de hemorragia', c: 'high',
+            farmacos: ['Ácido tranexámico'], l: 'Hemorragia tras la trombólisis', t: 'Sospecha de hemorragia', c: 'high',
             show: 'Deterioro neurológico, cefalea intensa, vómitos o HTA brusca: <b>parar la perfusión</b>, TC urgente, hemograma, coagulación y fibrinógeno.<br><b>Crioprecipitado 10 U IV</b> en 10–30 min, repitiendo hasta fibrinógeno ≥150 mg/dl (AHA/ASA 2026), o, si no hay o está contraindicado, <b>ácido tranexámico 1 g IV</b> en 10 min. Contactar con neurocirugía o la UCI de referencia.'
           },
           {
-            l: 'Angioedema orolingual', t: 'Angioedema orolingual', c: 'high',
+            farmacos: ['Metilprednisolona', 'Dexclorfeniramina', { n: 'Adrenalina', inf: false }], l: 'Angioedema orolingual', t: 'Angioedema orolingual', c: 'high',
             show: 'Más frecuente con IECA. <b>Parar la perfusión</b>, suspender los IECA y vigilar la vía aérea: intubación precoz (idealmente despierto y con fibroscopio) si afecta a laringe, paladar, suelo de la boca u orofaringe, o progresa en ~30 min.<br><b>Metilprednisolona 125 mg IV</b> + antihistamínico H1 IV (AHA: difenhidramina 50 mg; en España, dexclorfeniramina 5 mg IV) · famotidina 20 mg IV si está disponible.<br>Si progresa: <b>adrenalina 0,3 mg SC o 0,5 mg nebulizada</b>. Si no cede: icatibant 30 mg SC (cada 6 h, máx. 3 dosis/24 h) o inhibidor de la C1 esterasa 20 UI/kg IV (evidencia limitada).'
           },
           {
-            l: 'Tensión arterial alta', t: 'Tensión arterial', c: 'mid',
+            farmacos: ['Labetalol', 'Urapidilo'], l: 'Tensión arterial alta', t: 'Tensión arterial', c: 'mid',
             show: '<b>Candidato a trombólisis o ya trombolisado:</b> &lt;185/110 antes y &lt;180/105 las 24 h siguientes.<br><b>No candidato:</b> tratar solo si TAS >220 y/o TAD >120, bajando ~10 % y evitando descensos >15 %.<br>Labetalol IV 10 mg en 1–2 min (máx. 150 mg) o urapidilo si hay contraindicación a los betabloqueantes.'
           },
           {
-            l: 'Agitación, coma o crisis comicial', t: 'Complicaciones neurológicas', c: 'mid',
+            farmacos: ['Haloperidol'], l: 'Agitación, coma o crisis comicial', t: 'Complicaciones neurológicas', c: 'mid',
             show: 'Agitación → <b>haloperidol 2,5–5 mg IV</b> (evitar benzodiacepinas) · coma con GCS &lt;9 → valorar aislar la vía aérea · crisis comicial → benzodiacepinas IV (no profilácticas).'
           },
           {
-            l: 'Glucemia o fiebre', t: 'Glucemia y temperatura', c: 'mid',
+            farmacos: ['Paracetamol', { n: 'Insulina', inf: false }], l: 'Glucemia o fiebre', t: 'Glucemia y temperatura', c: 'mid',
             show: 'Hiperglucemia >180 mg/dl → insulina rápida IV según glucemia capilar · hipoglucemia &lt;60 → glucosa IV y mantener >70 · hipertermia >37,5 °C → paracetamol 1 g IV, evitar AAS.'
           }
         ]
@@ -661,7 +661,7 @@ window.PROTOCOLS = [
         help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma. El RTS usa la FR, la TAS y el Glasgow de arriba.',
         items: [
           {
-            l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
+            farmacos: ['Ácido tranexámico'], l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
             show: 'Compresión directa; <b>torniquete</b> si la hemorragia de una extremidad amenaza la vida; cinturón pélvico si se sospecha fractura de pelvis con hemorragia que amenaza la vida.<br>' +
               '<b>Ácido tranexámico</b> si sangra o hay riesgo de sangrado importante: <b>1 g IV en 10 min</b> (en 50–100 ml de SF) y después <b>1 g IV en 8 h</b>. Cuanto antes, dentro de las <b>3 h</b> desde la lesión; pasadas las 3 h, no iniciarlo. No en bolo rápido (hipotensión).<br>' +
               '<b>Hipotensión permisiva</b> sin TCE: TAS 80–90 mmHg (PAM 50–60) hasta controlar la hemorragia. Con TCE grave, no (ver «TCE grave»).<br>' +
@@ -801,7 +801,7 @@ window.PROTOCOLS = [
           t: 'Sin sospecha de infección', c: 'mid',
           show: 'No se activa el Codi Sèpsia: traslado a urgencias con <b>alerta de paciente crítico</b>.'
         },
-        activar: {
+        activar: { farmacos: [{ n: 'Fentanilo', inf: false }, 'Paracetamol', { n: 'Insulina', inf: false }],
           t: 'ACTIVAR CODI SÈPSIA', c: 'high',
           show: v => 'Comunicar a CECOS (IDEAS).<br>' +
             '<b>Primera hora:</b> hemocultivos y <b>antibiótico en &lt;1 h</b> · control del foco (drenaje precoz, &lt;12 h) · monitorización de FR, FC, TAM, relleno capilar, EtCO₂, índice de perfusión e índice de shock.<br>' +
@@ -822,7 +822,7 @@ window.PROTOCOLS = [
           t: 'Sin hipoperfusión',
           show: 'Sin bolos de rutina. Mantener la monitorización y repetir la valoración; si aparece hipoperfusión, volver a esta pregunta.'
         },
-        fluidos: {
+        fluidos: { farmacos: ['Plasmalyte'],
           t: 'FLUIDOS', c: 'high',
           show: v => '<b>Cristaloide balanceado</b> (p. ej., Plasmalyte) en bolos de <b>500 ml</b>, reevaluando la tolerancia tras cada uno (crepitantes, SpO₂, trabajo respiratorio). Evitar coloides.<br>' +
             'Volumen orientativo: <b>20–30 ml/kg</b>' + (hay(v.peso) ? ' = <b>' + f(Math.round(20 * v.peso / 10) * 10) + '–' + f(Math.round(30 * v.peso / 10) * 10) + ' ml</b>' : '. ' + faltaPeso) + '.<br>' +
@@ -834,7 +834,7 @@ window.PROTOCOLS = [
           t: 'Responde a los fluidos', c: 'low',
           show: 'Reevaluar a menudo (TAM, relleno capilar, EtCO₂, diuresis); nuevos bolos de 500 ml solo si vuelve la hipoperfusión y los tolera.'
         },
-        nora: {
+        nora: { farmacos: [{ n: 'Noradrenalina', mg: 8, vol: 50, mlh: 3 }, 'Vasopresina', 'Hidrocortisona'],
           t: 'NORADRENALINA', c: 'high',
           show: v => 'Perfusión continua de elección. Dilución del folleto: <b>8 mg en 50 ml de SG 5 % (160 µg/ml)</b>. Empezar a <b>3 ml/h</b> (8 µg/min) y subir de 3 en 3 ml/h hasta TAM 65–70 mmHg.<br>' +
             (hay(v.peso) ? 'Dosis máxima 1 µg/kg/min = <b>' + ml(1, v.peso) + ' ml/h</b> con ' + f(v.peso) + ' kg.<br>' : 'Dosis máxima 1 µg/kg/min (con 80 kg, 30 ml/h). ' + faltaPeso + '<br>') +

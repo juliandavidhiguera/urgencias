@@ -679,6 +679,18 @@ body {
 }
 .fl-esc { display: inline-flex; align-items: center; min-height: 44px; margin: 10px 8px 0 0; padding: 8px 14px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
 .fl-esc:hover, .fl-esc:focus-visible { background: var(--bg2); }
+.fl-farm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.fl-farm { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
+.fl-farm:hover, .fl-farm:focus-visible { border-color: var(--blue); background: var(--blue-bg); }
+.fl-farm-tag { font-size: var(--fs-xs); font-weight: 600; color: var(--blue); }
+.lat-farm .field { margin-top: 10px; }
+.lat-farm .field input { width: 100%; }
+.lat-farm-h { font-weight: 700; color: var(--text); }
+.lat-farm-dil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lat-farm-res { margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: var(--fs-base); }
+.lat-farm-warn { margin-top: 8px; padding: 8px 10px; border: 1px solid var(--red); border-radius: 6px; background: var(--red-bg); color: var(--red-text); font-weight: 600; font-size: var(--fs-sm); }
+.lat-farm-hint { margin-top: 8px; font-size: var(--fs-sm); color: var(--text2); }
+.lat-farm .btn { margin-top: 10px; margin-right: 6px; }
 
 /* PROTOCOLS */
 .protocol-card {
@@ -1437,7 +1449,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 <aside class="lat-panel" id="lat-panel" aria-labelledby="lat-title" hidden>
   <div class="lat-bar">
     <span class="lat-title" id="lat-title">Escala</span>
-    <button class="btn" id="lat-close" onclick="cerrarEscalaLateral()" aria-label="Cerrar la escala y volver al protocolo">✕ Cerrar</button>
+    <button class="btn" id="lat-close" onclick="cerrarEscalaLateral()" aria-label="Cerrar el panel y volver al protocolo">✕ Cerrar</button>
   </div>
   <div class="lat-body" id="lat-body"></div>
 </aside>
@@ -2203,9 +2215,13 @@ function _flowHtml(p) {
     '</div>';
 }
 
-function _flowShow(n, v) {
+function _flowShow(n, v, pid, nid) {
   const h = typeof n.show === 'function' ? n.show(v) : n.show;
   if (!h) return '';
+  if (pid && n.farmacos) {
+    return '<div class="ficha-section fl-card"><div class="ficha-section-title' + (n.c ? ' risk-' + n.c : '') + '">' + (n.t || '') + '</div>' +
+      '<div class="ficha-section-text">' + h + '</div>' + _flowFarmBtns(n, pid, nid) + '</div>';
+  }
   return '<div class="ficha-section fl-card"><div class="ficha-section-title' + (n.c ? ' risk-' + n.c : '') + '">' + (n.t || '') + '</div>' +
     '<div class="ficha-section-text">' + h + '</div></div>';
 }
@@ -2216,6 +2232,34 @@ function _flowEscBtns(n) {
     const sc = SCALES.find(x => x.id === id);
     return sc ? '<button class="fl-esc" onclick="abrirEscalaLateral(\'' + id + '\', this)">📊 Hacer la escala ' + sc.title + ' al lado</button>' : '';
   }).join('');
+}
+
+/* n.farmacos = ['Nombre de la ficha' | {n, inf, mg, vol, dosis, mlh}]: botón por fármaco que abre en el
+   panel lateral su perfusión (si está en INFUSIONS) con el peso del flujograma y el acceso a la ficha.
+   inf: nombre en INFUSIONS si difiere (false = sin perfusión); mg/vol: dilución del protocolo;
+   dosis: dosis inicial en la unidad de INFUSIONS; mlh: ritmo inicial en ml/h (calcula la dosis). */
+function _flowFarm(pid, nid, j) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const n = nid[0] === 'x' && !p.flow.nodes[nid] ? p.flow.extras.items[+nid.slice(1)] : p.flow.nodes[nid];
+  const c = n.farmacos[j];
+  return typeof c === 'string' ? { n: c } : c;
+}
+
+function _farmResolver(c) {
+  const ficha = (window.FICHAS || []).find(f => f.nombre === c.n) || null;
+  const nombreInf = c.inf === false ? null : (c.inf || c.n);
+  const inf = nombreInf ? (window.INFUSIONS || []).find(d => d.name === nombreInf) || null : null;
+  return { ficha, inf };
+}
+
+function _flowFarmBtns(n, pid, nid) {
+  return '<div class="fl-farm-row">' + n.farmacos.map((c, j) => {
+    const cfg = typeof c === 'string' ? { n: c } : c;
+    const r = _farmResolver(cfg);
+    if (!r.ficha && !r.inf) return '';
+    return '<button class="fl-farm" onclick="abrirFarmacoLateral(\'' + pid + '\',\'' + nid + '\',' + j + ', this)">💊 ' + cfg.n +
+      (r.inf ? ' <span class="fl-farm-tag">perfusión</span>' : '') + '</button>';
+  }).join('') + '</div>';
 }
 
 function _flowResp(path) {
@@ -2235,7 +2279,7 @@ function renderFlow(pid) {
   let nq = 0;
   body.innerHTML = path.map((st, i) => {
     const n = p.flow.nodes[st.n];
-    let h = _flowShow(n, v);
+    let h = _flowShow(n, v, pid, st.n);
     if (!n.q) return h + _flowEscBtns(n);
     nq++;
     if (st.o !== null) {
@@ -2264,7 +2308,7 @@ function renderFlow(pid) {
       const on = abiertos.includes(k);
       return '<button class="fl-chip' + (on ? ' fl-chip-on' : '') + '" aria-pressed="' + on + '" onclick="flowExtra(\'' + pid + '\',' + k + ')">' +
         '<span aria-hidden="true">' + (on ? '−' : '+') + '</span> ' + it.l + '</button>';
-    }).join('') + '</div>' + abiertos.map(k => _flowShow(p.flow.extras.items[k], v)).join('');
+    }).join('') + '</div>' + abiertos.map(k => _flowShow(p.flow.extras.items[k], v, pid, 'x' + k)).join('');
   }
 }
 
@@ -3640,12 +3684,145 @@ function abrirEscalaLateral(id, btn) {
     box.querySelector('details').open = true;
     calcScale(id, 'lat-');
   }
+  _latMostrar(box, 'Escala ' + sc.title);
+}
+
+function _latMostrar(box, titulo) {
+  const body = document.getElementById('lat-body');
   [...body.children].forEach(c => { c.hidden = c !== box; });
-  document.getElementById('lat-title').textContent = 'Escala ' + sc.title;
+  document.getElementById('lat-title').textContent = titulo;
   document.getElementById('lat-panel').hidden = false;
   document.body.classList.add('lat-open');
   body.scrollTop = 0;
   document.getElementById('lat-close').focus();
+}
+
+/* Medicación en el panel lateral: perfusión editable (dosis ↔ ml/h) cargada con el peso del
+   flujograma y la dilución del protocolo, y botón a la ficha con el peso ya puesto. Cada fármaco
+   (con su dilución) conserva lo que se ajuste mientras dure la sesión; no se guarda nada. */
+function abrirFarmacoLateral(pid, nid, j, btn) {
+  const c = _flowFarm(pid, nid, j);
+  const r = _farmResolver(c);
+  if (btn) _latOrigen = btn;
+  const pesoEl = document.getElementById('fl-' + pid + '-peso');
+  const peso = pesoEl ? parseFloat(String(pesoEl.value).replace(',', '.')) : NaN;
+  const d = r.inf;
+  const mg = c.mg != null ? c.mg : d ? d.mg : null;
+  const vol = c.vol != null ? c.vol : d ? d.vol : null;
+  const key = 'latf-' + (c.n + '-' + mg + '-' + vol).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
+  const body = document.getElementById('lat-body');
+  let box = document.getElementById(key);
+  if (!box) {
+    box = document.createElement('div');
+    box.id = key;
+    box.dataset.n = c.n;
+    box._cfg = c;
+    box.innerHTML = _farmCardHTML(key, c, r);
+    body.appendChild(box);
+    if (d) {
+      if (!isNaN(peso) && peso > 0) document.getElementById(key + '-peso').value = peso;
+      const ini = c.dosis != null ? c.dosis : d.doseMin;
+      if (c.mlh != null) { document.getElementById(key + '-mlh').value = c.mlh; _farmCalc(key, 'mlh'); }
+      else { document.getElementById(key + '-dosis').value = ini; _farmCalc(key, 'dosis'); }
+    }
+  } else if (d && !isNaN(peso) && peso > 0 && _n(key + '-peso') !== peso) {
+    document.getElementById(key + '-peso').value = peso; // el peso del flujograma ha cambiado
+    _farmCalc(key, 'dosis');
+  }
+  _latMostrar(box, 'Medicación: ' + c.n);
+}
+
+function _farmCardHTML(key, c, r) {
+  const d = r.inf;
+  const u = d ? (d.unitLabel || 'mg') : '';
+  let h = '<div class="scale-card lat-farm"><div class="scale-header"><div><h3 class="scale-title">' + c.n + '</h3>' +
+    (r.ficha && r.ficha.subtitulo ? '<div class="scale-subtitle">' + r.ficha.subtitulo + '</div>' : '') + '</div></div><div class="scale-body">';
+  if (d) {
+    const fld = (id, l, extra) => '<div class="field"><label for="' + key + '-' + id + '">' + l + '</label><input type="number" id="' + key + '-' + id + '" min="0" step="any" inputmode="decimal" oninput="_farmCalc(\'' + key + '\',\'' + extra + '\')"></div>';
+    h += '<div class="lat-farm-h">💧 Perfusión continua</div>' +
+      fld('peso', 'Peso real (kg)', 'dosis') +
+      '<div class="lat-farm-dil">' + fld('mg', 'Cantidad (' + u + ')', 'dosis') + fld('vol', 'Volumen (ml)', 'dosis') + '</div>' +
+      '<div class="lat-farm-dil">' + fld('dosis', 'Dosis (' + d.unit + ')', 'dosis') + fld('mlh', 'Ritmo (ml/h)', 'mlh') + '</div>' +
+      '<div class="lat-farm-res" id="' + key + '-res" aria-live="polite"></div>' +
+      '<div class="lat-farm-warn" id="' + key + '-warn" role="alert" hidden></div>' +
+      '<div class="scale-note">Rango: ' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit +
+      ' · Diluyente: ' + d.diluyente + (c.mg != null ? ' · Dilución del protocolo; la de Perfusión IV es ' + d.mg + ' ' + u + ' en ' + d.vol + ' ml' : '') + '</div>' +
+      (d.notas ? '<div class="scale-note">⚠ ' + d.notas + '</div>' : '') +
+      '<div class="lat-farm-hint">Cambia la dosis o el ritmo según la evolución: el otro valor se recalcula.</div>' +
+      '<button class="btn btn-copy" onclick="_farmCopiar(\'' + key + '\')">📋 Copiar perfusión</button>';
+  } else {
+    h += '<div class="scale-note">Bolo o dosis única: dosis y vía en la ficha. Si la ficha da la dosis por kilo, su calculadora se abre con el peso del paciente.</div>';
+  }
+  if (r.ficha) {
+    h += '<button class="btn lat-farm-ficha" onclick="_farmFicha(\'' + key + '\',\'' + r.ficha.file.replace(/'/g, "\\'") + '\')">📄 Ver la ficha</button>';
+  }
+  return h + '</div></div>';
+}
+
+function _farmCalc(key, origen) {
+  const box = document.getElementById(key);
+  const d = _farmResolver(_farmCfgDeCaja(box)).inf;
+  if (!d) return;
+  const mgEl = document.getElementById(key + '-mg');
+  if (mgEl.value === '') { // primera vez: dilución del protocolo o de Perfusión IV
+    const cfg = _farmCfgDeCaja(box);
+    mgEl.value = cfg.mg != null ? cfg.mg : d.mg;
+    document.getElementById(key + '-vol').value = cfg.vol != null ? cfg.vol : d.vol;
+  }
+  const peso = _n(key + '-peso'), mg = _n(key + '-mg'), vol = _n(key + '-vol');
+  const conc = mg != null && vol ? mg / vol : null;
+  const porUnidad = _infuMgPerHour(1, d.unit, peso || 0); // mg/h por unidad de dosis
+  const necesitaPeso = d.unit.indexOf('/kg/') !== -1;
+  const res = document.getElementById(key + '-res');
+  const warn = document.getElementById(key + '-warn');
+  if (conc == null || (necesitaPeso && !peso)) {
+    res.textContent = necesitaPeso && !peso ? 'Introduce el peso.' : 'Introduce la dilución.';
+    warn.hidden = true;
+    return;
+  }
+  const u = d.unitLabel || 'mg';
+  if (origen === 'mlh') {
+    const mlh = _n(key + '-mlh');
+    document.getElementById(key + '-dosis').value = mlh != null ? +(mlh * conc / porUnidad).toFixed(3) : '';
+  } else {
+    const dosis = _n(key + '-dosis');
+    document.getElementById(key + '-mlh').value = dosis != null ? +(dosis * porUnidad / conc).toFixed(1) : '';
+  }
+  const dosis = _n(key + '-dosis'), mlh = _n(key + '-mlh');
+  res.innerHTML = dosis != null && mlh != null
+    ? '<b>' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h</b><br>Concentración ' + _fmt(conc, 3) + ' ' + u + '/ml · 1 ml/h = ' + _fmt(conc / porUnidad, 3) + ' ' + d.unit
+    : 'Introduce la dosis o el ritmo.';
+  const fuera = dosis != null && (dosis < d.doseMin || (d.doseMax != null && dosis > d.doseMax));
+  warn.hidden = !fuera;
+  warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + d.doseMin + (d.doseMax != null ? '–' + d.doseMax : '') + ' ' + d.unit + '): revisar antes de administrar.' : '';
+}
+
+function _farmCfgDeCaja(box) {
+  /* La configuración (inf, mg, vol) se guarda en la caja al crearla. */
+  return box._cfg || { n: box.dataset.n };
+}
+
+function _farmCopiar(key) {
+  const box = document.getElementById(key);
+  const d = _farmResolver(_farmCfgDeCaja(box)).inf;
+  const u = d.unitLabel || 'mg';
+  const v = id => document.getElementById(key + '-' + id).value || '_';
+  const txt = '/URG PERFUSIÓN\nMedicamento: ' + box.dataset.n + '\nPeso: ' + v('peso') + ' kg\nDilución: ' + v('mg') + ' ' + u + ' en ' + v('vol') +
+    ' mL\nDosis: ' + v('dosis') + ' ' + d.unit + '\nResultado: ' + v('mlh') + ' mL/h';
+  navigator.clipboard.writeText(txt).then(showToast).catch(showCopyError);
+}
+
+function _farmFicha(key, file) {
+  const pesoEl = document.getElementById(key + '-peso');
+  let peso = pesoEl ? pesoEl.value : '';
+  if (!peso) { // fármaco sin perfusión: el peso del flujograma que abrió el panel
+    const fl = _latOrigen && _latOrigen.closest('.fl-box');
+    const inp = fl && fl.querySelector('input[id$="-peso"]');
+    peso = inp ? inp.value : '';
+  }
+  showFicha(file);
+  const fp = document.getElementById('ficha-calc-peso');
+  if (fp && peso) { fp.value = peso; calcFichaDosis(); }
 }
 
 function cerrarEscalaLateral() {
