@@ -239,7 +239,7 @@ window.PROTOCOLS = [
         muyalto: { t: 'SCASEST de muy alto riesgo', c: 'high', show: 'Tratar como muy alto riesgo <b>SIN activar el Codi IAM</b>: estrategia invasiva inmediata (&lt;2 h, ESC 2023).' },
         nosca: { t: 'Sin criterios de Codi IAM', c: 'mid', show: 'Seguir el protocolo de SCASEST específico.' },
         activar: {
-          t: 'ACTIVAR CODI IAM', c: 'high',
+          t: 'ACTIVAR CODI IAM', c: 'high', escalas: ['killip'],
           show: 'Notificar y anotar la hora del ECG.<br><b>Tratamiento inicial:</b> O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg) · <b>AAS 150–300 mg VO masticada</b> (450 mg IV de acetilsalicilato de lisina si no puede VO).<br>Nitroglicerina (SL 0,4 mg o IV): NO si TAS &lt;90, FC &lt;50, sospecha de IAM de VD o inhibidores de la PDE-5 en 24 h, ni como prueba diagnóstica.<br>Killip: I normal · II crepitantes o 3.er ruido · III edema agudo de pulmón · IV shock cardiogénico.',
           q: 'Localización del infarto en el ECG',
           help: 'En todo IAM inferior, y si hay descenso del ST en V1–V3, registrar V3R–V4R y V7–V9.',
@@ -439,7 +439,7 @@ window.PROTOCOLS = [
         },
         ped: { t: 'Ictus pediátrico', c: 'high', show: 'Activar SIEMPRE el Codi Ictus, con cualquier RACE → centro de referencia pediátrico más cercano.' },
         race: {
-          q: 'Puntuación de la escala RACE (0–9)',
+          escalas: ['race'], q: 'Puntuación de la escala RACE (0–9)',
           help: 'Paresia facial (0–2) · brazo (0–2) · pierna (0–2) · desviación oculocefálica (0–1) · afasia si la debilidad es derecha o agnosia si es izquierda (0–2). ≥5 = alta probabilidad de oclusión de gran vaso.',
           opts: [{ l: 'RACE 0–4', go: 'race_lo' }, { l: 'RACE 5–9', go: 'race_hi' }]
         },
@@ -503,7 +503,7 @@ window.PROTOCOLS = [
           opts: [{ l: 'Ver la vigilancia de las primeras 24 h', go: 'post' }]
         },
         post: {
-          t: 'Vigilancia tras la trombólisis',
+          t: 'Vigilancia tras la trombólisis', escalas: ['nihss'],
           show: 'NIHSS y TA cada 15 min durante 2 h, cada 30 min hasta las 6 h y cada hora hasta las 24 h · <b>TA &lt;180/105</b> · sin antiagregantes ni anticoagulantes 24 h (heparina SC máx. 10.000 UI/día si es imprescindible) · evitar sondas y vías centrales las primeras horas · TC de control a las 24 h antes de los antitrombóticos.<br>Si aparece deterioro neurológico, cefalea, vómitos, HTA brusca o hinchazón de lengua o labios: panel de complicaciones.'
         }
       },
@@ -590,7 +590,7 @@ window.PROTOCOLS = [
       start: 'fisio',
       nodes: {
         fisio: {
-          q: '¿Tiene algún criterio FISIOLÓGICO?',
+          escalas: ['gcs', 'gcsped'], q: '¿Tiene algún criterio FISIOLÓGICO?',
           help: v => {
             const r = fisio(v);
             return 'FR &lt;10 rpm (&lt;20 en &lt;1 año) o >29 rpm · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en &lt;1 año).' +
@@ -639,7 +639,7 @@ window.PROTOCOLS = [
           ...TIPO
         },
         inm_c: {
-          q: '¿Cumple algún criterio de inmovilización completa de la columna?',
+          escalas: ['gcs'], q: '¿Cumple algún criterio de inmovilización completa de la columna?',
           help: 'Alteración de la consciencia (Glasgow &lt;15) · dolor, déficit neurológico o motor, o deformidad del raquis · mecanismo lesional de riesgo junto con: intoxicación (alcohol, drogas, fármacos), dolor intenso en otro lugar o lesión distractora, incapacidad para comunicarse (idioma, &lt;3 años, enfermedad) o &lt;3 años con mecanismo de riesgo (incluida sospecha de maltrato) y/o hipotensión mantenida.',
           opts: [{ l: 'Sí', go: 'inmov', sug: v => num(v.gcs) && v.gcs < 15 }, { l: 'No', go: 'noinmov' }]
         },
@@ -705,7 +705,169 @@ window.PROTOCOLS = [
 ], src:'Codi PPT — SEM Catalunya, Grup de Treball de Trauma, revisión diciembre 2017'},
 
 {id:'codi-sepsia', title:'Codi Sèpsia', sub:'NEWS ≥7 + sospecha de infección — activación y objetivos de la 1ª hora', badge:'red', tag:'Crítico', rank:4, codigo:true,
-  folleto:'codigos/C04._Codi_sèpsia.pdf', steps:[
+  folleto:'codigos/C04._Codi_sèpsia.pdf',
+  flow:(() => {
+    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    const hay = x => !isNaN(x) && x > 0;
+    const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular volúmenes y ml/h.</span>';
+    const tam = v => hay(v.tas) && hay(v.tad) ? Math.round(v.tad + (v.tas - v.tad) / 3) : null;
+    const ishock = v => hay(v.fc) && hay(v.tas) ? Math.round(v.fc / v.tas * 100) / 100 : null;
+    const vital = v => {
+      const r = [];
+      if (hay(v.fr) && (v.fr > 30 || v.fr < 8)) r.push('FR ' + v.fr);
+      if (hay(v.tas) && (v.tas < 90 || v.tas > 220)) r.push('TAS ' + v.tas);
+      if (hay(v.fc) && (v.fc < 40 || v.fc > 131)) r.push('FC ' + v.fc);
+      return r;
+    };
+    // NEWS2 (RCP 2017, tabla del folleto). cons: 0 alerta, 1 confusión nueva/voz/dolor/inconsciente.
+    // oxi: 0 aire (escala 1), 1 O2 (escala 1), 2 aire (escala 2), 3 O2 (escala 2).
+    const news = v => {
+      const cons = v.resp.cons, oxi = v.resp.oxi;
+      const p = [], falta = [];
+      const add = (l, x, fn) => { if (hay(x)) p.push([l, fn(x)]); else falta.push(l); };
+      add('FR', v.fr, x => x <= 8 ? 3 : x <= 11 ? 1 : x <= 20 ? 0 : x <= 24 ? 2 : 3);
+      const o2 = oxi === 1 || oxi === 3;
+      add('SpO₂', v.spo2, x => oxi >= 2
+        ? (x <= 83 ? 3 : x <= 85 ? 2 : x <= 87 ? 1 : x <= 92 ? 0 : !o2 ? 0 : x <= 94 ? 1 : x <= 96 ? 2 : 3)
+        : (x <= 91 ? 3 : x <= 93 ? 2 : x <= 95 ? 1 : 0));
+      p.push([o2 ? 'Con oxígeno' : 'Aire ambiente', o2 ? 2 : 0]);
+      add('TAS', v.tas, x => x <= 90 ? 3 : x <= 100 ? 2 : x <= 110 ? 1 : x <= 219 ? 0 : 3);
+      add('FC', v.fc, x => x <= 40 ? 3 : x <= 50 ? 1 : x <= 90 ? 0 : x <= 110 ? 1 : x <= 130 ? 2 : 3);
+      p.push(['Consciencia', cons === 1 ? 3 : 0]);
+      add('Temperatura', v.temp, x => x <= 35 ? 3 : x <= 36 ? 1 : x <= 38 ? 0 : x <= 39 ? 1 : 2);
+      return { total: p.reduce((a, x) => a + x[1], 0), p, falta };
+    };
+    const ml = (dosis, peso) => f(Math.round(dosis * peso * 60 / 160 * 10) / 10);
+    const INFEC = {
+      q: '¿Sospecha de infección o factores de riesgo de infección?',
+      help: '<b>Sospecha:</b> fiebre (o sensación de haberla tenido), hipotermia no accidental o temperatura normal + ≥1 de: tos o expectoración · molestias urinarias, orina turbia o maloliente · dolor abdominal, diarrea o vómitos · cefalea o alteración del estado mental · dolor, inflamación o enrojecimiento de una extremidad · úlceras o heridas con supuración, catéter central con el punto de entrada enrojecido o sonda vesical permanente. O deterioro general sin otra causa que lo explique.<br>' +
+        '<b>Factores de riesgo:</b> diabetes · corticoides o inmunosupresores crónicos · inmunosupresión (esplenectomía, VIH, hemodiálisis) · neoplasia activa o quimioterapia · infección reciente o en tratamiento antibiótico · cirugía o endoscopia (urinaria, biliar) en el último mes · heridas quirúrgicas, úlceras, catéter venoso central (diálisis, port-a-cath) o sonda vesical · >70 años con dependencia o en residencia (valorar antes su estado basal).',
+      opts: [{ l: 'Sí', go: 'activar' }, { l: 'No', go: 'critico' }]
+    };
+    return {
+      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'fr', l: 'FR', u: 'rpm' }, { k: 'spo2', l: 'SpO₂', u: '%' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'tad', l: 'TAD', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }, { k: 'temp', l: 'Temperatura', u: '°C' }],
+      start: 'vital',
+      nodes: {
+        vital: {
+          q: '¿Tiene algún criterio de RIESGO VITAL?',
+          help: v => {
+            const r = vital(v);
+            return 'Al menos uno de: <b>A</b> vía aérea comprometida · <b>B</b> FR >30 o &lt;8 rpm (contada durante 1 min), trabajo respiratorio (escala de Patrick >3), cianosis · <b>C</b> TAS &lt;90 mmHg (o caída >40 % de la basal) o >220 mmHg, FC &lt;40 o >131 lpm · <b>D</b> somnolencia, estupor, coma o convulsiones. Un valor alterado aislado se interpreta según el estado general.' +
+              (r.length ? '<br><b>Con los datos introducidos: ' + r.join(' · ') + '.</b>' : '');
+          },
+          opts: [{ l: 'Sí', go: 'rv', sug: v => vital(v).length > 0 }, { l: 'No', go: 'cons' }]
+        },
+        rv: {
+          t: 'RIESGO VITAL', c: 'high',
+          show: 'Actuación inicial (ABCDE) y traslado con <b>ALERTA DE PACIENTE CRÍTICO</b>.',
+          ...INFEC
+        },
+        cons: {
+          q: 'Nivel de consciencia (para el NEWS)',
+          opts: [{ l: 'Alerta', go: 'oxi' }, { l: 'Confusión o desorientación nueva, responde solo a la voz o al dolor, o inconsciente', go: 'oxi' }]
+        },
+        oxi: {
+          q: '¿Respira aire ambiente u oxígeno? (para el NEWS)',
+          help: 'La escala 2 de SpO₂ es solo para pacientes con CPAP, BiPAP u oxígeno crónico domiciliario (objetivo de SpO₂ 88–92 %). Los demás, escala 1.',
+          opts: [
+            { l: 'Aire ambiente', go: 'news' },
+            { l: 'Oxígeno', go: 'news' },
+            { l: 'Aire ambiente, con CPAP, BiPAP u O₂ domiciliario (escala 2)', go: 'news' },
+            { l: 'Oxígeno, con CPAP, BiPAP u O₂ domiciliario (escala 2)', go: 'news' }
+          ]
+        },
+        news: {
+          t: 'Escala NEWS2',
+          show: v => {
+            const n = news(v);
+            return '<b>NEWS = ' + n.total + (n.falta.length ? ' (incompleto)' : '') + '</b>' + (n.total >= 7 ? ' → <b>≥7: paciente potencialmente crítico</b>' : '') + '<br>' +
+              n.p.map(x => x[0] + ' ' + x[1]).join(' · ') +
+              (n.falta.length ? '<br>Faltan: ' + n.falta.join(', ') + ' (introdúcelos arriba).' : '') +
+              '<br><span class="pe-nota">Se puntúa la primera valoración o la peor durante la asistencia.</span>';
+          },
+          escalas: ['news2'], q: '¿Resultado del NEWS?',
+          opts: [{ l: 'NEWS ≥7', go: 'news7', sug: v => news(v).total >= 7 }, { l: 'NEWS &lt;7', go: 'bajo', sug: v => !news(v).falta.length && news(v).total < 7 }]
+        },
+        news7: {
+          t: 'NEWS ≥7', c: 'high',
+          show: 'Comunicar a CECOS con la metodología IDEAS.',
+          ...INFEC
+        },
+        bajo: {
+          t: 'NEWS &lt;7', c: 'low',
+          show: 'Comunicar a CECOS (IDEAS) y <b>valorar el traslado</b>. Repetir el NEWS si cambia la situación.'
+        },
+        critico: {
+          t: 'Sin sospecha de infección', c: 'mid',
+          show: 'No se activa el Codi Sèpsia: traslado a urgencias con <b>alerta de paciente crítico</b>.'
+        },
+        activar: {
+          t: 'ACTIVAR CODI SÈPSIA', c: 'high',
+          show: v => 'Comunicar a CECOS (IDEAS).<br>' +
+            '<b>Primera hora:</b> hemocultivos y <b>antibiótico en &lt;1 h</b> · control del foco (drenaje precoz, &lt;12 h) · monitorización de FR, FC, TAM, relleno capilar, EtCO₂, índice de perfusión e índice de shock.<br>' +
+            '<b>Objetivos:</b> TAM 65–70 mmHg · EtCO₂ >25 (35–45) mmHg · SpO₂ >90 % · glucemia &lt;180 mg/dl.<br>' +
+            'Analgesia orientada al foco: si EVA ≥5/10 o dolor intenso, fentanilo 50 µg + paracetamol 1 g IV. Insulina rápida 10 UI SC si hiperglucemia; mantener cerca de 180 mg/dl y evitar la hipoglucemia.' +
+            (tam(v) !== null || ishock(v) !== null ? '<br><b>Con los datos:</b> ' + [tam(v) !== null ? 'TAM ' + tam(v) + ' mmHg' : '', ishock(v) !== null ? 'índice de shock ' + f(ishock(v)) : ''].filter(Boolean).join(' · ') + '.' : '') +
+            '<br><span class="pe-nota">SSC 2026: antibiótico inmediato, idealmente &lt;1 h, si el shock es posible, probable o seguro; en la sepsis posible sin shock, estudio rápido y antibiótico en &lt;3 h si persiste la sospecha.</span>',
+          q: '¿Hay hipoperfusión o shock?',
+          help: v => 'EtCO₂ &lt;25 mmHg · índice de perfusión &lt;1,4 · índice de shock (FC/TAS) >0,8 · TAM &lt;65 mmHg · mala perfusión periférica (relleno capilar lento, piel moteada).' +
+            (ishock(v) !== null && ishock(v) > 0.8 ? '<br><b>Índice de shock ' + f(ishock(v)) + ' (>0,8).</b>' : '') +
+            (tam(v) !== null && tam(v) < 65 ? '<br><b>TAM ' + tam(v) + ' mmHg (&lt;65).</b>' : ''),
+          opts: [
+            { l: 'Sí', go: 'fluidos', sug: v => (ishock(v) !== null && ishock(v) > 0.8) || (tam(v) !== null && tam(v) < 65) || (hay(v.tas) && v.tas < 90) },
+            { l: 'No', go: 'nohipo' }
+          ]
+        },
+        nohipo: {
+          t: 'Sin hipoperfusión',
+          show: 'Sin bolos de rutina. Mantener la monitorización y repetir la valoración; si aparece hipoperfusión, volver a esta pregunta.'
+        },
+        fluidos: {
+          t: 'FLUIDOS', c: 'high',
+          show: v => '<b>Cristaloide balanceado</b> (p. ej., Plasmalyte) en bolos de <b>500 ml</b>, reevaluando la tolerancia tras cada uno (crepitantes, SpO₂, trabajo respiratorio). Evitar coloides.<br>' +
+            'Volumen orientativo: <b>20–30 ml/kg</b>' + (hay(v.peso) ? ' = <b>' + f(Math.round(20 * v.peso / 10) * 10) + '–' + f(Math.round(30 * v.peso / 10) * 10) + ' ml</b>' : '. ' + faltaPeso) + '.<br>' +
+            '<span class="pe-nota">SSC 2026: sugiere al menos 30 ml/kg en las primeras 3 h, ajustado al paciente y con reevaluación frecuente (insuficiencia cardiaca, renal o cirrosis: más prudencia).</span>',
+          q: 'Tras los fluidos, ¿persiste la hipotensión (TAM &lt;65 mmHg)?',
+          opts: [{ l: 'Sí', go: 'nora', sug: v => tam(v) !== null && tam(v) < 65 }, { l: 'No, ha respondido', go: 'respuesta' }]
+        },
+        respuesta: {
+          t: 'Responde a los fluidos', c: 'low',
+          show: 'Reevaluar a menudo (TAM, relleno capilar, EtCO₂, diuresis); nuevos bolos de 500 ml solo si vuelve la hipoperfusión y los tolera.'
+        },
+        nora: {
+          t: 'NORADRENALINA', c: 'high',
+          show: v => 'Perfusión continua de elección. Dilución del folleto: <b>8 mg en 50 ml de SG 5 % (160 µg/ml)</b>. Empezar a <b>3 ml/h</b> (8 µg/min) y subir de 3 en 3 ml/h hasta TAM 65–70 mmHg.<br>' +
+            (hay(v.peso) ? 'Dosis máxima 1 µg/kg/min = <b>' + ml(1, v.peso) + ' ml/h</b> con ' + f(v.peso) + ' kg.<br>' : 'Dosis máxima 1 µg/kg/min (con 80 kg, 30 ml/h). ' + faltaPeso + '<br>') +
+            'Se puede empezar por una <b>vía periférica</b> (vena de la fosa antecubital o más proximal, por poco tiempo) en lugar de esperar a la vía central. Vigilar la extravasación. Para otra dilución, ver Perfusión IV.<br>' +
+            '<b>Si sigue subiendo la noradrenalina:</b> añadir vasopresina en lugar de seguir subiéndola (SSC 2021: suele empezarse con noradrenalina 0,25–0,5 µg/kg/min' + (hay(v.peso) ? ' = ' + ml(0.25, v.peso) + '–' + ml(0.5, v.peso) + ' ml/h' : '') + ') e <b>hidrocortisona 200 mg/día</b> IV (50 mg cada 6 h) si persiste la necesidad de vasopresor (SSC 2021: a partir de 0,25 µg/kg/min durante ≥4 h).<br>' +
+            '<span class="pe-nota">Objetivo de TAM: SSC 2026 sugiere 60–65 mmHg al inicio en pacientes ≥65 años; el folleto da 65–70.</span>'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma. Los volúmenes usan el peso de arriba.',
+        items: [
+          {
+            l: 'Niños', t: 'Sepsis grave en niños', c: 'high',
+            show: v => '<b>Detección:</b> foco, órganos con disfunción, mal aspecto. Administrar oxígeno.<br>' +
+              '<b>Reanimación</b> (ERC PLS 2025): bolos de cristaloide de <b>10 ml/kg</b>' + (hay(v.peso) ? ' = <b>' + f(Math.round(10 * v.peso)) + ' ml</b>' : '') + ', reevaluando tras cada uno, hasta 40–60 ml/kg; vasoactivo no más tarde de 30–40 ml/kg; parar si hay signos de sobrecarga.<br>' +
+              '<b>Control del foco:</b> cultivos, antibiótico &lt;1 h, drenaje precoz &lt;12 h.<br>' +
+              '<b>Objetivos:</b> estado mental normal · diuresis >1 ml/kg/h · relleno capilar &lt;2 s · TA normal · pulsos periféricos iguales a los centrales.<br>' +
+              '<b>Valoración:</b> soporte inotrópico, UCI pediátrica, necesidad de ECMO.' + (hay(v.peso) ? '' : ' ' + faltaPeso)
+          },
+          {
+            l: 'Escala de Patrick', t: 'Trabajo respiratorio (escala de Patrick)',
+            show: 'No usa la musculatura accesoria 0 · tensión cervical sin hundimiento 1 · no usa la musculatura subcostal 2 · tiraje subcostal marcado 3 · clavículas hundidas 4 · respiración abdominal 5. <b>>3 = criterio de riesgo vital.</b>'
+          },
+          {
+            l: 'Comunicación IDEAS', t: 'Comunicación a CECOS (IDEAS)',
+            show: '<b>I</b>dentificación: edad y sexo · sospecha <b>D</b>iagnóstica y síntoma guía · <b>E</b>stado: escala NEWS · <b>A</b>ctuación: tratamiento y acciones relevantes · <b>S</b>: alerta de paciente crítico o activación del Codi Sèpsia, si cumple los criterios.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'Calcular escala NEWS (frecuencia respiratoria, SpO₂, TAS, frecuencia cardíaca, nivel de consciencia, temperatura)'},
   {type:'decision', text:'¿Riesgo vital (vía aérea comprometida; FR>30 o <8; TAS<90 o >220; FC<40 o >131; somnolencia/estupor/coma/convulsiones) o NEWS ≥7?', yes:'Sí', no:'No → traslado sin activación'},
   {type:'decision', branch:'yes', text:'¿Sospecha de infección o factores de riesgo de infección?', yes:'Sí', no:'No'},
