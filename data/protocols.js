@@ -561,7 +561,135 @@ window.PROTOCOLS = [
 ], src:'Codi Ictus — SEM Catalunya, Grup de Treball en Ictus, v.03 abril 2023 · Fase hospitalaria (Campdevànol con teleictus): AHA/ASA 2026 Guideline for the Early Management of Acute Ischemic Stroke · ESO 2021 trombólisis IV (Berge E, Eur Stroke J 2021) y ESO 2023 tenecteplasa (Alamowitch S, Eur Stroke J 2023) · fichas técnicas Actilyse y Metalyse 25 mg (CIMA) · AcT (PMID 35779553), EXTEND (PMID 31067369), WAKE-UP (PMID 29766770), TWIST (Lancet Neurol 2023)'},
 
 {id:'codi-ppt', title:'Codi PPT', sub:'Paciente traumático — criterios fisiológicos, anatómicos y mecanismo lesional', badge:'red', tag:'Crítico', rank:3, codigo:true,
-  folleto:"codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf", steps:[
+  folleto:"codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf",
+  flow:(() => {
+    const num = x => !isNaN(x) && x >= 0;
+    const lact = v => num(v.edad) && v.edad < 1;
+    const fisio = v => {
+      const r = [];
+      if (num(v.fr) && (v.fr > 29 || v.fr < (lact(v) ? 20 : 10))) r.push('FR ' + v.fr + ' rpm');
+      if (num(v.tas) && v.tas < (lact(v) ? 70 : 90)) r.push('TAS ' + v.tas + ' mmHg');
+      if (num(v.gcs) && v.gcs <= 13) r.push('Glasgow ' + v.gcs);
+      return r;
+    };
+    const rts = v => {
+      if (!num(v.fr) || !num(v.tas) || !num(v.gcs)) return null;
+      const fr = v.fr > 29 ? 3 : v.fr >= 10 ? 4 : v.fr >= 6 ? 2 : v.fr >= 1 ? 1 : 0;
+      const ta = v.tas > 89 ? 4 : v.tas >= 76 ? 3 : v.tas >= 50 ? 2 : v.tas >= 1 ? 1 : 0;
+      const gc = v.gcs >= 13 ? 4 : v.gcs >= 9 ? 3 : v.gcs >= 6 ? 2 : v.gcs >= 4 ? 1 : 0;
+      return fr + ta + gc;
+    };
+    const DEST01 = '<b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 min: CAT 3 (considerar CAT 3e) · isócrona CAT 3 >30 min: CAT 3 (considerar CAT 3e) / CAT 2b · Pediátrico: CAT P3 (considerar CAT P3e) / CAT P2b.';
+    const TIPO = {
+      q: '¿Traumatismo cerrado o penetrante?',
+      help: 'Para decidir la inmovilización de la columna.',
+      opts: [{ l: 'Cerrado', go: 'inm_c' }, { l: 'Penetrante', go: 'inm_p' }]
+    };
+    return {
+      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'fr', l: 'FR', u: 'rpm' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'gcs', l: 'Glasgow', u: 'puntos' }],
+      start: 'fisio',
+      nodes: {
+        fisio: {
+          q: '¿Tiene algún criterio FISIOLÓGICO?',
+          help: v => {
+            const r = fisio(v);
+            return 'FR &lt;10 rpm (&lt;20 en &lt;1 año) o >29 rpm · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en &lt;1 año).' +
+              (r.length ? '<br><b>Con los datos introducidos cumple: ' + r.join(' · ') + '.</b>' : '');
+          },
+          opts: [{ l: 'Sí, algún criterio', go: 'p0', sug: v => fisio(v).length > 0 }, { l: 'No', go: 'anat' }]
+        },
+        p0: {
+          t: 'ACTIVAR CODI PPT — PRIORIDAD 0', c: 'high',
+          show: 'Criterio fisiológico: <b>box de críticos</b>. Notificar a CECOS.<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          ...TIPO
+        },
+        anat: {
+          q: '¿Tiene algún criterio ANATÓMICO?',
+          help: 'Herida penetrante en cabeza, cuello, tórax o extremidades (proximal a rodilla o codo) · fractura craneal abierta o hundimiento · tórax inestable (volet) · fractura de pelvis · ≥2 fracturas de huesos largos proximales (húmero o fémur; en &lt;1 año, ≥1) · amputación proximal a tobillo o muñeca · extremidad aplastada, desguantada o destrozada · parálisis o déficit motor o sensitivo de una extremidad (sospecha de lesión medular) · quemaduras de grado >II con extensión ≥15 % (≥10 % en &lt;10 años, >50 años o embarazadas) · quemaduras de grado III >5 % · quemadura completa de cara o cuello.',
+          opts: [{ l: 'Sí, algún criterio', go: 'p1' }, { l: 'No', go: 'mec' }]
+        },
+        p1: {
+          t: 'ACTIVAR CODI PPT — PRIORIDAD 1', c: 'high',
+          show: 'Criterio anatómico: <b>box de críticos</b>. Notificar a CECOS.<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          ...TIPO
+        },
+        mec: {
+          q: '¿Tiene un MECANISMO LESIONAL de riesgo?',
+          help: 'Caída: adultos >6 m, niños >2–3 veces su altura (en general >3 m) · colisión de vehículo con intrusión >30 cm en el lugar del acompañante o >45 cm en cualquier otro, eyección parcial o completa, muerte de un ocupante o telemetría de alto riesgo (en general >60 km/h) · atropello de peatón o ciclista con desplazamiento o impacto significativo (>30 km/h) · moto, bicicleta u otro dispositivo (p. ej., esquí) a velocidad significativa · sospecha de maltrato en &lt;3 años · objeto que cae desde altura (valorar peso y altura) · arma blanca o de fuego.',
+          opts: [{ l: 'Sí', go: 'p2' }, { l: 'No', go: 'ant' }]
+        },
+        p2: {
+          t: 'ACTIVAR CODI PPT — PRIORIDAD 2', c: 'mid',
+          show: 'Mecanismo lesional de riesgo. Notificar a CECOS.<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
+          ...TIPO
+        },
+        ant: {
+          q: '¿Tiene algún antecedente o consideración especial?',
+          help: 'Embarazo avanzado (>20 semanas) · anticoagulación o alteración de la coagulación · diálisis o múltiples patologías · niños pequeños o edad avanzada (orientativo &lt;3 y >65 años) · criterio del profesional.',
+          opts: [{ l: 'Sí', go: 'p3', sug: v => num(v.edad) && (v.edad < 3 || v.edad > 65) }, { l: 'No', go: 'noact' }]
+        },
+        p3: {
+          t: 'ACTIVAR CODI PPT — PRIORIDAD 3', c: 'mid',
+          show: 'Antecedente relevante. Notificar a CECOS.<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.',
+          ...TIPO
+        },
+        noact: {
+          t: 'Sin criterios de Codi PPT', c: 'low',
+          show: 'No se activa el código. Valoración y traslado habituales; reevaluar si cambian las constantes.',
+          ...TIPO
+        },
+        inm_c: {
+          q: '¿Cumple algún criterio de inmovilización completa de la columna?',
+          help: 'Alteración de la consciencia (Glasgow &lt;15) · dolor, déficit neurológico o motor, o deformidad del raquis · mecanismo lesional de riesgo junto con: intoxicación (alcohol, drogas, fármacos), dolor intenso en otro lugar o lesión distractora, incapacidad para comunicarse (idioma, &lt;3 años, enfermedad) o &lt;3 años con mecanismo de riesgo (incluida sospecha de maltrato) y/o hipotensión mantenida.',
+          opts: [{ l: 'Sí', go: 'inmov', sug: v => num(v.gcs) && v.gcs < 15 }, { l: 'No', go: 'noinmov' }]
+        },
+        inm_p: {
+          q: '¿Sospecha de déficit o molestias neurológicas?',
+          opts: [{ l: 'Sí', go: 'inmov' }, { l: 'No', go: 'noinmov' }]
+        },
+        inmov: {
+          t: 'Inmovilización completa de la columna', c: 'mid',
+          show: 'Traslado con <b>collarín cervical y colchón de vacío</b> hasta la transferencia. En caso de duda, inmovilizar.'
+        },
+        noinmov: {
+          t: 'Sin criterios de inmovilización completa',
+          show: 'No precisa inmovilización completa de la columna. En caso de duda, inmovilizar.'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma. El RTS usa la FR, la TAS y el Glasgow de arriba.',
+        items: [
+          {
+            l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
+            show: 'Compresión directa; <b>torniquete</b> si la hemorragia de una extremidad amenaza la vida; cinturón pélvico si se sospecha fractura de pelvis con hemorragia que amenaza la vida.<br>' +
+              '<b>Ácido tranexámico</b> si sangra o hay riesgo de sangrado importante: <b>1 g IV en 10 min</b> (en 50–100 ml de SF) y después <b>1 g IV en 8 h</b>. Cuanto antes, dentro de las <b>3 h</b> desde la lesión; pasadas las 3 h, no iniciarlo. No en bolo rápido (hipotensión).<br>' +
+              '<b>Hipotensión permisiva</b> sin TCE: TAS 80–90 mmHg (PAM 50–60) hasta controlar la hemorragia. Con TCE grave, no (ver «TCE grave»).<br>' +
+              'Si hay criterios, activar la transfusión masiva (ver protocolo «Transfusión masiva»).<br><span class="pe-nota">Guía europea de hemorragia en el trauma, 6.ª ed., 2023 (PMID 36859355): torniquete 1B, cinturón pélvico 1C.</span>'
+          },
+          {
+            l: 'TCE grave (Glasgow ≤8)', t: 'TCE grave (Glasgow ≤8)', c: 'high',
+            show: 'Mantener <b>PAM ≥80 mmHg</b>: no aplicar la hipotensión permisiva.<br>Glasgow: leve 14–15 · moderado 9–13 · grave ≤8 (el folleto escribe «grave &lt;8»; el corte habitual, y el de la guía europea, es ≤8).<br><span class="pe-nota">Guía europea de hemorragia en el trauma, 6.ª ed., 2023.</span>'
+          },
+          {
+            l: 'Escalas RTS e ITP', t: 'Escalas RTS (adulto) e ITP (pediátrico)',
+            show: v => {
+              const r = rts(v);
+              return '<b>RTS</b> = FR + TAS + Glasgow (0–12)' + (r === null ? '. Introduce la FR, la TAS y el Glasgow para calcularlo.' : ': <b>' + r + '</b>' + (r < 12 ? ' → <b>traslado a un centro de trauma especializado</b>.' : '.')) + '<br>' +
+                'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0. <b>RTS &lt;12 → centro de trauma especializado.</b><br>' +
+                '<b>ITP</b> (sumar +2 / +1 / −1): peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples. <b>ITP &lt;8 → centro de trauma especializado.</b>';
+            }
+          },
+          {
+            l: 'Transferencia al hospital', t: 'Transferencia al hospital',
+            show: '<b>Verbal:</b> presentación (profesionales y paciente) · prioridad PPT (crítico P0/P1, no crítico P2/P3) · constantes · paciente: antecedentes (sexo, edad, perfil), accidente (qué ha pasado), patrón lesional (qué tiene), ABCDE y reconocimiento secundario (cómo le afecta), intervenciones y resultado (qué le hemos hecho), alertas (qué nos preocupa) · documentación · acompañantes.<br>' +
+              '<b>Física:</b> camilla del hospital con tablero espinal e inmovilizador pélvico si está indicado · camillas juntas y a la misma altura · pasar al paciente con el colchón de vacío hecho · retirarlo con la técnica del puente lateral (líder en la cabecera) · no perder de vista monitorización, tubos y sondas.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'decision', text:'¿Tiene algún criterio FISIOLÓGICO? (box de críticos)', yes:'Sí → Prioridad 0', no:'No'},
   {type:'info', branch:'yes', text:'Criterios fisiológicos: FR <10 rpm (<20 en <1a) o >29 rpm (todas las edades) · TAS <90 mmHg (<70 en <1a) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en <1a)'},
   {type:'decision', branch:'no', text:'¿Tiene algún criterio ANATÓMICO? (box de críticos)', yes:'Sí → Prioridad 1', no:'No'},

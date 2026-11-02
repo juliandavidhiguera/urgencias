@@ -2150,7 +2150,7 @@ function _flowHtml(p) {
     ((p.flow.inputs || []).length ? '<div class="fl-inputs">' + p.flow.inputs.map(it =>
       '<label for="fl-' + p.id + '-' + it.k + '">' + it.l + (it.u ? ' (' + it.u + ')' : '') +
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
-      '</div><div class="fl-hint">Los datos solo se usan para calcular las dosis; no se guardan.</div>' : '') +
+      '</div><div class="fl-hint">Los datos solo se usan para los cálculos de esta pantalla; no se guardan.</div>' : '') +
     '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
     (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
