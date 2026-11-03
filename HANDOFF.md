@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-03 | **Sesion #:** 14 | **Rama:** main | **HEAD:** `8aed681` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-03 | **Sesion #:** 15 | **Rama:** main | **HEAD:** `6014df2` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -57,6 +57,16 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 15 - 2026-11-03
+- Anadido: `data/protocols.js` -> `hiperkalemia` con `flow` (inputs K+ y glucemia; parada → CaCl 10 % + bicarbonato por vias distintas e insulina-glucosa; gravedad con sugerencia por K+ 5,5/6,0/6,5 o cambios ECG; calcio → shift → eliminacion o dialisis; glucosa 10 % 50 mL/h 5 h si glucemia <126; extras ECG, causas/pseudohiperpotasemia, monitorizacion). Se conservan los `steps` antiguos. Escalas KDIGO y NEWS2. `src` + KDIGO 2019 (PMID 31706619) y UKKA 2023
+- Modificado: `protocolos/EPALS_2025_guia.html` -> talla y sexo en la calculadora; Vt con peso ideal por talla (Traub-Johnson <152 cm, Devine ≥152 cm), el menor entre peso ideal y real (PALICC-2 segun Perplexity, Vera no lo menciona); edad solo si falta la talla
+- Modificado: `protocolos/Flujograma_Asma_Campdevanol.pdf` -> version vectorial (154 KB, antes 1,5 MB raster) con «Vt 6–8 mL/kg de peso ideal»
+- Fuera del repo (Downloads, originales intactos): `Flujograma_Asma_Campdevanol_pesoideal.pdf`, `Asma_en_Urgencias_2026_v3_1_pesoideal.docx` (VM <115 mL/kg/min y VCV 6–8 mL/kg «de peso ideal»), `Protocolo_TEP_Campdevanol_2026_1_pesoideal.docx` (Vt 6 mL/kg de peso ideal). PDFs del TEP y Word EPOC sin volumenes por kg
+- Verificado: node (8/8 nodos alcanzables, fichas y escalas existen, sin NaN); Chrome local (sugerencia, rama glucemia, copiar, reset, sin errores de consola; EPALS 116 cm → 20,8 kg, sin desbordes 320/375 px); produccion con curl (protocols.js con UKKA 2023, EPALS con Traub-Johnson, PDF 200 con 154239 bytes)
+- Commits: `6014df2` feat(protocolos): flujograma interactivo de hiperpotasemia, peso ideal pediatrico por talla en EPALS y flujograma de asma con Vt por peso ideal
+- Discrepancias abiertas: SZC 10 g c/8 h hasta 48 h (ficha/ASHP) vs 72 h (UKKA 2023) — se muestran ambas; insulina 5 U solo como opcion (KDIGO, evidencia limitada). Sin cita: horarios de control de glucemia/K+, duracion del efecto del calcio y de la insulina (practica)
+- Sin bump de `CACHE` (ASSETS sin cambios; SW network-first)
 
 ### Sesion 14 - 2026-11-01
 - Anadido: `data/protocols.js` -> `asma-crisis` y `tep-agudo` con evaluador `eval` (mismo motor que EPOC). Fuentes: Word «Asma_en_Urgencias_2026_v3.docx» y «Protocolo_TEP_Campdevanol_2026_1.docx» (Downloads)
@@ -293,4 +303,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Seguir con el flujograma de hiperpotasemia (ensenar en el navegador antes de subir) y el resto de protocolos con el motor `p.flow` (EPOC/asma/TEP: anadir `flow.escalas` y farmacos); Codi Risc Suicidi sigue pendiente. Preguntar que troponina usa el laboratorio (dolor toracico).
+Preguntar al usuario el siguiente protocolo para el motor `p.flow` (EPOC/asma/TEP: anadir `flow.escalas` y farmacos; Codi Risc Suicidi pendiente) y que troponina usa el laboratorio (dolor toracico).
