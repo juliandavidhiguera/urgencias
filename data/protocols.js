@@ -621,6 +621,39 @@ window.PROTOCOLS = [
       const gc = v.gcs >= 13 ? 4 : v.gcs >= 9 ? 3 : v.gcs >= 6 ? 2 : v.gcs >= 4 ? 1 : 0;
       return fr + ta + gc;
     };
+    /* Mensaje de activación del Codi PPT al hospital (CatSalut, Instrucció 04/2011, annex III).
+       Lo elegido vive solo en memoria y se borra con «Empezar de nuevo». */
+    const ALFA = ['Desconocido', 'Accidente de tráfico', 'Atropello (peatón o ciclista)', 'Precipitación o caída', 'Agresión por arma blanca o de fuego', 'Agresión por otros mecanismos', 'Quemado', 'Ahogado en agua dulce, salada u otras', 'Accidente en metro o ferroviario', 'Otros'];
+    const CHARLIE = ['Sin lesiones aparentes', 'Cabeza', 'Cara', 'Cuello', 'Tórax', 'Abdomen', 'Pelvis ósea', 'Raquis o columna vertebral', 'Extremidades superiores o inferiores', 'Lesiones externas, incluidas quemaduras'];
+    const ROMEO = ['Manejo invasivo de la vía aérea: IOT, mascarilla laríngea, cricotirotomía…', 'Dificultad respiratoria', 'Normal'];
+    const HOTEL = { a0: 'Sin pulso o TAS <50 mmHg', a1: 'TAS 50–90 mmHg', a2: 'TAS >90 mmHg', n0: 'Sin pulso central ni periférico', n1: 'Pulso central sí, periférico no', n2: 'Pulsos central y periférico, mala perfusión', n3: 'Pulsos central y periférico, buena perfusión' };
+    const MSG = {};
+    let msgV = {};
+    const prio = v => { const id = ['p0', 'p1', 'p2', 'p3'].find(x => (v.ruta || []).includes(x)); return id ? +id[1] : null; };
+    const hotelDe = v => MSG.hotel || (num(v.tas) ? (v.tas < 50 ? 'a0' : v.tas <= 90 ? 'a1' : 'a2') : '');
+    const mensaje = v => {
+      const edad = num(v.edad) ? (v.edad < 1 ? Math.round(v.edad * 12) + ' meses' : Math.floor(v.edad) + ' años') : '¿edad?';
+      const pr = prio(v);
+      const cod = (k, lista, x) => x === undefined || x === '' ? k + ' ¿?' : k + ' ' + x + ' (' + lista[x] + ')';
+      const h = hotelDe(v);
+      let eta = 'ETA ¿?';
+      if (MSG.eta !== undefined && MSG.eta !== '' && +MSG.eta >= 0) {
+        const t = new Date(Date.now() + MSG.eta * 60000);
+        eta = 'ETA: ' + MSG.eta + ' minutos (llegada hacia las ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ')';
+      }
+      return 'Activamos Código PPT. ' + (MSG.sexo || '¿Sexo?') + ' de ' + edad + ', Prioridad ' + (pr === null ? '¿?' : pr) + '. ' +
+        cod('ALFA', ALFA, MSG.alfa) + '. ' + cod('CHARLIE', CHARLIE, MSG.charlie) + '. ' + cod('ROMEO', ROMEO, MSG.romeo) + '. ' +
+        (h ? 'HOTEL ' + h[1] + ' (' + HOTEL[h] + ')' : 'HOTEL ¿?') + '. GOLF ' + (num(v.gcs) ? v.gcs : '¿?') + '. ' + eta + '.';
+    };
+    window.pptMsg = (k, x) => {
+      MSG[k] = x;
+      const o = document.getElementById('ppt-msg-out');
+      if (o) o.textContent = mensaje(msgV);
+    };
+    const sel = (k, l, lista, ph) => '<label class="fl-form-l">' + l + '<select class="fl-sel" onchange="pptMsg(\'' + k + '\', this.value)"><option value="">' + ph + '</option>' +
+      lista.map(([x, t]) => '<option value="' + x + '"' + (MSG[k] === x ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></label>';
+    const codigos = lista => lista.map((t, i) => [String(i), i + ' · ' + t]);
+    const hotelOpts = pre => Object.keys(HOTEL).filter(x => x[0] === pre).map(x => '<option value="' + x + '"' + (MSG.hotel === x ? ' selected' : '') + '>' + x[1] + ' · ' + HOTEL[x].replace(/</g, '&lt;') + '</option>').join('');
     const DEST01 = '<b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 min: CAT 3 (considerar CAT 3e) · isócrona CAT 3 >30 min: CAT 3 (considerar CAT 3e) / CAT 2b · Pediátrico: CAT P3 (considerar CAT P3e) / CAT P2b.';
     const TIPO = {
       q: '¿Traumatismo cerrado o penetrante?',
@@ -641,8 +674,8 @@ window.PROTOCOLS = [
           opts: [{ l: 'Sí, algún criterio', go: 'p0', sug: v => fisio(v).length > 0 }, { l: 'No', go: 'anat' }]
         },
         p0: {
-          t: 'ACTIVAR CODI PPT — PRIORIDAD 0', c: 'high',
-          show: 'Criterio fisiológico: <b>box de críticos</b>. Notificar a CECOS.<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          t: '🔴 ACTIVAR CODI PPT — PRIORIDAD 0', c: 'high',
+          show: 'Criterio fisiológico: <b>box de críticos</b>. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
           ...TIPO
         },
         anat: {
@@ -651,8 +684,8 @@ window.PROTOCOLS = [
           opts: [{ l: 'Sí, algún criterio', go: 'p1' }, { l: 'No', go: 'mec' }]
         },
         p1: {
-          t: 'ACTIVAR CODI PPT — PRIORIDAD 1', c: 'high',
-          show: 'Criterio anatómico: <b>box de críticos</b>. Notificar a CECOS.<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          t: '🟠 ACTIVAR CODI PPT — PRIORIDAD 1', c: 'high',
+          show: 'Criterio anatómico: <b>box de críticos</b>. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
           ...TIPO
         },
         mec: {
@@ -661,8 +694,8 @@ window.PROTOCOLS = [
           opts: [{ l: 'Sí', go: 'p2' }, { l: 'No', go: 'ant' }]
         },
         p2: {
-          t: 'ACTIVAR CODI PPT — PRIORIDAD 2', c: 'mid',
-          show: 'Mecanismo lesional de riesgo. Notificar a CECOS.<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
+          t: '🟡 ACTIVAR CODI PPT — PRIORIDAD 2', c: 'mid',
+          show: 'Mecanismo lesional de riesgo. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
           ...TIPO
         },
         ant: {
@@ -671,8 +704,8 @@ window.PROTOCOLS = [
           opts: [{ l: 'Sí', go: 'p3', sug: v => num(v.edad) && (v.edad < 3 || v.edad > 65) }, { l: 'No', go: 'noact' }]
         },
         p3: {
-          t: 'ACTIVAR CODI PPT — PRIORIDAD 3', c: 'mid',
-          show: 'Antecedente relevante. Notificar a CECOS.<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.',
+          t: '🟢 ACTIVAR CODI PPT — PRIORIDAD 3', c: 'mid',
+          show: 'Antecedente relevante. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.',
           ...TIPO
         },
         noact: {
@@ -698,10 +731,37 @@ window.PROTOCOLS = [
           show: 'No precisa inmovilización completa de la columna. En caso de duda, inmovilizar.'
         }
       },
+      reset: () => { Object.keys(MSG).forEach(k => delete MSG[k]); },
       extras: {
         t: 'Durante la atención',
         help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma. El RTS usa la FR, la TAS y el Glasgow de arriba.',
         items: [
+          {
+            l: 'Activación SEM: prioridad y mensaje', t: 'Activación por el SEM: prioridad y mensaje al hospital',
+            show: v => {
+              msgV = v;
+              const pr = prio(v);
+              return '<b>Prioridad</b> (si cumple varias, prevalece la más grave):<br>' +
+                '🔴 <b>P0 · fisiológico</b>: FR &lt;10 o >29 rpm (&lt;20 en &lt;1 año) · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · sin pulsos periféricos · Glasgow ≤13.<br>' +
+                '🟠 <b>P1 · anatómico</b>: herida penetrante en cabeza, cuello, tórax o extremidad proximal a codo o rodilla · tórax inestable · fractura de pelvis o craneal abierta o con hundimiento · ≥2 fracturas de huesos largos proximales · amputación proximal a muñeca o tobillo · extremidad aplastada o destrozada · déficit motor o sensitivo de una extremidad · quemaduras graves o de cara y cuello.<br>' +
+                '🟡 <b>P2 · mecanismo lesional</b>: caída >6 m (niños >2–3 veces su altura) · tráfico con intrusión, eyección, ocupante fallecido o alta velocidad (>60 km/h) · atropello de peatón o ciclista · moto, bici o esquí a velocidad significativa · arma blanca o de fuego · sospecha de maltrato en &lt;3 años.<br>' +
+                '🟢 <b>P3 · consideraciones especiales</b>: embarazo >20 semanas · anticoagulación o coagulopatía · diálisis o multipatología · &lt;3 o >65 años (orientativo) · criterio del profesional.<br>' +
+                (pr === null ? '<i>Responde las preguntas del flujograma para fijar la prioridad.</i>' : '<b>Este caso: Prioridad ' + pr + '.</b>') +
+                '<br><br><b>Mensaje al hospital</b>, en este orden: sexo · edad · prioridad · ALFA · CHARLIE · ROMEO · HOTEL · GOLF · hora prevista de llegada. La edad, la prioridad, el HOTEL (con la TAS) y el GOLF salen de los datos de arriba.' +
+                '<div class="fl-form"><div class="fl-form-grid">' +
+                sel('sexo', 'Sexo', [['Mujer', 'Mujer'], ['Hombre', 'Hombre']], 'Elige…') +
+                sel('alfa', 'ALFA · tipo de accidente', codigos(ALFA), 'Elige…') +
+                sel('charlie', 'CHARLIE · zona del cuerpo', codigos(CHARLIE), 'Elige…') +
+                sel('romeo', 'ROMEO · respiración', codigos(ROMEO), 'Elige…') +
+                '<label class="fl-form-l">HOTEL · estado hemodinámico<select class="fl-sel" onchange="pptMsg(\'hotel\', this.value)"><option value="">Según la TAS (adulto)</option>' +
+                '<optgroup label="Adulto">' + hotelOpts('a') + '</optgroup><optgroup label="Niño (pulsos central y periférico)">' + hotelOpts('n') + '</optgroup></select></label>' +
+                '<label class="fl-form-l">Llegada prevista (minutos)<input type="number" min="0" step="1" inputmode="numeric" class="num-in" value="' + (MSG.eta || '') + '" oninput="pptMsg(\'eta\', this.value)"></label>' +
+                '</div></div>' +
+                '\n<div class="fl-msg" id="ppt-msg-out" aria-live="polite">' + mensaje(v).replace(/</g, '&lt;') + '</div>' +
+                '<div class="fl-form"><button class="fl-esc" onclick="navigator.clipboard.writeText(document.getElementById(\'ppt-msg-out\').textContent).then(() => showToast()).catch(showCopyError)">📋 Copiar el mensaje</button></div>' +
+                '\n<span class="pe-nota">Códigos de la Instrucció CatSalut 04/2011, annex III. Prioridades del folleto Codi PPT (SEM, 2017).</span>';
+            }
+          },
           {
             farmacos: ['Ácido tranexámico'], l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
             show: 'Compresión directa; <b>torniquete</b> si la hemorragia de una extremidad amenaza la vida; cinturón pélvico si se sospecha fractura de pelvis con hemorragia que amenaza la vida.<br>' +
@@ -741,6 +801,7 @@ window.PROTOCOLS = [
   {type:'decision', text:'¿Tiene antecedentes relevantes?', yes:'Sí → Prioridad 3', no:'No → sin activación'},
   {type:'info', text:'Consideraciones especiales (Prioridad 3): embarazo avanzado (>20 semanas), anticoagulación o coagulopatía, diálisis o multipatología, <3 años o >65 años, criterio del profesional'},
   {type:'action', text:'ACTIVAR CODI PPT según la prioridad más alta alcanzada, notificar a CECOS'},
+  {type:'info', text:'Mensaje de activación al hospital (CECOS): sexo · edad · prioridad · ALFA (tipo de accidente) · CHARLIE (zona del cuerpo) · ROMEO (respiración) · HOTEL (estado hemodinámico) · GOLF (Glasgow) · hora prevista de llegada (CatSalut, Instrucció 04/2011)'},
   {type:'info', text:'Destino: prioridades 0/1 → traslado preferentemente con USVA. Prioridades 2/3 sin criterios fisiológicos ni anatómicos → considerar USVB. Individualizar destino si inestabilidad hemodinámica'},
   {type:'action', text:'Inmovilización espinal completa (trauma cerrado) si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse o <3a con mecanismo de riesgo + hipotensión mantenida. Trauma penetrante: inmovilizar solo si sospecha de déficit neurológico'},
   {type:'info', text:'Escalas: Glasgow adulto/pediátrico (leve 14-15, moderado 9-13, grave <8) · RTS adulto (<12 → centro de trauma especializado) · Índice de Trauma Pediátrico ITP (<8 → centro de trauma especializado)'}
