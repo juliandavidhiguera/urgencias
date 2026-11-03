@@ -450,6 +450,14 @@ window.PROTOCOLS = [
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'tad', l: 'TAD', u: 'mmHg' }, { k: 'gluc', l: 'Glucemia', u: 'mg/dl' }],
       start: 'rapid',
+      escalas: [
+        { id: 'race', para: 'sospecha de oclusión de gran vaso (≥5)' },
+        { id: 'nihss', para: 'gravedad del déficit (0–42)' },
+        { id: 'mrs', para: 'situación funcional previa (RANCOM)' },
+        { id: 'gcs', para: 'nivel de consciencia' },
+        { id: 'abcd2', para: 'riesgo de ictus tras un AIT' },
+        { id: 'ich', para: 'gravedad de la hemorragia intracerebral' }
+      ],
       nodes: {
         rapid: {
           t: 'Test RAPID — estado clínico actual',
@@ -463,7 +471,7 @@ window.PROTOCOLS = [
         },
         nocodi: { t: 'No cumple criterios de Codi Ictus', c: 'mid', show: 'Valoración habitual. La sospecha de hemorragia subaracnoidea NO es Codi Ictus: tiene circuito específico.' },
         rancom: {
-          t: 'Test RANCOM — estado clínico previo', show: '¿Necesitaba ayuda para vestirse, moverse o ir al baño?',
+          t: 'Test RANCOM — estado clínico previo', escalas: ['mrs'], show: '¿Necesitaba ayuda para vestirse, moverse o ir al baño?',
           q: '¿Era independiente antes del ictus (RANCOM negativo)?',
           opts: [{ l: 'Sí, independiente', go: 'tiempo' }, { l: 'No, necesitaba ayuda', go: 'nodep' }]
         },
@@ -498,7 +506,7 @@ window.PROTOCOLS = [
         },
         traslado: { t: 'Traslado', show: 'Transmitir los datos a CECOS y trasladar al centro indicado. Tratar las complicaciones (panel de abajo) durante el traslado.' },
         hosp: {
-          t: 'Llegada al hospital', c: 'high',
+          t: 'Llegada al hospital', c: 'high', escalas: ['nihss'],
           show: v => 'Activar el <b>teleictus</b> (el neurólogo valora por videoconsulta y decide la trombólisis) · TC craneal sin contraste ± angio-TC (perfusión si se dispone) · glucemia capilar · peso real · 2 vías. No esperar plaquetas, INR ni TTPa salvo sospecha (anticoagulante, hepatopatía, hemopatía). <b>Objetivo puerta-aguja &lt;60 min.</b>' +
             (hay(v.gluc) && v.gluc < 60 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: glucosa IV y mantener >70.</b>' : '') +
             (hay(v.gluc) && v.gluc > 180 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: insulina rápida IV según glucemia capilar.</b>' : ''),

@@ -680,6 +680,7 @@ body {
 .fl-esc { display: inline-flex; align-items: center; min-height: 44px; margin: 10px 8px 0 0; padding: 8px 14px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
 .fl-esc:hover, .fl-esc:focus-visible { background: var(--bg2); }
 label.fl-ask-hint { display: block; }
+.fl-esc-bar { margin: 12px 0 4px; }
 .fl-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 14px; margin: 10px 0; }
 .fl-form-l { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--text2); }
 .fl-form-l .num-in { display: block; width: 100%; min-height: 48px; margin-top: 6px; }
@@ -2215,6 +2216,9 @@ function _flowHtml(p) {
       '<label for="fl-' + p.id + '-' + it.k + '">' + it.l + (it.u ? ' (' + it.u + ')' : '') +
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
       '</div><div class="fl-hint">Los datos solo se usan para los cálculos de esta pantalla; no se guardan.</div>' : '') +
+    (p.flow.escalas ? '<div class="fl-esc-bar"><label class="fl-ask-hint" for="fl-' + p.id + '-esc">📊 Escalas de este código (se abren al lado):</label>' +
+      '<select class="fl-sel" id="fl-' + p.id + '-esc" onchange="if (this.value) { abrirEscalaLateral(this.value, this); this.value = \'\'; }"><option value="">Elige una escala…</option>' +
+      p.flow.escalas.map(e => { const sc = SCALES.find(x => x.id === e.id); return sc ? '<option value="' + e.id + '">' + sc.title + ' · ' + e.para + '</option>' : ''; }).join('') + '</select></div>' : '') +
     '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
     (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
