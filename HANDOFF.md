@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-03 | **Sesion #:** 15 | **Rama:** main | **HEAD:** `6014df2` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-03 | **Sesion #:** 15 | **Rama:** main | **HEAD:** `17cce92` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -67,6 +67,10 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Commits: `6014df2` feat(protocolos): flujograma interactivo de hiperpotasemia, peso ideal pediatrico por talla en EPALS y flujograma de asma con Vt por peso ideal
 - Discrepancias abiertas: SZC 10 g c/8 h hasta 48 h (ficha/ASHP) vs 72 h (UKKA 2023) — se muestran ambas; insulina 5 U solo como opcion (KDIGO, evidencia limitada). Sin cita: horarios de control de glucemia/K+, duracion del efecto del calcio y de la insulina (practica)
 - Sin bump de `CACHE` (ASSETS sin cambios; SW network-first)
+- Peso ideal pediatrico (2.a parte, `17cce92`): `EPALS_2025_guia.html` usa el P50 (mediana M) de las tablas OMS 2006 descargadas de cdn.who.int (peso para la longitud 45–110 cm si < 2 a o, sin edad, < 87 cm; peso para la talla 65–120 cm), por sexo, interpolado cada 1 cm; 121–151 cm Traub-Johnson; ≥ 152 cm Devine. Motivo: Traub-Johnson sobreestimaba +127 % a 45 cm, +83 % a 50 cm, +22 % a 60 cm (< 2 % desde 75 cm). Etiqueta «Sexo» ya no dice «≥ 152 cm» (se usa siempre)
+- Devine unificado a 0,91 (ARDSNet) en `index.html` (`_itbPesoIdeal`) y `data/formulas.js` (`f-vt-protector`, `f-peso-ideal`); antes 0,9055
+- Descartado: formulas por edad del texto del usuario para ventilar (estiman peso real; «3 × edad + 3» no validada; se mantiene (edad + 4) × 2 de ERC para dosis); IMC × 23 / 21,5 en adultos (sobreestima +12–17 % a 145 cm frente a Devine; la evidencia de 6 mL/kg es con Devine)
+- Verificado: Chrome local (50 cm → 3,3 kg, 60 cm niña → 5,9, 130 cm → TJ 27, niña 165 cm → Devine 57, sin talla → aviso por edad; sin errores de consola); produccion con curl (formulas.js con 0.91, EPALS con whoP50, index con 0.91)
 
 ### Sesion 14 - 2026-11-01
 - Anadido: `data/protocols.js` -> `asma-crisis` y `tep-agudo` con evaluador `eval` (mismo motor que EPOC). Fuentes: Word «Asma_en_Urgencias_2026_v3.docx» y «Protocolo_TEP_Campdevanol_2026_1.docx» (Downloads)
