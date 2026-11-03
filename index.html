@@ -886,6 +886,7 @@ label.fl-ask-hint { display: block; }
 }
 .field { display: flex; flex-direction: column; gap: 3px; }
 .pcr-ped-only[hidden] { display: none !important; }
+.pcr-adulto-only[hidden] { display: none !important; }
 .field label {
   font-size: var(--fs-xs);
   line-height: 1.2;
@@ -1358,6 +1359,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
       </div>
     </div>
   </div>
+  <div class="btn-row pcr-adulto-only" style="padding:8px 0 0"><button class="btn" onclick="window.open('protocolos/SVA_adulto_2025_guia.html','_blank')">📘 Ver el resumen completo de SVA adulto (ERC 2025)</button></div>
   <div class="tile-aux pcr-ped-only" id="pcr-ped-info" hidden></div>
   <details class="fl-full pcr-ped-only" id="pcr-epals" hidden>
     <summary>🧭 Flujograma EPALS 2025: niño grave y PCR pediátrica</summary>
@@ -3327,6 +3329,7 @@ function _pcrDosisTexto(d) {
 function cambiarModoPcr() {
   const ped = _pcrEsPed();
   document.querySelectorAll('.pcr-ped-only').forEach(el => { el.hidden = !ped; });
+  document.querySelectorAll('.pcr-adulto-only').forEach(el => { el.hidden = ped; });
   document.getElementById('pcr-titulo').textContent = ped
     ? 'Algoritmo SVAP (EPALS 2025) — pediátrico, dosis por peso'
     : 'Algoritmo ALS intrahospitalario — adulto';
@@ -3685,6 +3688,7 @@ function resetPcr() {
   document.getElementById('pcr-peso').value = '';
   document.getElementById('pcr-edad').value = '';
   document.querySelectorAll('.pcr-ped-only').forEach(el => { el.hidden = true; });
+  document.querySelectorAll('.pcr-adulto-only').forEach(el => { el.hidden = false; });
   document.getElementById('pcr-titulo').textContent = 'Algoritmo ALS intrahospitalario — adulto';
   document.getElementById('pcr-farmacos-titulo').textContent = 'Medicación del paro (dosis fija de adulto)';
   renderPcrEventos();
