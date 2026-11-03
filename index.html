@@ -681,6 +681,14 @@ body {
 .fl-esc:hover, .fl-esc:focus-visible { background: var(--bg2); }
 label.fl-ask-hint { display: block; }
 .fl-esc-bar { margin: 12px 0 4px; }
+.esc-res { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); }
+.esc-res-h { font-size: var(--fs-sm); font-weight: 700; margin-bottom: 4px; }
+.esc-res-it { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
+.esc-res-it:first-of-type { border-top: 0; }
+.esc-res-t { flex: 1; font-size: var(--fs-sm); line-height: 1.45; }
+.esc-res-t span { display: block; color: var(--text2); }
+.esc-res-x { flex: none; min-width: 44px; min-height: 44px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; cursor: pointer; }
+.lat-add { margin: 10px 0 0; }
 .fl-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 14px; margin: 10px 0; }
 .fl-form-l { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--text2); }
 .fl-form-l .num-in { display: block; width: 100%; min-height: 48px; margin-top: 6px; }
@@ -2006,6 +2014,7 @@ function onScalePaste(id, pfx) {
 function onScaleChange(id, pfx) {
   trackRecent(id);
   calcScale(id, pfx);
+  if (pfx === 'lat-') escGuardar(id);
 }
 
 function calcScale(id, pfx) {
@@ -2057,9 +2066,11 @@ function resetGeneric(id, pfx) {
     document.getElementById(uid + '_paste-res').textContent = '';
   }
   calcScale(id, pfx);
+  if (pfx === 'lat-') { const box = document.getElementById('lat-sc-' + id); if (box && box.dataset.pid) escQuitar(box.dataset.pid, id); }
 }
 
-function copyScaleResult(id, pfx) {
+/* Texto del resultado de una escala (el mismo que copia «Copiar resultado»). */
+function _scaleResultTxt(id, pfx) {
   pfx = pfx || '';
   const uid = pfx + id;
   const sc = _findScaleOrFormula(id);
@@ -2081,6 +2092,11 @@ function copyScaleResult(id, pfx) {
     const score = sc.max ? num + '/' + sc.max : num;
     txt = sc.title + ': ' + score + ' — ' + risk + '\n' + detail;
   }
+  return txt;
+}
+
+function copyScaleResult(id, pfx) {
+  const txt = _scaleResultTxt(id, pfx);
   navigator.clipboard.writeText(txt).then(() => {
     // Brief visual feedback
     const btn = event.target;
@@ -2130,9 +2146,10 @@ function renderProtocols() {
           }).join(''); })() +
           (p.flow ? '</details>' : '') +
           (p.src ? '<div class="scale-src">Fuente: ' + p.src + '</div>' : '') +
-          ((p.folleto || p.flujograma) ? '<div class="btn-row" style="padding:10px 0 0">' +
+          ((p.folleto || p.flujograma || p.docs) ? '<div class="btn-row" style="padding:10px 0 0">' +
             (p.folleto ? '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.folleto) + '\',\'_blank\')">📄 Ver folleto original</button>' : '') +
             (p.flujograma ? '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(p.flujograma) + '\',\'_blank\')">🗺️ Ver flujograma</button>' : '') +
+            (p.docs || []).map(d => '<button class="btn" onclick="event.stopPropagation();window.open(\'' + encodeURI(d.f) + '\',\'_blank\')">' + d.l + '</button>').join('') +
           '</div>' : '') +
           (p.galeria ? '<div class="btn-row" style="padding:6px 0 0"><button class="btn" onclick="event.stopPropagation();openGaleria(\'' + p.id + '\')">🫀 Ver patrones IAM nuevos (OMI)</button></div>' : '') +
         '</div>' +
@@ -2146,7 +2163,8 @@ function renderProtocols() {
 function _protoEvalHtml(p) {
   const pid = 'pe-' + p.id;
   const on = 'calcProtoEval(\'' + p.id + '\')';
-  return '<div class="pe-box"><div class="pe-title">🧮 Evaluador del paciente</div>' +
+  return '<div class="pe-box" data-pid="' + p.id + '"><div class="pe-title">🧮 Evaluador del paciente</div>' +
+    (p.eval.escalas ? _escBarHtml('pe-' + p.id + '-escsel', p.eval.escalas) + _escResHtml(p.id) : '') +
     p.eval.items.map(it => {
       if (it.t === 'h') return '<div class="pe-h">' + it.l + '</div>';
       const id = pid + '-' + it.k;
@@ -2182,6 +2200,7 @@ function resetProtoEval(pid) {
     if (it.t === 'chk') el.checked = false; else if (it.t === 'sel') el.selectedIndex = 0; else el.value = '';
   });
   calcProtoEval(pid);
+  escBorrarCaso(pid);
 }
 
 function copyProtoEval(pid) {
@@ -2195,7 +2214,7 @@ function copyProtoEval(pid) {
   }).filter(Boolean).join(' · ');
   const res = [...document.querySelectorAll('#pe-' + pid + '-out .ficha-section')].map(s =>
     s.querySelector('.ficha-section-title').textContent + '\n' + s.querySelector('.ficha-section-text').innerText).join('\n\n');
-  navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res).then(showToast).catch(showCopyError);
+  navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res + _escTxt(pid)).then(showToast).catch(showCopyError);
 }
 
 /* Flujograma paso a paso dentro de un protocolo (p.flow).
@@ -2208,6 +2227,61 @@ function copyProtoEval(pid) {
 const _flowPath = {};
 const _flowExtra = {};
 
+/* Escalas del caso: cada escala hecha en el panel lateral desde un protocolo (flujograma o
+   evaluador) añade su resultado al protocolo, se lista en #esc-res-<pid> y entra en el texto
+   copiado para la historia clínica. Solo en memoria: nunca en localStorage (datos de paciente). */
+const _escRes = {};
+
+function _escBarHtml(selId, escalas) {
+  if (!escalas || !escalas.length) return '';
+  return '<div class="fl-esc-bar"><label class="fl-ask-hint" for="' + selId + '">📊 Escalas de este protocolo (se abren al lado; el resultado se añade al caso):</label>' +
+    '<select class="fl-sel" id="' + selId + '" onchange="if (this.value) { abrirEscalaLateral(this.value, this); this.value = \'\'; }"><option value="">Elige una escala…</option>' +
+    escalas.map(e => { const sc = SCALES.find(x => x.id === e.id); return sc ? '<option value="' + e.id + '">' + sc.title + ' · ' + e.para + '</option>' : ''; }).join('') + '</select></div>';
+}
+
+function _escResHtml(pid) {
+  return '<div class="esc-res" id="esc-res-' + pid + '" aria-live="polite" hidden></div>';
+}
+
+function escGuardar(id) {
+  const box = document.getElementById('lat-sc-' + id);
+  const pid = box && box.dataset.pid;
+  if (!pid) return;
+  (_escRes[pid] || (_escRes[pid] = {}))[id] = _scaleResultTxt(id, 'lat-');
+  _escPintar(pid);
+}
+
+function escQuitar(pid, id) {
+  if (_escRes[pid]) delete _escRes[pid][id];
+  _escPintar(pid);
+}
+
+/* Al empezar de nuevo: se borran los resultados y las escalas que este caso abrió al lado,
+   para que el siguiente paciente no herede valores. */
+function escBorrarCaso(pid) {
+  delete _escRes[pid];
+  document.querySelectorAll('#lat-body > [id^="lat-sc-"]').forEach(b => { if (b.dataset.pid === pid) b.remove(); });
+  _escPintar(pid);
+}
+
+function _escPintar(pid) {
+  const el = document.getElementById('esc-res-' + pid);
+  if (!el) return;
+  const ids = Object.keys(_escRes[pid] || {});
+  el.hidden = !ids.length;
+  const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  el.innerHTML = ids.length ? '<div class="esc-res-h">📊 Escalas del caso (entran en «Copiar»)</div>' + ids.map(id => {
+    const [l1, ...rest] = _escRes[pid][id].split('\n');
+    return '<div class="esc-res-it"><div class="esc-res-t"><b>' + esc(l1) + '</b>' + (rest.join(' ').trim() ? '<span>' + esc(rest.join(' ').trim()) + '</span>' : '') + '</div>' +
+      '<button class="esc-res-x" onclick="escQuitar(\'' + pid + '\',\'' + id + '\')" aria-label="Quitar ' + esc(l1.split(':')[0]) + ' del caso">✕</button></div>';
+  }).join('') : '';
+}
+
+function _escTxt(pid) {
+  const r = Object.values(_escRes[pid] || {});
+  return r.length ? '\n\nEscalas:\n' + r.join('\n\n') : '';
+}
+
 function _flowVals(p) {
   const v = {};
   (p.flow.inputs || []).forEach(it => {
@@ -2219,14 +2293,12 @@ function _flowVals(p) {
 
 function _flowHtml(p) {
   const on = 'renderFlow(\'' + p.id + '\')';
-  return '<div class="fl-box"><div class="pe-title">🧭 Flujograma del caso</div>' +
+  return '<div class="fl-box" data-pid="' + p.id + '"><div class="pe-title">🧭 Flujograma del caso</div>' +
     ((p.flow.inputs || []).length ? '<div class="fl-inputs">' + p.flow.inputs.map(it =>
       '<label for="fl-' + p.id + '-' + it.k + '">' + it.l + (it.u ? ' (' + it.u + ')' : '') +
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
       '</div><div class="fl-hint">Los datos solo se usan para los cálculos de esta pantalla; no se guardan.</div>' : '') +
-    (p.flow.escalas ? '<div class="fl-esc-bar"><label class="fl-ask-hint" for="fl-' + p.id + '-esc">📊 Escalas de este protocolo (se abren al lado):</label>' +
-      '<select class="fl-sel" id="fl-' + p.id + '-esc" onchange="if (this.value) { abrirEscalaLateral(this.value, this); this.value = \'\'; }"><option value="">Elige una escala…</option>' +
-      p.flow.escalas.map(e => { const sc = SCALES.find(x => x.id === e.id); return sc ? '<option value="' + e.id + '">' + sc.title + ' · ' + e.para + '</option>' : ''; }).join('') + '</select></div>' : '') +
+    _escBarHtml('fl-' + p.id + '-esc', p.flow.escalas) + _escResHtml(p.id) +
     '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
     (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
@@ -2365,6 +2437,7 @@ function resetFlow(pid) {
   delete _flowExtra[pid];
   if (p.flow.reset) p.flow.reset();
   renderFlow(pid);
+  escBorrarCaso(pid);
 }
 
 function copyFlow(pid) {
@@ -2384,7 +2457,7 @@ function copyFlow(pid) {
     const it = p.flow.extras.items[k];
     lineas.push((it.t || txt(it.l)) + '\n' + txt(typeof it.show === 'function' ? it.show(v) : it.show));
   });
-  navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n')).then(showToast).catch(showCopyError);
+  navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n') + _escTxt(pid)).then(showToast).catch(showCopyError);
 }
 
 function _drugId(name) {
@@ -3705,11 +3778,15 @@ function abrirEscalaLateral(id, btn) {
   if (!box) {
     box = document.createElement('div');
     box.id = 'lat-sc-' + id;
-    box.innerHTML = renderOneScale(sc, getFavs(), 'lat-');
+    box.innerHTML = renderOneScale(sc, getFavs(), 'lat-') +
+      '<button class="btn lat-add" hidden onclick="escGuardar(\'' + id + '\')">➕ Añadir el resultado al caso</button>';
     body.appendChild(box);
     box.querySelector('details').open = true;
     calcScale(id, 'lat-');
   }
+  const caso = btn && btn.closest('[data-pid]');
+  if (caso) box.dataset.pid = caso.dataset.pid;
+  box.querySelector('.lat-add').hidden = !box.dataset.pid;
   _latMostrar(box, 'Escala ' + sc.title);
 }
 

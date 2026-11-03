@@ -86,6 +86,7 @@ window.PROTOCOLS = [
   flow:(() => {
     const num = x => !isNaN(x) && x > 0;
     const kg = (v, f, max) => num(v.peso) ? ' (' + String(Math.round(Math.min(v.peso * f, max || Infinity))).replace('.', ',') + ' mg con ' + v.peso + ' kg)' : '';
+    const rg = (v, a, b, u) => num(v.peso) ? ' (<b>' + Math.round(v.peso * a) + '–' + Math.round(v.peso * b) + ' ' + (u || 'mg') + '</b> con ' + v.peso + ' kg)' : '';
     const SED = ['Etomidato', 'Propofol', 'Midazolam', { n: 'Fentanilo', inf: false }];
     const ANTICO = ['Enoxaparina', 'Heparina sódica'];
     const POSTCV = 'Tras cualquier cardioversión: <b>anticoagulación ≥4 semanas</b> (opcional solo si no hay factores de riesgo y el ritmo sinusal se recuperó en &lt;24 h desde un inicio seguro); después, según el CHA₂DS₂-VA.';
@@ -212,6 +213,26 @@ window.PROTOCOLS = [
           {
             l: 'Desencadenantes', t: 'Desencadenantes y causas reversibles',
             show: 'Sepsis o fiebre · hipovolemia o hemorragia · anemia · hipoxemia o neumonía · TEP · hipertiroidismo · alcohol o tóxicos · alteraciones iónicas (K⁺, Mg²⁺) · isquemia · postoperatorio · insuficiencia cardiaca. Si la FC alta es compensadora, tratar la causa antes que frenarla.'
+          },
+          {
+            farmacos: ['Propofol', 'Etomidato', 'Midazolam', { n: 'Fentanilo', inf: false }, 'Ketamina', 'Flumazenilo', 'Naloxona', 'Atropina'],
+            l: 'Sedación para la cardioversión', t: 'Sedación para la cardioversión eléctrica', c: 'mid',
+            show: v => 'Monitor, capnografía, vía venosa, O₂ y bolsa, aspirador y antídotos preparados. El ayuno no debe retrasar una cardioversión necesaria en Urgencias.<br>' +
+              '<b>Propofol</b> 0,5–1 mg/kg IV lento' + rg(v, 0.5, 1) + ', después 10–20 mg cada 1–2 min. Ancianos, ASA III o PA límite: 0,25–0,5 mg/kg' + rg(v, 0.25, 0.5) + '.<br>' +
+              '<b>Etomidato</b> 0,1–0,2 mg/kg IV' + rg(v, 0.1, 0.2) + ': de elección si hay hipotensión o shock (0,2–0,3 mg/kg es la dosis de intubación).<br>' +
+              '<b>Midazolam</b> 1 mg IV y después 0,5–1 mg cada 2–3 min, con <b>fentanilo</b> 25–50 µg IV. Antídotos: flumazenilo 0,2 mg cada 1 min (máx. 1 mg); naloxona 0,04–0,2 mg cada 2–3 min.<br>' +
+              '<b>Ketamina</b> 0,5–1 mg/kg IV en ≥60 s' + rg(v, 0.5, 1) + ' si hay broncoespasmo; sube la FC y la PA, sin atropina sistemática.<br>' +
+              'Electrodos anterolaterales o anteroposteriores (ambos válidos). 200 J bifásicos sincronizados, subiendo hasta la máxima; resincronizar antes de cada descarga. Bradicardia: atropina 0,5 mg IV.<br><span class="pe-nota">ACEP 2014 (PMID 24438649); RAFF2 (PMID 32007169); CHESS (PMID 31504412). Dosis con el peso real.</span>'
+          },
+          {
+            farmacos: ['Carbón activado'],
+            l: 'Hemorragia y antídotos', t: 'Hemorragia grave con anticoagulante', c: 'high',
+            show: v => 'Suspender, comprimir, reponer la volemia y transfundir según necesidad.<br>' +
+              '<b>Apixabán o rivaroxabán:</b> andexanet alfa (consultar disponibilidad). <b>Dosis baja</b> 400 mg IV en bolo + 4 mg/min durante 120 min, si apixabán ≤5 mg o rivaroxabán ≤10 mg, o última toma hace ≥8 h. <b>Dosis alta</b> 800 mg + 8 mg/min durante 120 min si la dosis era mayor (o desconocida) y se tomó hace &lt;8 h o a hora desconocida.<br>' +
+              'Sin andexanet: <b>complejo protrombínico</b> 50 UI/kg IV' + (num(v.peso) ? ' (<b>' + Math.round(v.peso * 50) + ' UI</b> con ' + v.peso + ' kg)' : '') + '.<br>' +
+              '<b>Dabigatrán:</b> idarucizumab 5 g IV (2 viales de 2,5 g).<br>' +
+              '<b>Heparina no fraccionada:</b> protamina 1 mg por cada 100 UI recibidas en las últimas 2–3 h (máx. 50 mg), IV lenta. <b>Enoxaparina:</b> 1 mg por mg si se puso hace &lt;8 h; 0,5 mg por mg si hace &gt;8 h.<br>' +
+              '<b>Carbón activado</b> si la toma fue hace &lt;2–4 h.<br><span class="pe-nota">ACC 2020 (PMID 32680646); EHRA 2018 (PMID 29562325). La ACC/AHA 2023 acepta el carbón hasta 6–8 h.</span>'
           }
         ]
       }
@@ -230,7 +251,12 @@ window.PROTOCOLS = [
   {type:'info', text:'VENTANA DE SEGURIDAD ESC 2024: bajó de 48 h a 24 h. Con FA >24 h o de inicio incierto SIN anticoagulación previa eficaz, NO cardiovertir a ciegas: ETE o 3 semanas de anticoagulación antes'},
   {type:'action', text:'Anticoagulación a largo plazo por CHA₂DS₂-VA (ESC 2024): ≥2 recomendada, =1 considerar. Mantener ≥4 semanas tras cardioversión en todos'},
   {type:'info', text:'La duración referida por el paciente puede ser falsa si hubo FA asintomática previa. Prudencia en ancianos y cardiopatía estructural'}],
-  src:'ESC 2024 · PMID 39210723 · RACE 7 ACWAS NEJM 2019 · PMID 30883054 · AHA ALS 2025 · PMID 41122884'},
+  src:'ESC 2024 · PMID 39210723 · RACE 7 ACWAS NEJM 2019 · PMID 30883054 · AHA ALS 2025 · PMID 41122884',
+  docs:[
+    {l:'🗺️ Algoritmo FA (Campdevànol)', f:'protocolos/FA_Algoritmo_Campdevanol.pdf'},
+    {l:'💊 Anticoagulantes en FA', f:'protocolos/FA_Anticoagulantes_Campdevanol.pdf'},
+    {l:'😴 Sedación para la cardioversión', f:'protocolos/FA_Sedacion_CVE_Campdevanol.pdf'}
+  ]},
 
 {id:'rcp', title:'RCP / SVA', sub:'Soporte vital avanzado adulto — ritmo desfibrilable vs no desfibrilable', badge:'red', tag:'Crítico', rank:6, steps:[
   {type:'action', text:'Confirmar PCR: inconsciente, no respira con normalidad (o gasping), sin pulso central palpable (máx. 10 seg)'},
@@ -1302,6 +1328,7 @@ window.PROTOCOLS = [
      v[k] = número (NaN si vacío), booleano (chk) o número (sel). calc devuelve
      secciones [{t: título, c: 'low'|'mid'|'high'|'', h: html}]. */
   eval:{
+    escalas:[{id:'decaf', para:'mortalidad hospitalaria'}, {id:'anthonisen', para:'indicación de antibiótico'}, {id:'news2', para:'deterioro clínico'}, {id:'curb65', para:'si hay neumonía'}, {id:'mmrc', para:'disnea basal'}, {id:'cfs', para:'fragilidad'}],
     items:[
       {t:'h', l:'Riesgo vital y nivel de intensidad terapéutica'},
       {k:'vital', t:'chk', l:'Riesgo vital inmediato: parada o preparada respiratoria, estupor/coma o agitación incontrolable, inestabilidad hemodinámica o arritmia grave, pH &lt;7,20 con deterioro rápido'},
@@ -1482,6 +1509,7 @@ window.PROTOCOLS = [
 {id:'asma-crisis', title:'Crisis de asma (adulto)', sub:'Gravedad (SEMES 2026 · GEMA 5.5 · ALAT-SEPAR 2025), tratamiento en urgencias y destino inicial', badge:'amber', tag:'Urgente', rank:12.6,
   flujograma:'protocolos/Flujograma_Asma_Campdevanol.pdf',
   eval:{
+    escalas:[{id:'news2', para:'deterioro clínico'}],
     items:[
       {t:'h', l:'Situación inicial'},
       {k:'anafil', t:'chk', l:'Sospecha de anafilaxia (urticaria, angioedema, hipotensión, desencadenante alérgico)'},
@@ -1670,6 +1698,7 @@ window.PROTOCOLS = [
 {id:'tep-agudo', title:'TEP agudo', sub:'Probabilidad, categoría A–E (AHA/ACC 2026) y riesgo ESC 2019, anticoagulación, fibrinólisis y destino', badge:'red', tag:'Crítico', rank:12.7,
   flujograma:'protocolos/Flujograma_TEP_Campdevanol.pdf',
   eval:{
+    escalas:[{id:'wells', para:'probabilidad clínica'}, {id:'geneva', para:'probabilidad clínica (alternativa)'}, {id:'perc', para:'descartar sin dímero D'}, {id:'years', para:'algoritmo YEARS'}, {id:'dd-edad', para:'dímero D ajustado por edad'}, {id:'spesi', para:'riesgo de mortalidad'}, {id:'pesi', para:'riesgo de mortalidad (completa)'}, {id:'hestia', para:'tratamiento ambulatorio'}],
     items:[
       {t:'h', l:'Hemodinámica'},
       {k:'hemo', t:'sel', l:'Situación hemodinámica', o:[['Estable (PAS ≥90 sin vasopresores)',0],['Hipotensión transitoria que responde a fluidos',1],['Hipotensión persistente o recurrente / shock cardiogénico',2],['Shock refractario o PCR',3]]},
