@@ -1351,6 +1351,11 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
     </div>
   </div>
   <div class="tile-aux pcr-ped-only" id="pcr-ped-info" hidden></div>
+  <details class="fl-full pcr-ped-only" id="pcr-epals" hidden>
+    <summary>🧭 Flujograma EPALS 2025: niño grave y PCR pediátrica</summary>
+    <div class="btn-row" style="padding:8px 0 0"><button class="btn" onclick="window.open('protocolos/EPALS_2025_guia.html','_blank')">📘 Ver el resumen completo de EPALS 2025</button></div>
+    <div id="pcr-epals-flow"></div>
+  </details>
 
   <div class="subhead">Metrónomo de compresiones — ERC: 100–120/min</div>
   <div class="metro-row">
@@ -2095,7 +2100,10 @@ function _protocolTier(p) {
 function renderProtocols() {
   const container = document.getElementById('tab-protocolos');
   const favs = getFavs();
-  const sorted = PROTOCOLS.slice().sort((a, b) => {
+  /* p.soloPcr: el flujograma se pinta en la pestaña PCR (modo pediátrico), no en la lista. */
+  const pcrFl = document.getElementById('pcr-epals-flow');
+  if (pcrFl && !pcrFl.innerHTML) pcrFl.innerHTML = PROTOCOLS.filter(p => p.soloPcr && p.flow).map(_flowHtml).join('');
+  const sorted = PROTOCOLS.filter(p => !p.soloPcr).sort((a, b) => {
     const ta = _protocolTier(a), tb = _protocolTier(b);
     if (ta !== tb) return ta - tb;
     const fa = favs['protocol:' + a.id] || 0, fb = favs['protocol:' + b.id] || 0;
@@ -3374,6 +3382,7 @@ function calcPcr() {
     if (peso) info = 'Bolo de volumen 10 mL/kg ≈ ' + _pcrPedFmt(Math.min(peso * 10, 500), 0) + ' mL · G10% 2 mL/kg ≈ ' + _pcrPedFmt(peso * 2, 1) + ' mL · ' + info;
     if (peso >= 40) info = '⚠ Peso ≥40 kg: la mayoría de dosis alcanzan el máximo de adulto; valorar algoritmo adulto. ' + info;
     document.getElementById('pcr-ped-info').textContent = info;
+    PROTOCOLS.filter(p => p.soloPcr && p.flow).forEach(p => renderFlow(p.id));
   }
   _pcrFarmacosLista().forEach(d => {
     const dEl = document.getElementById('pcr-fx-' + d.id + '-dosis');

@@ -1851,4 +1851,179 @@ window.PROTOCOLS = [
   {type:'info', text:'Al alta: anticoagulación ≥3 meses, control a las 48 h–7 d y a los ~3 meses; signos de alarma (sangrado, disnea súbita, síncope); evitar AINE. Disnea o intolerancia persistente → estudio de HPTEC'}],
   src:'Protocolo TEP agudo Hospital de Campdevànol v1.1 (oct 2026) · 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN PE Guideline (Creager MA, Circulation 2026) · ESC/ERS 2019: Konstantinides SV, Eur Heart J 2020;41:543-603 · ERC 2025 · CHEST 2021: Stevens SM, Chest 2021;160:e545 · HOME-PE: Roy PM, Eur Heart J 2021;42:3146 · Barco S, Eur Heart J 2019;40:902 · Ficha técnica de alteplasa (CIMA) · Alteplasa en PCR: ERC 2025 Special Circumstances (Lott C, PMID 41117569); OUH Medicines Information Leaflet vol. 7 n.º 8 (ene 2026) · AHA/ACC 2026: PMID 41712677 / 41712898 · ESC 2019: PMID 31504429'},
 
+{id:'epals', soloPcr:true, title:'Niño grave y PCR pediátrica (EPALS 2025)', sub:'Reconocimiento ABCDE, PCR, arritmias, shock, anafilaxia, insuficiencia respiratoria y convulsiones', badge:'red', tag:'Crítico', rank:99, steps:[],
+  src:'Curso EPALS 2025 del ERC (módulo online, versión española; resumen de estudio propio) · ERC Guidelines 2025 Paediatric Life Support: Djakow J, Resuscitation 2025;110767 · PMID 41117571',
+  flow:(() => {
+    /* Peso y edad salen de los campos de arriba de la pestaña PCR (un solo peso para todo el evento). */
+    const leer = id => { const el = document.getElementById(id); const x = el ? parseFloat(String(el.value).replace(',', '.')) : NaN; return x > 0 ? x : NaN; };
+    const W = () => leer('pcr-peso');
+    const E = () => leer('pcr-edad');
+    const f = (x, d) => (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ',');
+    /* d(mgPorKg, max, decimales, unidad): dosis calculada con el peso real, o aviso si no hay peso. */
+    const d = (k, max, dec, u) => { const w = W(); return w ? ' <b>= ' + f(Math.min(w * k, max == null ? Infinity : max), dec) + ' ' + u + '</b>' + (max != null && w * k > max ? ' (máximo)' : '') : ''; };
+    const sinPeso = () => W() ? '' : '<br><span class="pe-nota">Introduce el peso arriba (o «Estimar peso» con la edad) para ver las dosis calculadas.</span>';
+    const F = n => ({ n: n, inf: false });
+    return {
+      start: 'inicio',
+      escalas: [
+        { id: 'gcsped', para: 'consciencia en el niño' },
+        { id: 'flacc', para: 'dolor en el niño que no habla' },
+        { id: 'westley', para: 'gravedad del crup' },
+        { id: 'apgar', para: 'recién nacido' }
+      ],
+      nodes: {
+        inicio: {
+          t: 'Vistazo rápido (&lt;10 s, sin tocar)',
+          show: () => '<b>Apariencia</b> (tono, interacción, llanto, mirada) · <b>respiración</b> (ruidos, tiraje, aleteo, cabeceo) · <b>color</b> (palidez, moteado, cianosis).' + sinPeso(),
+          q: '¿Responde y respira con normalidad?',
+          opts: [{ l: 'No responde y no respira con normalidad (o solo boquea)', go: 'pcr' }, { l: 'Responde o respira, pero está grave', go: 'abcde' }]
+        },
+        pcr: {
+          t: 'Parada cardiorrespiratoria', c: 'high',
+          show: 'Pedir ayuda · <b>5 ventilaciones de rescate</b> · RCP <b>15:2</b> con bolsa-mascarilla y O₂ 100 % (2 personas) · compresiones 100–120/min, ≥1/3 del diámetro AP · parches y monitor · acceso IV o <b>IO</b> (IO si 2 intentos o 5 min sin IV).<br>Comprimir también si la FC es &lt;60 con muy mala perfusión pese a ventilar bien.<br>Registra ritmo, ciclos y fármacos en el registro de arriba.',
+          q: '¿Qué ritmo tiene?',
+          opts: [{ l: 'No desfibrilable: asistolia, AESP o bradicardia sin signos de vida', go: 'nodesf' }, { l: 'Desfibrilable: FV o TV sin pulso', go: 'desf' }]
+        },
+        nodesf: {
+          farmacos: [F('Adrenalina')],
+          t: 'Ritmo no desfibrilable', c: 'high',
+          show: () => '<b>Adrenalina 10 µg/kg IV/IO</b>' + d(0.01, 1, 2, 'mg') + ' (0,1 ml/kg de 1:10.000' + d(0.1, 10, 1, 'ml') + '; máx. 1 mg) <b>lo antes posible</b>, después <b>cada 4 min</b> (cada 2 ciclos). Ritmo cada 2 min.<br>' +
+            'Buscar y tratar las <b>4H y 4T</b> (abajo). Si pasa a desfibrilable, cambiar de rama manteniendo el intervalo de 4 min de la adrenalina.<br>' +
+            'Al final de un ciclo con ritmo organizado: buscar signos de vida y pulso central (≤5 s), EtCO₂ y PA.' + sinPeso()
+        },
+        desf: {
+          farmacos: [F('Adrenalina'), F('Amiodarona'), F('Lidocaína')],
+          t: 'Ritmo desfibrilable', c: 'high',
+          show: () => { const w = W(); return '<b>Descarga 4 J/kg</b>' + (w ? ' <b>= ' + Math.min(Math.ceil(w * 4), 200) + ' J</b>' : '') + ' (redondear al alza; máx. 200 J iniciales) → RCP 2 min → descarga → RCP 2 min → 3.ª descarga →<br>' +
+            '<b>adrenalina 10 µg/kg</b>' + d(0.01, 1, 2, 'mg') + ' + <b>amiodarona 5 mg/kg</b>' + d(5, 300, 0, 'mg') + ' (máx. 300) → adrenalina cada 4 min → <b>amiodarona 5 mg/kg tras la 5.ª</b>' + d(5, 150, 0, 'mg') + ' (máx. 150).<br>' +
+            'Refractaria (desde la 5.ª descarga): escalar a <b>6 → 8 J/kg</b>' + (w ? ' (' + Math.min(Math.round(w * 6), 360) + ' → ' + Math.min(Math.round(w * 8), 360) + ' J)' : '') + ', máx. 360 J, y revisar o cambiar la posición de los parches.<br>' +
+            'Alternativa a la amiodarona: <b>lidocaína 1 mg/kg</b>' + d(1, 100, 0, 'mg') + ' (máx. 100).<br>' +
+            'Parches anteroposteriores si &lt;25 kg; palas de lactante si &lt;10 kg. Cargar comprimiendo, pausa &lt;5 s.<br>' +
+            'PCR presenciada y monitorizada con parches puestos: hasta 3 descargas seguidas.' + sinPeso() +
+            '<br><span class="pe-nota">ERC 2025. La AHA 2025 empieza con 2 J/kg y sube a ≥4 J/kg (hasta 10 J/kg o la dosis de adulto).</span>'; }
+        },
+        abcde: {
+          t: 'Valoración ABCDE: tratar sobre la marcha',
+          show: () => '<b>A</b>: ¿permeable? Postura de confort; abrir, aspirar, cánula.<br>' +
+            '<b>B</b>: frecuencia, trabajo, volumen, oxigenación. O₂ a alto flujo con reservorio y después SpO₂ 94–98 %.<br>' +
+            '<b>C</b>: FC, perfusión (TRC ≤2 s), pulsos, precarga, PA. Acceso IV/IO; bolo de cristaloide <b>10 ml/kg</b>' + d(10, 500, 0, 'ml') + ' (máx. 500) si hay shock.<br>' +
+            '<b>D</b>: AVDN o GCS motora (D o M ≤4 = coma), pupilas, <b>glucemia siempre</b>.<br>' +
+            '<b>E</b>: temperatura, piel (púrpura), lesiones, AMPLE. Reevaluar tras cada intervención.' + sinPeso(),
+          q: '¿Qué problema predomina?',
+          opts: [
+            { l: 'Insuficiencia respiratoria', go: 'resp' },
+            { l: 'Shock', go: 'shock' },
+            { l: 'Anafilaxia', go: 'anaf' },
+            { l: 'Bradicardia (&lt;60, o &lt;80 en lactante) con mala perfusión', go: 'bradi' },
+            { l: 'Taquicardia (&gt;180, o &gt;220 en lactante)', go: 'taqui' },
+            { l: 'Convulsión que no cede', go: 'convul' }
+          ]
+        },
+        resp: {
+          farmacos: [F('Ketamina'), F('Midazolam'), F('Rocuronio'), F('Salbutamol')],
+          t: 'Insuficiencia respiratoria', c: 'mid',
+          show: () => { const e = E(); return 'Vía aérea permeable → O₂ con reservorio → SpO₂ 94–98 %. Si persiste la hipoxemia o el trabajo respiratorio: <b>CNAF</b> (1–2 l/kg/min) o <b>VNI</b>.<br>' +
+            'Respiración ineficaz: <b>bolsa-mascarilla</b> con O₂ 100 %, 2 personas, Vt 6–8 ml/kg de <b>peso ideal</b>, elevación torácica visible.<br>' +
+            'Intubación por quien tenga experiencia (máx. 2 intentos + 1 de rescate, ≤30 s cada uno): SRI con <b>ketamina 2 mg/kg</b>' + d(2, null, 1, 'mg') + ' + <b>midazolam 0,1 mg/kg</b>' + d(0.1, null, 2, 'mg') + ' + <b>rocuronio 1 mg/kg</b>' + d(1, null, 1, 'mg') + '. Sin presión cricoidea; atropina no rutinaria.<br>' +
+            (e >= 1 ? 'Tubo con balón ≈ <b>' + f(e / 4 + 3.5, 1) + ' mm</b> (±0,5) · profundidad oral ≈ <b>' + f(12 + e / 2, 1) + ' cm</b>.<br>' : 'Tubo con balón: edad/4 + 3,5 mm (±0,5); profundidad oral 12 + edad/2 cm (pon la edad arriba para calcularlo).<br>') +
+            'Crup, bronquiolitis y asma: ver el resumen completo.' + sinPeso(); }
+        },
+        shock: {
+          farmacos: [F('Adrenalina'), F('Noradrenalina'), F('Hidrocortisona'), F('Ceftriaxona')],
+          t: 'Shock', c: 'high',
+          show: () => 'O₂ a alto flujo, monitor, IV o IO (2 intentos o 5 min → IO), muestras (gases, lactato, glucosa, iones, cultivos).<br>' +
+            '<b>Bolo de cristaloide balanceado 10 ml/kg</b>' + d(10, 500, 0, 'ml') + ' → reevaluar → repetir hasta 40–60 ml/kg en la 1.ª hora si no hay sobrecarga (hepatomegalia, crepitantes).<br>' +
+            '<b>Cardiogénico</b>: bolos de 5 ml/kg' + d(5, null, 0, 'ml') + ' con cautela e inotrópico. <b>Hemorrágico</b>: cristaloide ≤20 ml/kg y después hemoderivados (hematíes 10 : plasma 10 : plaquetas 5 ml/kg) y ácido tranexámico. <b>Obstructivo</b>: descomprimir o drenar.<br>' +
+            '<b>Séptico</b>: antibiótico en la 1.ª hora; <b>adrenalina o noradrenalina</b> no más tarde de 30–40 ml/kg (vía periférica válida). Regla: 0,3 × kg mg en 50 ml → 1 ml/h = 0,1 µg/kg/min' + (W() ? ' (<b>' + f(W() * 0.3, 2) + ' mg en 50 ml</b>)' : '') + '. Hidrocortisona 1–2 mg/kg si es refractario.' + sinPeso()
+        },
+        anaf: {
+          farmacos: [F('Adrenalina'), F('Hidrocortisona'), F('Salbutamol')],
+          t: 'Anafilaxia', c: 'high',
+          show: () => '<b>Adrenalina IM 10 µg/kg</b> (0,01 ml/kg de 1 mg/ml)' + d(0.01, 0.5, 2, 'mg') + ' (máx. 0,5 mg) en la cara anterolateral del muslo; <b>repetir a los 5 min</b> si no mejora. Autoinyector: ≤6 años 150 µg · 6–12 años 300 µg · &gt;12 años 500 µg.<br>' +
+            'Retirar el alérgeno · O₂ 100 % · bolo 10 ml/kg' + d(10, 500, 0, 'ml') + ' si hay shock · salbutamol si hay broncoespasmo · intubación precoz por un experto si hay edema.<br>' +
+            'Más de 2 dosis sin respuesta: experto y adrenalina IV en perfusión. Segunda línea: antihistamínico; corticoide solo si hay asma.<br>' +
+            'Observación 6–8 h (una dosis y buena respuesta) o 12–24 h.' + sinPeso()
+        },
+        bradi: {
+          farmacos: [F('Atropina'), F('Adrenalina')],
+          t: 'Bradicardia con pulso', c: 'high',
+          show: () => 'Casi siempre es <b>hipoxia o shock</b>: vía aérea, <b>O₂ 100 % y ventilar</b> con bolsa-mascarilla.<br>' +
+            'Si persiste con mala perfusión y FC &lt;60: <b>compresiones</b> y <b>adrenalina 1–2 µg/kg IV</b>' + (W() ? ' <b>= ' + f(W(), 0) + '–' + f(W() * 2, 0) + ' µg</b>' : '') + ' o en perfusión.<br>' +
+            'Causa vagal o bloqueo AV primario: <b>atropina 20 µg/kg</b>' + d(0.02, 0.5, 2, 'mg') + ' (máx. 0,5 mg).<br>' +
+            'Bloqueo AV completo o enfermedad del seno refractarios: marcapasos (inútil en la bradicardia hipóxica).' + sinPeso()
+        },
+        taqui: {
+          q: '¿Hay shock descompensado (hipotensión, consciencia disminuida)?',
+          opts: [{ l: 'Sí', go: 'cardiov' }, { l: 'No', go: 'qrs' }]
+        },
+        cardiov: {
+          farmacos: [F('Ketamina'), F('Midazolam'), F('Amiodarona'), F('Procainamida')],
+          t: 'Cardioversión sincronizada', c: 'high',
+          show: () => { const w = W(); return '<b>Sincronizada 1 → 2 → 4 J/kg</b>' + (w ? ' <b>= ' + Math.round(w) + ' → ' + Math.round(w * 2) + ' → ' + Math.round(w * 4) + ' J</b>' : '') + ', con sedoanalgesia.<br>Si fracasa, un experto valora amiodarona o procainamida antes del 3.er intento (nunca las dos juntas).' + sinPeso(); }
+        },
+        qrs: {
+          q: '¿Cómo es el QRS?',
+          help: 'Taquicardia sinusal: P normal, variabilidad R-R, inicio gradual y una causa (fiebre, dolor, hipovolemia); se trata la causa, nunca con antiarrítmicos.',
+          opts: [{ l: 'Estrecho (&lt;0,08 s): TSV', go: 'tsv' }, { l: 'Ancho (&gt;0,08 s)', go: 'tv' }]
+        },
+        tsv: {
+          farmacos: [F('Adenosina')],
+          t: 'Taquicardia supraventricular', c: 'mid',
+          show: () => '<b>Maniobras vagales</b>: hielo en la cara en lactantes; Valsalva soplando por una jeringa en mayores. Nunca presión ocular.<br>' +
+            '<b>Adenosina 0,1–0,2 mg/kg</b>' + (W() ? ' <b>= ' + f(Math.min(W() * 0.1, 6), 2) + '–' + f(Math.min(W() * 0.2, 6), 2) + ' mg</b>' : '') + ' (máx. 6 mg) en bolo rápido + 10 ml de SF, vena proximal → <b>0,3 mg/kg</b>' + d(0.3, 12, 2, 'mg') + ' (máx. 12–18 mg) → aumentos de 0,05–0,1 hasta 0,5 mg/kg.<br>' +
+            'Si no cede: cardiólogo pediátrico (amiodarona o cardioversión).' + sinPeso() +
+            '<br><span class="pe-nota">Pauta del curso EPALS. Otras fuentes (ASHP) dan 0,1 mg/kg (máx. 6) → 0,2 mg/kg (máx. 12).</span>'
+        },
+        tv: {
+          farmacos: [F('Amiodarona'), F('Lidocaína'), F('Sulfato de magnesio')],
+          t: 'Taquicardia de QRS ancho', c: 'high',
+          show: () => 'Tratarla como <b>TV</b> si hay dudas. Cardiólogo; corregir las 4H y 4T.<br>' +
+            'Monomorfa estable: <b>amiodarona 5 mg/kg en 20–30 min</b>' + d(5, 300, 0, 'mg') + ' o <b>lidocaína 1 mg/kg</b>' + d(1, 100, 0, 'mg') + '.<br>' +
+            'Polimórfica o torsades: <b>sulfato de magnesio 50 mg/kg</b>' + d(50, 2000, 0, 'mg') + ' (máx. 2 g) en 10–20 min.<br>' +
+            'Si aparece shock: cardioversión sincronizada 1 → 2 → 4 J/kg.' + sinPeso()
+        },
+        convul: {
+          farmacos: [F('Midazolam'), F('Diazepam'), F('Levetiracetam'), F('Valproato sódico')],
+          t: 'Estatus epiléptico (5-10-20-40)', c: 'high',
+          show: () => 'Glucemia, iones, O₂. Preguntar qué fármacos ha recibido ya.<br>' +
+            '<b>5 min</b>: benzodiacepina: midazolam IM 0,2 mg/kg' + d(0.2, 10, 1, 'mg') + ' · intranasal o bucal 0,3 mg/kg' + d(0.3, 10, 1, 'mg') + ' · IV 0,15 mg/kg' + d(0.15, 10, 1, 'mg') + ' (máx. 10 mg).<br>' +
+            '<b>10 min</b>: 2.ª dosis de benzodiacepina y preparar la 2.ª línea.<br>' +
+            '<b>≤20 min</b>: <b>levetiracetam 40–60 mg/kg</b>' + (W() ? ' <b>= ' + f(Math.min(W() * 40, 4500), 0) + '–' + f(Math.min(W() * 60, 4500), 0) + ' mg</b>' : '') + ' en 5 min (máx. 4,5 g); alternativas: fenitoína 20 mg/kg, valproico 40 mg/kg (máx. 3 g; no en hepatopatía ni metabolopatía), fenobarbital 20 mg/kg.<br>' +
+            '<b>≤40 min</b>: refractario → anestesia, intubación y EEG continuo (UCIP).' + sinPeso()
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'Causas reversibles (4H 4T)', t: 'Causas reversibles en la PCR', c: 'mid',
+            show: () => '<b>Hipoxia</b>: O₂ 100 %, revisar fugas y distensión · <b>Hipovolemia</b>: 10 ml/kg' + d(10, 500, 0, 'ml') + ' o hemoderivados · ' +
+              '<b>Hiperpotasemia</b> &gt;6,5–7: insulina rápida 0,1 U/kg' + d(0.1, 10, 1, 'U') + ' (máx. 10) + G10 % 5 ml/kg' + d(5, 250, 0, 'ml') + ' (máx. 250) + salbutamol IV 5 µg/kg; <b>en la PCR, ni calcio ni bicarbonato</b> · ' +
+              '<b>Hipopotasemia</b> &lt;2,5: K 1 mmol/kg' + d(1, 30, 0, 'mmol') + ' (máx. 30) · <b>Hipoglucemia</b>: G10 % 2 ml/kg' + d(2, null, 0, 'ml') + ' · ' +
+              '<b>Hipotermia</b>: &lt;30 °C una sola adrenalina y máx. 3 descargas; 30–35 °C adrenalina cada 8 min · ' +
+              '<b>Neumotórax a tensión</b>: toracocentesis o toracostomía · <b>Taponamiento</b>: pericardiocentesis · <b>Trombosis</b>: trombólisis · <b>Tóxicos</b>: antídoto, valorar ECMO.'
+          },
+          {
+            l: 'Vía aérea en la RCP', t: 'Vía aérea y ventilación en la RCP',
+            show: 'Bolsa-mascarilla con O₂ 100 % (no titular la FiO₂ durante la RCP). Con tubo o dispositivo supraglótico: compresiones continuas y ventilar a <b>25/min</b> (lactante) · <b>20</b> (&gt;1 año) · <b>15</b> (&gt;8 años) · <b>10</b> (&gt;12 años); si hay fuga o dudas, volver a 15:2.<br>PA invasiva: PAD ≥25 mmHg (lactante) o ≥30 (niño). <b>No usar la vía traqueal para fármacos.</b>'
+          },
+          {
+            l: 'Cuidados tras la RCE', t: 'Cuidados tras la recuperación de la circulación', c: 'mid',
+            show: 'SpO₂ 94–98 % · normocapnia (comprobar con PaCO₂) · <b>PAS y PAM por encima del percentil 10</b> para la edad · lactato &lt;2 · temperatura ≤37,5 °C (no recalentar si &gt;32 °C) · glucemia normal · tratar las convulsiones · sonda gástrica · traslado a la UCIP con transferencia estructurada (RSVP o SAVR).'
+          },
+          {
+            l: 'Cuándo no iniciar o parar', t: 'Decisión de iniciar o continuar la RCP',
+            show: 'No iniciar: seguridad no garantizada, muerte irreversible evidente o voluntad anticipada válida. Apoya la decisión de parar: <b>asistolia &gt;20 min de SVA de calidad</b> sin causa reversible (salvo hipotermia, tóxicos o candidato a ECMO). Ningún dato aislado basta (pupilas, EtCO₂, duración). Decisión de equipo y con la familia; documentar y hacer debriefing.'
+          },
+          {
+            l: 'Valores normales por edad', t: 'Valores normales por edad',
+            show: '<b>FC</b> (lím. inferior–superior): 1 mes 110–180 · 1 año 100–170 · 2 años 90–160 · 5 años 70–140 · 10 años 60–120 · 18 años 60–100.<br>' +
+              '<b>FR</b>: 1 mes 25–60 · 1 año 20–50 · 2 años 18–40 · 5 años 17–30 · 10 años 14–25 · 18 años 12–20.<br>' +
+              '<b>PAS p5</b>: 1 mes 50 · 1 año 70 · 2 años 73 · 5 años 75 · 10 años 80 · 18 años 90. <b>PAM p10</b> (objetivo mínimo tras la RCE): 45 · 55 · 58 · 60 · 60 · 65.'
+          }
+        ]
+      }
+    };
+  })()},
 ];
