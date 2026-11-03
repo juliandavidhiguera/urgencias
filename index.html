@@ -2990,7 +2990,7 @@ function _itbPesoIdeal() {
   const talla = parseFloat(document.getElementById('itb-talla').value);
   const sexo = document.getElementById('itb-sexo').value;
   if (!talla || talla <= 0) return null;
-  const base = 0.9055 * (talla - 152.4);
+  const base = 0.91 * (talla - 152.4);
   return sexo === 'f' ? 45.5 + base : 50 + base;
 }
 

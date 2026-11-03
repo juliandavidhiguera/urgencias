@@ -226,7 +226,7 @@ section[id]{scroll-margin-top:16px}</style>
           <label for="talla">Talla (cm)
             <input id="talla" type="number" min="45" max="200" step="1" placeholder="para Vt">
           </label>
-          <label for="sexo">Sexo (≥ 152 cm)
+          <label for="sexo">Sexo
             <select id="sexo">
               <option value="h">niño</option>
               <option value="m">niña</option>
@@ -2499,8 +2499,9 @@ section[id]{scroll-margin-top:16px}</style>
         <div class="fx">
           <b>Volumen corriente</b>
           <div class="f">Con peso ideal: espontáneo ≈ 7 mL/kg · VM 6–8 mL/kg</div>
-          <div class="f">Peso ideal (talla &lt; 152 cm) = 2,396 × e^(0,01863 × talla en cm)</div>
-          <div class="d">Traub-Johnson; desde 152 cm, Devine. Usar el menor entre peso ideal y peso real (PALICC-2). Por edad solo si no hay talla.</div>
+          <div class="f">Peso ideal 45–120 cm = P50 de peso para la talla (OMS 2006)</div>
+          <div class="f">121–151 cm = 2,396 × e^(0,01863 × talla en cm)</div>
+          <div class="d">Traub-Johnson entre 121 y 151 cm (difiere &lt; 2 % del P50 OMS desde 75 cm, pero lo duplica en recién nacidos); desde 152 cm, Devine. Usar el menor entre peso ideal y peso real (PALICC-2). Por edad solo si no hay talla.</div>
         </div>
         <div class="fx">
           <b>Cricotiroidotomía con aguja</b>
@@ -2793,6 +2794,16 @@ section[id]{scroll-margin-top:16px}</style>
     if(y<=12) return (y+4)*2;
     return null;
   }
+  // OMS 2006, P50 (mediana M) cada 1 cm: peso para la longitud 45–110 cm (< 2 años, tumbado) y para la talla 65–120 cm (≥ 2 años, de pie)
+  var WHO={L:{h:[2.44,2.61,2.78,2.95,3.13,3.33,3.54,3.76,4.01,4.27,4.55,4.83,5.13,5.42,5.71,5.99,6.26,6.53,6.78,7.03,7.27,7.5,7.74,7.97,8.2,8.42,8.65,8.87,9.09,9.3,9.5,9.7,9.9,10.08,10.26,10.45,10.64,10.83,11.04,11.27,11.5,11.74,11.99,12.24,12.48,12.72,12.96,13.19,13.42,13.66,13.89,14.13,14.38,14.63,14.89,15.16,15.44,15.73,16.02,16.32,16.63,16.94,17.26,17.59,17.92,18.27],m:[2.46,2.63,2.8,2.97,3.16,3.35,3.56,3.79,4.03,4.29,4.55,4.82,5.08,5.35,5.62,5.87,6.13,6.37,6.61,6.85,7.08,7.31,7.53,7.74,7.96,8.16,8.37,8.57,8.77,8.96,9.15,9.33,9.52,9.7,9.89,10.09,10.3,10.51,10.74,10.98,11.22,11.47,11.72,11.97,12.22,12.47,12.72,12.97,13.22,13.46,13.71,13.97,14.22,14.48,14.75,15.03,15.31,15.6,15.91,16.22,16.55,16.88,17.23,17.58,17.95,18.33]},
+           H:{h:[7.43,7.67,7.9,8.13,8.35,8.58,8.8,9.02,9.23,9.44,9.64,9.84,10.03,10.21,10.39,10.58,10.77,10.98,11.2,11.43,11.67,11.92,12.16,12.41,12.65,12.89,13.12,13.35,13.59,13.82,14.06,14.3,14.55,14.81,15.08,15.36,15.64,15.93,16.23,16.53,16.85,17.16,17.49,17.82,18.16,18.52,18.88,19.24,19.62,20,20.38,20.77,21.17,21.56,21.96,22.35],m:[7.24,7.46,7.68,7.89,8.1,8.31,8.51,8.71,8.9,9.09,9.28,9.46,9.65,9.83,10.03,10.23,10.45,10.67,10.91,11.15,11.39,11.64,11.9,12.15,12.4,12.65,12.89,13.14,13.39,13.64,13.89,14.15,14.41,14.67,14.94,15.22,15.52,15.82,16.13,16.45,16.78,17.12,17.48,17.84,18.22,18.6,19,19.41,19.82,20.24,20.66,21.09,21.52,21.95,22.39,22.82]}};
+  function whoP50(t,sx,y){
+    var len = y!==null ? y<2 : t<87;          // OMS: longitud tumbado < 2 a; talla de pie ≥ 2 a
+    if(len && t>110) len=false; if(!len && t<65) len=true;
+    var a=WHO[len?'L':'H'][sx], t0=len?45:65, i=Math.floor(t-t0), f=(t-t0)-i;
+    if(i<0 || i>=a.length) return null; if(i===a.length-1) return a[i];
+    return a[i]+(a[i+1]-a[i])*f;
+  }
   function ageYears(){var a=parseFloat($('age').value);if(isNaN(a))return null;return $('unit').value==='m'?a/12:a;}
   function cap(x,m){return Math.min(x,m)}
   function box(t,rows){return '<div class="cbox"><h5>'+t+'</h5><table>'+rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('')+'</table></div>'}
@@ -2824,7 +2835,8 @@ section[id]{scroll-margin-top:16px}</style>
       ['Profundidad oral', y!==null && y>=1 ? r(12+y/2,1)+' cm' : '—'],
       ['Profundidad nasal', y!==null && y>=1 ? r(15+y/2,1)+' cm' : '—'],
       (function(){var t=parseFloat($('talla').value), pi=null, m='';
-        if(t>=45 && t<152){pi=2.396*Math.exp(0.01863*t); m='Traub-Johnson';}
+        if(t>=45 && t<=120){pi=whoP50(t,$('sexo').value,ageYears()); m='P50 OMS peso para la talla';}
+        else if(t>120 && t<152){pi=2.396*Math.exp(0.01863*t); m='Traub-Johnson';}
         else if(t>=152){pi=($('sexo').value==='m'?45.5:50)+0.91*(t-152.4); m='Devine';}
         if(pi){var ref=Math.min(pi,w); return ['VT 6–8 mL/kg de peso ideal', r(ref*6,0)+'–'+r(ref*8,0)+' mL (peso ideal '+r(pi,1)+' kg por talla, '+m+(w<pi?'; se usa el peso real, menor':'')+')'];}
         var e=estWeight(); return ['VT 6–8 mL/kg de peso ideal', e ? r(Math.min(e,w)*6,0)+'–'+r(Math.min(e,w)*8,0)+' mL (aproximado por edad: falta la talla)' : '— (indicar la talla)'];})(),

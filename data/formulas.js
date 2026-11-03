@@ -419,7 +419,7 @@ window.FORMULAS = [
 {id:'f-vt-protector', src:'ARDSnet — ventilación protectora', title:'Volumen Corriente Protector', sub:'6–8 mL/kg de peso ideal (Devine), no peso real', badge:'red', tag:'Ventilación', max:800, agg:'custom', items:[
   {t:'num', l:'Talla (cm)', u:'cm', f:function(v){return 0}},
   {t:'sel', l:'Sexo', o:[['Hombre',50],['Mujer',45.5]]}],
-  calcCustom:function(v){var pbw=v[1]+0.9055*(v[0]-152.4); return Math.round(pbw*10)/10},
+  calcCustom:function(v){var pbw=v[1]+0.91*(v[0]-152.4); return Math.round(pbw*10)/10},
   interp:function(s){return ['low','PBW '+s+' kg','Volumen corriente objetivo: '+Math.round(s*6)+'–'+Math.round(s*8)+' mL (6–8 mL/kg de peso ideal)']}},
 
 {id:'f-compliance-din', src:'Mecánica ventilatoria básica', title:'Compliance Dinámica', sub:'Vt/(P.pico − PEEP total)', badge:'blue', tag:'Ventilación', max:150, agg:'custom', items:[
@@ -550,7 +550,7 @@ window.FORMULAS = [
 {id:'f-peso-ideal', src:'Fórmula de Devine', title:'Peso Ideal (Devine)', sub:'Base para dosificación por peso ideal', badge:'blue', tag:'Antropometría', max:120, agg:'custom', items:[
   {t:'num', l:'Talla (cm)', u:'cm', f:function(v){return 0}},
   {t:'sel', l:'Sexo', o:[['Hombre',50],['Mujer',45.5]]}],
-  calcCustom:function(v){return Math.round((v[1]+0.9055*(v[0]-152.4))*10)/10},
+  calcCustom:function(v){return Math.round((v[1]+0.91*(v[0]-152.4))*10)/10},
   interp:function(s){return ['low',s+' kg','Peso ideal estimado']}},
 
 {id:'f-superficie-corporal', src:'Fórmula de Mosteller', title:'Superficie Corporal (Mosteller)', sub:'√[(peso × talla) / 3600]', badge:'blue', tag:'Antropometría', max:3, agg:'custom', items:[
