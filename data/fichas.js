@@ -446,6 +446,25 @@ window.FICHAS = [
     "id": "digoxina"
   },
   {
+    "file": "Diltiazem.md",
+    "nombre": "Diltiazem",
+    "altoRiesgo": true,
+    "fuente": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=3f2942d7-f4d0-2d77-e063-6294a90a74ad",
+    "subtitulo": "Ficha propia (no está en la guía del SEM): ficha técnica estadounidense del diltiazem inyectable (DailyMed) y guía ESC 2024",
+    "alerta": "En España solo está autorizado por vía oral (CIMA, consultado el 03-11-2026): la forma IV solo se encuentra en otros países o como medicamento extranjero.",
+    "presentacion": "Vial de 25 mg en 5 ml (5 mg/ml) (presentación estadounidense). Conservar en nevera.",
+    "propiedades": "Antagonista del calcio no dihidropiridínico. Enlentece la conducción y alarga la refractariedad del nodo AV. Efecto a los 3 min, máximo a los 2–7 min; dura 1–3 h. Rara vez revierte la FA.",
+    "indicaciones": "Control temporal de la frecuencia ventricular en la FA o el flutter auricular. Conversión de la TSVP a ritmo sinusal (tras las maniobras vagales).",
+    "dosis": "Adulto, con el peso real:\n• Bolo: 0,25 mg/kg IV en 2 min (unos 20 mg). Si no basta, a los 15 min, 0,35 mg/kg IV en 2 min (unos 25 mg).\n• Perfusión tras el bolo: 10 mg/h (algunos pacientes responden a 5 mg/h); subir de 5 en 5 mg/h hasta 15 mg/h. Máximo 24 h y 15 mg/h (no estudiado por encima).\n• La ESC 2024 pasa el bolo de 0,25 mg/kg en 5 min y da la perfusión a 5–15 mg/h.\n• Diluir en SF, G5 % o G5 % con SF 0,45 %; usar en 24 h.",
+    "contraindicaciones": "Hipersensibilidad. Enfermedad del seno o BAV de 2.º–3.er grado sin marcapasos ventricular. Hipotensión grave o shock cardiogénico. Betabloqueante IV a la vez o en las horas previas. FA o flutter con vía accesoria (WPW, PR corto). Taquicardia ventricular o de QRS ancho no aclarada. FEVI ≤40 % (ESC 2024).",
+    "efectosSecundarios": "Hipotensión (sintomática en el 3,2 %, asintomática en el 4,3 %), reacción en el punto de inyección, rubefacción, ritmo de la unión. Poco frecuentes: bradicardia, BAV, asistolia, insuficiencia cardiaca, arritmias ventriculares.",
+    "observaciones": "• Monitorización continua del ECG y de la TA; desfibrilador a mano.\n• Efecto aditivo con otros fármacos que frenan la conducción o bajan la TA.\n• Sobredosis: atropina si hay bradicardia; calcio IV (cloruro cálcico 1 g o gluconato cálcico 3 g en 5 min, repetible cada 10–20 min), con eficacia variable; vasopresores si hay hipotensión. No se elimina con diálisis.",
+    "embarazo": "Solo si el beneficio justifica el riesgo (toxicidad en animales; sin estudios en humanos).",
+    "lactancia": "Pasa a la leche en concentraciones parecidas a las del plasma: si es imprescindible, suspender la lactancia.",
+    "pediatria": "Seguridad y eficacia no establecidas.",
+    "id": "diltiazem"
+  },
+  {
     "file": "Dobutamina.md",
     "nombre": "Dobutamina",
     "altoRiesgo": true,
@@ -482,6 +501,25 @@ window.FICHAS = [
     "lactancia": null,
     "pediatria": null,
     "id": "enoxaparina"
+  },
+  {
+    "file": "Esmolol.md",
+    "nombre": "Esmolol",
+    "altoRiesgo": true,
+    "fuente": "https://cima.aemps.es/cima/publico/detalle.html?nregistro=72608",
+    "subtitulo": "Ficha propia (no está en la guía del SEM): ficha técnica de Brevibloc® (AEMPS) y guía ESC 2024",
+    "alerta": null,
+    "presentacion": "Brevibloc® 10 mg/ml: vial de 10 ml (100 mg) y bolsa lista para usar de 250 ml (2.500 mg). 1 ml = 10 mg.",
+    "propiedades": "Betabloqueante β1-selectivo de acción ultracorta (lo metabolizan las esterasas de los hematíes): actúa en minutos y el efecto desaparece unos 30 min después de parar la perfusión.",
+    "indicaciones": "Control rápido de la frecuencia ventricular en la FA o el flutter auricular cuando conviene un fármaco de acción corta. Taquicardia sinusal no compensada. Taquicardia e hipertensión perioperatorias. No en los síndromes de preexcitación.",
+    "dosis": "Taquiarritmia supraventricular, adulto, con el peso real:\n• Carga: 500 µg/kg/min durante 1 min (0,05 ml/kg: 3,5 ml con 70 kg).\n• Mantenimiento: 50 µg/kg/min durante 4 min (21 ml/h con 70 kg). Si no basta, repetir la carga y subir de 50 en 50 µg/kg/min cada 4 min.\n• Dosis eficaz habitual: 50–200 µg/kg/min; por encima de 200 apenas baja más la FC y aumentan los efectos adversos. La ESC 2024 da 50–300 µg/kg/min.\n• Al acercarse a la FC deseada o si baja la TA: parar la carga y subir de 25 en 25 µg/kg/min o menos.\n• Ritmo en ml/h con la solución de 10 mg/ml = µg/kg/min × kg × 0,006.\n• Retirarlo de forma progresiva (rebote de taquicardia e hipertensión). Al pasar a otro fármaco: bajar al 50 % en la hora siguiente a la primera dosis del nuevo y suspenderlo tras la segunda si la respuesta es buena.",
+    "contraindicaciones": "Hipersensibilidad (posible sensibilidad cruzada con otros betabloqueantes). Bradicardia sinusal grave (<50 lpm). Disfunción sinusal. Trastornos graves de la conducción AV o BAV de 2.º–3.er grado sin marcapasos. Shock cardiogénico. Hipotensión grave. Insuficiencia cardiaca descompensada. Verapamilo IV a la vez o en las 48 h previas. Feocromocitoma no tratado. Hipertensión pulmonar. Crisis asmática. Acidosis metabólica.",
+    "efectosSecundarios": "Hipotensión (la más frecuente, dependiente de la dosis; cede unos 30 min después de parar), bradicardia y parada cardiaca, mareo, somnolencia, cefalea, náuseas, reacciones en el punto de infusión.",
+    "observaciones": "• Monitorización continua del ECG y de la TA.\n• Insuficiencia renal: el metabolito ácido se acumula (en la enfermedad renal terminal su semivida es diez veces mayor); precaución en perfusión.\n• Ancianos: empezar con dosis menores.\n• Perfusiones de más de 24 h, poco estudiadas.\n• Bolsa de 250 ml: el puerto de medicación solo sirve para extraer el bolo inicial. Evitar la extravasación.",
+    "embarazo": "No recomendado. Si se usa, vigilar el crecimiento fetal y al recién nacido (hipoglucemia, hipotensión, bradicardia).",
+    "lactancia": "No debe usarse.",
+    "pediatria": "No indicado en menores de 18 años.",
+    "id": "esmolol"
   },
   {
     "file": "Etomidat.md",
@@ -1433,6 +1471,25 @@ window.FICHAS = [
     "lactancia": "Fármaco seguro.",
     "pediatria": "• Menores de 1 año: solo en caso imprescindible, a 0,1-0,2 mg/kg en bolo de 2 minutos mínimo, con monitorización de ECG y TA por el riesgo de hipotensión y bajo gasto cardíaco.\n• Mayores de 1 año: 0,1-0,3 mg/kg (máximo 5 mg/dosis); si no hay respuesta, repetir a los 30 minutos una segunda dosis (máximo 10 mg/dosis).\n• Perfusión continua: 1-5 microgramos/kg/min.\n¡Atención! No administrar en bolo rápido, ya que se han descrito situaciones de colapso",
     "id": "verapamilo"
+  },
+  {
+    "file": "Vernakalant.md",
+    "nombre": "Vernakalant",
+    "altoRiesgo": true,
+    "fuente": "https://cima.aemps.es/cima/publico/detalle.html?nregistro=10645002",
+    "subtitulo": "Ficha propia (no está en la guía del SEM): ficha técnica de Brinavess® (AEMPS) y guía ESC 2024",
+    "alerta": "Rellenar la lista de comprobación previa a la perfusión que acompaña al envase. No administrarlo en bolo.",
+    "presentacion": "Se perfunde diluido a 4 mg/ml. Brinavess® concentrado de 20 mg/ml: viales de 10 ml (200 mg) y de 25 ml (500 mg).",
+    "propiedades": "Antiarrítmico de acción preferentemente auricular (bloquea canales de sodio y de potasio). Revierte con rapidez la FA de inicio reciente.",
+    "indicaciones": "Adultos: conversión rápida a ritmo sinusal de la FA de inicio reciente: ≤7 días en pacientes no quirúrgicos y ≤3 días tras cirugía cardiaca.",
+    "dosis": "Con el peso real (la dosis máxima se calcula sobre 113 kg):\n• 1.ª perfusión: 3 mg/kg IV en 10 min (máx. 339 mg = 84,7 ml de la solución de 4 mg/ml).\n• Si no revierte en los 15 min siguientes al final de la 1.ª: 2.ª perfusión de 2 mg/kg en 10 min (máx. 226 mg = 56,5 ml).\n• Dosis acumulada máxima en 24 h: 5 mg por kg. Si revierte durante una perfusión, terminarla.\n• Si aparece un flutter estable tras la 1.ª, puede darse la 2.ª.\n• Dilución a 4 mg/ml con SF, Ringer lactato o G5 % (>100 kg: 30 ml del vial en 120 ml de diluyente); preparar de entrada lo necesario para las dos perfusiones. Bomba de perfusión.\n• Sin ajuste por función renal o hepática ni en mayores de 65 años.",
+    "contraindicaciones": "Hipersensibilidad. Estenosis aórtica grave. TAS <100 mmHg. Insuficiencia cardiaca NYHA III–IV. QT largo de base (>440 ms sin corregir). Bradicardia grave, disfunción sinusal o BAV de 2.º–3.er grado sin marcapasos. Antiarrítmicos IV de clase I o III en las 4 h previas o posteriores. Síndrome coronario agudo en los últimos 30 días.",
+    "efectosSecundarios": "Disgeusia (18 %), estornudos (12,5 %) y parestesias (7 %), transitorios. Hipotensión (5,7 %, precoz), bradicardia (sobre todo al revertir), flutter auricular, arritmia ventricular.",
+    "observaciones": "• Vigilar las constantes y el ritmo durante la perfusión y al menos 15 min después; observación de 2 h desde el inicio y hasta que el ECG se estabilice.\n• Suspender si cae bruscamente la TA o la FC, o si aparecen hipotensión, bradicardia o cambios en el ECG (pausa sinusal, BAV completo, bloqueo de rama nuevo, QRS o QT muy alargados, isquemia, arritmia ventricular); en ese caso, no dar la 2.ª dosis.\n• Antes de la perfusión: paciente hidratado y hemodinámicamente optimizado, anticoagulado según las guías y con K⁺ ≥3,5 mmol/l.",
+    "embarazo": "Evitarlo (malformaciones en estudios con animales).",
+    "lactancia": "Precaución: se desconoce si pasa a la leche.",
+    "pediatria": "No usar en menores de 18 años.",
+    "id": "vernakalant"
   },
   {
     "file": "Àcid acetilsalicílic.md",

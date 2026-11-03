@@ -82,7 +82,142 @@ window.PROTOCOLS = [
   {type:'info', text:'Observación antes del alta según gravedad y respuesta. Alta con autoinyector, plan escrito y derivación a alergología'}],
   src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568 · Actualizacion de evidencia en anafilaxia: Dodd 2021 · PMID 33895231 · Preparacion de la perfusion IV: LoVerde 2017 · PMID 28800865'},
 
-{id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', rank:13, steps:[
+{id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', rank:13,
+  flow:(() => {
+    const num = x => !isNaN(x) && x > 0;
+    const kg = (v, f, max) => num(v.peso) ? ' (' + String(Math.round(Math.min(v.peso * f, max || Infinity))).replace('.', ',') + ' mg con ' + v.peso + ' kg)' : '';
+    const SED = ['Etomidato', 'Propofol', 'Midazolam', { n: 'Fentanilo', inf: false }];
+    const ANTICO = ['Enoxaparina', 'Heparina sódica'];
+    const POSTCV = 'Tras cualquier cardioversión: <b>anticoagulación ≥4 semanas</b> (opcional solo si no hay factores de riesgo y el ritmo sinusal se recuperó en &lt;24 h desde un inicio seguro); después, según el CHA₂DS₂-VA.';
+    return {
+      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }],
+      start: 'ecg',
+      escalas: [
+        { id: 'chadsva', para: 'riesgo embólico (ESC 2024)' },
+        { id: 'hasbled', para: 'riesgo hemorrágico: factores corregibles' },
+        { id: 'ehra', para: 'gravedad de los síntomas' },
+        { id: 'chadsvasc', para: 'riesgo embólico (versión anterior, ACC/AHA)' }
+      ],
+      nodes: {
+        ecg: {
+          t: 'Primeros minutos',
+          show: v => '<b>ECG de 12 derivaciones</b>, monitorización, vía venosa y analítica (iones con Mg, función renal, hemograma, TSH; troponina si hay dolor). Confirmar que es FA y no flutter u otra taquicardia.' +
+            (num(v.fc) ? ' FC ' + v.fc + ' lpm.' : '') + '<br>Buscar el <b>desencadenante</b> (ver «Desencadenantes» abajo): una taquicardia compensadora no se frena, se trata la causa.',
+          q: '¿Hay signos de preexcitación?',
+          help: 'FA preexcitada: QRS ancho y de morfología cambiante, muy irregular, a menudo con FC &gt;250 lpm; onda delta en ECG previos.',
+          opts: [{ l: 'Sí, sospecha de FA preexcitada', go: 'preex' }, { l: 'No', go: 'inest' }]
+        },
+        preex: {
+          farmacos: SED.concat(['Procainamida', 'Flecainida']),
+          t: 'FA preexcitada (vía accesoria)', c: 'high',
+          show: '<b>NO dar frenadores del nodo AV</b>: betabloqueantes, verapamilo, diltiazem, digoxina, adenosina ni <b>amiodarona IV</b> (aceleran la conducción por la vía accesoria y pueden provocar FV).<br>' +
+            '<b>Inestable: cardioversión eléctrica sincronizada inmediata.</b><br>' +
+            'Estable: la cardioversión eléctrica sincronizada es la opción más segura; como alternativa farmacológica, ibutilida o procainamida IV (ACC/AHA 2023) o flecainida (ESC 2024), según disponibilidad. Avisar a cardiología.<br><span class="pe-nota">ESC 2024; ACC/AHA 2023; AHA 2025 SVA.</span>'
+        },
+        inest: {
+          q: '¿Hay inestabilidad hemodinámica ATRIBUIBLE a la FA?',
+          help: 'Shock o hipotensión mantenida, edema agudo de pulmón, isquemia miocárdica en curso, síncope o alteración de la consciencia por la taquicardia.',
+          opts: [{ l: 'Sí', go: 'cve', sug: v => num(v.tas) && v.tas < 90 }, { l: 'No', go: 'fevi' }]
+        },
+        cve: {
+          farmacos: SED.concat(['Amiodarona'], ANTICO),
+          t: 'Cardioversión eléctrica sincronizada inmediata', c: 'high',
+          show: '<b>Sincronizada, 200 J bifásicos</b>; si fracasa, aumentar la energía. Sedoanalgesia breve (etomidato o propofol a dosis bajas si hay hipotensión).<br>' +
+            'No retrasarla por la duración de la FA ni por la anticoagulación: heparina en cuanto sea posible, sin demorar la descarga.<br>' +
+            'Si la FA recurre o no revierte: amiodarona IV y valorar repetir.<br>' + POSTCV + '<br><span class="pe-nota">ESC 2024; AHA 2025 SVA (200 J).</span>'
+        },
+        fevi: {
+          q: '¿Cómo está la función ventricular?',
+          help: 'Si no hay ecocardiograma previo, trata como FEVI reducida a quien tenga signos de insuficiencia cardiaca. Ecografía a pie de cama si está disponible.',
+          opts: [
+            { l: 'FEVI >40 % (o desconocida sin signos de insuficiencia cardiaca)', go: 'frec' },
+            { l: 'FEVI ≤40 %, insuficiencia cardiaca o TAS límite', go: 'frec_ic', sug: v => num(v.tas) && v.tas < 100 }
+          ]
+        },
+        frec: {
+          farmacos: ['Metoprolol', 'Esmolol', 'Diltiazem', 'Verapamilo', 'Digoxina'],
+          t: 'Control de frecuencia (FEVI >40 %)', c: 'mid',
+          show: v => 'Objetivo inicial: <b>FC &lt;110 lpm</b> en reposo (control leniente); más estricto si persisten los síntomas.<br>' +
+            '<b>Metoprolol</b> 2,5–5 mg IV en 2 min; repetir hasta 15 mg.<br>' +
+            '<b>Esmolol</b> 500 µg/kg IV en 1 min' + kg(v, 0.5) + ', después 50–300 µg/kg/min (según la ficha técnica, por encima de 200 apenas aporta).<br>' +
+            '<b>Diltiazem</b> (no comercializado IV en España) 0,25 mg/kg IV en 5 min' + kg(v, 0.25) + ', después 5–15 mg/h.<br>' +
+            '<b>Verapamilo</b> 2,5–10 mg IV en 5 min.<br>' +
+            '<b>Digoxina</b> 0,5 mg IV, como añadido si no basta (hasta 0,75–1,5 mg en 24 h en dosis divididas; reducir en insuficiencia renal y ancianos).<br>' +
+            'No juntar betabloqueante IV con verapamilo o diltiazem IV sin monitorización estrecha.<br><span class="pe-nota">ESC 2024, tabla 12. La ACC/AHA 2023 da el diltiazem en 2 min y el verapamilo 5–10 mg en ≥2 min.</span>',
+          q: '¿Se consigue controlar la frecuencia?',
+          opts: [{ l: 'Sí', go: 'durac' }, { l: 'No', go: 'refr' }]
+        },
+        frec_ic: {
+          farmacos: ['Digoxina', 'Amiodarona', 'Metoprolol'],
+          t: 'Control de frecuencia (FEVI ≤40 % o insuficiencia cardiaca)', c: 'mid',
+          show: '<b>Evitar verapamilo y diltiazem.</b> Objetivo inicial FC &lt;110 lpm.<br>' +
+            '<b>Digoxina</b> 0,5 mg IV (hasta 0,75–1,5 mg en 24 h en dosis divididas; ajustar a la función renal).<br>' +
+            '<b>Betabloqueante</b> (metoprolol 2,5–5 mg IV) solo si no hay insuficiencia cardiaca descompensada ni hipotensión.<br>' +
+            '<b>Amiodarona</b> 300 mg IV en 30–60 min y 900–1.200 mg en 24 h si hay inestabilidad o FEVI muy reducida. Puede revertir la FA: si dura &gt;24 h y no está anticoagulado, existe riesgo embólico.<br>' +
+            'Tratar la congestión (ver protocolo de insuficiencia cardiaca aguda).<br><span class="pe-nota">ESC 2024, tabla 12. La ACC/AHA 2023 pauta la amiodarona 150–300 mg en 1 h y después 10–50 mg/h.</span>',
+          q: '¿Se consigue controlar la frecuencia?',
+          opts: [{ l: 'Sí', go: 'durac' }, { l: 'No', go: 'refr' }]
+        },
+        refr: {
+          farmacos: ['Amiodarona', 'Digoxina'],
+          t: 'Frecuencia refractaria', c: 'high',
+          show: 'Revisar el desencadenante (sepsis, hipovolemia, anemia, hipoxemia, tirotoxicosis, TEP). <b>Combinar</b> betabloqueante o verapamilo con digoxina; amiodarona IV si no basta. Si aparece inestabilidad: cardioversión eléctrica. Consultar con cardiología o la UCI.'
+        },
+        durac: {
+          q: '¿Desde cuándo está en FA?',
+          help: '<b>ESC 2024</b>: no cardiovertir sin anticoagulación previa si la FA dura <b>&gt;24 h</b> (antes, 48 h). La <b>ACC/AHA 2023</b> mantiene 48 h. La duración que refiere el paciente puede ser falsa si hubo FA asintomática.',
+          opts: [
+            { l: 'Inicio seguro hace &lt;24 h, o anticoagulado eficazmente ≥3 semanas', go: 'ritmo' },
+            { l: '&gt;24 h o inicio incierto, sin anticoagulación previa', go: 'espera' }
+          ]
+        },
+        ritmo: {
+          escalas: ['ehra'],
+          q: '¿Hay cardiopatía estructural significativa?',
+          help: 'Puede cardiovertirse ya o esperar: en la FA estable de &lt;36 h, la cardioversión diferida («esperar y ver») no fue inferior a la precoz y el 69 % revirtió solo en ≤48 h (RACE 7 ACWAS). Cardiopatía estructural: FEVI reducida, cardiopatía isquémica, hipertrofia importante o valvulopatía significativa.',
+          opts: [{ l: 'No', go: 'flec' }, { l: 'Sí', go: 'amio_cv' }]
+        },
+        flec: {
+          farmacos: ['Flecainida', 'Vernakalant'].concat(SED, ANTICO),
+          t: 'Cardioversión sin cardiopatía estructural', c: 'low',
+          show: v => '<b>Flecainida</b> 1–2 mg/kg IV en 10 min' + kg(v, 2, 150) + ' (máximo 150 mg) o 200–300 mg VO en dosis única. Asociar un frenador del nodo AV (evita el flutter 1:1); suspender si el QRS se ensancha &gt;25 %. No con cardiopatía isquémica, Brugada ni ClCr &lt;35.<br>' +
+            '<b>Vernakalant</b> 3 mg/kg IV en 10 min (máx. 339 mg); si no revierte en los 15 min siguientes, 2 mg/kg en 10 min (máx. 226 mg). No con TAS &lt;100, SCA &lt;1 mes, NYHA III–IV, QT largo ni estenosis aórtica grave.<br>' +
+            'O <b>cardioversión eléctrica</b> sincronizada 200 J.<br>' +
+            'Heparina o anticoagulante oral antes de cardiovertir. ' + POSTCV + '<br><span class="pe-nota">ESC 2024, tabla 13.</span>'
+        },
+        amio_cv: {
+          farmacos: ['Amiodarona'].concat(SED, ANTICO),
+          t: 'Cardioversión con cardiopatía estructural', c: 'mid',
+          show: '<b>Cardioversión eléctrica</b> sincronizada 200 J, o <b>amiodarona</b> 300 mg IV en 30–60 min y 900–1.200 mg en 24 h (revierte más lento, en horas).<br>' +
+            'No usar flecainida. Heparina o anticoagulante oral antes de cardiovertir. ' + POSTCV + '<br><span class="pe-nota">ESC 2024, tabla 13.</span>'
+        },
+        espera: {
+          escalas: ['chadsva', 'hasbled'], farmacos: ANTICO,
+          t: 'FA &gt;24 h o de inicio incierto: no cardiovertir', c: 'mid',
+          show: 'Control de frecuencia y <b>anticoagulación</b>. Cardioversión diferida tras <b>≥3 semanas de anticoagulación eficaz</b>, o antes si una <b>ecocardiografía transesofágica</b> descarta trombo.<br>Evitar los fármacos que pueden revertir la FA (amiodarona, flecainida) salvo que no haya alternativa.<br><span class="pe-nota">ESC 2024.</span>'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            farmacos: ANTICO,
+            l: 'Anticoagulación', t: 'Anticoagulación (ESC 2024)', c: 'mid',
+            show: '<b>CHA₂DS₂-VA</b> (sin el punto por sexo femenino): ≥2 → anticoagulación recomendada; 1 → considerarla.<br>' +
+              'Preferir un <b>anticoagulante oral directo</b> a la warfarina, salvo prótesis valvular mecánica o estenosis mitral moderada-grave.<br>' +
+              '<b>HAS-BLED</b>: sirve para corregir los factores de riesgo hemorrágico, no para negar la anticoagulación.<br>' +
+              'Antes de una cardioversión: heparina o anticoagulante oral cuanto antes.<br><span class="pe-nota">ESC 2024. La ACC/AHA 2023 sigue usando CHA₂DS₂-VASc.</span>'
+          },
+          {
+            l: 'Desencadenantes', t: 'Desencadenantes y causas reversibles',
+            show: 'Sepsis o fiebre · hipovolemia o hemorragia · anemia · hipoxemia o neumonía · TEP · hipertiroidismo · alcohol o tóxicos · alteraciones iónicas (K⁺, Mg²⁺) · isquemia · postoperatorio · insuficiencia cardiaca. Si la FC alta es compensadora, tratar la causa antes que frenarla.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'ECG de 12 derivaciones. Descartar preexcitación (QRS ancho, delta): contraindica frenar el nodo AV'},
   {type:'decision', text:'¿Inestabilidad hemodinámica ATRIBUIBLE a la FA? (shock, hipotensión mantenida, edema agudo de pulmón, isquemia en curso)', yes:'Inestable', no:'Estable'},
   {type:'action', branch:'yes', text:'CARDIOVERSIÓN ELÉCTRICA SINCRONIZADA inmediata. No retrasar por la duración de la FA ni por completar anticoagulación'},
