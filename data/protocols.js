@@ -175,7 +175,131 @@ window.PROTOCOLS = [
   src:'European guideline on major bleeding and coagulopathy following trauma, 6th ed · PMID 36859355 · NAEMSP/ACEP/ACS-COT TXA 2025 · PMID 40842057 · Ventana de 3 h, subanalisis de CRASH-2 · PMID 21439633'
 },
 
-{id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', rank:12, steps:[
+{id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', rank:12,
+  flow:(() => {
+    const num = x => !isNaN(x) && x >= 0;
+    const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', 'Heparina sódica'];
+    return {
+      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }, { k: 'spo2', l: 'SpO₂', u: '%' }],
+      start: 'ecg',
+      escalas: [
+        { id: 'heart', para: 'riesgo del dolor torácico y alta precoz' },
+        { id: 'grace', para: 'riesgo del SCASEST (>140 = alto)' },
+        { id: 'killip', para: 'insuficiencia cardiaca en el SCA' },
+        { id: 'addrs', para: 'síndrome aórtico agudo' },
+        { id: 'wells', para: 'probabilidad de TEP' },
+        { id: 'perc', para: 'excluir TEP sin dímero D' },
+        { id: 'years', para: 'umbral de dímero D en el TEP' }
+      ],
+      nodes: {
+        ecg: {
+          t: 'Primeros 10 minutos',
+          show: v => '<b>ECG de 12 derivaciones en &lt;10 min</b> (repetirlo si el dolor reaparece o cambia), monitorización, vía venosa y troponina de alta sensibilidad a la llegada (0 h).' +
+            (num(v.spo2) && v.spo2 < 90 ? '<br><b>SpO₂ ' + v.spo2 + ' %: oxígeno</b> (indicado solo si SpO₂ &lt;90 %).' : ' Oxígeno solo si SpO₂ &lt;90 %.'),
+          q: '¿Qué muestra el ECG?',
+          opts: [
+            { l: 'Elevación del ST, BRIHH o marcapasos con sospecha de isquemia, o patrón de oclusión (OMI)', go: 'stemi' },
+            { l: 'Sin elevación del ST (descenso del ST, T negativas o normal)', go: 'muyalto' }
+          ]
+        },
+        stemi: {
+          t: 'SCACEST o equivalente: ACTIVAR CODI IAM', c: 'high',
+          show: 'Seguir el protocolo <b>Codi IAM</b> (reperfusión: ICP primaria, o fibrinólisis si la ICP se retrasa >120 min). No esperar a la troponina.'
+        },
+        muyalto: {
+          escalas: ['killip'], q: '¿Tiene algún criterio de MUY ALTO riesgo?',
+          help: 'Inestabilidad hemodinámica o shock cardiogénico · dolor recurrente o refractario al tratamiento médico · arritmias con riesgo vital o parada cardiaca recuperada · complicación mecánica · insuficiencia cardiaca aguda por isquemia · cambios dinámicos recurrentes del ST/T, sobre todo elevación intermitente del ST.',
+          opts: [{ l: 'Sí, alguno', go: 'inmediata', sug: v => num(v.tas) && v.tas < 90 }, { l: 'No', go: 'alt' }]
+        },
+        inmediata: {
+          farmacos: ANTI.concat(['Nitroglicerina', { n: 'Fentanilo', inf: false }]),
+          t: 'Muy alto riesgo: coronariografía inmediata (&lt;2 h)', c: 'high',
+          show: 'Avisar a cardiología o hemodinámica para la <b>estrategia invasiva inmediata</b>, aunque la troponina aún sea normal. AAS y anticoagulación parenteral; el inhibidor P2Y12, según indique hemodinámica.<br><span class="pe-nota">ESC 2023 (clase I); ACC/AHA 2025.</span>'
+        },
+        alt: {
+          q: '¿Sospechas otra causa grave de dolor torácico?',
+          help: '<b>Síndrome aórtico</b>: dolor brusco, desgarrador o que irradia a la espalda, déficit de pulso o neurológico, soplo de insuficiencia aórtica nuevo · <b>TEP</b>: disnea, taquicardia, factores de riesgo de trombosis · <b>neumotórax</b>, <b>taponamiento</b> o <b>rotura esofágica</b> (dolor tras vómitos).',
+          opts: [
+            { l: 'Síndrome aórtico agudo', go: 'aorta' },
+            { l: 'Tromboembolismo pulmonar', go: 'tep' },
+            { l: 'Neumotórax, taponamiento o rotura esofágica', go: 'otras' },
+            { l: 'No, sospecha de síndrome coronario', go: 'trop' }
+          ]
+        },
+        aorta: {
+          escalas: ['addrs'], farmacos: ['Labetalol'],
+          t: 'Sospecha de síndrome aórtico agudo', c: 'high',
+          show: '<b>No dar antiagregantes ni anticoagulantes hasta descartarlo.</b><br>ADD-RS ≥2 → <b>angio-TC de aorta</b> urgente. ADD-RS 0–1 → dímero D: &lt;500 ng/ml lo hace improbable; ≥500 → angio-TC.<br>Si se confirma: analgesia IV y control de la <b>FC (&lt;60 lpm)</b> y la <b>TAS (100–120 mmHg)</b> con betabloqueante IV; cirugía cardiaca urgente si es tipo A.<br><span class="pe-nota">ESC 2024 de enfermedad aórtica y arterial periférica; estudio ADvISED.</span>'
+        },
+        tep: {
+          escalas: ['wells', 'perc', 'years'],
+          t: 'Sospecha de tromboembolismo pulmonar', c: 'mid',
+          show: 'Seguir el protocolo <b>TEP agudo</b>: Wells o YEARS; PERC si la probabilidad clínica es baja; dímero D ajustado por edad.'
+        },
+        otras: {
+          t: 'Otras causas graves', c: 'high',
+          show: '<b>Neumotórax a tensión</b>: descompresión inmediata, sin esperar a la radiografía. <b>Taponamiento</b>: ecografía a pie de cama y pericardiocentesis si hay compromiso hemodinámico. <b>Rotura esofágica</b>: TC con contraste, dieta absoluta, antibiótico de amplio espectro y cirugía.'
+        },
+        trop: {
+          escalas: ['heart'], q: 'Resultado del algoritmo de troponina ESC 0 h/1 h',
+          help: 'Umbrales <b>propios de cada ensayo</b> (ng/l); confirma cuál usa tu laboratorio:<br>' +
+            '<b>Elecsys hs-cTnT (Roche)</b> · descartado: 0 h &lt;5 (si el dolor empezó hace >3 h) o 0 h &lt;12 y Δ1 h &lt;3 · confirmado: 0 h ≥52 o Δ1 h ≥5.<br>' +
+            '<b>Architect hs-cTnI (Abbott)</b> · descartado: 0 h &lt;4 (si el dolor empezó hace >3 h) o 0 h &lt;5 y Δ1 h &lt;2 · confirmado: 0 h ≥64 o Δ1 h ≥6.<br>' +
+            'Alternativa 0 h/2 h · Elecsys: descartado 0 h &lt;14 y Δ2 h &lt;4, confirmado Δ2 h ≥10 · Architect: descartado 0 h &lt;6 y Δ2 h &lt;2, confirmado Δ2 h ≥15.<br>' +
+            'El resto de combinaciones es la <b>zona de observación</b>.<br><span class="pe-nota">ESC 2023 (tabla de los algoritmos rápidos, sin cambios desde ESC 2020).</span>',
+          opts: [{ l: 'Descartado', go: 'bajo' }, { l: 'Zona de observación', go: 'obs' }, { l: 'Confirmado', go: 'scasest' }]
+        },
+        bajo: {
+          t: 'Infarto descartado por la troponina', c: 'low',
+          show: 'Si la sospecha clínica no es alta y el <b>HEART es ≤3</b>, con ECG no isquémico: alta con seguimiento; valorar prueba de imagen (TC coronario o prueba de estrés) ambulatoria. Si la sospecha clínica sigue siendo alta, repetir la troponina a las 3 h.<br><span class="pe-nota">ESC 2023; guía AHA/ACC 2021 del dolor torácico; consenso ACC 2022.</span>',
+          escalas: ['heart']
+        },
+        obs: {
+          escalas: ['grace'],
+          t: 'Zona de observación', c: 'mid',
+          show: 'Troponina a las <b>3 h</b> y ECG seriado. Ecocardiografía; valorar el GRACE.',
+          q: '¿Cómo es la troponina de las 3 h?',
+          opts: [{ l: 'Cambio significativo', go: 'scasest' }, { l: 'Sin cambio significativo', go: 'obs_neg' }]
+        },
+        obs_neg: {
+          t: 'Troponina sin cambio significativo', c: 'mid',
+          show: 'Probable daño miocárdico crónico u otra causa. Individualizar: TC coronario o prueba de isquemia; ingreso si la sospecha clínica es alta.'
+        },
+        scasest: {
+          escalas: ['grace', 'killip'],
+          farmacos: ANTI.concat(['Nitroglicerina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Ticagrelor', 'Clopidogrel']),
+          t: 'IAMSEST: alto riesgo', c: 'high',
+          show: 'Ingreso con monitorización. <b>Coronariografía precoz (&lt;24 h)</b>: el IAMSEST, los cambios dinámicos del ST/T, la elevación transitoria del ST o un GRACE >140 son criterios de alto riesgo.<br>' +
+            'AAS y anticoagulación parenteral. <b>Sin pretratamiento rutinario con inhibidor P2Y12</b> si la coronariografía será en &lt;24 h; valorarlo (ticagrelor o clopidogrel) si se retrasará más.<br><span class="pe-nota">ESC 2023: invasiva precoz IIa; pretratamiento rutinario III. ACC/AHA 2025: invasiva &lt;24 h razonable en alto riesgo.</span>'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            farmacos: ['Nitroglicerina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Metoprolol'],
+            l: 'Tratamiento antiisquémico', t: 'Tratamiento antiisquémico', c: 'mid',
+            show: '<b>Nitroglicerina</b> sublingual o IV si persiste el dolor, hay hipertensión o insuficiencia cardiaca. No si TAS &lt;90 mmHg, sospecha de infarto del VD o inhibidores de la PDE-5 recientes.<br>' +
+              '<b>Opioide IV</b> si el dolor persiste.<br><b>Betabloqueante</b> si hay taquicardia o hipertensión sin insuficiencia cardiaca (no con Killip ≥II ni signos de bajo gasto).<br><b>Oxígeno</b> solo si SpO₂ &lt;90 %.'
+          },
+          {
+            farmacos: ANTI,
+            l: 'Antiagregación y anticoagulación', t: 'Antiagregación y anticoagulación (SCASEST)', c: 'mid',
+            show: '<b>AAS</b>: carga de 150–300 mg VO (o 75–250 mg IV) y después 75–100 mg/24 h.<br>' +
+              '<b>Enoxaparina</b>: 1 mg/kg/12 h SC con el peso real; con ClCr 15–30 ml/min, 1 mg/kg/24 h; con ClCr &lt;15, heparina sódica.<br>' +
+              '<b>Fondaparinux</b>: 2,5 mg/24 h SC (no con FG &lt;20 ml/min según la ESC; la ficha técnica es más restrictiva). No sirve como único anticoagulante durante la ICP.<br>' +
+              '<b>Heparina sódica</b>: si se va a hacer coronariografía inmediata o hay insuficiencia renal grave.<br><span class="pe-nota">ESC 2023.</span>'
+          },
+          {
+            l: 'Criterios de alta segura', t: 'Criterios de alta segura',
+            show: 'Infarto descartado con el algoritmo de troponina · ECG no isquémico · sin dolor · <b>HEART ≤3</b> · sin otra causa grave sospechada. Seguimiento y prueba de imagen ambulatoria según la probabilidad clínica.<br><span class="pe-nota">Guía AHA/ACC 2021 del dolor torácico; consenso ACC 2022.</span>'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'ECG de 12 derivaciones en menos de 10 minutos desde la llegada'},
   {type:'decision', text:'¿Elevación del ST o BRIHH de nueva aparición (SCACEST)?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Activar código IAM: doble antiagregación + traslado urgente para ICP primaria (<90–120 min) o fibrinólisis si no está disponible'},
