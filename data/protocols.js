@@ -304,7 +304,125 @@ window.PROTOCOLS = [
   src:'DAS/ICS intubacion en paciente critico 2017 · PMID 29406182 · DAS 2025 · PMID 41203471'
 },
 
-{id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', rank:11, steps:[
+{id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', rank:11,
+  flow:(() => {
+    const num = x => !isNaN(x) && x > 0;
+    const CALCIO = ['Gluconato de calcio'];
+    const SHIFT = [{ n: 'Insulina', inf: false }, { n: 'Glucosa', inf: false }, 'Salbutamol'];
+    const kTxt = v => num(v.k) ? ' K⁺ ' + String(v.k).replace('.', ',') + ' mmol/L.' : '';
+    return {
+      inputs: [{ k: 'k', l: 'Potasio', u: 'mmol/L' }, { k: 'glu', l: 'Glucemia', u: 'mg/dL' }],
+      start: 'inicio',
+      escalas: [
+        { id: 'kdigo', para: 'lesión renal aguda' },
+        { id: 'news2', para: 'deterioro clínico' }
+      ],
+      nodes: {
+        inicio: {
+          t: 'Primeros minutos',
+          show: v => '<b>ECG de 12 derivaciones</b> y monitorización continua; vía venosa.' + kTxt(v) + '<br>' +
+            'Si el valor sorprende y el ECG es normal, <b>repetir el potasio</b> (gasometría venosa para tenerlo rápido): descartar hemólisis de la muestra, torniquete prolongado, trombocitosis o leucocitosis intensas.<br>' +
+            'Buscar la causa a la vez (ver «Causas» abajo): insuficiencia renal, fármacos, acidosis, rabdomiólisis, lisis tumoral.',
+          q: '¿Está en parada cardiaca?',
+          opts: [{ l: 'Sí', go: 'pcr' }, { l: 'No', go: 'grav' }]
+        },
+        pcr: {
+          farmacos: ['Bicarbonato sódico'].concat(CALCIO, SHIFT.slice(0, 2)),
+          t: 'Parada por hiperpotasemia', c: 'high',
+          show: 'SVA estándar y, además:<br>' +
+            '• <b>Cloruro cálcico 10 % 10 mL IV</b> + <b>bicarbonato sódico 50 mmol IV</b>, por vías distintas o lavando entre ambos (precipitan).<br>' +
+            '• <b>Insulina rápida 10 U + glucosa 25 g IV</b>.<br>' +
+            '• Valorar diálisis durante la RCP y ECPR si la RCP inicial no funciona y el sistema lo permite.<br>' +
+            '<span class="pe-nota">ERC 2025, circunstancias especiales (PMID 41117569).</span>'
+        },
+        grav: {
+          q: '¿Qué gravedad tiene?',
+          help: 'Leve 5,5–5,9 · moderada 6,0–6,4 · grave ≥6,5 mmol/L. <b>Cualquier cambio en el ECG la convierte en grave</b>: T picudas, PR &gt;0,2 s, P aplanada o ausente, QRS &gt;0,12 s, onda sinusoidal, bradicardia o arritmia. Un ECG normal no la descarta.',
+          opts: [
+            { l: 'Grave: K⁺ ≥6,5 o cambios en el ECG', go: 'calcio', sug: v => num(v.k) && v.k >= 6.5 },
+            { l: 'Moderada: K⁺ 6,0–6,4 sin cambios en el ECG', go: 'shift', sug: v => num(v.k) && v.k >= 6 && v.k < 6.5 },
+            { l: 'Leve: K⁺ 5,5–5,9 sin cambios en el ECG', go: 'leve', sug: v => num(v.k) && v.k >= 5.5 && v.k < 6 }
+          ]
+        },
+        calcio: {
+          farmacos: CALCIO,
+          t: 'Grave: proteger el miocardio ya', c: 'high',
+          show: 'Calcio IV con monitorización ECG. No baja el potasio: protege el corazón durante 30–60 min.<br>' +
+            '• <b>Gluconato cálcico 10 % 30 mL IV</b> en 5–10 min: de elección por vía periférica.<br>' +
+            '• O <b>cloruro cálcico 10 % 10 mL IV</b>: por vía central o en parada (vesicante si se extravasa).<br>' +
+            'No son intercambiables mL a mL. <b>Repetir a los 5 min</b> si persisten o reaparecen los cambios del ECG.<br>' +
+            'Si se sospecha intoxicación digitálica: calcio lento y con precaución.<br>' +
+            '<span class="pe-nota">ERC 2025; KDIGO 2019 (PMID 31706619).</span>',
+          q: 'A la vez, hay que bajar el potasio:',
+          opts: [{ l: 'Continuar con insulina-glucosa', go: 'shift' }]
+        },
+        shift: {
+          farmacos: SHIFT.concat(['Bicarbonato sódico']),
+          t: 'Introducir el potasio en la célula', c: 'mid',
+          show: v => '• <b>Insulina rápida 10 U IV + glucosa 25 g IV</b> (glucosa 10 % 250 mL en 15–30 min, o glucosa 50 % 50 mL). Baja el K⁺ en 15–30 min; efecto de 4–6 h.<br>' +
+            (num(v.glu)
+              ? (v.glu < 126
+                  ? '• Glucemia previa <b>' + v.glu + ' mg/dL (&lt;126)</b>: añadir <b>glucosa 10 % a 50 mL/h durante 5 h</b> para evitar la hipoglucemia.<br>'
+                  : '• Glucemia previa ' + v.glu + ' mg/dL: no hace falta la perfusión de glucosa, pero sí vigilar la glucemia.<br>')
+              : '• Si la glucemia previa es &lt;126 mg/dL (7 mmol/L): añadir <b>glucosa 10 % a 50 mL/h durante 5 h</b>.<br>') +
+            '• Glucemia capilar a los 30 y 60 min y después cada hora hasta 6 h. Más riesgo de hipoglucemia con insuficiencia renal, sin diabetes, bajo peso o edad avanzada; en ellos algunos protocolos usan <b>5 U</b> (evidencia limitada).<br>' +
+            '• <b>Salbutamol 10–20 mg nebulizado</b> como complemento, nunca solo. Precaución con cardiopatía isquémica o taquiarritmias; efecto menor con betabloqueantes.<br>' +
+            '• <b>Ciclosilicato de sodio y zirconio 10 g VO</b> desde el principio, en paralelo.<br>' +
+            '• Bicarbonato sódico solo si hay acidosis metabólica; no de rutina.<br>' +
+            '• Potasio de control a la 1–2 h y a las 4–6 h (puede haber rebote).<br>' +
+            '<span class="pe-nota">ERC 2025 (PMID 41117569); UK Kidney Association 2023; KDIGO 2019.</span>',
+          q: '¿Cómo va el potasio de control (1–2 h)?',
+          opts: [
+            { l: 'Baja y el ECG se normaliza', go: 'elim' },
+            { l: 'Sigue ≥6,5 o con cambios en el ECG, o hay anuria, ERC avanzada o liberación continua (rabdomiólisis, lisis)', go: 'dial', sug: v => num(v.k) && v.k >= 6.5 }
+          ]
+        },
+        leve: {
+          t: 'Leve (5,5–5,9) sin cambios en el ECG', c: 'low',
+          show: 'No necesita calcio ni insulina-glucosa.<br>' +
+            '• Revisar y ajustar los fármacos que suben el potasio y los suplementos.<br>' +
+            '• Tratar la causa; repetir el potasio y la función renal.<br>' +
+            '• Valorar un quelante oral si persiste.<br>' +
+            '<span class="pe-nota">ERC 2025; UK Kidney Association 2023.</span>'
+        },
+        elim: {
+          t: 'Eliminar potasio y evitar el rebote', c: 'mid',
+          show: '• <b>Ciclosilicato de sodio y zirconio 10 g VO cada 8 h</b> durante 24–48 h (la UK Kidney Association permite hasta 72 h); separarlo 2 h de otros fármacos orales. Alternativa: patiromer 8,4 g cada 24 h (empieza a actuar a las 4–7 h).<br>' +
+            '• Resinas clásicas (poliestireno sulfonato): no de rutina en el tratamiento agudo.<br>' +
+            '• Diurético de asa si hay sobrecarga de volumen y la función renal lo permite.<br>' +
+            '• Suspender o ajustar los fármacos causantes; dieta baja en potasio.<br>' +
+            '• Potasio a las 4–6 h y a las 24 h. Moderada o grave: ingreso con monitorización.<br>' +
+            '<span class="pe-nota">La duración del ciclosilicato difiere: hasta 48 h (ficha, ASHP) o hasta 72 h (UK Kidney Association 2023).</span>'
+        },
+        dial: {
+          t: 'Diálisis urgente', c: 'high',
+          show: '• Contactar con nefrología: hemodiálisis urgente en la hiperpotasemia grave refractaria (ERC 2025) o si el K⁺ sigue &gt;6 mmol/L o con cambios en el ECG pese al tratamiento (KDIGO).<br>' +
+            '• Mientras tanto: monitorización continua, repetir el calcio si vuelven los cambios del ECG, repetir insulina-glucosa según el control y vigilar la glucemia.<br>' +
+            '• Si el hospital no tiene diálisis: traslado con monitorización y el tratamiento en marcha.'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'ECG', t: 'ECG de la hiperpotasemia',
+            show: 'T altas y picudas → PR largo y P aplanada o ausente → QRS ancho → onda sinusoidal → FV, asistolia o AESP. También bradicardia y bloqueos. La progresión no es ordenada y un ECG normal no excluye una hiperpotasemia grave.'
+          },
+          {
+            l: 'Causas', t: 'Causas y pseudohiperpotasemia',
+            show: '<b>Pseudohiperpotasemia:</b> hemólisis, torniquete o puño cerrado, trombocitosis o leucocitosis intensas, muestra refrigerada o retrasada.<br>' +
+              '<b>Causas:</b> insuficiencia renal aguda o crónica · fármacos (IECA, ARA II, antialdosterónicos, AINE, trimetoprim, heparina, betabloqueantes, intoxicación digitálica, suplementos de potasio) · acidosis · rabdomiólisis · lisis tumoral · hemólisis · insuficiencia suprarrenal · quemaduras · transfusión masiva.'
+          },
+          {
+            l: 'Monitorización y destino', t: 'Monitorización y destino',
+            show: 'ECG continuo en la moderada y la grave. Potasio a la 1–2 h, a las 4–6 h y a las 24 h. Glucemia capilar tras la insulina hasta 6 h. Ingreso si es moderada o grave, si la causa persiste o si hace falta diálisis.'
+          }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'Confirmar hiperkalemia con ECG y descartar pseudohiperpotasemia (hemólisis de la muestra, torniquete prolongado)'},
   {type:'decision', text:'¿Cambios ECG (T picudas, QRS ancho, aplanamiento de onda P) o K⁺ >6.5 mmol/L?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'Estabilización de membrana — elegir UNA sal según el acceso venoso. Son fármacos distintos: aportan calcio elemental equivalente (~270 mg, ~13,6 mEq) pero NO son intercambiables mL a mL.\n• GLUCONATO cálcico 10%: 30 mL IV en 5–10 min. De elección con vía PERIFÉRICA, es menos flebotóxico.\n• CLORURO cálcico 10%: 10 mL IV en 2–5 min. Preferible con vía CENTRAL o en parada, aporta más Ca²⁺ por mL, pero es vesicante y causa necrosis si extravasa.\nReevaluar ECG y repetir a los 5 min si persisten los cambios'},
@@ -320,7 +438,7 @@ window.PROTOCOLS = [
   {type:'info', text:'K⁺ de control a la 1–2 h (efecto máximo de la insulina a los 30–60 min) y de nuevo a las 4–6 h: el efecto es transitorio y puede haber rebote si no se ha eliminado potasio'},
   {type:'info', text:'Monitorización ECG continua y controles de K⁺ seriados cada 1–2 h hasta normalización; la gravedad clínica depende tanto del valor de K⁺ como de la velocidad de instauración y los cambios ECG'}
 ],
-  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822 · Insulina-glucosa e hipoglucemia: Jessen 2025 · PMID 39761907 · Ibarra 2024 · PMID 39111100'
+  src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 Executive Summary · PMID 41117573 · ILCOR 2025 ALS CoSTR · PMID 41122842 · Sales de calcio y via: Bianchi 2019 · PMID 31119681 · Variabilidad del CaCl2 10%: Putowski 2022 · PMID 36403822 · Insulina-glucosa e hipoglucemia: Jessen 2025 · PMID 39761907 · Ibarra 2024 · PMID 39111100 · KDIGO Controversies 2019 · PMID 31706619 · UK Kidney Association 2023 (tratamiento de la hiperpotasemia aguda)'
 },
 
 {id:'transfusion-masiva', title:'Protocolo de transfusión masiva', sub:'Activación, ratio 1:1:1, ácido tranexámico y control de daños', badge:'red', tag:'Crítico', rank:10, steps:[

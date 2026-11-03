@@ -223,6 +223,15 @@ section[id]{scroll-margin-top:16px}</style>
               <option value="m">meses</option>
             </select>
           </label>
+          <label for="talla">Talla (cm)
+            <input id="talla" type="number" min="45" max="200" step="1" placeholder="para Vt">
+          </label>
+          <label for="sexo">Sexo (≥ 152 cm)
+            <select id="sexo">
+              <option value="h">niño</option>
+              <option value="m">niña</option>
+            </select>
+          </label>
           <button id="est" type="button">Estimar peso por edad</button>
           <div>
             <div class="wt" id="wt">20 kg</div>
@@ -2490,6 +2499,8 @@ section[id]{scroll-margin-top:16px}</style>
         <div class="fx">
           <b>Volumen corriente</b>
           <div class="f">Con peso ideal: espontáneo ≈ 7 mL/kg · VM 6–8 mL/kg</div>
+          <div class="f">Peso ideal (talla &lt; 152 cm) = 2,396 × e^(0,01863 × talla en cm)</div>
+          <div class="d">Traub-Johnson; desde 152 cm, Devine. Usar el menor entre peso ideal y peso real (PALICC-2). Por edad solo si no hay talla.</div>
         </div>
         <div class="fx">
           <b>Cricotiroidotomía con aguja</b>
@@ -2812,7 +2823,11 @@ section[id]{scroll-margin-top:16px}</style>
       ['Tubo con balón', y!==null && y>=1 ? r(y/4+3.5,1)+' mm (±0,5)' : '— (indicar edad ≥ 1 a)'],
       ['Profundidad oral', y!==null && y>=1 ? r(12+y/2,1)+' cm' : '—'],
       ['Profundidad nasal', y!==null && y>=1 ? r(15+y/2,1)+' cm' : '—'],
-      (function(){var pi=estWeight(); return ['VT 6–8 mL/kg de peso ideal', pi ? r(pi*6,0)+'–'+r(pi*8,0)+' mL (peso ideal '+r(pi,1)+' kg, por edad)' : (y!==null && y>12 ? '— (> 12 a: peso ideal por talla)' : '— (indicar la edad)')];})(),
+      (function(){var t=parseFloat($('talla').value), pi=null, m='';
+        if(t>=45 && t<152){pi=2.396*Math.exp(0.01863*t); m='Traub-Johnson';}
+        else if(t>=152){pi=($('sexo').value==='m'?45.5:50)+0.91*(t-152.4); m='Devine';}
+        if(pi){var ref=Math.min(pi,w); return ['VT 6–8 mL/kg de peso ideal', r(ref*6,0)+'–'+r(ref*8,0)+' mL (peso ideal '+r(pi,1)+' kg por talla, '+m+(w<pi?'; se usa el peso real, menor':'')+')'];}
+        var e=estWeight(); return ['VT 6–8 mL/kg de peso ideal', e ? r(Math.min(e,w)*6,0)+'–'+r(Math.min(e,w)*8,0)+' mL (aproximado por edad: falta la talla)' : '— (indicar la talla)'];})(),
       ['Ketamina 2 mg/kg', r(w*2,1)+' mg'],
       ['Midazolam 0,1 mg/kg', r(w*0.1,2)+' mg'],
       ['Rocuronio 1 mg/kg', r(w,1)+' mg']
@@ -2860,6 +2875,8 @@ section[id]{scroll-margin-top:16px}</style>
   }
   $('w').addEventListener('input',function(){src='peso introducido';render()});
   $('age').addEventListener('input',render);
+  $('talla').addEventListener('input',render);
+  $('sexo').addEventListener('change',render);
   $('unit').addEventListener('change',render);
   $('est').addEventListener('click',function(){
     var e=estWeight();
