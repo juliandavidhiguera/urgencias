@@ -1605,6 +1605,125 @@ window.PROTOCOLS = [
       return out;
     }
   },
+  /* Flujograma paso a paso (flujograma de Campdevànol). Sin datos propios: usa los del
+     evaluador de arriba (v.ph, v.pco2, v.o2, v.musc, v.vital, v.iot, v.compl, v.social)
+     para sugerir la opción. Mismo contenido clínico que el evaluador y los pasos. */
+  flow:(() => {
+    const has = x => typeof x === 'number' && !isNaN(x);
+    const gasC = v => has(v.ph) && has(v.pco2) && v.ph <= 7.35 && v.pco2 >= 45;
+    const esC = v => gasC(v) || v.musc === true;
+    const esB = v => !esC(v) && v.o2 >= 2;
+    const esA = v => has(v.ph) && has(v.pco2) && !esC(v) && v.o2 < 2;
+    const NOTA = '<span class="pe-nota">Umbrales locales propuestos (Campdevànol/HUV), a consensuar con la Dirección Asistencial y con UCI/Neumología de HUV.</span>';
+    const CANDIDATO = [{ l: 'Sí, es candidato', sug: v => v.iot === 1 }, { l: 'No: VMNI como techo terapéutico', sug: v => v.iot === 0 }];
+    return {
+      start: 'llegada',
+      nodes: {
+        llegada: {
+          t: 'Llegada (primeros 15 min)',
+          show: '• Monitorizar SpO₂, FC, FR, PA, temperatura, nivel de conciencia y disnea EVA 0–10.<br>' +
+            '• <b>O₂ controlado</b> con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 %. Evitar la hiperoxia.<br>' +
+            '• Vía venosa · gasometría arterial (venosa si es menos grave) · ECG · hemograma con eosinófilos, bioquímica, PCR, troponina, NT-proBNP; dímero D si se sospecha TEP · Rx de tórax.<br>' +
+            '• Fijar desde el inicio el nivel de intensidad terapéutica: ¿candidato a IOT/UCI? (PIIC/PCC, voluntades anticipadas, situación basal, opinión del paciente y la familia).',
+          q: '¿Riesgo vital inmediato?',
+          help: 'Parada o preparada respiratoria, estupor/coma o agitación incontrolable, inestabilidad hemodinámica o arritmia grave, pH &lt;7,20 con deterioro rápido.',
+          opts: [{ l: 'Sí', go: 'vital', sug: v => v.vital === true }, { l: 'No', go: 'trat' }]
+        },
+        vital: {
+          t: 'Riesgo vital inmediato', c: 'high',
+          show: 'SVA. Decidir YA la candidatura a IOT/UCI.',
+          q: '¿Es candidato a IOT/UCI?',
+          opts: [{ l: CANDIDATO[0].l, go: 'iot', sug: CANDIDATO[0].sug }, { l: 'No: VMNI como techo o medidas de confort', go: 'techoVital', sug: CANDIDATO[1].sug }]
+        },
+        iot: {
+          t: 'IOT y traslado a UCI de HUV', c: 'high',
+          show: 'IOT + SVA y <b>traslado a UCI de HUV</b> (llamada médico a médico; SEM con SVA).<br>' + NOTA
+        },
+        techoVital: {
+          t: 'VMNI como techo o confort', c: 'high',
+          show: 'VMNI como techo terapéutico o medidas de confort; ubicación según acuerdo local (PADES si procede).<br>' + NOTA
+        },
+        trat: {
+          farmacos: [{ n: 'Salbutamol', inf: false }, { n: 'Bromuro de ipratropio', inf: false }, { n: 'Metilprednisolona', inf: false }],
+          t: 'Tratamiento inicial', c: 'mid',
+          show: '• <b>Broncodilatadores:</b> salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE (no con O₂), 1 dosis cada hora × 2–3 y después cada 2–4 h según respuesta; evitar dosis altas de SABA. Alternativa: MDI con cámara, salbutamol 400–600 µg (4–6 pulsaciones) + ipratropio 80–120 µg con la misma pauta. No suspender los LABD. Metilxantinas IV: no.<br>' +
+            '• <b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral). En la exacerbación leve, reservarlo para las significativas.<br>' +
+            '• <b>Antibiótico 5 días</b> si ≥2 de aumento de disnea, fiebre, volumen o purulencia (siendo uno la purulencia), cultivo previo positivo o VMNI/IOT. El evaluador de arriba da el antibiótico y la dosis según la gravedad y el riesgo de <i>Pseudomonas</i>.<br>' +
+            '• Descartar lo que simula o agrava el SAE: neumonía, IC descompensada, SCA/arritmia, TEP (hasta el 5,9 % de los ingresados) y neumotórax.',
+          q: 'Reevaluar a los 30–60 min con clínica y gasometría: ¿qué tipo de insuficiencia respiratoria?',
+          help: '<b>A</b>: sin IR o hipoxemia que corrige con Venturi ≤35 %, pH ≥7,35, PaCO₂ ≤45 o basal. <b>B</b>: hipoxémica (SpO₂ &lt;88 % o PaO₂ &lt;60 con Venturi ≥35 %, pH ≥7,35). <b>C</b>: hipercápnica (pH ≤7,35 y PaCO₂ ≥45) o fatiga muscular. La sugerencia usa la gasometría y el O₂ del evaluador.',
+          opts: [
+            { l: 'A · Sin insuficiencia respiratoria o corrige con Venturi ≤35 %', go: 'tipoA', sug: esA },
+            { l: 'B · Hipoxémica: no corrige con Venturi ≤35 %', go: 'tipoB', sug: esB },
+            { l: 'C · Hipercápnica con acidosis o fatiga muscular', go: 'tipoC', sug: esC }
+          ]
+        },
+        tipoA: {
+          t: 'Tipo A', c: 'low',
+          show: 'Continuar el tratamiento y reevaluar a las 2–4 h (disnea, FR, SpO₂, tolerancia al esfuerzo).',
+          q: '¿Cómo está a las 2–4 h?',
+          opts: [
+            { l: 'Buena respuesta, estable y con apoyo domiciliario', go: 'alta' },
+            { l: 'No responde, sin apoyo domiciliario o comorbilidad descompensada', go: 'planta', sug: v => v.social === true },
+            { l: 'Complicación que requiere UCI o especialista (TEP de alto riesgo, SCA, neumotórax, sepsis)', go: 'huv', sug: v => v.compl === true }
+          ]
+        },
+        tipoB: {
+          t: 'Tipo B · hipoxémica', c: 'mid',
+          show: '<b>OAF</b> (primera modalidad en la hipoxémica, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ para SpO₂ 88–92 %. Gasometría a 1–2 h. Descartar neumonía, IC y TEP.',
+          q: '¿Cómo está a las 2 h?',
+          opts: [
+            { l: 'FiO₂ ≤40 %, FR &lt;25 y puede pasar a Venturi', go: 'planta' },
+            { l: 'No mejora o necesita OAF mantenida', go: 'huv' },
+            { l: 'Aparece hipercapnia con acidosis', go: 'tipoC', sug: gasC }
+          ]
+        },
+        tipoC: {
+          t: 'Tipo C · hipercápnica', c: 'high',
+          show: '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25). Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h. El antibiótico está indicado.',
+          q: '¿Es candidato a IOT/UCI?',
+          opts: [{ l: CANDIDATO[0].l, go: 'vmniHuv', sug: CANDIDATO[0].sug }, { l: CANDIDATO[1].l, go: 'vmniTecho', sug: CANDIDATO[1].sug }]
+        },
+        vmniHuv: {
+          t: 'VMNI y traslado a HUV', c: 'high',
+          show: '<b>Avisar a HUV al iniciar la VMNI → traslado con VMNI.</b> pH &lt;7,25 que no mejora o fracaso → IOT + traslado.<br>' +
+            'Excepción: corrección rápida (pH ≥7,35) y tolera ≥4 h sin VMNI en urgencias → puede ir a planta. La VMNI se retira directamente, sin destete.<br>' + NOTA
+        },
+        vmniTecho: {
+          t: 'VMNI como techo terapéutico', c: 'high',
+          show: 'Decisión compartida; ubicación según acuerdo local; confort/PADES si fracasa.<br>' + NOTA
+        },
+        planta: {
+          farmacos: [{ n: 'Enoxaparina', inf: false }],
+          t: 'Ingreso en planta (Campdevànol)', c: 'mid',
+          show: '• HBPM profiláctica y balance hídrico.<br>' +
+            '• Si empeora (FR &gt;25, SpO₂ &lt;88 % con O₂, somnolencia) → gasometría y reclasificar (B/C).<br>' + NOTA
+        },
+        huv: {
+          t: 'Traslado a HUV', c: 'high',
+          show: 'Llamada médico a médico. Criterios de traslado: VMNI u OAF mantenidas, pH ≤7,25, PaCO₂ &gt;60, FiO₂ &gt;40 %, alteración del estado mental, necesidad de IOT, inestabilidad hemodinámica o arritmia grave, TEP de alto riesgo, SCA, neumotórax o sepsis.<br>' + NOTA
+        },
+        alta: {
+          t: 'Alta', c: 'low',
+          show: 'LABA+LAMA (añadir CI si hay eosinofilia; eos ≥300 → triple terapia), revisar la técnica inhalatoria, completar prednisona y antibiótico 5 días, plan escrito, tabaco y vacunas (gripe, neumococo, COVID, VRS, dTpa, zóster). AP a las 48–72 h, revisión a las 1–4 semanas y a las 12–16 semanas con FEV₁, rehabilitación en &lt;4 semanas.'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'Recursos de Campdevànol', t: 'Recursos locales',
+            show: 'OAF y VMNI en el box de urgencias. Sin observación con monitorización continua ni UCI/semicríticos. Centro de referencia: Hospital Universitari de Vic (HUV).'
+          },
+          {
+            l: 'Criterios de traslado a HUV', t: 'Criterios de traslado a HUV',
+            show: 'VMNI u OAF mantenidas, pH ≤7,25, PaCO₂ &gt;60, FiO₂ &gt;40 %, alteración del estado mental, necesidad de IOT, inestabilidad hemodinámica o arritmia grave, TEP de alto riesgo, SCA, neumotórax o sepsis.'
+          }
+        ]
+      }
+    };
+  })(),
   steps:[
   {type:'info', text:'Recursos locales (Hospital de Campdevànol): OAF y VMNI en el box de urgencias. Sin observación con monitorización continua ni UCI/semicríticos. Centro de referencia: Hospital Universitari de Vic (HUV)'},
   {type:'action', text:'LLEGADA (primeros 15 min): triaje, monitorizar SpO₂, FC, FR, PA, temperatura, nivel de conciencia y disnea EVA 0–10'},

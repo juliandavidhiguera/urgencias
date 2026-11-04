@@ -2181,17 +2181,23 @@ function _protoEvalHtml(p) {
     '</div>';
 }
 
-function calcProtoEval(pid) {
-  const p = PROTOCOLS.find(x => x.id === pid);
+function _evalVals(p) {
   const v = {};
   p.eval.items.forEach(it => {
     if (it.t === 'h') return;
-    const el = document.getElementById('pe-' + pid + '-' + it.k);
+    const el = document.getElementById('pe-' + p.id + '-' + it.k);
+    if (!el) return;
     v[it.k] = it.t === 'chk' ? el.checked : parseFloat(String(el.value).replace(',', '.'));
   });
-  document.getElementById('pe-' + pid + '-out').innerHTML = p.eval.calc(v).map(s =>
+  return v;
+}
+
+function calcProtoEval(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  document.getElementById('pe-' + pid + '-out').innerHTML = p.eval.calc(_evalVals(p)).map(s =>
     '<div class="ficha-section"><div class="ficha-section-title' + (s.c ? ' risk-' + s.c : '') + '">' + s.t + '</div>' +
     '<div class="ficha-section-text">' + s.h + '</div></div>').join('');
+  if (p.flow) renderFlow(pid); // el flujograma sugiere las opciones con los datos del evaluador
 }
 
 function resetProtoEval(pid) {
@@ -2223,7 +2229,8 @@ function copyProtoEval(pid) {
    p.flow = { inputs:[{k,l,u}], start:'id', nodes:{ id:{ t, c, show, q, help, opts:[{l, go, sug}] } } }
    - show: HTML o función (v) => HTML, que se pinta al llegar al nodo (v = datos del paciente;
      v.ruta = ids de los nodos recorridos, para variar el contenido según la rama;
-     v.resp = { idNodo: índice de la opción elegida } en las preguntas ya contestadas).
+     v.resp = { idNodo: índice de la opción elegida } en las preguntas ya contestadas;
+     si el protocolo tiene también p.eval, v incluye los datos del evaluador).
    - q/opts: pregunta con botones; sin opts el nodo es final. sug(v) marca la opción que sugieren los datos.
    El estado vive solo en memoria (nunca en localStorage: son datos de paciente). */
 const _flowPath = {};
@@ -2285,7 +2292,7 @@ function _escTxt(pid) {
 }
 
 function _flowVals(p) {
-  const v = {};
+  const v = p.eval ? _evalVals(p) : {};
   (p.flow.inputs || []).forEach(it => {
     const el = document.getElementById('fl-' + p.id + '-' + it.k);
     v[it.k] = el ? parseFloat(String(el.value).replace(',', '.')) : NaN;
@@ -2300,7 +2307,7 @@ function _flowHtml(p) {
       '<label for="fl-' + p.id + '-' + it.k + '">' + it.l + (it.u ? ' (' + it.u + ')' : '') +
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
       '</div><div class="fl-hint">Los datos solo se usan para los cálculos de esta pantalla; no se guardan.</div>' : '') +
-    _escBarHtml('fl-' + p.id + '-esc', p.flow.escalas) + _escResHtml(p.id) +
+    _escBarHtml('fl-' + p.id + '-esc', p.flow.escalas) + (p.eval ? '' : _escResHtml(p.id)) + // con evaluador, las escalas del caso van en él
     '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
     (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
