@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-04 | **Sesion #:** 16 | **Rama:** main | **HEAD:** `e797e16` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-05 | **Sesion #:** 17 | **Rama:** main | **HEAD:** `73a908c` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -57,6 +57,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 17 - 2026-11-05
+- Anadido: `data/protocols.js` -> `codi-risc-suicidi` con `flow` (algoritmo generico del folleto SEM v.01 jun 2024, sin contenido clinico propio): sospecha (¿tentativa? → activar directo) → MINI m1..m6 uno a uno (1/2/6/10/10/4 p; `v.resp[m]===0` = si) → resultado con total y desglose, sugiere ALTO ≥10 / MEDIO 6–9 / BAJO 1–5 (0 p: el folleto no lo clasifica, sin sugerencia) → medio: ¿subir a alto por comorbilidad/factores? → activar (motivo segun `v.ruta`: tentativa / MINI / medio subido; CECOS 061/112, recursos, contencion, traslado a hospital de referencia CRS, seguimiento 30 d) o consejo (telefonico + dispositivos AP/Salud Mental + seguimiento 061). Extras: factores de riesgo, seguimiento a 30 dias. `steps` sin cambios
+- Decisiones (leidas del grafico del PDF renderizado, ambiguas): «acompanamiento telefonico continuado» puesto en activar y en consejo (en el dibujo esta entre ambos); informacion de dispositivos para bajo Y medio (el gráfico; el resumen .md lo limitaba a medio)
+- Verificado: Node 11/11 nodos alcanzables, sugerencias en 7 casos (3 p bajo, 6 y 7 medio, 10 y 13 alto, tentativa, 0 p manual); Chrome headless 375 px sin errores ni desbordamiento; produccion con curl («Resultado del MINI»)
+- Commit: `73a908c` feat(protocolos): flujograma interactivo del Codi Risc Suïcidi (MINI paso a paso)
+- Pendiente ofrecido al usuario: bloque hospitalario (paciente ya en urgencias de Campdevanol: derivacion, interconsulta psiquiatria, vigilancia, contencion) con Vera + Perplexity, ensenar antes de aplicar
 
 ### Sesion 16 - 2026-11-04
 - Anadido: `data/protocols.js` -> `epoc-agudizado` con `flow` bajo el `eval` existente (decision del usuario: flujograma bajo el evaluador, escalas solo en el evaluador). Nodos: llegada (¿riesgo vital?) → vital (¿candidato IOT/UCI?) → iot / techoVital; trat (salbutamol, ipratropio, metilprednisolona) → tipo A/B/C a 30–60 min; A → alta / planta / HUV; B (OAF) → planta / HUV / C; C (VMNI) → vmniHuv / vmniTecho; planta (enoxaparina). Extras: recursos de Campdevanol y criterios de traslado a HUV. Sin contenido clinico nuevo: textos reutilizados del `eval` y los `steps` ya verificados en la sesion 12 (no se repitio Vera)
@@ -244,4 +251,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Probar los flujogramas de EPOC, asma y TEP en movil real y preguntar al usuario el siguiente (Codi Risc Suicidi) y que troponina usa el laboratorio (dolor toracico).
+Probar los flujogramas de EPOC, asma, TEP y Codi Risc Suicidi en movil real; preguntar al usuario si quiere el bloque hospitalario del Codi Risc Suicidi y que troponina usa el laboratorio (dolor toracico).
