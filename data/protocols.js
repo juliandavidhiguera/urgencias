@@ -1396,7 +1396,100 @@ window.PROTOCOLS = [
 ], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021'},
 
 {id:'codi-risc-suicidi', title:'Codi Risc Suïcidi', sub:'Cribado MINI y estratificación del riesgo suicida', badge:'amber', tag:'Urgente', rank:5, codigo:true,
-  folleto:'codigos/C05.Codi_risc_suïcidi.pdf', steps:[
+  folleto:'codigos/C05.Codi_risc_suïcidi.pdf',
+  /* Flujograma paso a paso del algoritmo genérico del folleto SEM (v.01, junio 2024).
+     El MINI se contesta pregunta a pregunta (v.resp[m1..m6] = 0 si «Sí») y el resultado
+     sugiere el nivel de riesgo. Sin contenido clínico propio fuera del folleto. */
+  flow:(() => {
+    const MINI = [
+      ['m1', 'Durante el último mes, ¿ha pensado que estaría mejor muerto/a?', 1],
+      ['m2', 'Durante el último mes, ¿ha querido hacerse daño?', 2],
+      ['m3', 'Durante el último mes, ¿ha pensado en el suicidio?', 6],
+      ['m4', 'Durante el último mes, ¿ha planeado cómo hacerlo?', 10],
+      ['m5', 'Durante el último mes, ¿lo ha intentado recientemente?', 10],
+      ['m6', '¿Lo ha intentado alguna vez en la vida?', 4]
+    ];
+    const pts = v => MINI.reduce((a, m) => a + (v.resp[m[0]] === 0 ? m[2] : 0), 0);
+    const FACTORES = '• Depresión mayor.<br>' +
+      '• Diagnóstico psiquiátrico: trastorno depresivo, psicótico, bipolar, límite de la personalidad o de la conducta alimentaria.<br>' +
+      '• Impulsividad, agresividad, agitación o nivel de consciencia alterado.<br>' +
+      '• Consumo excesivo o dependencia del alcohol; consumo o adicción a otras sustancias.<br>' +
+      '• Enfermedades orgánicas graves.<br>' +
+      '• Otros: género hombre · &gt;65 años o adolescente · problemas sociales · acontecimientos vitales estresantes en los últimos 3 meses (laborales, de pareja, económicos, familiares).<br>' +
+      '• Acceso a armas, tóxicos u otros medios letales, o situaciones de violencia.<br>' +
+      '• Antecedentes familiares de 1.er grado de suicidio consumado.';
+    const SEGUIMIENTO = 'El 061/Salut Respon llama a los 30 días del alta hospitalaria: ¿ha recibido la llamada de su CSM? ¿tiene día de visita confirmado? ¿se encuentra mejor? ¿ha sido visitado en su CSM?';
+    const nodes = {
+      sospecha: {
+        t: 'Sospecha de riesgo de suicidio',
+        q: '¿Hay una tentativa de suicidio?',
+        help: 'Ante una tentativa se activa el código directamente, sin el MINI.',
+        opts: [{ l: 'Sí, tentativa de suicidio', go: 'activar' }, { l: 'No', go: 'm1' }]
+      },
+      resultado: {
+        t: 'Resultado del MINI',
+        show: v => {
+          const n = pts(v);
+          const si = MINI.filter(m => v.resp[m[0]] === 0);
+          return '<b>MINI = ' + n + ' puntos</b>' + (si.length ? ' (sí en: ' + si.map(m => m[2] + ' p').join(' + ') + ')' : '') + '<br>' +
+            '1–5 puntos = riesgo BAJO · 6–9 = riesgo MEDIO · ≥10 = riesgo ALTO.' +
+            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '');
+        },
+        q: 'Nivel de riesgo de suicidio',
+        opts: [
+          { l: 'ALTO · ≥10 puntos', go: 'activar', sug: v => pts(v) >= 10 },
+          { l: 'MEDIO · 6–9 puntos', go: 'medio', sug: v => pts(v) >= 6 && pts(v) <= 9 },
+          { l: 'BAJO · 1–5 puntos', go: 'consejo', sug: v => pts(v) >= 1 && pts(v) <= 5 }
+        ]
+      },
+      medio: {
+        t: 'Riesgo MEDIO (6–9 puntos)', c: 'mid',
+        q: '¿La comorbilidad y los factores de riesgo aconsejan subir a riesgo ALTO?',
+        help: 'Excepcionalmente, la valoración clínica de la comorbilidad y de los factores de riesgo del paciente con riesgo medio puede aconsejar subir el nivel de sospecha a riesgo alto. Factores de riesgo:<br>' + FACTORES,
+        opts: [{ l: 'Sí: tratar como riesgo ALTO', go: 'activar' }, { l: 'No', go: 'consejo' }]
+      },
+      activar: {
+        t: 'ACTIVAR CODI RISC SUÏCIDI', c: 'high',
+        show: v => {
+          const por = v.ruta.indexOf('m1') < 0 ? 'tentativa de suicidio' : v.ruta.indexOf('medio') >= 0 ? 'riesgo medio subido a alto por la valoración clínica' : 'MINI ' + pts(v) + ' puntos (riesgo ALTO)';
+          return 'Motivo: <b>' + por + '</b>.<br>' +
+            '• <b>Alerta</b> a la Central de Coordinación Sanitaria del SEM (CECOS) · 061/Salut Respon · 112.<br>' +
+            '• Activación de recursos y acompañamiento telefónico continuado.<br>' +
+            '• Valoración del estado del paciente y <b>contención</b>.<br>' +
+            '• <b>Traslado al hospital de referencia CRS.</b><br>' +
+            '• Seguimiento posterior al alta hospitalaria (061/Salut Respon, a los 30 días).';
+        }
+      },
+      consejo: {
+        t: 'Consejo telefónico', c: 'low',
+        show: v => (v.ruta.indexOf('medio') >= 0 ? 'Riesgo MEDIO sin criterios para subir a alto.' : 'Riesgo BAJO.') + '<br>' +
+          '• Consejo telefónico con acompañamiento telefónico continuado.<br>' +
+          '• Información de los dispositivos de la red disponibles: Atención Primaria y Salud Mental.<br>' +
+          '• Seguimiento proactivo del 061/Salut Respon.'
+      }
+    };
+    MINI.forEach((m, i) => {
+      nodes[m[0]] = {
+        t: i === 0 ? 'MINI (mini-entrevista neuropsiquiátrica internacional)' : undefined,
+        q: m[1],
+        help: '«Sí» = ' + m[2] + (m[2] === 1 ? ' punto.' : ' puntos.'),
+        opts: [{ l: 'Sí', go: i < 5 ? MINI[i + 1][0] : 'resultado' }, { l: 'No', go: i < 5 ? MINI[i + 1][0] : 'resultado' }]
+      };
+    });
+    return {
+      start: 'sospecha',
+      nodes,
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          { l: 'Factores de riesgo', t: 'Identificación de factores de riesgo', show: FACTORES },
+          { l: 'Seguimiento a los 30 días', t: 'Seguimiento proactivo CRS', show: SEGUIMIENTO }
+        ]
+      }
+    };
+  })(),
+  steps:[
   {type:'action', text:'Ante sospecha de riesgo de suicidio, aplicar el cribado MINI (mini-entrevista neuropsiquiátrica) sobre el último mes'},
   {type:'info', text:'Puntuación MINI si la respuesta es SÍ: ¿ha pensado que estaría mejor muerto/a? 1p · ¿ha querido hacerse daño? 2p · ¿ha pensado en el suicidio? 6p · ¿ha planeado cómo hacerlo? 10p · ¿lo ha intentado recientemente? 10p · ¿lo ha intentado alguna vez en la vida? 4p'},
   {type:'decision', text:'Puntuación total o tentativa de suicidio', yes:'≥10 puntos o tentativa → riesgo ALTO', no:'1-5 riesgo BAJO · 6-9 riesgo MEDIO'},
