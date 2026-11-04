@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-03 | **Sesion #:** 15 | **Rama:** main | **HEAD:** `17cce92` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-04 | **Sesion #:** 16 | **Rama:** main | **HEAD:** `f947a28` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -57,6 +57,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 16 - 2026-11-04
+- Anadido: `data/protocols.js` -> `epoc-agudizado` con `flow` bajo el `eval` existente (decision del usuario: flujograma bajo el evaluador, escalas solo en el evaluador). Nodos: llegada (¿riesgo vital?) → vital (¿candidato IOT/UCI?) → iot / techoVital; trat (salbutamol, ipratropio, metilprednisolona) → tipo A/B/C a 30–60 min; A → alta / planta / HUV; B (OAF) → planta / HUV / C; C (VMNI) → vmniHuv / vmniTecho; planta (enoxaparina). Extras: recursos de Campdevanol y criterios de traslado a HUV. Sin contenido clinico nuevo: textos reutilizados del `eval` y los `steps` ya verificados en la sesion 12 (no se repitio Vera)
+- Modificado: `index.html` -> `_evalVals(p)` (lectura de los campos del evaluador, compartida); `calcProtoEval` re-renderiza el flujograma; `_flowVals` mezcla los datos del `eval` (las `sug` del flow leen `v.ph`, `v.pco2`, `v.o2`, `v.musc`, `v.vital`, `v.iot`, `v.compl`, `v.social`); `_flowHtml` no pinta `_escResHtml` si hay `eval` (evita `#esc-res-<id>` duplicado)
+- Commit: `f947a28` feat(protocolos): flujograma interactivo de EPOC agudizado bajo el evaluador
+- Verificado: node (13/13 nodos alcanzables, fichas existen, sugerencias C/B/A/fatiga/vital/sin datos); Chrome local (sugerencias con pH 7.28/PaCO2 62 → C, O2 ≥2 → B, O2 1 → A, `social` → planta; botones de fichas y panel lateral; copiar y reiniciar; 1 solo esc-res; los otros 7 flujogramas sin cambios; sin errores de consola); produccion con curl (protocols.js con `CANDIDATO`, `/` con `_evalVals`). Sin captura visual (Chrome no respondio) ni prueba en movil
+- Archivado: sesiones 4–10 a `docs/HANDOFF_ARCHIVE.md` (limite de 300 lineas)
 
 ### Sesion 15 - 2026-11-03
 - Anadido: `data/protocols.js` -> `hiperkalemia` con `flow` (inputs K+ y glucemia; parada → CaCl 10 % + bicarbonato por vias distintas e insulina-glucosa; gravedad con sugerencia por K+ 5,5/6,0/6,5 o cambios ECG; calcio → shift → eliminacion o dialisis; glucosa 10 % 50 mL/h 5 h si glucemia <126; extras ECG, causas/pseudohiperpotasemia, monitorizacion). Se conservan los `steps` antiguos. Escalas KDIGO y NEWS2. `src` + KDIGO 2019 (PMID 31706619) y UKKA 2023
@@ -145,80 +152,6 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Verificado (2o commit): dopamina adulto 70 kg 200/50; pediatrico 10 kg 30/50 y 1 mL/h = 1 mcg/kg/min; adrenalina ped 10 kg 3/50; lidocaina 70 kg 1,5 mg/kg/h = 10,5 mL/h; Intubacion dopamina 20 kg 200/50; consola sin errores.
 - Contexto: el trabajo se empezo por error en el repo `herramientas` y se revirtio alli por completo.
 
-### Sesion 10 - 2026-10-21
-
-- Commit `ddbefcc`. **CSP** en `_headers`: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'`. Inventario previo: cero recursos externos (ni CDN ni fetch externo; favicon `data:`; PDFs e imagenes propias; Blob solo en descarga de Utstein).
-- Probada en local con un servidor node que aplica `_headers` (los 10 tabs, popup de impresion via `window.open`+`document.write`, traspaso a Utstein, PDFs, pegado de gasometria; `fetch` externo bloqueado como se espera) y en produccion (sin violaciones en consola).
-- **CSRS**: medio 8,0% (55/687) y alto 19,2% (32/167), tabla 3 de la validacion (JAMA Intern Med 2020, PMID 32202605, PMC7091474). Backlog #10 cerrado.
-- **Simulacro PCR** adulto (FV presenciada, 5 descargas, adrenalina+amiodarona, via aerea, RCE): informe completo y legible, impresion y traspaso a Utstein OK. Bug corregido: tras la 3a descarga pedia "administrar ahora" amiodarona Y lidocaina; ahora lidocaina sale como "alternativa a amiodarona" y si se marca una no se pide la otra (`calcPcr()`).
-- Detectado (resuelto despues en `539fbbf`, ver abajo): tras marcar la 1a dosis la fila no vuelve a avisar de repeticiones (adrenalina cada 3-5 min, 2a amiodarona tras la 5a descarga); solo lo dice el texto de recomendacion, y las dosis repetidas solo quedan en el campo "Total dosis".
-- Commit `cd89ab8`. **Metronomo de compresiones** en el tab PCR (bajo "Paciente"): boton on/off, frecuencia 100-120/min (rango ERC adulto y pediatrico, defecto 110) y volumen 0-100% en vivo. Web Audio (`AudioContext`, oscilador 1 kHz 50 ms) con planificacion anticipada de 120 ms via `setInterval` 25 ms; el boton parpadea en cada golpe. No se para al cambiar de tab ni con Reset. Verificado en local: 5,5 golpes/3 s a 110 y 6/3 s a 120, sin errores ni violaciones CSP, claro y oscuro.
-- Commit `0779702`. **Gasometria: lactato y glucosa opcionales** (items 9 y 10 de `f-gasometria`). Lactato >2 hiperlactatemia, >=4 marcada (no se etiqueta acidosis lactica sola); con AG alto, AG residual = (AGc-12)-lactato, orientativo. Glucosa: acidosis (pH<7,30 y/o HCO3<18) + glu>=200 -> CAD si beta-HB>=3 (pide medirlo); glu<200 -> nota CAD euglucemica (iSGLT2, ayuno, embarazo, alcohol); glu>=600 con pH>=7,30 y HCO3>=15 -> EHH con osmolalidad efectiva (Na medido); glu>=600 con acidosis -> mixto CAD-EHH. Fuente: consenso ADA/EASD/JBDS 2024 (PMID 39052901); Vera y Perplexity coinciden. Parser: cLac/Lactato, cGlu/Glucosa/Glucemia; convierte glucosa mmol/L->mg/dL y lactato mg/dL->mmol/L. Probado: 6 casos en node + pegado en navegador local (11 campos rellenos).
-- Commit `539fbbf`. **PCR: aviso de dosis repetidas** (cierra #11). Boton «+ Dosis» por farmaco: guarda la hora de cada dosis en `pcrDosisLog`, marca la casilla, rellena hora de 1a dosis y «Total dosis». Adrenalina: «proxima en ~X min» y, en rojo, «repetir ahora» a los 3 min en adulto (pauta 3-5) o 4 min en pediatria (ERC); refresco cada 15 s con el tab visible. Amiodarona/lidocaina adulto: «2a dosis tras la 5a descarga» -> «2a dosis ahora» a la 5a (lidocaina pediatrica sin 2a dosis). Sin «+ Dosis», usa la hora manual solo si total <=1. Informe: horas de cada dosis. Probado en navegador local (adulto FV/asistolia, pediatria 20 kg), sin errores ni violaciones CSP.
-- No hecho: prueba en movil real (el navegador de pruebas no emula viewport movil; presentaciones reales del hospital solo las conoce el usuario).
-
-### Sesion 9 - 2026-10-20
-
-- Commit `26b7e3d`. **Fichas**: la calculadora muestra la dosis en mL segun la presentacion comercial (`parsePresentacion()` lee `f.presentacion`: 55/76 fichas; campos editables), convierte g/mg/mcg y aplica el tope "max. X mg" de la propia linea (`_fichaTope()`).
-- **Naloxona**: `f-naloxona` retirada de Formulas a peticion del usuario; su pauta pediatrica (ERC PLS 2025, 10-40 mcg/kg max. 2 mg) va ahora en la ficha via `scripts/patch_fichas_verificacion.js` (linea en `dosis` + texto en `pediatria`).
-- **Perfusion IV**: lista en orden alfabetico + buscador `#inf-buscar` (filtra desplegable y tarjetas, sin tildes, tambien por grupo); `goToInfusion`, `irAPerfusion` y Reset quitan el filtro.
-- Discrepancia detectada con Vera: AHA 2025 da naloxona pediatrica 0,1 mg/kg (y perfusion 2/3 de la dosis eficaz/h) frente a 10-40 mcg/kg del ERC; se mantiene ERC (decision de la sesion 5) y la AHA queda escrita en Pediatria de la ficha.
-
-### Sesion 8 - 2026-10-20
-
-- Commit `26435f6` feat(escalas): cierra backlog #9. Escalas: `addrs` (ADD-RS + dimero D, ADvISED; tag nuevo `Aorta` en Cardiovascular), `padua`, `improve-vte`, `improve-bleed` (edad y FG como tramos excluyentes), `ottawa-sah`, `ich` (0-6; mortalidad observada en la cohorte original, sin uso para limitar tratamiento), `lrinec` (nunca en verde: no excluye), `ciwa` (cortes ASAM 2020, PMID 32511109). Formulas: `f-rox` (2/6/12 h, zona indeterminada), `f-regla9` (%SCQ adulto para Parkland).
-- Contrastado con Vera Health via navegador; PMID verificados en PubMed (ver `src` de cada escala). Probado con Node (cortes y limites) y en Chrome (render, botones, 0 errores).
-- Decisiones: ADvISED dice "permite considerar la exclusion", no "descarta" (correccion de Vera); CIWA-Ar se anade al localizar la guia ASAM 2020, con los cortes marcados como clasificacion ASAM y no de la escala original.
-
-### Sesion 7 - 2026-10-20
-
-- Commit `e2c972c` feat: perfusiones urapidilo/naloxona, gasometria, bloques A-C de escalas (push a `main`, desplegado).
-- `data/infusions.js`: **Urapidilo** (2-7 mcg/kg/min, 50 mg/50 mL, ficha SEM; nota ESC 2019 5-40 mg/h y AEMPS 9 mg/h media) y **Naloxona** (grupo nuevo Antidotos, 0,2-1,6 mg/h orientativo, 2 mg/50 mL, regla 2/3 de la dosis eficaz/h). Urapidilo se habia quitado en agosto por no usarse en perfusion; el usuario pidio volver a anadirlo (memoria `perfusion_iv_scope` actualizada).
-- `data/formulas.js`: `f-gasometria` (trastorno primario, Winters/Boston, AG corregido, delta ratio, oxigenacion, posibles causas; lector de informe pegado: coma decimal, subindices, `cNa+`/`cCl-`, kPa, HCO3 real vs estandar), `f-ckd-epi`, `f-cockcroft` (peso real), `f-qtc` (Fridericia preferente + Bazett), `f-na-correccion` (10 mEq/L primeras 24 h, 8 cada 24 h siguientes, <=8 alto riesgo; avisa de ritmo excesivo).
-- `data/scales.js`: `mrs`, `perc`, `years`, `dd-edad` (FEU x10 / DDU x5), `cchr`, `ccspine` (logica secuencial, no suma), `oakland` (Hb en g/dL), `grace` (1.0 intrahospitalario), `csrs`.
-- `index.html`: items `sel` con `btn:true` se pintan como botones; `sc.paste` anade cuadro de texto pegado; `copyDatos:true` hace que "Copiar resultado" incluya los datos introducidos; grupos de formulas nuevos `Funcion renal` y `ECG`; tag `Síncope` en Cardiovascular.
-- Contrastado con **Vera Health via navegador** (el MCP `vera` no conecta): 5 consultas guardadas en el historial de Vera del usuario. PMID verificados en PubMed. Perplexity (`pplx.mjs`) para recencia.
-- Decisiones: mantener 0,04 mg/mL de naloxona (SEM y Red de Antidotos 2025) pese a que Vera cita 4 mcg/mL (monografia EEUU); mantener "9 mg/h de media" del urapidilo (ficha AEMPS literal; Vera lo atribuia mal); calcio corregido fuera (peor correlacion con Ca ionico, JAMA Netw Open 2025); GRACE 1.0 y no 3.0 para el corte >140.
-- Descartado: citar una "guia europea de hiponatremia 2025" (Vera la menciono; en PubMed solo hay un estudio de practica, PMID 40455923) -> se cita Spasovski 2014.
-
-
-### Sesion 6 - 2026-10-15
-
-- **Service worker network-first** (commit `432050f`): tras el deploy del modo pediatrico el navegador del usuario seguia sirviendo la version vieja (cache-first + copia guardada de una version anterior); una pestana nueva sin cache si veia la nueva. `fetch` ahora va a red con `cache:'no-cache'`, guarda copia de cada respuesta `ok` same-origin y solo cae a la cache sin conexion (navegacion sin copia -> `/index.html`). Peticiones no-GET o de otro origen no se interceptan.
-- Transicion para quien tenia el SW viejo: `install` detecta si habia un SW activo y, tras `clients.claim()`, `activate` recarga las pestanas abiertas (`client.navigate`), asi el cambio se ve sin que el usuario borre datos del sitio. `skipWaiting` y la purga de caches antiguas se mantienen.
-- `CACHE` `urg-v63` -> `urg-v64` (necesario esta vez: cambia la logica de `sw.js`). `index.html` no se toca.
-- Verificado con Playwright contra servidor estatico local: con el SW viejo instalado, deploy de HTML+SW nuevos -> 1a carga vieja y auto-recarga a la nueva; siguiente cambio de HTML visible a la primera sin bump; offline sirve la ultima version vista; 0 errores de pagina. En produccion: `/sw.js` servido con el codigo nuevo.
-- Backlog #1 (bump manual) queda obsoleto; trampa de la seccion 9 reescrita.
-
-### Sesion 5 - 2026-10-14
-
-- **Modo pediatrico en el tab PCR** (cierra backlog #5, decision del usuario tras el curso EPALS 2025 del ERC): selector `#pcr-modo` (adulto/pediatrico) + `#pcr-peso` + `#pcr-edad` con boton "Estimar peso" (ERC: 3-6-10 kg a 0-6-12 m; (edad+4)x2 de 1 a 12 a). Datos nuevos en `data/pcr.js`: `PCR_FARMACOS_PED` (adrenalina 10 mcg/kg max 1 mg cada 4 min; amiodarona 5 mg/kg max 300 tras 3a y max 150 tras 5a; lidocaina 1 mg/kg max 100), `PCR_ENERGIA_DESFIB_PED(peso)` (4 J/kg max 200 inicial; refractaria desde 5a: 6 -> 8 J/kg max 360), `PCR_CALIDAD_RCP_PED`, `PCR_CAUSAS_REVERSIBLES_PED` (4H/4T con tratamiento pediatrico), `PCR_POST_ROSC_PED`, `PCR_PED_PESO_ESTIMADO()`.
-- Mismos ids de farmaco en ambos modos (`adrenalina`, `amiodarona`, `lidocaina`) para no romper `PCR_FARMACO_EVENTO_SYNC` ni el traspaso a `registro-utstein.html` (que ademas prellena `ut-peso` si el modo es pediatrico). Informe copiable/imprimible indica algoritmo, peso y edad.
-- **Correcciones EPALS/ERC PLS 2025**: `intubacion.js` paso `posicion` sin Sellick (solo BURP guiado por quien intuba); atropina sin `doseMinAbs` 0,1 mg y con `doseMaxAbs` 0,5 mg (soporte nuevo en `calcIntubacion()` y en la nota), nota "no rutinaria". `formulas.js`: `f-peso-ped` con selector de metodo (APLS / ERC), nueva `f-tet-prof-edad` (12/15 + edad/2), `f-naloxona` pediatrica 10-40 mcg/kg max 2 mg (antes "hasta 0,1 mg/kg"). `protocols.js` Codi Sepsia: pediatria con bolos de 10 mL/kg y vasoactivo tras 30-40 mL/kg (antes 20-60 mL/kg).
-- `CACHE` `urg-v62` -> `urg-v63` (el HANDOFF decia v47/v46: estaba desactualizado, el valor real en `sw.js` era v62).
-- Verificado con Playwright headless contra servidor estatico local: 0 errores de consola; adulto sigue mostrando 1 mg; pediatrico 20 kg -> adrenalina 0,2 mg (2 mL), amiodarona 100 mg, 80 J; tras 3 descargas marca adrenalina "administrar ahora"; reset vuelve a adulto; handoff lleva modo+peso y Utstein prellena el peso; atropina 40 kg -> 0,5 mg (techo), 3 kg -> 0,06 mg (sin minimo).
-- Fix tras revisar la vista previa de Cloudflare: el tab PCR **nunca tuvo estilos** (en produccion tampoco) porque el CSS de `.event-row/.drug-row/.btn-now/...` estaba acotado a `#tab-intubacion`; ahora cada selector incluye `#tab-pcr`. Ademas, al cambiar de modo se regeneran las filas de farmacos (las notas de adulto quedaban visibles en pediatrico) conservando check/hora/total.
-- **Pendiente antes de uso clinico**: verificacion con Vera de las dosis pediatricas nuevas (PARCIAL en `0cc681b`: adrenalina, energias, amiodarona/lidocaina y ventilacion confirmadas con el texto ERC 2025) y simulacro pediatrico completo (ver backlog #4).
-
-### Sesion 4 (continuacion 11) - 2026-09-22
-
-- **Cabeceras de seguridad** (disparado por el CSV de Cloudflare Security Insights del 2026-09-21, revisado en el repo `site`): `_headers` añade al bloque `/*` ya existente `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`.
-- Por que importaba: `curl -I` confirmo que este era el unico de los tres sitios del Dr. (`doctorhiguera.com`, `lpclinics.com`, este) que no enviaba NINGUNA cabecera de seguridad, y es el que maneja el material clinico. El `includeSubDomains` del apex `doctorhiguera.com` solo protege a quien ya visito el dominio padre en ese navegador: la **primera visita directa** a `urgencias.` (un marcador abierto en plena guardia) viajaba sin HSTS.
-- Comprobado ANTES de añadirlas que no rompen nada: `grep` de `getUserMedia|mediaDevices|geolocation|usb|requestPayment` sobre `index.html` y `registro-utstein.html` no devuelve nada (por eso `Permissions-Policy` es seguro), y ningun `iframe` de `site` apunta aqui (por eso `X-Frame-Options: SAMEORIGIN` es seguro).
-- Verificado en produccion tras el deploy: las 5 cabeceras nuevas salen y las 2 previas (`Cache-Control`, `X-Robots-Tag`) siguen intactas. Humo sobre `/`, `/registro-utstein`, `/sw.js`, `/manifest.json` y `/robots.txt`: los 5 en 200 con su `content-type` correcto.
-- **Descartado a proposito: CSP.** `index.html` son 147 KB con scripts inline; una CSP a ciegas romperia la PWA. Queda como backlog #8, no como olvido.
-- Sin bump de `CACHE` en `sw.js`: el cambio es solo de cabeceras HTTP, no toca `index.html` ni `data/*.js`, asi que la trampa de la seccion 9 no aplica.
-- Commit: `1d890f3`.
-
-### Sesion 4 (continuacion 10) - 2026-09-16
-
-- **URG CLINICO fuera de los buscadores** (decision del usuario, backlog #20 del repo `site`): `_headers` añade `X-Robots-Tag: noindex, nofollow` a `/*`; `index.html` y `registro-utstein.html` llevan `<meta name="robots" content="noindex, nofollow">`; `robots.txt` nuevo que **permite** el rastreo a proposito.
-- Por que se permite el rastreo: bloquearlo en `robots.txt` impediria que Google leyera la orden de no indexar, y la direccion podria acabar indexada igual desde enlaces externos (misma trampa ya documentada en el HANDOFF de `site`, sesion 17).
-- Verificado en produccion tras el deploy (~170 s): `/robots.txt` se sirve como `text/plain` con `Allow: /`; la portada responde 200 con la cabecera y la etiqueta; `registro-utstein.html` redirige 308 a `/registro-utstein` y esa pagina final tambien responde 200 con ambas.
-- Commit: `877d89b`.
-
-> Sesiones anteriores (4 continuacion 9 y previas) archivadas en `docs/HANDOFF_ARCHIVE.md`.
-
 ## 6. PENDIENTE - BACKLOG PRIORIZADO
 | # | Tarea | Archivos | Prioridad | Bloqueado por | Criterio de hecho |
 |---|---|---|---|---|---|
@@ -297,6 +230,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Texto rojo: usar `var(--red-text)`, no `var(--red)` (este queda para bordes y fondos; AA justo como color de letra). En `#tab-perfusiones` las reglas `#tab-perfusiones .tile-aux` y `.scale-pts` fuerzan `color: var(--text)`: cualquier color propio ahi necesita selector con `#tab-perfusiones`.
 - `info` en `data/infusions.js` es opcional por farmaco; se pinta con `innerHTML` (datos estaticos del repo, no entrada de usuario).
 
+- **`eval` + `flow` en el mismo protocolo** (EPOC, sesion 16): el flow no tiene inputs propios; sus `sug` reciben los valores del evaluador (`_evalVals`) y se recalculan en cada cambio del evaluador. Las escalas del caso van en el evaluador. En los `num` probar con punto («7.28»): el input number del navegador rechaza «7,28»
 - **Evaluador de protocolos (`eval`)**: los ids son `pe-<protocolo>-<k>`; `chk` → booleano, `sel` y `num` → numero (`NaN` si vacio; acepta coma decimal). En `calc`, los `sel` con valor 0 por defecto (`iot` excluido, `o2`, `mental`, `disAct`) NO cuentan como «datos introducidos» (lista `SEL` del guard): si se anade un `sel` nuevo, incluirlo ahi o el evaluador saldra de «Introduce los datos» con el formulario vacio. `renderProtocols()` re-renderiza al marcar favorito y se pierden los datos escritos (igual que en escalas).
 - **Protocolo EPOC: el destino debe seguir el flujograma de Campdevanol** y, en dosis/umbrales, **GOLD 2026 prevalece** sobre el Word y el flujograma (decisiones del usuario, sesion 12). Si se cambia el flujograma, regenerar el PDF desde la fuente HTML (Chrome headless `--print-to-pdf`, 1 pagina A4) y sustituir tambien la imagen `word/media/flujograma_campdevanol.png` del Word.
 
@@ -307,4 +241,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Preguntar al usuario el siguiente protocolo para el motor `p.flow` (EPOC/asma/TEP: anadir `flow.escalas` y farmacos; Codi Risc Suicidi pendiente) y que troponina usa el laboratorio (dolor toracico).
+Ver el flujograma de EPOC en movil real y preguntar al usuario si se lleva el mismo patron (`flow` bajo el `eval`) a asma y TEP, o Codi Risc Suicidi y que troponina usa el laboratorio (dolor toracico).
