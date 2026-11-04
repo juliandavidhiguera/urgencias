@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-04 | **Sesion #:** 16 | **Rama:** main | **HEAD:** `f947a28` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-04 | **Sesion #:** 16 | **Rama:** main | **HEAD:** `e797e16` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -64,6 +64,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Commit: `f947a28` feat(protocolos): flujograma interactivo de EPOC agudizado bajo el evaluador
 - Verificado: node (13/13 nodos alcanzables, fichas existen, sugerencias C/B/A/fatiga/vital/sin datos); Chrome local (sugerencias con pH 7.28/PaCO2 62 → C, O2 ≥2 → B, O2 1 → A, `social` → planta; botones de fichas y panel lateral; copiar y reiniciar; 1 solo esc-res; los otros 7 flujogramas sin cambios; sin errores de consola); produccion con curl (protocols.js con `CANDIDATO`, `/` con `_evalVals`). Sin captura visual (Chrome no respondio) ni prueba en movil
 - Archivado: sesiones 4–10 a `docs/HANDOFF_ARCHIVE.md` (limite de 300 lineas)
+- Anadido (`e797e16`): `asma-crisis` y `tep-agudo` con `flow` bajo el `eval` (mismo patron que EPOC, peticion del usuario). Las `sug` NO duplican logica: llaman a `PROTOCOLS.find(...).eval.calc(_evalVals(p))` y leen los titulos de las secciones («Gravedad SEMES 2026: crisis …», «Respuesta y destino inicial: A/B/C …», «Categoría AHA/ACC 2026: …», «Escalas: … Hestia N»). Asma: llegada → anafilaxia (adrenalina + perfusion) → gravedad SEMES → muy grave/grave/no grave → respuesta A/B/C → alta/planta/IOT/VMNI puente + HUV (13 nodos). TEP: PCR/shock → HNF → E → lisis o PERT; estable → probabilidad → descartado/confirmado → A–B (Hestia: alta/planta), C1–C2, C3, D, E (15 nodos). Sin contenido clinico nuevo (textos de la sesion 14)
+- Modificado (`e797e16`): `index.html` `abrirFarmacoLateral` toma el peso de `pe-<pid>-peso` si no hay `fl-<pid>-peso`
+- Verificado (`e797e16`): node (13/13 y 15/15 nodos alcanzables, fichas e INFUSIONS existen, 13 casos de sugerencia); Chrome local (asma grave → B; TEP C3 y E con hemo 2; noradrenalina con 80 kg del evaluador); Chrome headless 375 px por CDP (`scratchpad/tools/cdp375.mjs`): sin desbordes en los 10 flujogramas, sin errores; produccion con curl
 
 ### Sesion 15 - 2026-11-03
 - Anadido: `data/protocols.js` -> `hiperkalemia` con `flow` (inputs K+ y glucemia; parada → CaCl 10 % + bicarbonato por vias distintas e insulina-glucosa; gravedad con sugerencia por K+ 5,5/6,0/6,5 o cambios ECG; calcio → shift → eliminacion o dialisis; glucosa 10 % 50 mL/h 5 h si glucemia <126; extras ECG, causas/pseudohiperpotasemia, monitorizacion). Se conservan los `steps` antiguos. Escalas KDIGO y NEWS2. `src` + KDIGO 2019 (PMID 31706619) y UKKA 2023
@@ -230,7 +233,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Texto rojo: usar `var(--red-text)`, no `var(--red)` (este queda para bordes y fondos; AA justo como color de letra). En `#tab-perfusiones` las reglas `#tab-perfusiones .tile-aux` y `.scale-pts` fuerzan `color: var(--text)`: cualquier color propio ahi necesita selector con `#tab-perfusiones`.
 - `info` en `data/infusions.js` es opcional por farmaco; se pinta con `innerHTML` (datos estaticos del repo, no entrada de usuario).
 
-- **`eval` + `flow` en el mismo protocolo** (EPOC, sesion 16): el flow no tiene inputs propios; sus `sug` reciben los valores del evaluador (`_evalVals`) y se recalculan en cada cambio del evaluador. Las escalas del caso van en el evaluador. En los `num` probar con punto («7.28»): el input number del navegador rechaza «7,28»
+- **`eval` + `flow` en el mismo protocolo** (EPOC, asma, TEP, sesion 16): si se cambian los titulos de las secciones de `calc` de asma/TEP, revisar las `sug` del `flow`, que los leen. el flow no tiene inputs propios; sus `sug` reciben los valores del evaluador (`_evalVals`) y se recalculan en cada cambio del evaluador. Las escalas del caso van en el evaluador. En los `num` probar con punto («7.28»): el input number del navegador rechaza «7,28»
 - **Evaluador de protocolos (`eval`)**: los ids son `pe-<protocolo>-<k>`; `chk` → booleano, `sel` y `num` → numero (`NaN` si vacio; acepta coma decimal). En `calc`, los `sel` con valor 0 por defecto (`iot` excluido, `o2`, `mental`, `disAct`) NO cuentan como «datos introducidos» (lista `SEL` del guard): si se anade un `sel` nuevo, incluirlo ahi o el evaluador saldra de «Introduce los datos» con el formulario vacio. `renderProtocols()` re-renderiza al marcar favorito y se pierden los datos escritos (igual que en escalas).
 - **Protocolo EPOC: el destino debe seguir el flujograma de Campdevanol** y, en dosis/umbrales, **GOLD 2026 prevalece** sobre el Word y el flujograma (decisiones del usuario, sesion 12). Si se cambia el flujograma, regenerar el PDF desde la fuente HTML (Chrome headless `--print-to-pdf`, 1 pagina A4) y sustituir tambien la imagen `word/media/flujograma_campdevanol.png` del Word.
 
@@ -241,4 +244,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Ver el flujograma de EPOC en movil real y preguntar al usuario si se lleva el mismo patron (`flow` bajo el `eval`) a asma y TEP, o Codi Risc Suicidi y que troponina usa el laboratorio (dolor toracico).
+Probar los flujogramas de EPOC, asma y TEP en movil real y preguntar al usuario el siguiente (Codi Risc Suicidi) y que troponina usa el laboratorio (dolor toracico).
