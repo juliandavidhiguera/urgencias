@@ -1914,6 +1914,156 @@ window.PROTOCOLS = [
       return out;
     }
   },
+  /* Flujograma paso a paso (flujograma de Campdevànol). Sin datos propios: las sugerencias salen del
+     cálculo del evaluador de arriba (gravedad SEMES, respuesta A/B/C y destino), para que el
+     flujograma y el evaluador no puedan discrepar. Mismo contenido clínico que el evaluador y los pasos. */
+  flow:(() => {
+    const ev = () => { const p = PROTOCOLS.find(x => x.id === 'asma-crisis'); return p.eval.calc(_evalVals(p)); };
+    const sec = pre => ev().find(s => s.t.indexOf(pre) === 0) || { t: '', h: '' };
+    const tit = pre => sec(pre).t.slice(pre.length);
+    const semes = () => tit('Gravedad SEMES 2026: crisis ');
+    const resp = () => tit('Respuesta y destino inicial: ').charAt(0);
+    const has = x => typeof x === 'number' && !isNaN(x);
+    const IOT = v => v.mental > 0 || v.hemo === true || (has(v.pco2) && v.pco2 > 60);
+    const NOTA = '<span class="pe-nota">Circuito local (sin observación monitorizada ni UCI en Campdevànol) pendiente de consenso con la Dirección Asistencial y la UCI de HUV.</span>';
+    const RESP = [
+      { l: 'A · Buena respuesta: PEF &gt;60–70 %, SpO₂ &gt;93 % sin O₂, asintomático', go: 'respA', sug: () => resp() === 'A' },
+      { l: 'B · Respuesta incompleta: PEF 40–60 %, rescate más a menudo que cada 4 h u O₂ para SpO₂ ≥93 %', go: 'respB', sug: () => resp() === 'B' },
+      { l: 'C · Mala respuesta: PEF &lt;40 % (o &lt;25 % a la llegada), FR &gt;25, FC &gt;110, musculatura accesoria o hipercapnia', go: 'respC', sug: () => resp() === 'C' }
+    ];
+    const RESP_HELP = 'La sugerencia usa la respuesta tras 1–3 h que introduces en el evaluador de arriba (PEF, SpO₂ sin O₂, rescate, O₂ y signos persistentes).';
+    const IOT_Q = '¿Criterios de IOT? (conciencia ↓, agitación, PaO₂/FiO₂ &lt;200, PaCO₂ &gt;60, inestabilidad)';
+    const IOT_OPTS = [{ l: 'Sí', go: 'iot', sug: IOT }, { l: 'No', go: 'vmniHuv' }];
+    return {
+      start: 'llegada',
+      nodes: {
+        llegada: {
+          t: 'Llegada (primeros 15 min)',
+          show: '• SpO₂, FR, FC, PA, conciencia, capacidad para hablar, musculatura accesoria.<br>' +
+            '• <b>PEF o FEV₁ antes de tratar</b> (salvo crisis vital): mejor de 3 intentos, mismo medidor.<br>' +
+            '• O₂ solo si SpO₂ &lt;92 %; objetivo 93–95 % (gestante ≥95 %).',
+          q: '¿Anafilaxia?',
+          help: 'Urticaria, angioedema, hipotensión, desencadenante alérgico.',
+          opts: [{ l: 'Sí', go: 'anafil', sug: v => v.anafil === true }, { l: 'No', go: 'gravedad' }]
+        },
+        anafil: {
+          farmacos: [{ n: 'Adrenalina', inf: 'Adrenalina (perfusión)' }],
+          t: 'Anafilaxia primero', c: 'high',
+          show: '<b>Adrenalina 0,5 mg IM</b> (1 mg/mL) en el vasto lateral, repetible cada 5–15 min, PRIMERO; los broncodilatadores después. Triptasa a las 0, 2 y 24 h. Shock: perfusión IV titulada (GALAXIA).',
+          q: 'Tras la adrenalina, valorar la crisis de asma',
+          opts: [{ l: 'Continuar con la gravedad de la crisis', go: 'gravedad' }]
+        },
+        gravedad: {
+          t: 'Gravedad (SEMES 2026)',
+          show: 'Clasificar antes de tratar. El evaluador de arriba da además GEMA 5.5 y ALAT-SEPAR 2025.',
+          q: '¿Gravedad de la crisis?',
+          help: '<b>Muy grave (crisis vital):</b> somnolencia o confusión, fatiga (la FR baja sin mejoría), silencio auscultatorio, respiración paradójica, bradicardia o hipotensión, SpO₂ &lt;90 % con O₂, PaCO₂ &gt;45 o acidemia. ' +
+            '<b>Grave:</b> PEF &lt;50 %, FR &gt;25, habla en palabras o embarazo. <b>No grave:</b> PEF &gt;50 %, FR &lt;25 y SpO₂ &gt;93 % (deben cumplirse todos). La sugerencia sale de la clasificación SEMES del evaluador.',
+          opts: [
+            { l: 'Muy grave (crisis vital)', go: 'muyGrave', sug: () => semes() === 'MUY GRAVE' },
+            { l: 'Grave', go: 'grave', sug: () => semes() === 'GRAVE' },
+            { l: 'No grave', go: 'noGrave', sug: () => semes().indexOf('NO GRAVE') === 0 }
+          ]
+        },
+        muyGrave: {
+          farmacos: [{ n: 'Salbutamol', inf: false }, { n: 'Bromuro de ipratropio', inf: false }, { n: 'Hidrocortisona', inf: false }, { n: 'Sulfato de magnesio', inf: false }],
+          t: 'Crisis vital (muy grave)', c: 'high',
+          show: '• <b>O₂</b> a la FiO₂ necesaria hasta el soporte ventilatorio.<br>' +
+            '• <b>NEB continua:</b> salbutamol 10–15 mg/h + ipratropio 0,5 mg.<br>' +
+            '• <b>Hidrocortisona 250 mg IV</b> (SEMES).<br>' +
+            '• <b>Ya, sin esperar: sulfato de magnesio 2 g IV</b> en 50–100 mL de SSF en 20 min, dosis única (reflejos, PA, FR; ajustar con IR grave).<br>' +
+            '• <b>Preparar la IOT</b> y avisar a la UCI de HUV.',
+          q: IOT_Q,
+          opts: IOT_OPTS
+        },
+        grave: {
+          farmacos: [{ n: 'Salbutamol', inf: false }, { n: 'Bromuro de ipratropio', inf: false }, { n: 'Budesonida', inf: false }, { n: 'Hidrocortisona', inf: false }, { n: 'Sulfato de magnesio', inf: false }],
+          t: 'Crisis grave', c: 'high',
+          show: '• <b>O₂</b> con FiO₂ &lt;40 % → SpO₂ 93–95 % (embarazo ≥95 %).<br>' +
+            '• <b>Salbutamol + ipratropio:</b> MDI + cámara 4–10 inh de salbutamol + 4–8 inh de ipratropio (20 µg/inh) cada 10–15 min en la 1.ª hora, o NEB cada 20 min: salbutamol 2,5–5 mg + ipratropio 0,5 mg.<br>' +
+            '• <b>GCI a dosis altas en la 1.ª hora:</b> budesonida NEB 0,5 mg cada 20 min, o fluticasona propionato 2 inh × 250 µg / budesonida 4 inh × 200 µg MDI + cámara cada 10–15 min (pauta SEMES; evidencia incierta).<br>' +
+            '• <b>Prednisona 40–50 mg VO al día</b>, dosis matutina, 5–7 días sin descenso, o hidrocortisona 100–200 mg IV si no tolera la VO.<br>' +
+            '• <b>Si no mejora en 1 h</b> (hipoxemia persistente o PEF &lt;60 %): sulfato de magnesio 2 g IV en 20 min, dosis única.<br>' +
+            '• Descartar causa alternativa o añadida (ver «Descartar otra causa» abajo).',
+          q: 'Reevaluar de forma continua y decidir en ~3 h: ¿respuesta?',
+          help: RESP_HELP,
+          opts: RESP
+        },
+        noGrave: {
+          farmacos: [{ n: 'Salbutamol', inf: false }],
+          t: 'Crisis no grave', c: 'low',
+          show: '• <b>O₂</b> solo si SpO₂ &lt;92 %; objetivo 93–95 % (embarazo ≥95 %).<br>' +
+            '• <b>Salbutamol</b> MDI + cámara 4–10 inh (100 µg/inh) cada 20 min en la 1.ª hora; reevaluar tras la 1.ª dosis. Alternativa: budesonida-formoterol 160/4,5 µg (hasta 12 inh/24 h), puente a MART.<br>' +
+            '• <b>Corticoide sistémico</b> si no hay buena respuesta inmediata, lleva días mal, PEF &lt;60 %, instauración rápida o crisis graves previas: prednisona 40–50 mg VO al día, 5–7 días.',
+          q: 'Reevaluar cada 30 min y decidir en ~1 h: ¿respuesta?',
+          help: RESP_HELP,
+          opts: RESP
+        },
+        respA: {
+          t: 'A · Buena respuesta', c: 'low',
+          show: '1 h más sin broncodilatador para comprobar la estabilidad: tolera el decúbito, SpO₂ basal &gt;93 %, entiende el plan de acción.',
+          q: '¿Alta o ingreso?',
+          help: 'Ingreso si hay factores de riesgo de mala evolución (instauración rápida, crisis vital o UCI previa, visitas o ingresos frecuentes, sin GCI o abuso de SABA, empeora con corticoide ya iniciado, comorbilidad o edad avanzada), complicación, embarazo o no se garantizan el tratamiento y la vigilancia en el domicilio.',
+          opts: [
+            { l: 'Estable, sin factores de riesgo y con apoyo en el domicilio', go: 'alta', sug: () => sec('Respuesta y destino inicial: A').h.indexOf('<b>Alta</b>') === 0 },
+            { l: 'Factores de riesgo, complicación, embarazo o sin apoyo', go: 'planta', sug: () => sec('Respuesta y destino inicial: A').h.indexOf('<b>Ingreso en planta') === 0 }
+          ]
+        },
+        respB: {
+          farmacos: [{ n: 'Sulfato de magnesio', inf: false }],
+          t: 'B · Respuesta incompleta', c: 'mid',
+          show: 'Intensificar: salbutamol + ipratropio, GCI a dosis altas y corticoide sistémico; <b>sulfato de magnesio 2 g IV</b> en 20 min si hipoxemia o PEF &lt;60 % tras 1 h; gasometría si SpO₂ &lt;92 %.',
+          q: '¿Mejora en 2–3 h, sin hipercapnia y con SpO₂ ≥93 % con O₂ convencional?',
+          opts: [{ l: 'Sí', go: 'planta' }, { l: 'No: pasar a C', go: 'respC', sug: () => resp() === 'C' }]
+        },
+        respC: {
+          farmacos: [{ n: 'Sulfato de magnesio', inf: false }, { n: 'Salbutamol', inf: false }],
+          t: 'C · Mala respuesta', c: 'high',
+          show: v => 'Intensificar: sulfato de magnesio 2 g IV, <b>VMNI en el box solo como PUENTE</b> y <b>traslado a la UCI de HUV</b> (SEMES: cualquier soporte ventilatorio = UCI).<br>' +
+            '<b>Salbutamol IV solo como rescate en la crisis refractaria</b>, con monitorización y de acuerdo con la UCI de HUV: 200 µg en 30 min → 0,1–0,2 µg/kg/min' +
+            (has(v.peso) && v.peso > 0 ? ' (' + (v.peso * 0.1).toFixed(0) + '–' + (v.peso * 0.2).toFixed(0) + ' µg/min con el peso real)' : '') + ', con ECG, K⁺ y lactato.',
+          q: IOT_Q,
+          opts: IOT_OPTS
+        },
+        iot: {
+          t: 'IOT y traslado a la UCI de HUV', c: 'high',
+          show: 'VMI: Vt 6–8 mL/kg de <b>peso ideal</b>, FR 10–12, I:E 1:3–1:5, PEEP 0, Pplat &lt;30; hipercapnia permisiva con pH &gt;7,20 (pauta SEMES).<br>' +
+            'Circuito: llamada médico a médico → SEM con SVA → informe con PEF, gasometrías, dosis y hora del corticoide.<br>' + NOTA
+        },
+        vmniHuv: {
+          t: 'VMNI como puente y traslado a la UCI de HUV', c: 'high',
+          show: '<b>Avisar a HUV al iniciar la VMNI y trasladar con VMNI.</b> VMNI en el box solo como puente (pauta SEMES: IPAP 8 subiendo, EPAP 4–6, I:E 1:4–1:5; evidencia débil en asma). Nunca retrasar la IOT.<br>' +
+            'Circuito: llamada médico a médico → SEM con SVA → mantener NEB/VMNI → informe con PEF, gasometrías, dosis y hora del corticoide.<br>' + NOTA
+        },
+        planta: {
+          t: 'Ingreso en planta (Campdevànol)', c: 'mid',
+          show: 'PEF y SpO₂ cada 4–6 h. Complicación (neumonía, neumotórax, neumomediastino): mínimo ingreso; traslado si compromiso o neumotórax que precisa drenaje sin recursos.<br>' + NOTA
+        },
+        alta: {
+          t: 'Alta', c: 'low',
+          show: 'Todo paciente se va con <b>GCI</b>; MART preferente (budesonida-formoterol 160/4,5 µg 1–2 inh/12 h + 1 a demanda, máx. 12 inh/24 h); prednisona 40–50 mg 5–7 días; técnica inhalatoria y plan escrito; AP en ~7 días; Neumología/Alergología en &lt;2 semanas si crisis vital, embarazo o anafilaxia. Vacunas: gripe, neumococo, COVID-19; VRS ≥65 años.'
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'Recursos de Campdevànol', t: 'Recursos locales',
+            show: 'VMNI en el box solo como puente y OAF (evidencia limitada en asma). Sin observación con monitorización continua ni UCI. Centro de referencia: Hospital Universitari de Vic (HUV).'
+          },
+          {
+            l: 'Descartar otra causa', t: 'Causa alternativa o añadida',
+            show: 'Neumotórax/neumomediastino, neumonía, TEP (disnea sin caída del PEF: dímero D), IC (NT-proBNP), obstrucción laríngea inducible, acidosis láctica por β2. Taquipnea creciente pese a SABA → lactato: <b>más SABA no siempre es mejor</b>.'
+          },
+          {
+            l: 'Criterios de traslado a HUV', t: 'Criterios de traslado a HUV',
+            show: 'Necesidad de VMNI/VMI o soporte hemodinámico, parada respiratoria, disminución de conciencia, deterioro pese al tratamiento, SpO₂ &lt;90 % con O₂, PaCO₂ &gt;45 o acidemia, neumotórax con compromiso, anafilaxia refractaria. Llamada médico a médico → SEM con SVA.'
+          }
+        ]
+      }
+    };
+  })(),
   steps:[
   {type:'info', text:'Recursos locales (Hospital de Campdevànol): VMNI en el box solo como puente y OAF (evidencia limitada en asma). Sin observación con monitorización continua ni UCI. Centro de referencia: Hospital Universitari de Vic (HUV)'},
   {type:'action', text:'LLEGADA (primeros 15 min): SpO₂, FR, FC, PA, conciencia, capacidad para hablar, musculatura accesoria. PEF o FEV₁ antes de tratar (salvo crisis vital): mejor de 3 intentos, mismo medidor'},
@@ -2102,6 +2252,153 @@ window.PROTOCOLS = [
       return out;
     }
   },
+  /* Flujograma paso a paso (flujograma de Campdevànol). Sin datos propios: las sugerencias salen del
+     cálculo del evaluador de arriba (probabilidad, categoría A–E y Hestia), para que el flujograma y el
+     evaluador no puedan discrepar. Mismo contenido clínico que el evaluador y los pasos. */
+  flow:(() => {
+    const ev = () => { const p = PROTOCOLS.find(x => x.id === 'tep-agudo'); return p.eval.calc(_evalVals(p)); };
+    const sec = pre => ev().find(s => s.t.indexOf(pre) === 0) || { t: '', h: '' };
+    const cat = () => sec('Categoría AHA/ACC 2026: ').t.slice(24).split(' ')[0];
+    const hestia = () => { const m = /Hestia (\d+)/.exec(sec('Escalas: ').t); return m ? +m[1] : NaN; };
+    const NOTA = '<span class="pe-nota">Adaptación local (red Campdevànol–Vic–Clínic) pendiente de validación con UCI CHV, PERT Clínic, Farmacia y Dirección médica.</span>';
+    const PERT = 'PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E.';
+    const DOSIS = '<br><span class="pe-nota">Las dosis con el peso real y el aclaramiento las calcula el evaluador de arriba.</span>';
+    const SOPORTE = '<b>Soporte:</b> cristaloide ≤500 mL en 15–30 min solo sin congestión · noradrenalina (inicio de pauta local) 0,05–0,1 µg/kg/min si PAM &lt;65, titular sin techo fijo · dobutamina 2–10 µg/kg/min si bajo gasto con PA conservada · O₂ para SpO₂ ≥90 %; evitar la IOT (si es imprescindible: ketamina/etomidato, vasopresor en marcha, Vt 6 mL/kg de peso ideal, PEEP baja).';
+    const HEP = [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }];
+    return {
+      start: 'llegada',
+      nodes: {
+        llegada: {
+          t: 'Llegada',
+          show: 'ABC, constantes, ECG y monitor; dos vías si hay compromiso hemodinámico. O₂ para SpO₂ ≥90 %; VMNI/IOT con precaución (la presión positiva puede precipitar el fallo del VD).',
+          q: '¿PCR, hipotensión persistente o shock?',
+          opts: [{ l: 'Sí', go: 'inestable', sug: v => v.hemo >= 2 }, { l: 'No', go: 'prob' }]
+        },
+        inestable: {
+          farmacos: [{ n: 'Heparina sódica', inf: false }],
+          t: 'Inestable: confirmar sin perder tiempo', c: 'high',
+          show: '<b>HNF bolo 80 U/kg</b> en cuanto se sospecha. Trasladable a TC → angio-TC inmediato acompañado. No trasladable → POCUS. PCR con sospecha fundada → fibrinólisis sin imagen (ERC 2025).' + DOSIS,
+          q: '¿TEP confirmado o muy probable?',
+          help: 'Angio-TC con TEP, POCUS con VD alterado sin otra causa, o PCR con sospecha fundada.',
+          opts: [
+            { l: 'Sí: tratar como E', go: 'catE', sug: v => v.hemo >= 2 && (v.conf === true || v.vd === true) },
+            { l: 'No: VD normal en POCUS', go: 'otraCausa' }
+          ]
+        },
+        otraCausa: {
+          t: 'Buscar otra causa', c: 'mid',
+          show: 'VD normal en POCUS: el shock probablemente no es por TEP; buscar otra causa.'
+        },
+        catE: {
+          farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
+          t: 'Categoría E (hipotensión persistente, shock o PCR)', c: 'high',
+          show: 'HNF 80 U/kg + llamada simultánea a PERT Clínic + UCI Vic (no retrasa la lisis).<br>' + SOPORTE + DOSIS,
+          q: '¿Contraindicación ABSOLUTA de fibrinólisis?',
+          help: 'Ictus hemorrágico o desconocido, isquémico &lt;6 meses, neoplasia del SNC, trauma/cirugía/TCE &lt;3 semanas, diátesis hemorrágica, sangrado activo, disección. Las relativas se individualizan.',
+          opts: [{ l: 'Sí', go: 'pertE', sug: v => v.ciLisis === true }, { l: 'No', go: 'lisis' }]
+        },
+        lisis: {
+          farmacos: [{ n: 'Alteplasa', inf: false }],
+          t: 'Fibrinólisis en Campdevànol sin esperar el traslado', c: 'high',
+          show: '• <b>Alteplasa 100 mg IV en 2 h:</b> 10 mg en bolo + 90 mg en 2 h (&lt;65 kg: máx. 1,5 mg/kg total).<br>' +
+            '• <b>En PCR: 50 mg IV en bolo en 2 min</b>; si no hay ROSC a los 15–30 min, segunda dosis de 50 mg (máx. 100 mg; por peso, ERC 2025: 0,6–1,0 mg/kg, máx. 100 mg). RCP 60–90 min tras la lisis.<br>' +
+            '• <b>Parar la HNF durante la alteplasa</b> (criterio CHV); reiniciar sin bolo cuando TTPa &lt;2 × LSN.<br>' +
+            '• <b>No trasladar antes de estabilizar</b> (AHA 2026, clase 3). Post-lisis: PERT decide Clínic (SEM 061, SVA); si no → UCI Vic.<br>' + PERT + DOSIS + '<br>' + NOTA
+        },
+        pertE: {
+          t: 'PERT del Clínic de inmediato', c: 'high',
+          show: 'Contraindicación absoluta de fibrinólisis → <b>PERT del Clínic de inmediato</b> (catéter, embolectomía, ECMO-VA). No trasladar antes de estabilizar.<br>' + PERT + '<br>' + NOTA
+        },
+        prob: {
+          farmacos: [{ n: 'Enoxaparina', inf: false }],
+          t: 'Probabilidad clínica',
+          show: 'Wells, Ginebra o YEARS: <b>baja</b> → PERC (8/8 negativos descarta) → dímero D ajustado por edad (edad × 10 µg/L si &gt;50 años) · <b>intermedia</b> → dímero D · <b>alta</b> → angio-TC directo (HBPM empírica si hay demora de imagen y el riesgo hemorrágico es aceptable).',
+          q: '¿Resultado?',
+          help: 'La sugerencia usa Wells, PERC y dímero D del evaluador de arriba, o la casilla «TEP confirmado».',
+          opts: [
+            { l: 'TEP descartado (PERC 8/8 negativo o dímero D bajo el corte)', go: 'descartado', sug: v => !v.conf && !v.incid && sec('Probabilidad clínica').h.indexOf('TEP descartado') >= 0 },
+            { l: 'TEP confirmado (angio-TC, o TVP proximal con sospecha de TEP)', go: 'confirmado', sug: v => v.conf === true || v.incid === true },
+            { l: 'Angio-TC sin TEP', go: 'descartado' }
+          ]
+        },
+        descartado: {
+          t: 'TEP descartado', c: 'low',
+          show: 'Buscar un diagnóstico alternativo de los síntomas.'
+        },
+        confirmado: {
+          t: 'TEP confirmado: estratificar', c: 'mid',
+          show: 'VD (VD/VI ≥1,0 en angio-TC o POCUS) + troponina, NT-proBNP y lactato + PESI/sPESI/Hestia → <b>categoría A–E escrita en la historia antes de decidir el destino</b>.',
+          q: '¿Categoría AHA/ACC 2026?',
+          help: '<b>A</b> incidental asintomático · <b>B</b> PESI I–II/sPESI 0, VD y biomarcadores normales · <b>C1</b> escala elevada, VD y biomarcadores normales · <b>C2</b> VD o biomarcador alterado · <b>C3</b> VD + biomarcador · <b>D1</b> hipotensión transitoria · <b>D2</b> shock normotenso (lactato &gt;2, oliguria, alteración mental o PAM &lt;60) · <b>E</b> hipotensión persistente, shock o PCR. La sugerencia sale de la categoría del evaluador.',
+          opts: [
+            { l: 'A–B', go: 'catAB', sug: () => /^[AB]$/.test(cat()) },
+            { l: 'C1–C2', go: 'catC12', sug: () => /^C[12]$/.test(cat()) },
+            { l: 'C3', go: 'catC3', sug: () => cat() === 'C3' },
+            { l: 'D1–D2', go: 'catD', sug: () => /^D/.test(cat()) },
+            { l: 'E', go: 'catE', sug: () => /^E/.test(cat()) }
+          ]
+        },
+        catAB: {
+          t: 'Categoría A–B', c: 'low',
+          show: '<b>ACOD:</b> apixabán 10 mg/12 h VO × 7 días → 5 mg/12 h, o rivaroxabán 15 mg/12 h VO × 21 días → 20 mg/24 h con comida (ClCr &lt;15: evitar rivaroxabán). Embarazo: HBPM o HNF.',
+          q: '¿Hestia?',
+          help: 'Inestabilidad, trombólisis, sangrado o alto riesgo, O₂ &gt;24 h, TEP con anticoagulación, analgesia IV &gt;24 h, razón médica o social, ClCr &lt;30, insuficiencia hepática grave, embarazo o TIH previa. La sugerencia usa el Hestia del evaluador.',
+          opts: [
+            { l: 'Hestia 0', go: 'alta', sug: () => hestia() === 0 },
+            { l: 'Hestia positivo', go: 'planta', sug: () => hestia() > 0 }
+          ]
+        },
+        catC12: {
+          farmacos: HEP,
+          t: 'Categoría C1–C2', c: 'mid',
+          show: '<b>Enoxaparina 1 mg/kg SC cada 12 h</b> (ClCr 15–30 → cada 24 h; &lt;15 → HNF) → ACOD a las 24–48 h si está estable y sin procedimiento previsto.<br>' +
+            '<b>Planta Campdevànol</b> (C2: NEWS2 cada 4 h). PERT recomendable (AHA 2026: PERT en C–E).' + DOSIS + '<br>' + NOTA
+        },
+        catC3: {
+          farmacos: HEP,
+          t: 'Categoría C3 (VD + biomarcador)', c: 'high',
+          show: '<b>Enoxaparina 1 mg/kg SC cada 12 h</b> (ClCr &lt;30: HNF); HNF si se prevé procedimiento. Reperfusión no rutinaria. Paso a ACOD tras 2–3 días de anticoagulación parenteral si está estable.<br>' +
+            '<b>Observación de urgencias con monitor</b> → planta solo con estabilidad confirmada (no por plazo fijo); NEWS2 cada 2 h; troponina/lactato a las 6–12 h. <b>PERT obligado</b> (clase 1). Traslado precoz a Vic si no hay box monitorizado o la tendencia empeora. <i>Discrepancia abierta: traslado precoz de todo C3 estable, pendiente de acuerdo de red.</i>' + DOSIS + '<br>' + NOTA
+        },
+        catD: {
+          farmacos: [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }, { n: 'Alteplasa', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
+          t: 'Categoría D1–D2', c: 'high',
+          show: '• HBPM por defecto; <b>HNF</b> si se prevé reperfusión o procedimiento, o FG &lt;30.<br>' +
+            '• <b>Fibrinólisis sistémica:</b> se puede considerar si el riesgo de sangrado es aceptable y se plantea terapia avanzada (AHA 2026). Decidir con el PERT.<br>' +
+            '• ' + SOPORTE + '<br>' +
+            '• <b>D1:</b> llamar al PERT del Clínic en ≤30 min → Clínic o Medicina Interna monitorizada de Vic; si no es candidato, guardia del CHV. <b>D2:</b> PERT del Clínic en ≤30 min + UCI de Vic. Ningún D sale sin anticoagulación parenteral en curso. Si pasa a E: fibrinólisis local antes del traslado.<br>' + PERT + DOSIS + '<br>' + NOTA
+        },
+        alta: {
+          t: 'Alta precoz u observación corta', c: 'low',
+          show: 'Requisitos: estable, bajo riesgo hemorrágico, sin barreras sociales, anticoagulante disponible y comprendido, control a las 48 h–7 días. Categoría A: ambulatorio con ACOD.<br>' +
+            'Al alta: anticoagulación ≥3 meses, control a las 48 h–7 d y a los ~3 meses; signos de alarma (sangrado, disnea súbita, síncope); evitar AINE. Disnea o intolerancia persistente → estudio de HPTEC.'
+        },
+        planta: {
+          farmacos: HEP,
+          t: 'Ingreso en planta (Campdevànol)', c: 'mid',
+          show: 'Hestia positivo: no tratar en el domicilio.<br>' + NOTA
+        }
+      },
+      extras: {
+        t: 'Durante la atención',
+        help: 'Ábrelos cuando hagan falta, en cualquier momento del flujograma.',
+        items: [
+          {
+            l: 'Recursos de Campdevànol', t: 'Recursos locales',
+            show: 'Angio-TC, troponina, NT-proBNP, lactato 24 h y alteplasa en stock; POCUS si hay urgenciólogo formado. Sin UCI ni ecocardiografía reglada. Red: CHV Vic (~30 min: UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO).'
+          },
+          {
+            l: 'Traslado a Vic al margen de la categoría', t: 'Traslado a Vic al margen de la categoría',
+            show: 'Arritmia significativa · hipoxemia que no se controla con Ventimask/reservorio con deterioro rápido · cualquier C que evoluciona a D (↑FC, ↓PA, ↓SpO₂ o ↑FiO₂, oliguria, confusión, ↑lactato o troponina).'
+          },
+          {
+            l: 'Reglas del traslado', t: 'Reglas del traslado',
+            show: 'Nunca trasladar un E antes de estabilizarlo (AHA 2026, clase 3) ni un D sin anticoagulación parenteral en curso. ' + PERT
+          }
+        ]
+      }
+    };
+  })(),
   steps:[
   {type:'info', text:'Recursos locales (Hospital de Campdevànol): angio-TC, troponina, NT-proBNP, lactato 24 h y alteplasa en stock; POCUS si hay urgenciólogo formado. Sin UCI ni ecocardiografía reglada. Red: CHV Vic (~30 min: UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO)'},
   {type:'action', text:'ABC, constantes, ECG y monitor; dos vías si hay compromiso hemodinámico. O₂ para SpO₂ ≥90 %; VMNI/IOT con precaución (la presión positiva puede precipitar el fallo del VD)'},

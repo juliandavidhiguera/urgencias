@@ -3818,8 +3818,8 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
   const c = _flowFarm(pid, nid, j);
   const r = _farmResolver(c);
   if (btn) _latOrigen = btn;
-  const pesoEl = document.getElementById('fl-' + pid + '-peso');
-  const peso = pesoEl ? parseFloat(String(pesoEl.value).replace(',', '.')) : NaN;
+  const pesoEl = document.getElementById('fl-' + pid + '-peso') || document.getElementById('pe-' + pid + '-peso'); // con evaluador, el peso está en él
+  const peso = pesoEl ?parseFloat(String(pesoEl.value).replace(',', '.')) : NaN;
   const d = r.inf;
   const mg = c.mg != null ? c.mg : d ? d.mg : null;
   const vol = c.vol != null ? c.vol : d ? d.vol : null;
