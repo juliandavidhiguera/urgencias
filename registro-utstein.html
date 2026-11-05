@@ -477,7 +477,9 @@ function aplicarDatosPcr(d) {
       _setValIf('ut-tl-primera_epinefrina', d.farmacos.adrenalina.hora);
     }
     calcElapsed();
-    if (d.eventos.rce && d.eventos.rce.chk) document.getElementById('ut-resultado-inicial').value = 'Recuperación';
+    /* Manda el motivo de «Terminar la reanimación»: tras un RCE puede volver a pararse y acabar en éxitus. */
+    if (d.fin) document.getElementById('ut-resultado-inicial').value = d.fin === 'rce' ? 'Recuperación' : 'Éxitus';
+    else if (d.eventos.rce && d.eventos.rce.chk) document.getElementById('ut-resultado-inicial').value = 'Recuperación';
     else if (d.eventos.suspension && d.eventos.suspension.chk) document.getElementById('ut-resultado-inicial').value = 'Éxitus';
   }
 
@@ -492,6 +494,7 @@ function aplicarDatosPcr(d) {
   }
 
   const obsPartes = [];
+  if (d.lineaTiempo) obsPartes.push('Línea de tiempo de la reanimación (tab PCR):\n' + d.lineaTiempo);
   if (d.ritmoLog && d.ritmoLog.length) {
     obsPartes.push('Cambios de ritmo registrados en el tab PCR:\n' + d.ritmoLog.map((r, i) => (i + 1) + '. ' + r.label + ' — ' + r.hora).join('\n'));
   }
@@ -501,7 +504,7 @@ function aplicarDatosPcr(d) {
     ).join('\n'));
   }
   if (d.ciclos) obsPartes.push('Ciclos de RCP (2 min) completados: ' + d.ciclos);
-  if (d.causas && d.causas.length) obsPartes.push('Causas reversibles marcadas (4H/4T): ' + d.causas.join(', '));
+  if (d.causas && d.causas.length) obsPartes.push('Causas reversibles (4H/4T): ' + d.causas.join(' · '));
   if (d.postRosc && d.postRosc.length) obsPartes.push('Cuidados post-RCE marcados: ' + d.postRosc.join(', '));
   if (d.obs) obsPartes.push('Observaciones del tab PCR: ' + d.obs);
   if (obsPartes.length) document.getElementById('ut-obs').value = obsPartes.join('\n\n');

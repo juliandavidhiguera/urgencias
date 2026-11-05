@@ -35,7 +35,7 @@ window.PCR_EVENTOS = [
 window.PCR_FARMACOS = [
   { id: 'adrenalina', nombre: 'Adrenalina', dosis: '1 mg IV/IO', unit: 'mg',
     ritmos: ['no_desfibrilable', 'desfibrilable'],
-    nota: 'No desfibrilable: lo antes posible y luego cada 3–5 min · Desfibrilable: tras la 3ª descarga y luego cada 3–5 min (≈ cada 2 ciclos).' },
+    nota: 'No desfibrilable: lo antes posible y luego cada 4 min · Desfibrilable: tras la 3ª y tras la 5ª descarga (junto con la amiodarona) y luego cada 4 min (cada 2 ciclos). Protocolo local cada 4 min (ERC 2025: 3–5 min).' },
   { id: 'amiodarona', nombre: 'Amiodarona', dosis: '300 mg IV/IO (1ª dosis) · 150 mg IV/IO (2ª dosis)', unit: 'mg',
     ritmos: ['desfibrilable'],
     nota: 'Solo en FV/TV sin pulso refractaria: 300 mg tras la 3ª descarga, 150 mg adicionales tras la 5ª descarga.' },
@@ -98,7 +98,7 @@ window.PCR_FARMACOS_PED = [
       const mg = Math.min(p * 0.01, 1);
       return _pcrPedFmt(mg, 2) + ' mg IV/IO (10 mcg/kg, máx. 1 mg) = ' + _pcrPedFmt(Math.min(p * 0.1, 10), 1) + ' mL de 1:10.000 (0,1 mg/mL)';
     },
-    nota: 'No desfibrilable: lo antes posible y luego cada 4 min (cada 2 ciclos) · Desfibrilable: tras la 3ª descarga y luego cada 4 min. Lavar con 2–10 mL SF. Al cambiar de rama del algoritmo, mantener el intervalo de 4 min.' },
+    nota: 'No desfibrilable: lo antes posible y luego cada 4 min (cada 2 ciclos) · Desfibrilable: tras la 3ª y tras la 5ª descarga (junto con la amiodarona) y luego cada 4 min. Lavar con 2–10 mL SF. Al cambiar de rama del algoritmo, mantener el intervalo de 4 min.' },
   { id: 'amiodarona', nombre: 'Amiodarona', ritmos: ['desfibrilable'],
     dosisPed: function (p) {
       return _pcrPedFmt(Math.min(p * 5, 300), 0) + ' mg IV/IO tras la 3ª descarga (5 mg/kg, máx. 300) · ' +
@@ -113,10 +113,10 @@ window.PCR_FARMACOS_PED = [
 ];
 
 window.PCR_ENERGIA_DESFIB_PED = function (p) {
-  if (!(p > 0)) return 'Introduce el peso para calcular la energía. 4 J/kg (máx. 200 J iniciales) · refractaria desde la 5ª descarga: 6 → 8 J/kg (máx. 360 J).';
+  if (!(p > 0)) return 'Introduce el peso para calcular la energía. 4 J/kg (máx. 200 J iniciales) · refractaria (más de 5 descargas, desde la 6ª): 6 → 8 J/kg (máx. 360 J).';
   const j4 = Math.min(Math.ceil(p * 4), 200), j6 = Math.min(Math.round(p * 6), 360), j8 = Math.min(Math.round(p * 8), 360);
   return 'Descargas iniciales 4 J/kg ≈ ' + j4 + ' J (redondear al alza al nivel disponible; máx. 200 J). ' +
-    'FV/TVSP refractaria (desde la 5ª descarga): escalar a 6 J/kg ≈ ' + j6 + ' J → 8 J/kg ≈ ' + j8 + ' J (máx. 360 J) y revisar/cambiar posición de parches. ' +
+    'FV/TVSP refractaria (más de 5 descargas, desde la 6ª): escalar a 6 J/kg ≈ ' + j6 + ' J → 8 J/kg ≈ ' + j8 + ' J (máx. 360 J) y revisar/cambiar posición de parches. ' +
     'Parches autoadhesivos: antero-posteriores si <25 kg; AP o antero-lateral si >25 kg. Palas de lactante si <10 kg. Cargar comprimiendo, pausa <5 s, retirar O₂ libre. ' +
     'DEA: con atenuador si <25 kg (<8 años); si no hay, DEA de adulto. ' +
     'Paro monitorizado y presenciado con parches puestos (UCIP/quirófano/hemodinámica): hasta 3 descargas consecutivas antes de iniciar compresiones.';

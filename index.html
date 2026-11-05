@@ -411,6 +411,86 @@ body {
 #tab-pcr .metro-ctrl { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; font-size: var(--fs-xs); color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; }
 #tab-pcr .metro-ctrl input[type=range] { flex: 1; min-width: 110px; accent-color: var(--red); }
 #tab-pcr .metro-ctrl output { font-family: var(--mono); font-size: var(--fs-base); min-width: 64px; }
+/* PCR — línea de tiempo de la reanimación (botones grandes: se pulsan con guantes y prisa) */
+.rt-box { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.rt-top { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 8px; align-items: stretch; }
+.rt-clk { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; min-width: 0; }
+.rt-lbl { font-size: var(--fs-xs); color: var(--text2); }
+.rt-val { font-family: var(--mono); font-size: var(--fs-lg); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rt-val.alerta { color: var(--red-text); }
+.rt-112 { display: flex; align-items: center; justify-content: center; padding: 0 12px; border-radius: 6px; background: var(--red); color: #fff; font-weight: 700; text-decoration: none; font-size: var(--fs-base); white-space: nowrap; }
+.rt-ritmo { font-weight: 600; font-size: var(--fs-base); padding: 6px 10px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border); }
+.rt-ritmo.d { background: var(--red-bg); color: var(--red-text); border-color: var(--red); }
+.rt-ritmo.nd { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+.rt-ritmo.ok { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.rt-next { display: flex; flex-direction: column; gap: 6px; }
+.rt-todo { padding: 10px 12px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg2); font-size: var(--fs-md); line-height: 1.35; }
+.rt-todo.ya { border-color: var(--red); background: var(--red-bg); color: var(--red-text); font-weight: 700; }
+.rt-todo small { display: block; font-size: var(--fs-sm); font-weight: 400; color: var(--text2); margin-top: 2px; }
+.rt-todo.ya small { color: var(--red-text); }
+.rt-flow { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.rt-flow:empty { display: none; }
+.rt-flow li { font-size: var(--fs-sm); padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text2); background: var(--bg3); }
+.rt-flow li.hecho { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.rt-flow li.ahora { color: var(--red-text); border-color: var(--red); background: var(--red-bg); font-weight: 700; }
+.rt-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 8px; }
+.rt-b[hidden] { display: none; }
+.rt-b { min-height: 56px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font-size: var(--fs-base); font-weight: 600; font-family: inherit; cursor: pointer; padding: 6px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: manipulation; }
+.rt-b small { font-size: var(--fs-xs); font-weight: 400; color: var(--text2); }
+.rt-b:active { filter: brightness(0.92); }
+.rt-b.rt-d { border-color: var(--red); }
+.rt-b.rt-nd { border-color: var(--blue); }
+.rt-b.rt-ok { border-color: var(--green); }
+.rt-b.rt-end { border-color: var(--text2); grid-column: 1 / -1; }
+.rt-fin { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg3); }
+.rt-fin[hidden], .rt-btns[hidden] { display: none; }
+.rt-fin-q { font-weight: 700; font-size: var(--fs-base); }
+.rt-b.sug { background: var(--red-bg); color: var(--red-text); border-width: 2px; }
+.rt-b:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.rt-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+#tab-pcr .rt-opts .btn-now.on { background: var(--blue-bg); border-color: var(--blue); color: var(--blue); }
+.rt-voz-estado { font-size: var(--fs-sm); color: var(--text2); }
+.rt-line { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.rt-line li { display: grid; grid-template-columns: 64px 46px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: var(--fs-sm); align-items: baseline; }
+.rt-line li .t { font-family: var(--mono); font-weight: 700; }
+.rt-line li .h { font-family: var(--mono); color: var(--text2); }
+.rt-line li.prox { color: var(--text2); border-bottom-style: dashed; }
+.rt-line li.prox .t { font-weight: 400; }
+@media (max-width: 420px) {
+  .rt-top { grid-template-columns: repeat(3, 1fr); }
+  .rt-112 { grid-column: 1 / -1; min-height: 44px; }
+  .rt-val { font-size: var(--fs-md); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rt-todo.ya { animation: rt-pulso 1.2s ease-out infinite alternate; }
+  @keyframes rt-pulso { from { box-shadow: 0 0 0 0 var(--red); } to { box-shadow: 0 0 0 3px transparent; } }
+}
+/* Barra fija de la reanimación (por encima del contenido, por debajo de modales y panel lateral) */
+.rt-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: calc(var(--z-header) + 1); display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--bg2); border-top: 2px solid var(--red); box-shadow: 0 -4px 14px rgba(0,0,0,.18); }
+.rt-bar[hidden] { display: none; }
+body.rt-bar-on { padding-bottom: var(--rt-bar-h, 128px); }
+body.rt-bar-on .toast { bottom: calc(var(--rt-bar-h, 128px) + 12px); }
+.rt-bar-info { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rt-bar-info:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+.rt-bar-clk { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text2); display: flex; flex-wrap: wrap; gap: 0 12px; }
+.rt-bar-clk b { color: var(--text); font-variant-numeric: tabular-nums; }
+.rt-bar-clk b.alerta { color: var(--red-text); }
+.rt-bar-next { font-weight: 700; font-size: var(--fs-base); line-height: 1.25; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rt-bar-next.ya { color: var(--red-text); }
+.rt-bar-last { font-size: var(--fs-xs); color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rt-bar-btns { display: flex; flex-direction: column; gap: 6px; grid-column: 2; grid-row: 1 / span 2; }
+.rt-bar-info { grid-column: 1; }
+.rt-bar-ok { grid-column: 1; display: flex; flex-wrap: wrap; gap: 6px; }
+.rt-bar-ok[hidden] { display: none; }
+.rt-hecho { min-height: 40px; padding: 0 12px; border-radius: 8px; border: 2px solid var(--red); background: var(--red-bg); color: var(--red-text); font: 700 var(--fs-sm) var(--sans); cursor: pointer; touch-action: manipulation; }
+.rt-hecho.pend { border-color: var(--border); background: var(--bg3); color: var(--text); border-width: 1px; }
+.rt-line li.ahora { grid-template-columns: 64px 1fr; color: var(--red-text); }
+.rt-line li.ahora.pend { color: var(--text); }
+.rt-line li.ahora .t { font-weight: 700; }
+.rt-line li.ahora .acc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.rt-bar-b { min-height: 44px; min-width: 104px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font: 600 var(--fs-sm) var(--sans); display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; touch-action: manipulation; }
+.rt-bar-b.on { background: var(--red); border-color: var(--red); color: #fff; }
+.rt-bar-112 { background: var(--red); border-color: var(--red); color: #fff; }
 #tab-intubacion .drug-row, #tab-pcr .drug-row { padding: 8px 14px; border-bottom: 1px solid var(--bg3); }
 #tab-intubacion .drug-row:last-child, #tab-pcr .drug-row:last-child { border-bottom: none; }
 #tab-intubacion .drug-head, #tab-pcr .drug-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -912,6 +992,18 @@ label.fl-ask-hint { display: block; }
 .field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 .field input.missing { border-color: var(--amber); }
 
+/* 4H/4T con tres estados (sospecha / tratada / descartada); pulsar el activo lo quita */
+.causas-list { padding: 2px 14px 12px; }
+.causa-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.causa-row:last-child { border-bottom: 0; }
+.causa-txt { flex: 1 1 220px; font-size: var(--fs-sm); }
+.causa-ops { display: flex; gap: 4px; }
+.causa-op { min-height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); font: 600 var(--fs-xs) var(--sans); cursor: pointer; touch-action: manipulation; }
+.causa-op[aria-pressed="true"].sospecha { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.causa-op[aria-pressed="true"].tratada { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.causa-op[aria-pressed="true"].descartada { background: var(--bg2); border-color: var(--text2); color: var(--text); }
+.causa-op:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
 .chk-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -1367,6 +1459,54 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
     <div id="pcr-epals-flow"></div>
   </details>
 
+  <div class="subhead">⏱ Reanimación en curso — línea de tiempo y siguiente paso</div>
+  <div class="rt-box" id="rt-box">
+    <div class="rt-top">
+      <div class="rt-clk"><span class="rt-lbl">Tiempo de paro</span><span class="rt-val" id="rt-total">--:--</span></div>
+      <div class="rt-clk"><span class="rt-lbl">Ciclo de 2 min</span><span class="rt-val" id="rt-ciclo">--:--</span></div>
+      <div class="rt-clk"><span class="rt-lbl">Próx. adrenalina</span><span class="rt-val" id="rt-adr">—</span></div>
+      <a class="rt-112" href="tel:112" aria-label="Llamar al 112">📞 112</a>
+    </div>
+    <div class="rt-ritmo" id="rt-ritmo">Ritmo: sin evaluar · soporte vital básico</div>
+    <div class="rt-next" id="rt-next" aria-live="assertive"></div>
+    <ol class="rt-flow" id="rt-flow" aria-label="Flujograma del ritmo actual"></ol>
+    <div class="rt-btns">
+      <button class="rt-b" id="rt-b-inicio" data-a="inicio" onclick="rtAccion('inicio')">▶ Iniciar RCP</button>
+      <button class="rt-b" id="rt-b-sva" data-a="sva" onclick="rtAccion('sva')">🩸 Acceso vascular + monitor</button>
+      <button class="rt-b rt-d" data-a="desf" onclick="rtAccion('desf')">⚡ Ritmo desfibrilable<small>FV / TV sin pulso</small></button>
+      <button class="rt-b rt-nd" data-a="nodesf" onclick="rtAccion('nodesf')">〰 No desfibrilable<small>asistolia / AESP</small></button>
+      <button class="rt-b rt-d" data-a="descarga" onclick="rtAccion('descarga')">⚡ Descarga dada</button>
+      <button class="rt-b" data-a="adrenalina" onclick="rtAccion('adrenalina')">💉 Adrenalina dada</button>
+      <button class="rt-b" data-a="amiodarona" onclick="rtAccion('amiodarona')">💊 Amiodarona dada</button>
+      <button class="rt-b rt-undo" data-a="deshacer" onclick="rtAccion('deshacer')">↶ Deshacer el último</button>
+      <button class="rt-b rt-end" data-a="terminar" onclick="rtAccion('terminar')">⏹ Terminar la reanimación</button>
+    </div>
+    <div class="rt-fin" id="rt-fin" hidden>
+      <div class="rt-fin-q">¿Cómo termina la reanimación?</div>
+      <div class="rt-btns">
+        <button class="rt-b rt-ok" onclick="rtTerminar('rce')">💓 RCE mantenido</button>
+        <button class="rt-b rt-end" onclick="rtTerminar('exitus')">⏹ Suspensión de maniobras (éxitus)</button>
+        <button class="rt-b rt-undo" onclick="rtFinCancelar()">↩ Seguir con la RCP</button>
+      </div>
+    </div>
+    <div class="rt-fin" id="rt-fin-ok" hidden>
+      <div class="rt-fin-q" id="rt-fin-txt"></div>
+      <div class="rt-btns">
+        <button class="rt-b" onclick="rtPdf()">🖨️ PDF del registro</button>
+        <button class="rt-b" onclick="abrirRegistroUtstein()">📄 Registro Utstein</button>
+        <button class="rt-b rt-d" id="rt-reparada" onclick="rtReparada()">🔁 Nueva parada (pierde el pulso)</button>
+        <button class="rt-b rt-undo" onclick="rtAccion('deshacer')">↶ Reabrir (terminada por error)</button>
+      </div>
+    </div>
+    <div class="rt-opts">
+      <button class="btn-now" id="rt-voz" aria-pressed="false" onclick="rtVoz()">🎤 Órdenes por voz</button>
+      <button class="btn-now on" id="rt-habla" aria-pressed="true" onclick="rtHabla()">🔊 Avisos hablados</button>
+      <button class="btn-now on" id="rt-pitido" aria-pressed="true" onclick="rtPitido()">🔔 Pitido a los 2 min</button>
+    </div>
+    <div class="rt-voz-estado" id="rt-voz-estado" hidden></div>
+    <ol class="rt-line" id="rt-line" aria-label="Línea de tiempo del paro"></ol>
+  </div>
+
   <div class="subhead">Metrónomo de compresiones — ERC: 100–120/min</div>
   <div class="metro-row">
     <button class="btn-now" id="pcr-metro-btn" onclick="toggleMetronomo()" aria-pressed="false">▶ Activar metrónomo</button>
@@ -1419,8 +1559,8 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
   <div class="subhead" id="pcr-farmacos-titulo">Medicación del paro (dosis fija de adulto)</div>
   <div id="pcr-farmacos"></div>
 
-  <div class="subhead">Causas reversibles (4H / 4T)</div>
-  <div class="chk-grid" id="pcr-causas"></div>
+  <div class="subhead">Causas reversibles (4H / 4T) — marca cada una: sospecha, tratada o descartada</div>
+  <div class="causas-list" id="pcr-causas"></div>
 
   <div class="subhead">Cuidados post-RCE (retorno de circulación espontánea)</div>
   <div class="chk-grid" id="pcr-postrosc"></div>
@@ -1432,8 +1572,6 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 
   <div class="btn-row" style="padding: 0 14px 14px;">
     <button class="btn btn-copy" onclick="copyPcrReport()">📋 Copiar informe</button>
-    <button class="btn" onclick="printPcrReport()">🖨️ Imprimir / Guardar PDF</button>
-    <button class="btn" onclick="abrirRegistroUtstein()">📄 Registro Utstein (con los datos de este evento)</button>
     <button class="reset-btn" style="margin-top:0" onclick="resetPcr()">↺ Reset</button>
   </div>
 </div>
@@ -1460,6 +1598,20 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 </div><!-- end tab-bibliografia -->
 
 </div><!-- main -->
+
+<!-- Barra fija de la reanimación: siempre visible en la pestaña PCR y, con un paro en curso, en todas -->
+<div class="rt-bar" id="rt-bar" role="region" aria-label="Reanimación en curso" hidden>
+  <button class="rt-bar-info" onclick="rtIrPanel()" aria-label="Ir a la línea de tiempo de la reanimación">
+    <span class="rt-bar-clk"><span aria-label="Tiempo de paro">⏱ <b id="rtb-total">--:--</b></span><span aria-label="Ciclo de 2 minutos">↻ <b id="rtb-ciclo">--:--</b></span><span aria-label="Adrenalina">💉 <b id="rtb-adr">—</b></span></span>
+    <span class="rt-bar-next" id="rtb-next"></span>
+    <span class="rt-bar-last" id="rtb-last"></span>
+  </button>
+  <div class="rt-bar-ok" id="rtb-ok" hidden></div>
+  <div class="rt-bar-btns">
+    <button class="rt-bar-b" id="rtb-metro" aria-pressed="false" onclick="toggleMetronomo()">▶ Metrónomo</button>
+    <a class="rt-bar-b rt-bar-112" href="tel:112" aria-label="Llamar al 112">📞 112</a>
+  </div>
+</div>
 
 <div class="ficha-overlay" id="ficha-overlay" style="display:none" onclick="if(event.target===this) closeFicha()">
   <div class="ficha-modal" id="ficha-modal" role="dialog" aria-modal="true" aria-labelledby="ficha-modal-title" tabindex="-1"></div>
@@ -1603,6 +1755,7 @@ function showTab(name, btn) {
   btn.setAttribute('aria-selected', 'true');
   btn.setAttribute('tabindex', '0');
   window.scrollTo(0, 0);
+  rtBar();
 }
 
 function onNavKeydown(e) {
@@ -3391,10 +3544,33 @@ function renderPcrFarmacos() {
   ).join('');
 }
 
+/* Estado de cada causa reversible: índice → 'sospecha' | 'tratada' | 'descartada'. Solo en memoria. */
+let pcrCausaEstado = {};
+const PCR_CAUSA_ESTADOS = [['sospecha', 'Sospecha'], ['tratada', 'Tratada'], ['descartada', 'Descartada']];
+
 function renderPcrCausas() {
+  pcrCausaEstado = {};
   document.getElementById('pcr-causas').innerHTML = _pcrCausasLista().map((c, i) =>
-    '<label class="chk"><input type="checkbox" id="pcr-causa-' + i + '">' + c + '</label>'
+    '<div class="causa-row" role="group" aria-label="' + _pcrCausaCorta(c) + '"><span class="causa-txt">' + c + '</span><span class="causa-ops">' +
+      PCR_CAUSA_ESTADOS.map(([k, l]) => '<button class="causa-op ' + k + '" id="pcr-causa-' + i + '-' + k + '" aria-pressed="false" onclick="marcarCausaPcr(' + i + ', \'' + k + '\')">' + l + '</button>').join('') +
+    '</span></div>'
   ).join('');
+}
+
+function marcarCausaPcr(i, k) {
+  if (pcrCausaEstado[i] === k) delete pcrCausaEstado[i]; else pcrCausaEstado[i] = k;
+  PCR_CAUSA_ESTADOS.forEach(([e]) => document.getElementById('pcr-causa-' + i + '-' + e).setAttribute('aria-pressed', pcrCausaEstado[i] === e ? 'true' : 'false'));
+}
+
+/* Nombre corto de la causa (sin la pauta de tratamiento) para el informe y el Utstein. */
+function _pcrCausaCorta(c) { return c.split(' — ')[0].split(' (')[0]; }
+
+/* ['Sospecha: …', 'Tratada: …', 'Descartada: …'] solo con los grupos que tienen alguna. */
+function _pcrCausasGrupos() {
+  return PCR_CAUSA_ESTADOS.map(([k, l]) => {
+    const c = _pcrCausasLista().filter((x, i) => pcrCausaEstado[i] === k).map(_pcrCausaCorta);
+    return c.length ? l + ': ' + c.join(', ') : '';
+  }).filter(Boolean);
 }
 
 function renderPcrPostRosc() {
@@ -3494,11 +3670,11 @@ function calcPcr() {
     if (dado && ritmo && d.ritmos.includes(ritmo)) {
       const info = _pcrDosisInfo(d.id);
       if (d.id === 'adrenalina') {
-        const min = ped ? 4 : 3;
+        const min = 4; // protocolo local: cada 4 min en adulto y niño (ERC 2025: adulto 3–5, niño 4)
         if (info.ultima === null) repetir = '<span class="drug-flag pref-estable">registra cada dosis con «+ Dosis» para avisar de la siguiente</span>';
         else {
           const m = (Date.now() - info.ultima) / 60000;
-          repetir = m >= min ? '<span class="drug-flag pref-inestable">▶ repetir ahora (' + Math.floor(m) + ' min desde la última · cada ' + (ped ? '4' : '3–5') + ' min)</span>'
+          repetir = m >= min ? '<span class="drug-flag pref-inestable">▶ repetir ahora (' + Math.floor(m) + ' min desde la última · cada 4 min)</span>'
             : '<span class="drug-flag pref-estable">próxima dosis en ~' + Math.ceil(min - m) + ' min</span>';
         }
       } else if (info.n < 2 && !(ped && d.id === 'lidocaina')) {
@@ -3524,16 +3700,16 @@ function calcPcr() {
       recEl.innerHTML = '<strong>No desfibrilable (asistolia / AESP / bradicardia &lt;60 sin signos de vida):</strong> adrenalina ' + adr + ' IV/IO lo antes posible, luego cada 4 min (2 ciclos). Reevaluar ritmo cada 2 min. Buscar 4H/4T.';
     } else {
       recEl.innerHTML = '<strong>Desfibrilable (FV / TV sin pulso):</strong> descarga 4 J/kg → RCP 2 min → reevaluar. ' +
-        (descargas >= 5 ? 'Tras la 5ª descarga: amiodarona ' + ami2 + ' + escalar energía a 6–8 J/kg; adrenalina cada 4 min.'
+        (descargas >= 5 ? 'Tras la 5ª descarga: adrenalina ' + adr + ' + amiodarona ' + ami2 + '; desde la 6ª descarga, escalar la energía a 6–8 J/kg (máx. 360 J). Adrenalina cada 4 min.'
          : descargas >= 3 ? 'Tras la 3ª descarga: adrenalina ' + adr + ' + amiodarona ' + ami1 + ' (o lidocaína 1 mg/kg).'
          : 'Adrenalina y amiodarona se inician tras la 3ª descarga si persiste el ritmo desfibrilable.');
     }
     if (!p) recEl.innerHTML += ' <em>Introduce el peso para ver dosis en mg.</em>';
   } else if (ritmo === 'no_desfibrilable') {
-    recEl.innerHTML = '<strong>No desfibrilable (Asistolia/AESP):</strong> Adrenalina 1 mg IV/IO lo antes posible, luego cada 3–5 min (≈ cada 2 ciclos). Reevaluar ritmo cada 2 min.';
+    recEl.innerHTML = '<strong>No desfibrilable (Asistolia/AESP):</strong> Adrenalina 1 mg IV/IO lo antes posible, luego cada 4 min (cada 2 ciclos; ERC 2025: 3–5 min). Reevaluar ritmo cada 2 min.';
   } else {
     recEl.innerHTML = '<strong>Desfibrilable (FV/TV sin pulso):</strong> descarga → RCP 2 min → reevaluar ritmo. ' +
-      (descargas >= 5 ? 'Tras la 5ª descarga: 2ª dosis de amiodarona (150 mg) o lidocaína (50 mg), y adrenalina si corresponde por tiempo.'
+      (descargas >= 5 ? 'Tras la 5ª descarga: adrenalina 1 mg + 2ª dosis de amiodarona 150 mg (o lidocaína 50 mg), juntas.'
        : descargas >= 3 ? 'Tras la 3ª descarga: adrenalina 1 mg + amiodarona 300 mg (o lidocaína 100 mg si no hay amiodarona).'
        : 'Adrenalina y antiarrítmico se inician tras la 3ª descarga si persiste el ritmo desfibrilable.');
   }
@@ -3569,8 +3745,8 @@ function _pcrDescargasLogTexto() {
 }
 
 function _pcrCausasTexto() {
-  const marcadas = _pcrCausasLista().filter((c, i) => document.getElementById('pcr-causa-' + i).checked);
-  return marcadas.length ? marcadas.join(', ') : 'Ninguna marcada';
+  const g = _pcrCausasGrupos();
+  return g.length ? g.join('\n') : 'Ninguna valorada';
 }
 
 function _pcrPostRoscTexto() {
@@ -3592,6 +3768,9 @@ function _pcrReportText() {
 Algoritmo: ${modoTexto}
 Paro presenciado: ${presenciado === 'si' ? 'Sí' : presenciado === 'no' ? 'No' : 'Sin especificar'} · Monitorizado: ${monitorizado === 'si' ? 'Sí' : monitorizado === 'no' ? 'No' : 'Sin especificar'}
 Ritmo actual: ${ritmoTexto} · Ciclos de RCP (2 min): ${ciclos} · Nº de desfibrilaciones: ${pcrDescargasLog.length}
+
+--- LÍNEA DE TIEMPO DE LA REANIMACIÓN ---
+${_rtLineaTexto()}
 
 --- CAMBIOS DE RITMO REGISTRADOS ---
 ${_pcrRitmoLogTexto()}
@@ -3617,16 +3796,6 @@ ${obs}`;
 
 function copyPcrReport() {
   navigator.clipboard.writeText(_pcrReportText()).then(showToast).catch(showCopyError);
-}
-
-function printPcrReport() {
-  const w = window.open('', '_blank');
-  const html = '<pre style="font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;padding:24px;color:#111">' +
-    _pcrReportText().replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre>';
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Registro de PCR</title></head><body>' + html + '</body></html>');
-  w.document.close();
-  w.focus();
-  w.print();
 }
 
 /* Metrónomo de compresiones: Web Audio con planificación anticipada para que el
@@ -3670,6 +3839,7 @@ function toggleMetronomo() {
     btn.classList.remove('on');
     btn.textContent = '▶ Activar metrónomo';
     btn.setAttribute('aria-pressed', 'false');
+    rtBar();
     return;
   }
   if (!_metroCtx) {
@@ -3685,9 +3855,11 @@ function toggleMetronomo() {
   btn.classList.add('on');
   btn.textContent = '■ Parar metrónomo';
   btn.setAttribute('aria-pressed', 'true');
+  rtBar();
 }
 
 function resetPcr() {
+  rtReset();
   pcrRitmoLog = [];
   pcrDescargasLog = [];
   pcrDosisLog = {};
@@ -3710,6 +3882,507 @@ function resetPcr() {
   document.getElementById('pcr-ciclos').value = '0';
   document.getElementById('pcr-obs').value = '';
   calcPcr();
+}
+
+/* ==================================================================
+   PCR — línea de tiempo de la reanimación
+   El reloj empieza con «Iniciar RCP». El soporte vital avanzado empieza con
+   «Acceso vascular + monitor»: desde ahí cuentan los ciclos de 2 min y la
+   adrenalina cada 4 min (protocolo local, adulto y niño; ERC 2025: adulto 3–5
+   min, niño 4 min). Cada botón escribe en los registros de abajo (ritmos,
+   descargas, dosis, checklist), así el informe y el Utstein no cambian.
+   Desfibrilable: amiodarona tras la 3.ª y la 5.ª descarga; en niños, 4 J/kg y,
+   con más de 5 descargas (desde la 6.ª), 6–8 J/kg, máx. 360 J (ERC 2025 PLS,
+   PMID 41117571). Estado solo en memoria: nunca en localStorage.
+   ================================================================== */
+const RT_CICLO = 120000, RT_ADR = 240000;
+const rt = { t0: null, tSva: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, ev: [], avisos: {},
+  tick: null, voz: false, habla: true, pitido: true, rec: null, recActivo: false, hablando: 0, sordoHasta: 0, wake: null };
+
+function _rtFmt(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function _rtHora(ms) { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function _rtShocks() { return pcrDescargasLog.length; }
+function _rtDosis(id) { return (pcrDosisLog[id] || []).length; }
+function _rtUltAdr() { const l = pcrDosisLog.adrenalina || []; return l.length ? l[l.length - 1] : null; }
+function _rtAntiarr() { return _rtDosis('amiodarona') + _rtDosis('lidocaina'); }
+
+function _rtAdr() {
+  if (!_pcrEsPed()) return { txt: '1 mg IV/IO', voz: 'un miligramo' };
+  const p = _pcrPeso();
+  if (!p) return { txt: '10 µg/kg IV/IO (introduce el peso)', voz: '10 microgramos por kilo' };
+  const mg = _pcrPedFmt(Math.min(p * 0.01, 1), 2);
+  return { txt: mg + ' mg IV/IO (10 µg/kg)', voz: mg + ' miligramos' };
+}
+function _rtAmio(n) {
+  const max = n === 1 ? 300 : 150;
+  if (!_pcrEsPed()) return { txt: max + ' mg IV/IO', voz: max + ' miligramos' };
+  const p = _pcrPeso();
+  if (!p) return { txt: '5 mg/kg IV/IO (máx. ' + max + ' mg; introduce el peso)', voz: '5 miligramos por kilo' };
+  const mg = _pcrPedFmt(Math.min(p * 5, max), 0);
+  return { txt: mg + ' mg IV/IO (5 mg/kg)', voz: mg + ' miligramos' };
+}
+/* k = número de la descarga que toca. j = julios para el registro (vacío si depende del equipo). */
+function _rtEnergia(k) {
+  if (!_pcrEsPed()) return k === 1 ? { txt: '≥150 J bifásica (o la del fabricante)', j: '', voz: '150 julios o más' }
+    : { txt: '≥150 J, escalando si el equipo lo permite', j: '', voz: 'escalar la energía si el equipo lo permite' };
+  const p = _pcrPeso();
+  if (k <= 5) {
+    if (!p) return { txt: '4 J/kg (introduce el peso)', j: '', voz: '4 julios por kilo' };
+    const j = Math.min(Math.ceil(p * 4), 200);
+    return { txt: '4 J/kg ≈ ' + j + ' J', j, voz: j + ' julios' };
+  }
+  if (!p) return { txt: '6–8 J/kg, máx. 360 J (refractaria: más de 5 descargas; introduce el peso)', j: '', voz: '6 a 8 julios por kilo' };
+  const j6 = Math.min(Math.round(p * 6), 360), j8 = Math.min(Math.round(p * 8), 360);
+  return { txt: '6–8 J/kg ≈ ' + j6 + '–' + j8 + ' J, máx. 360 J (refractaria: más de 5 descargas)', j: j6, voz: 'subir a ' + j6 + ' julios' };
+}
+
+/* Lo que toca ahora, en orden. ya = hay que hacerlo ya; id = instancia, para avisar una sola vez. */
+function _rtTareas(now) {
+  const T = [];
+  if (rt.fin) return [{ k: 'fin', txt: 'Reanimación terminada: ' + (rt.fin.motivo === 'rce' ? 'RCE mantenido' : 'suspensión de maniobras (éxitus)') + (rt.t0 ? ' · duración ' + _rtFmt(rt.fin.t - rt.t0) : ''), sub: 'PDF del registro generado y Utstein abierto para completarlo.' + (rt.fin.motivo === 'rce' ? ' Cuidados post-RCE más abajo.' : '') }];
+  if (!rt.t0) return [{ k: 'inicio', txt: 'Pulsa «Iniciar RCP» al empezar las compresiones', sub: 'O di «iniciar» con las órdenes por voz activadas.' }];
+  if (rt.rce) return [{ k: 'ritmo', ya: true, id: 'np' + rt.ev.length, txt: 'NUEVA PARADA: evaluar el ritmo y reanudar la RCP', sub: 'Pulsa el ritmo que ves.', voz: 'Nueva parada. Evaluar el ritmo' }];
+  const sh = _rtShocks(), am = _rtAntiarr();
+  if (rt.ciclo0 && now - rt.ciclo0 >= RT_CICLO) T.push({ k: 'evaluar', ya: true, id: 'ev' + rt.ciclo0, txt: 'EVALUAR EL RITMO (pausa <5 s)', sub: 'Pulsa lo que ves: desfibrilable o no desfibrilable; si hay pulso, «Terminar la reanimación» → RCE. Cambiar de reanimador.', voz: 'Dos minutos. Evaluar el ritmo' });
+  if (!rt.ritmo) T.push({ k: 'ritmo', ya: !!rt.tSva, id: 'ri' + rt.tSva, txt: 'Monitor o DEA: evaluar el ritmo cuanto antes', sub: 'RCP 30:2 de calidad mientras tanto.', voz: 'Evaluar el ritmo' });
+  if (rt.pendDescarga) {
+    const e = _rtEnergia(sh + 1);
+    T.push({ k: 'descarga', ya: true, id: 'de' + sh, txt: 'DESCARGA n.º ' + (sh + 1) + ': ' + e.txt, sub: 'Cargar comprimiendo, apartarse, descargar y RCP inmediata 2 min sin comprobar el pulso.', voz: 'Descarga número ' + (sh + 1) + ', ' + e.voz });
+  }
+  if (!rt.tSva) T.push({ k: 'sva', txt: 'Acceso vascular IV/IO y monitorización', sub: 'Al ponerlos empieza el soporte vital avanzado: ciclos de 2 min y adrenalina cada 4 min.' });
+  const u = _rtUltAdr();
+  /* Desfibrilable: la adrenalina va junto con la amiodarona tras la 3.ª y tras la 5.ª descarga
+     (protocolo; ERC 2025). Si ya se puso una hace menos de 3 min (mínimo de la ERC), sigue el reloj de 4 min. */
+  const hito = rt.ritmo === 'd' ? (sh >= 5 ? 5 : sh >= 3 ? 3 : 0) : 0, tHito = hito && (pcrDescargasLog[hito - 1] || {}).t;
+  const adrHito = !!hito && u !== null && (!tHito || u < tHito) && now - u >= 180000;
+  if (rt.ritmo === 'nd' || sh >= 3 || u !== null) {
+    const a = _rtAdr(), falta = u === null ? 0 : RT_ADR - (now - u);
+    if (!rt.tSva) T.push({ k: 'adr', txt: 'Adrenalina ' + a.txt + ' en cuanto haya acceso vascular', sub: rt.ritmo === 'nd' ? 'No desfibrilable: lo antes posible.' : 'Tras la 3.ª descarga.' });
+    else if (falta <= 0 || adrHito) T.push({ k: 'adr', ya: true, id: 'ad' + (u || 0), txt: 'ADRENALINA ' + a.txt,
+      sub: u === null ? (rt.ritmo === 'nd' ? 'No desfibrilable: lo antes posible.' : 'Tras la 3.ª descarga, junto con la amiodarona.')
+        : adrHito && falta > 0 ? 'Tras la ' + hito + '.ª descarga, junto con la amiodarona (' + Math.floor((now - u) / 60000) + ' min desde la última).'
+        : Math.floor((now - u) / 60000) + ' min desde la última (cada 4 min).', voz: 'Adrenalina, ' + a.voz });
+  }
+  if (rt.ritmo === 'd' && ((sh >= 3 && am === 0) || (sh >= 5 && am === 1))) {
+    const n = am + 1, a = _rtAmio(n);
+    T.push({ k: 'amio', ya: !!rt.tSva, id: 'am' + n, txt: 'AMIODARONA ' + a.txt + ' (' + n + '.ª dosis)', sub: (n === 1 ? 'Tras la 3.ª descarga' : 'Tras la 5.ª descarga') + (T.some(t => t.k === 'adr') || u === null ? ', junto con la adrenalina.' : ' (adrenalina puesta hace ' + Math.floor((now - u) / 60000) + ' min: sigue su reloj de 4 min).') + (rt.tSva ? '' : ' En cuanto haya acceso vascular.') + ' Alternativa: lidocaína.', voz: 'Amiodarona, ' + a.voz });
+  }
+  if (!T.some(t => t.ya)) T.push({ k: 'rcp', txt: 'RCP de calidad, sin pausas', sub: 'Compresiones 100–120/min · capnografía · vía aérea · buscar y tratar 4H/4T.' + (rt.ritmo === 'd' && sh >= 3 && !_pcrEsPed() ? ' Refractaria: revisar los parches o cambiar el vector.' : '') });
+  return T;
+}
+
+/* Flujograma del ritmo actual: los pasos en fila, con el que toca marcado. */
+function _rtFlujo(T) {
+  if (!rt.t0 || rt.rce || !rt.ritmo) return [];
+  const ya = k => T.some(t => t.k === k && t.ya), sh = _rtShocks(), am = _rtAntiarr(), adr = _rtDosis('adrenalina');
+  const rcp = !ya('evaluar') && !rt.pendDescarga;
+  if (rt.ritmo === 'd') return [
+    ['⚡ Descarga', rt.pendDescarga ? 'ahora' : sh ? 'hecho' : ''],
+    ['RCP 2 min', rcp && sh ? 'ahora' : ''],
+    ['Evaluar el ritmo', ya('evaluar') ? 'ahora' : ''],
+    ['Tras la 3.ª: adrenalina + amiodarona', sh >= 3 ? (adr && am ? 'hecho' : 'ahora') : ''],
+    ['Tras la 5.ª: adrenalina + amiodarona (2.ª)', sh >= 5 ? (am >= 2 && !ya('adr') ? 'hecho' : 'ahora') : ''],
+    _pcrEsPed() ? ['Desde la 6.ª: 6–8 J/kg', sh >= 5 && rt.pendDescarga ? 'ahora' : ''] : ['Refractaria: parches / vector', sh >= 3 && rt.pendDescarga ? 'ahora' : ''],
+    ['Adrenalina cada 4 min', ya('adr') ? 'ahora' : '']
+  ];
+  return [
+    ['Adrenalina lo antes posible', adr ? 'hecho' : 'ahora'],
+    ['RCP 2 min', rcp ? 'ahora' : ''],
+    ['Evaluar el ritmo', ya('evaluar') ? 'ahora' : ''],
+    ['Adrenalina cada 4 min', adr && ya('adr') ? 'ahora' : ''],
+    ['4H / 4T', '']
+  ];
+}
+
+/* Botones «✓ Hecho» de lo sugerido: cada tarea se acepta con la misma acción que su botón. */
+const RT_ACEPTAR = {
+  inicio: [['inicio', '▶ Iniciar RCP']], sva: [['sva', '✓ Acceso + monitor puestos']],
+  evaluar: [['desf', '⚡ Desfibrilable'], ['nodesf', '〰 No desfibrilable']], ritmo: [['desf', '⚡ Desfibrilable'], ['nodesf', '〰 No desfibrilable']],
+  descarga: [['descarga', '✓ Descarga hecha']], adr: [['adrenalina', '✓ Adrenalina puesta']], amio: [['amiodarona', '✓ Amiodarona puesta']]
+};
+function _rtAceptarHtml(t) {
+  return RT_ACEPTAR[t.k].map(([a, l]) => '<button class="rt-hecho' + (t.ya ? '' : ' pend') + '" onclick="rtAccion(\'' + a + '\')">' + l + '</button>').join('');
+}
+
+const RT_BOTON = { inicio: ['inicio'], evaluar: ['desf', 'nodesf'], ritmo: ['desf', 'nodesf'], descarga: ['descarga'], adr: ['adrenalina'], amio: ['amiodarona'], sva: ['sva'] };
+
+function rtRender() {
+  const box = document.getElementById('rt-box');
+  if (!box) return;
+  const now = rt.fin ? rt.fin.t : Date.now(), T = _rtTareas(now);
+  const el = id => document.getElementById(id);
+  el('rt-total').textContent = rt.t0 ? _rtFmt(now - rt.t0) : '--:--';
+  const ciclo = el('rt-ciclo');
+  if (rt.ciclo0 && !rt.rce) { const f = RT_CICLO - (now - rt.ciclo0); ciclo.textContent = f > 0 ? _rtFmt(f) : 'EVALUAR'; ciclo.classList.toggle('alerta', f <= 0); }
+  else { ciclo.textContent = '--:--'; ciclo.classList.remove('alerta'); }
+  const adrEl = el('rt-adr'), u = _rtUltAdr(), adrT = T.find(t => t.k === 'adr');
+  if (rt.rce || !rt.t0) { adrEl.textContent = u ? _rtHora(u) : '—'; adrEl.classList.remove('alerta'); }
+  else if (adrT && adrT.ya) { adrEl.textContent = 'AHORA'; adrEl.classList.add('alerta'); }
+  else if (adrT) { adrEl.textContent = 'al acceso'; adrEl.classList.remove('alerta'); }
+  else if (u !== null) { adrEl.textContent = _rtFmt(RT_ADR - (now - u)); adrEl.classList.remove('alerta'); }
+  else { adrEl.textContent = '—'; adrEl.classList.remove('alerta'); }
+
+  const r = el('rt-ritmo');
+  r.className = 'rt-ritmo' + (rt.rce ? ' ok' : rt.ritmo ? ' ' + rt.ritmo : '');
+  r.textContent = !rt.t0 ? 'Sin iniciar' : (rt.rce ? '💓 RCE — circulación espontánea'
+    : rt.ritmo === 'd' ? '⚡ Desfibrilable (FV / TV sin pulso)' : rt.ritmo === 'nd' ? '〰 No desfibrilable (asistolia / AESP)' : 'Ritmo sin evaluar') +
+    ' · ' + (rt.tSva ? 'soporte vital avanzado' : 'soporte vital básico') +
+    ' · descargas ' + _rtShocks() + ' · adrenalina ' + _rtDosis('adrenalina') + ' · antiarrítmico ' + _rtAntiarr();
+
+  el('rt-next').innerHTML = T.map(t => '<div class="rt-todo' + (t.ya ? ' ya' : '') + '">' + t.txt + (t.sub ? '<small>' + t.sub + '</small>' : '') + '</div>').join('');
+  el('rt-flow').innerHTML = _rtFlujo(T).map(([txt, st]) => '<li' + (st ? ' class="' + st + '"' : '') + '>' + (st === 'hecho' ? '✓ ' : st === 'ahora' ? '▶ ' : '') + txt + '</li>').join('');
+
+  const sug = new Set();
+  T.filter(t => t.ya || t.k === 'inicio' || t.k === 'sva').forEach(t => (RT_BOTON[t.k] || []).forEach(a => sug.add(a)));
+  box.querySelectorAll('.rt-b[data-a]').forEach(b => b.classList.toggle('sug', sug.has(b.dataset.a)));
+  el('rt-b-inicio').hidden = !!rt.t0;
+  box.querySelector('.rt-btns').hidden = !!rt.fin;
+  el('rt-fin-ok').hidden = !rt.fin;
+  el('rt-reparada').hidden = !rt.fin || rt.fin.motivo !== 'rce';
+  if (rt.fin) { el('rt-fin').hidden = true; el('rt-fin-txt').textContent = T[0].txt; }
+  el('rt-b-sva').hidden = !!rt.tSva;
+
+  /* Próximos eventos (en gris) y lo ya hecho, lo último arriba. */
+  const prox = [];
+  if (rt.t0 && !rt.rce) {
+    if (rt.ciclo0 && now - rt.ciclo0 < RT_CICLO) prox.push([rt.ciclo0 + RT_CICLO, 'Evaluar el ritmo']);
+    if (u !== null && now - u < RT_ADR && rt.tSva) prox.push([u + RT_ADR, 'Adrenalina ' + _rtAdr().txt]);
+  }
+  const fila = (t, txt, cls) => '<li' + (cls ? ' class="' + cls + '"' : '') + '><span class="t">+' + _rtFmt(t - rt.t0) + '</span><span class="h">' + _rtHora(t) + '</span><span>' + txt + '</span></li>';
+  const acc = T.filter(t => RT_ACEPTAR[t.k]);
+  el('rt-line').innerHTML = acc.map(t => '<li class="ahora' + (t.ya ? '' : ' pend') + '"><span class="t">' + (t.ya ? 'AHORA' : 'Pendiente') + '</span><span>' + t.txt +
+      '<span class="acc">' + _rtAceptarHtml(t) + '</span></span></li>').join('') +
+    prox.sort((a, b) => b[0] - a[0]).map(p => fila(p[0], 'Próximo: ' + p[1], 'prox')).join('') +
+    rt.ev.slice().reverse().map(e => fila(e.t, e.txt)).join('');
+
+  T.filter(t => t.ya && t.voz && !rt.avisos[t.id]).forEach(t => {
+    rt.avisos[t.id] = 1;
+    if (t.k === 'evaluar') _rtPitar();
+    _rtDecir(t.voz);
+  });
+  rtBar(T);
+}
+
+/* Barra fija: copia los relojes, lo que toca y el último registro del panel. */
+function rtBar(T) {
+  const bar = document.getElementById('rt-bar');
+  if (!bar) return;
+  const on = document.getElementById('tab-pcr').classList.contains('active') || (!!rt.t0 && !rt.fin);
+  bar.hidden = !on;
+  document.body.classList.toggle('rt-bar-on', on);
+  if (!on) return;
+  ['total', 'ciclo', 'adr'].forEach(k => { const src = document.getElementById('rt-' + k), dst = document.getElementById('rtb-' + k); dst.textContent = src.textContent; dst.classList.toggle('alerta', src.classList.contains('alerta')); });
+  T = T || _rtTareas(Date.now());
+  const ya = T.filter(t => t.ya), next = document.getElementById('rtb-next');
+  next.textContent = (ya.length ? ya : T).slice(0, 2).map(t => t.txt).join(' · ');
+  next.classList.toggle('ya', ya.length > 0);
+  const ok = document.getElementById('rtb-ok'), urg = ya.find(t => RT_ACEPTAR[t.k]);
+  ok.hidden = !urg;
+  ok.innerHTML = urg ? _rtAceptarHtml(urg) : '';
+  document.documentElement.style.setProperty('--rt-bar-h', (bar.offsetHeight + 16) + 'px');
+  const e = rt.ev[rt.ev.length - 1];
+  document.getElementById('rtb-last').textContent = e ? 'Último: ' + (rt.t0 ? '+' + _rtFmt(e.t - rt.t0) + ' ' : '') + ' ' + e.txt : 'Toca para ver la línea de tiempo';
+  const m = document.getElementById('rtb-metro');
+  m.classList.toggle('on', !!_metroTimer);
+  m.setAttribute('aria-pressed', _metroTimer ? 'true' : 'false');
+  m.textContent = _metroTimer ? '■ Metrónomo' : '▶ Metrónomo';
+}
+
+function rtIrPanel() {
+  if (!document.getElementById('tab-pcr').classList.contains('active')) showTab('pcr', document.getElementById('navbtn-pcr'));
+  const box = document.getElementById('rt-box');
+  const h = ['.header', '.nav'].reduce((x, sel) => { const e = document.querySelector(sel); return x + (e && /sticky|fixed/.test(getComputedStyle(e).position) ? e.offsetHeight : 0); }, 0);
+  window.scrollTo(0, box.getBoundingClientRect().top + scrollY - h - 8);
+}
+
+function _rtLog(t, txt, undo) { rt.ev.push({ t, txt, undo }); }
+
+function _rtEvento(id, ms) {
+  const c = document.getElementById('pcr-ev-' + id + '-chk'), h = document.getElementById('pcr-ev-' + id + '-hora');
+  if (!c || c.checked) return () => {};
+  c.checked = true; h.value = _rtHora(ms);
+  return () => { c.checked = false; h.value = ''; };
+}
+
+function _rtIniciar(now, deducido) {
+  rt.t0 = now;
+  const des = _rtEvento('inicio_rcp', now);
+  _rtLog(now, 'Inicio de RCP (compresiones)' + (deducido ? ' — hora del primer registro' : ''), () => { des(); clearInterval(rt.tick); rt.tick = null; rt.t0 = null; _rtDespierto(false); });
+  if (!rt.tick) rt.tick = setInterval(rtRender, 1000);
+  _rtDespierto(true);
+}
+
+function _rtFijarRitmo(nuevo, now) {
+  const sel = document.getElementById('pcr-ritmo'), val = nuevo === 'd' ? 'desfibrilable' : 'no_desfibrilable';
+  const prev = { ritmo: rt.ritmo, pend: rt.pendDescarga, ciclo0: rt.ciclo0, rce: rt.rce, sel: sel.value, ciclos: document.getElementById('pcr-ciclos').value };
+  const nombre = x => x === 'd' ? 'desfibrilable' : 'no desfibrilable';
+  const txt = prev.rce ? 'Nueva PCR: ritmo ' + nombre(nuevo) : prev.ritmo && prev.ritmo !== nuevo ? 'Cambio de ritmo: ' + nombre(prev.ritmo) + ' → ' + nombre(nuevo) + ' (se pasa a su flujograma)' : 'Ritmo: ' + nombre(nuevo);
+  if (rt.ciclo0 && now - rt.ciclo0 >= 90000) { const c = document.getElementById('pcr-ciclos'); c.value = (parseInt(c.value, 10) || 0) + 1; }
+  let empujado = false;
+  if (_pcrRitmoActual() !== val || prev.rce) { sel.value = val; registrarCambioRitmo(); empujado = true; }
+  rt.ritmo = nuevo; rt.rce = false; rt.pendDescarga = nuevo === 'd';
+  if (rt.tSva) rt.ciclo0 = now;
+  _rtLog(now, txt, () => {
+    Object.assign(rt, { ritmo: prev.ritmo, pendDescarga: prev.pend, ciclo0: prev.ciclo0, rce: prev.rce });
+    document.getElementById('pcr-ciclos').value = prev.ciclos;
+    if (empujado) { pcrRitmoLog.pop(); renderPcrRitmoLog(); }
+    sel.value = prev.sel;
+  });
+}
+
+function _rtDosisDada(id, now) {
+  const horaEl = document.getElementById('pcr-fx-' + id + '-hora'), chk = document.getElementById('pcr-fx-' + id + '-chk');
+  const prev = { hora: horaEl.value, chk: chk.checked };
+  registrarDosisPcr(id);
+  return () => {
+    (pcrDosisLog[id] || []).pop();
+    const n = _rtDosis(id);
+    document.getElementById('pcr-fx-' + id + '-total').value = n || '';
+    if (!n) { chk.checked = prev.chk; horaEl.value = prev.hora; }
+  };
+}
+
+const RT_NOMBRES = { inicio: 'iniciar RCP', sva: 'acceso vascular + monitor', desf: 'ritmo desfibrilable', nodesf: 'no desfibrilable', descarga: 'descarga', adrenalina: 'adrenalina', amiodarona: 'amiodarona', rce: 'RCE: terminar con RCE', deshacer: 'deshacer', terminar: 'terminar' };
+
+function rtAccion(a, porVoz) {
+  _rtAudio();
+  const now = Date.now();
+  if (a === 'deshacer') {
+    const e = rt.ev.pop();
+    if (e) { if (e.undo) e.undo(); _rtDecir('Anulado'); }
+    rtRender(); calcPcr();
+    return;
+  }
+  if (a === 'terminar' || a === 'rce') {
+    if (rt.fin) return;
+    if (a === 'rce') { rtTerminar('rce'); return; }
+    const f = document.getElementById('rt-fin');
+    f.hidden = false;
+    f.scrollIntoView({ block: 'center' });
+    return;
+  }
+  if (rt.fin) return; /* terminada: solo se reabre con «Reabrir la reanimación» */
+  if (a === 'inicio' && rt.t0) { _rtDecir('La RCP ya está en marcha'); return; }
+  if (!rt.t0) _rtIniciar(now, a !== 'inicio');
+  if (a === 'sva') {
+    if (rt.tSva) { _rtDecir('El soporte avanzado ya consta'); return; }
+    const prevC = rt.ciclo0;
+    rt.tSva = now; rt.ciclo0 = now;
+    _rtLog(now, 'Acceso vascular + monitorización: empieza el soporte vital avanzado', () => { rt.tSva = null; rt.ciclo0 = prevC; });
+  } else if (a === 'desf' || a === 'nodesf') {
+    _rtFijarRitmo(a === 'desf' ? 'd' : 'nd', now);
+  } else if (a === 'descarga') {
+    if (rt.ritmo !== 'd') _rtFijarRitmo('d', now);
+    const k = _rtShocks() + 1, e = _rtEnergia(k);
+    const obj = { hora: _pcrNow(), energia: e.j === '' ? '' : String(e.j), doble: false, t: now };
+    pcrDescargasLog.push(obj); renderPcrDescargasLog();
+    const des = k === 1 ? _rtEvento('primera_desfibrilacion', now) : () => {};
+    const prev = { pend: rt.pendDescarga, ciclo0: rt.ciclo0 };
+    rt.pendDescarga = false;
+    if (rt.tSva) rt.ciclo0 = now;
+    _rtLog(now, 'Descarga n.º ' + k + ' — ' + (e.j !== '' ? e.j + ' J' : e.txt), () => {
+      const i = pcrDescargasLog.indexOf(obj); if (i >= 0) pcrDescargasLog.splice(i, 1);
+      renderPcrDescargasLog(); des(); rt.pendDescarga = prev.pend; rt.ciclo0 = prev.ciclo0;
+    });
+  } else if (a === 'adrenalina' || a === 'amiodarona') {
+    if (!rt.tSva) { rt.tSva = now; rt.ciclo0 = rt.ciclo0 || now; _rtLog(now, 'Acceso vascular (deducido de la medicación): empieza el soporte vital avanzado', () => { rt.tSva = null; }); }
+    const n = (a === 'adrenalina' ? _rtDosis('adrenalina') : _rtAntiarr()) + 1;
+    const dosis = a === 'adrenalina' ? _rtAdr().txt : _rtAmio(Math.min(n, 2)).txt;
+    const undo = _rtDosisDada(a, now);
+    _rtLog(now, (a === 'adrenalina' ? 'Adrenalina' : 'Amiodarona') + ' n.º ' + n + ' — ' + dosis, undo);
+  }
+  if (porVoz) _rtDecir('Registrado: ' + RT_NOMBRES[a]);
+  calcPcr();
+  rtRender();
+}
+
+function rtReset() {
+  clearInterval(rt.tick);
+  Object.assign(rt, { t0: null, tSva: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, fin: null, ev: [], avisos: {}, tick: null });
+  document.getElementById('rt-fin').hidden = true;
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  _rtDespierto(false);
+  rtRender();
+}
+
+function rtFinCancelar() { document.getElementById('rt-fin').hidden = true; }
+
+/* Tras un RCE, si vuelve a perder el pulso: se reanuda sin borrar el RCE (queda en el registro). */
+function rtReparada() {
+  if (!rt.fin || rt.fin.motivo !== 'rce') return;
+  const now = Date.now(), finPrev = rt.fin;
+  rt.fin = null;
+  if (!rt.t0) _rtIniciar(now, true);
+  _rtLog(now, 'Pierde el pulso tras el RCE: se reanuda la reanimación', () => {
+    rt.fin = finPrev; clearInterval(rt.tick); rt.tick = null; _rtDespierto(false);
+  });
+  if (!rt.tick) rt.tick = setInterval(rtRender, 1000);
+  _rtDespierto(true);
+  calcPcr();
+  rtRender();
+}
+
+/* Terminar: quedan la hora y el motivo, se para todo (reloj, voz, metrónomo), se marca el
+   hito del checklist (RCE o suspensión), se abre el Utstein con los datos y se imprime el registro. */
+function rtTerminar(motivo) {
+  const now = Date.now();
+  document.getElementById('rt-fin').hidden = true;
+  rt.fin = { t: now, motivo };
+  const des = _rtEvento(motivo === 'rce' ? 'rce' : 'suspension', now);
+  const prevRce = rt.rce;
+  if (motivo === 'rce') rt.rce = true;
+  if (motivo === 'rce') _rtDecir('Retorno de circulación. Cuidados post R C E');
+  _rtLog(now, 'Fin de la reanimación: ' + (motivo === 'rce' ? 'RCE mantenido' : 'suspensión de maniobras (éxitus)') + (rt.t0 ? ' — duración ' + _rtFmt(now - rt.t0) : ''), () => {
+    des(); rt.fin = null; rt.rce = prevRce; rt.avisos = {};
+    if (rt.t0 && !rt.tick) rt.tick = setInterval(rtRender, 1000);
+    if (rt.t0) _rtDespierto(true);
+  });
+  clearInterval(rt.tick); rt.tick = null;
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  rt.hablando = 0;
+  if (rt.voz) rtVoz();
+  if (_metroTimer) toggleMetronomo();
+  _rtDespierto(false);
+  calcPcr();
+  rtRender();
+  abrirRegistroUtstein();
+  rtPdf();
+}
+
+const _rtEsc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* PDF del registro: se imprime desde un iframe oculto (en la app instalada window.open
+   salta al navegador). En el diálogo de impresión se elige «Guardar como PDF». */
+function rtPdf() {
+  const fin = rt.fin, ini = rt.t0, d = new Date(ini || Date.now());
+  const fecha = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const resto = _pcrReportText().replace(/--- LÍNEA DE TIEMPO DE LA REANIMACIÓN ---[\s\S]*?\n\n(?=--- )/, '');
+  const fila = (k, v) => '<tr><th>' + k + '</th><td>' + _rtEsc(v) + '</td></tr>';
+  const html = '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Registro_PCR_' + d.toISOString().slice(0, 10) + '_' + _rtHora(d.getTime()).replace(':', '') + '</title><style>' +
+    'body{font:12px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111;margin:18mm 14mm}h1{font-size:18px;margin:0 0 4px}' +
+    '.sub{color:#444;margin:0 0 12px}table{border-collapse:collapse;width:100%;margin:0 0 14px}th,td{border:1px solid #bbb;padding:4px 6px;text-align:left;vertical-align:top}' +
+    'th{background:#f0f0f0;width:34%}.tl th{width:auto}.tl td{font-variant-numeric:tabular-nums}h2{font-size:14px;margin:16px 0 6px}' +
+    'pre{font:11px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap}.pie{color:#555;font-size:10px;margin-top:16px}tr{page-break-inside:avoid}</style></head><body>' +
+    '<h1>Registro de parada cardiorrespiratoria</h1><p class="sub">' + fecha + ' · ' + (_pcrEsPed() ? 'Pediátrico (SVAP/EPALS 2025)' + (_pcrPeso() ? ' · peso ' + _pcrPeso() + ' kg' : '') : 'Adulto (ALS)') + '</p>' +
+    '<table>' + fila('Inicio de la RCP', ini ? _rtHora(ini) : '—') +
+    fila('Inicio del soporte vital avanzado', rt.tSva ? _rtHora(rt.tSva) + ' (+' + _rtFmt(rt.tSva - ini) + ')' : '—') +
+    fila('Fin de la reanimación', fin ? _rtHora(fin.t) + ' — ' + (fin.motivo === 'rce' ? 'RCE mantenido' : 'suspensión de maniobras (éxitus)') : 'en curso') +
+    fila('Duración (min:s)', ini ? _rtFmt((fin ? fin.t : Date.now()) - ini) : '—') +
+    fila('Descargas · adrenalina · antiarrítmico', _rtShocks() + ' · ' + _rtDosis('adrenalina') + ' · ' + _rtAntiarr()) +
+    fila('Ciclos de RCP (2 min)', document.getElementById('pcr-ciclos').value || '0') + '</table>' +
+    '<h2>Línea de tiempo</h2><table class="tl"><tr><th>Tiempo</th><th>Hora</th><th>Actividad</th></tr>' +
+    (rt.ev.length ? rt.ev.map(e => '<tr><td>' + (ini ? '+' + _rtFmt(e.t - ini) : '—') + '</td><td>' + _rtHora(e.t) + '</td><td>' + _rtEsc(e.txt) + '</td></tr>').join('') : '<tr><td colspan="3">Sin registros</td></tr>') + '</table>' +
+    '<h2>Registro completo</h2><pre>' + _rtEsc(resto) + '</pre>' +
+    '<p class="pie">Generado con URG CLÍNICO. Revisar y completar antes de incorporarlo a la historia clínica.</p></body></html>';
+  const f = document.createElement('iframe');
+  f.setAttribute('aria-hidden', 'true');
+  f.tabIndex = -1;
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f);
+  const doc = f.contentDocument;
+  doc.open(); doc.write(html); doc.close();
+  f.contentWindow.onafterprint = () => setTimeout(() => f.remove(), 500);
+  setTimeout(() => { f.contentWindow.focus(); f.contentWindow.print(); }, 300);
+}
+
+function _rtLineaTexto() {
+  return rt.ev.length ? rt.ev.map(e => (rt.t0 ? '+' + _rtFmt(e.t - rt.t0) + ' ' : '') + '(' + _rtHora(e.t) + ') ' + e.txt).join('\n') : '(sin registros)';
+}
+
+/* ---- Pitido, avisos hablados y pantalla encendida ---- */
+let _rtCtx = null;
+function _rtAudio() {
+  if (!_rtCtx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; _rtCtx = new C(); }
+  _rtCtx.resume();
+  return _rtCtx;
+}
+function _rtPitar() {
+  if (!rt.pitido) return;
+  const c = _rtAudio(); if (!c) return;
+  [0, 0.25, 0.5].forEach(d => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.5, c.currentTime + d);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + d + 0.18);
+    o.connect(g).connect(c.destination);
+    o.start(c.currentTime + d); o.stop(c.currentTime + d + 0.2);
+  });
+}
+/* Mientras la app habla, el micrófono se pausa: si no, oiría su propio «adrenalina» y lo registraría. */
+function _rtDecir(txt) {
+  if (!rt.habla || !window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = 'es-ES'; u.rate = 1.05;
+  rt.hablando++; _rtRecPausa();
+  u.onend = u.onerror = () => { rt.hablando = Math.max(0, rt.hablando - 1); if (!rt.hablando) { rt.sordoHasta = Date.now() + 800; setTimeout(_rtRecSeguir, 300); } };
+  speechSynthesis.speak(u);
+}
+function _rtToggle(id, on) { const b = document.getElementById(id); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+function rtHabla() { rt.habla = !rt.habla; if (!rt.habla && window.speechSynthesis) { speechSynthesis.cancel(); rt.hablando = 0; _rtRecSeguir(); } _rtToggle('rt-habla', rt.habla); }
+function rtPitido() { rt.pitido = !rt.pitido; _rtToggle('rt-pitido', rt.pitido); if (rt.pitido) _rtPitar(); }
+async function _rtDespierto(on) {
+  try {
+    if (on && 'wakeLock' in navigator && !rt.wake) { rt.wake = await navigator.wakeLock.request('screen'); rt.wake.addEventListener('release', () => { rt.wake = null; }); }
+    else if (!on && rt.wake) { await rt.wake.release(); rt.wake = null; }
+  } catch (e) { /* sin wake lock: la pantalla sigue su ajuste normal */ }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && rt.t0) _rtDespierto(true); });
+
+/* ---- Órdenes por voz (Web Speech API; en Chrome el audio lo procesa Google y necesita internet) ---- */
+const RT_ORDENES = [
+  ['deshacer', /\b(deshacer|deshaz|anular|anula|borrar|borra)\b/],
+  ['nodesf', /\bno desfibrilable|asistolia|\baesp\b|actividad electrica sin pulso|disociacion/],
+  ['desf', /desfibrilable|fibrilacion|taquicardia ventricular|(tv|fv)|sin pulso/],
+  ['rce', /\b(rce|tiene pulso|hay pulso|recupera|circulacion espontanea|retorno de circulacion)\b/],
+  ['descarga', /\b(descarga|descargado|choque|chocado)\b/],
+  ['adrenalina', /adrenalina|epinefrina/],
+  ['amiodarona', /amiodarona/],
+  ['sva', /\b(acceso|via venosa|intraosea|monitor|monitorizado)\b/],
+  ['inicio', /\b(iniciar|inicio|empezar|empezamos|comenzar)\b/],
+  ['terminar', /\b(terminar|terminamos|suspender|suspension|exitus)\b/]
+];
+function _rtComando(alts) {
+  for (const t of alts) {
+    const s = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const o = RT_ORDENES.find(([, re]) => re.test(s));
+    if (o) return o[0];
+  }
+  return null;
+}
+function _rtVozEstado(txt) { const e = document.getElementById('rt-voz-estado'); e.hidden = !txt; e.textContent = txt; }
+function _rtRecCrear() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.lang = 'es-ES'; r.continuous = true; r.interimResults = false; r.maxAlternatives = 3;
+  r.onresult = ev => {
+    if (rt.hablando || Date.now() < rt.sordoHasta) return;
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      if (!ev.results[i].isFinal) continue;
+      const alts = Array.from(ev.results[i]).map(x => x.transcript);
+      const a = _rtComando(alts);
+      _rtVozEstado('Oído: «' + alts[0].trim() + '»' + (a ? ' → ' + RT_NOMBRES[a] : ' (sin orden reconocida)'));
+      if (a) rtAccion(a, true);
+    }
+  };
+  r.onend = () => { rt.recActivo = false; if (rt.voz && !rt.hablando) setTimeout(_rtRecSeguir, 250); };
+  r.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { rt.voz = false; _rtToggle('rt-voz', false); _rtVozEstado('Sin permiso para el micrófono: actívalo en el navegador.'); }
+    else if (e.error === 'network') _rtVozEstado('El reconocimiento de voz necesita conexión a internet.');
+  };
+  return r;
+}
+function _rtRecSeguir() { if (!rt.voz || rt.hablando || rt.recActivo || !rt.rec) return; try { rt.rec.start(); rt.recActivo = true; } catch (e) { /* ya estaba arrancando */ } }
+function _rtRecPausa() { if (rt.rec && rt.recActivo) { try { rt.rec.abort(); } catch (e) { /* ya parado */ } rt.recActivo = false; } }
+function rtVoz() {
+  if (!rt.voz) {
+    rt.rec = rt.rec || _rtRecCrear();
+    if (!rt.rec) { _rtVozEstado('Este navegador no reconoce la voz: usa Chrome o Safari.'); return; }
+    rt.voz = true;
+    _rtVozEstado('Escuchando. Di: «iniciar», «acceso», «desfibrilable», «no desfibrilable», «descarga», «adrenalina», «amiodarona», «deshacer», «pulso» (termina con RCE), «terminar» (pregunta cómo). El 112 se llama con el botón.');
+    _rtRecSeguir();
+  } else { rt.voz = false; _rtRecPausa(); _rtVozEstado(''); }
+  _rtToggle('rt-voz', rt.voz);
 }
 
 /* Traspaso puntual (no persistente) de los datos ya diligenciados en
@@ -3743,11 +4416,13 @@ function pcrHandoffPayload() {
     descargasLog: pcrDescargasLog.slice(),
     eventos,
     farmacos,
-    causas: _pcrCausasLista().filter((c, i) => document.getElementById('pcr-causa-' + i).checked),
+    causas: _pcrCausasGrupos(),
     postRosc: _pcrPostRoscLista().filter((c, i) => document.getElementById('pcr-rosc-' + i).checked),
     modo: _pcrModo(),
     peso: _pcrPeso() || '',
-    obs: document.getElementById('pcr-obs').value
+    obs: document.getElementById('pcr-obs').value,
+    fin: rt.fin ? rt.fin.motivo : '',
+    lineaTiempo: rt.ev.length ? _rtLineaTexto() : ''
   };
 }
 
@@ -4498,6 +5173,7 @@ renderIntubacionComplicaciones();
 renderIntubacionMantenimiento();
 calcIntubacion();
 renderPcrEventos();
+rtRender();
 renderPcrFarmacos();
 renderPcrCausas();
 renderPcrPostRosc();

@@ -2552,7 +2552,7 @@ window.PROTOCOLS = [
           t: 'Ritmo desfibrilable', c: 'high',
           show: () => { const w = W(); return '<b>Descarga 4 J/kg</b>' + (w ? ' <b>= ' + Math.min(Math.ceil(w * 4), 200) + ' J</b>' : '') + ' (redondear al alza; máx. 200 J iniciales) → RCP 2 min → descarga → RCP 2 min → 3.ª descarga →<br>' +
             '<b>adrenalina 10 µg/kg</b>' + d(0.01, 1, 2, 'mg') + ' + <b>amiodarona 5 mg/kg</b>' + d(5, 300, 0, 'mg') + ' (máx. 300) → adrenalina cada 4 min → <b>amiodarona 5 mg/kg tras la 5.ª</b>' + d(5, 150, 0, 'mg') + ' (máx. 150).<br>' +
-            'Refractaria (desde la 5.ª descarga): escalar a <b>6 → 8 J/kg</b>' + (w ? ' (' + Math.min(Math.round(w * 6), 360) + ' → ' + Math.min(Math.round(w * 8), 360) + ' J)' : '') + ', máx. 360 J, y revisar o cambiar la posición de los parches.<br>' +
+            'Refractaria (más de 5 descargas, desde la 6.ª): escalar a <b>6 → 8 J/kg</b>' + (w ? ' (' + Math.min(Math.round(w * 6), 360) + ' → ' + Math.min(Math.round(w * 8), 360) + ' J)' : '') + ', máx. 360 J, y revisar o cambiar la posición de los parches.<br>' +
             'Alternativa a la amiodarona: <b>lidocaína 1 mg/kg</b>' + d(1, 100, 0, 'mg') + ' (máx. 100).<br>' +
             'Parches anteroposteriores si &lt;25 kg; palas de lactante si &lt;10 kg. Cargar comprimiendo, pausa &lt;5 s.<br>' +
             'PCR presenciada y monitorizada con parches puestos: hasta 3 descargas seguidas.' + sinPeso() +
