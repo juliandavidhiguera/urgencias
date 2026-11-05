@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-05 | **Sesion #:** 17 | **Rama:** main | **HEAD:** `73a908c` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-05 | **Sesion #:** 17 | **Rama:** main | **HEAD:** `5c7f4ec` (desplegado en produccion)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -63,6 +63,16 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Decisiones (leidas del grafico del PDF renderizado, ambiguas): «acompanamiento telefonico continuado» puesto en activar y en consejo (en el dibujo esta entre ambos); informacion de dispositivos para bajo Y medio (el gráfico; el resumen .md lo limitaba a medio)
 - Verificado: Node 11/11 nodos alcanzables, sugerencias en 7 casos (3 p bajo, 6 y 7 medio, 10 y 13 alto, tentativa, 0 p manual); Chrome headless 375 px sin errores ni desbordamiento; produccion con curl («Resultado del MINI»)
 - Commit: `73a908c` feat(protocolos): flujograma interactivo del Codi Risc Suïcidi (MINI paso a paso)
+- Anadido (`5c7f4ec`): LINEA DE TIEMPO DE LA REANIMACION en la pestana PCR (`index.html`: HTML `#rt-box` antes del metronomo, CSS `.rt-*`, JS `rt`/`rtAccion`/`_rtTareas`/`rtRender`/`rtBar`/`rtTerminar`/`rtPdf`/`rtReparada`). Peticion del usuario, decisiones suyas: reloj desde «Iniciar RCP»; SVA (ciclos 2 min + adrenalina) desde «Acceso vascular + monitor»; adrenalina cada 4 min en adulto y nino (protocolo; ERC 2025 adulto 3–5); adrenalina JUNTO con amiodarona tras la 3.a y la 5.a descarga (salvo adrenalina hace <3 min: minimo ERC, anadido por el modelo y comunicado); 112 fijo (`tel:112`); panel arriba de la pestana
+  - Cada boton escribe en los registros existentes (`pcrRitmoLog`, `pcrDescargasLog` con `t` en ms, `pcrDosisLog`, checklist `pcr-ev-*`), asi informe, Utstein y ciclos siguen igual. «Deshacer el ultimo» revierte tambien esos registros
+  - Siguiente paso con tarjetas rojas, flujograma del ritmo actual (cambia al cambiar el ritmo), filas «AHORA» con «✓ Hecho» en la linea de tiempo y en la barra; proximos eventos en gris
+  - Barra fija `#rt-bar` (relojes, siguiente paso, ultimo registro, metronomo sincronizado, 112): siempre en PCR y en todas las pestanas con paro en curso; `--rt-bar-h` ajusta el padding del body
+  - Voz: Web Speech (Chrome lo procesa en Google, necesita internet), avisos hablados (micro en pausa mientras habla para no autoregistrarse), pitido a los 2 min, Wake Lock
+  - «Terminar la reanimacion» unico (RCE mantenido / suspension-exitus): para reloj, voz y metronomo; marca rce/suspension; PDF por impresion desde iframe oculto (titulo `Registro_PCR_fecha_hora`); abre el Utstein con `fin` y `lineaTiempo` en el payload (`registro-utstein.html`: `d.fin` manda en el resultado inicial). Tras RCE: «Nueva parada» reanuda sin borrar el RCE; «Reabrir» deshace el fin. Eliminados el boton RCE suelto, «Imprimir / Guardar PDF» y «Registro Utstein» del final (y `printPcrReport`, huerfana)
+  - 4H/4T con tres estados (sospecha / tratada / descartada, `pcrCausaEstado`); informe y Utstein agrupados por estado
+  - Corregido (Vera PMID 41117571 + Perplexity): escalada pediatrica «desde la 5.a descarga» → «mas de 5 descargas, desde la 6.a» (6–8 J/kg, max 360 J) en `data/pcr.js`, `data/protocols.js` (EPALS), `protocolos/EPALS_2025_guia.html` y recomendacion de `calcPcr`. Perplexity dijo adrenalina pediatrica 3–5 min (AHA); ERC 2025 PLS = 4 min
+  - Verificado: Chrome headless 375 px claro/oscuro con reloj simulado (adulto y nino completos, 3.a/5.a descarga, ND→D, RCE→nueva parada→exitus, Utstein rellenado, PDF por contenido, aceptar sugeridos, 4H/4T, reset), sin errores; produccion con curl. SIN PROBAR: microfono/altavoz reales y dialogo de impresion en movil
+- Commit: `5c7f4ec` feat(pcr): linea de tiempo de la reanimacion con siguiente paso, voz y cierre con PDF + Utstein
 - Pendiente ofrecido al usuario: bloque hospitalario (paciente ya en urgencias de Campdevanol: derivacion, interconsulta psiquiatria, vigilancia, contencion) con Vera + Perplexity, ensenar antes de aplicar
 
 ### Sesion 16 - 2026-11-04
@@ -203,6 +213,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - No hay comando de test ni de build.
 
 ## 9. TRAMPAS Y CONTEXTO NO OBVIO
+- Linea de tiempo PCR: el estado `rt` es aparte de los controles manuales de abajo (cambiar el select de ritmo a mano NO cambia `rt.ritmo`). Las sugerencias de la 3.a/5.a descarga leen `pcrDescargasLog[k].t` (ms): descargas registradas con el boton antiguo no lo tienen. No mapear el 112 a la voz (un falso positivo llamaria)
 - `sed -i` de Git Bash convierte CRLF→LF en todo el fichero y un heredoc `python - <<'EOF'` puede llegar alterado (hook RTK): para editar, script `.py` en el scratchpad. `curl https://urgencias.doctorhiguera.com/index.html` redirige (vacio sin `-L`): comprobar con `/`.
 - **Service worker network-first** (desde sesion 6, commit `432050f`): ya no hay que subir `CACHE` al tocar `index.html` o `data/*.js`. Subirlo **solo** si se añade/quita un fichero de `ASSETS` (si no, el nuevo no queda disponible offline hasta que el usuario lo abra con conexion) o si se cambia la logica de `sw.js`. No volver a cache-first: fue la causa de que usuarios con la app instalada quedaran atascados en contenido clinico viejo hasta borrar datos del sitio a mano.
 - `medicamentos/*.md` son texto crudo extraido de PDF (catalan) — contienen caracteres de Private Use Area por glifos de fuente incrustada que `parse_fichas.js` limpia con una regex (`raw.replace(/[-]/g, '')`, linea ~24) — no editar esos `.md` a mano sin entender ese artefacto.
@@ -251,4 +262,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Probar los flujogramas de EPOC, asma, TEP y Codi Risc Suicidi en movil real; preguntar al usuario si quiere el bloque hospitalario del Codi Risc Suicidi y que troponina usa el laboratorio (dolor toracico).
+Probar en movil real la linea de tiempo del PCR (voz, avisos hablados, pitido, Guardar como PDF, Utstein) y los flujogramas de EPOC, asma, TEP y Codi Risc Suicidi; preguntar si quiere el bloque hospitalario del Codi Risc Suicidi y que troponina usa el laboratorio.
