@@ -1482,6 +1482,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
     <div class="rt-btns">
       <button class="rt-b" id="rt-b-inicio" data-a="inicio" onclick="rtAccion('inicio')">▶ Iniciar RCP</button>
       <button class="rt-b" id="rt-b-sva" data-a="sva" onclick="rtAccion('sva')">🩸 Acceso vascular + monitor</button>
+      <button class="rt-b" id="rt-b-via" data-a="via" onclick="rtAccion('via')">🫁 Vía aérea avanzada<small>IOT / supraglótico · sin hora fija</small></button>
       <button class="rt-b rt-d" data-a="desf" onclick="rtAccion('desf')">⚡ Ritmo desfibrilable<small>FV / TV sin pulso</small></button>
       <button class="rt-b rt-nd" data-a="nodesf" onclick="rtAccion('nodesf')">〰 No desfibrilable<small>asistolia / AESP</small></button>
       <button class="rt-b rt-d" data-a="descarga" onclick="rtAccion('descarga')">⚡ Descarga dada</button>
@@ -4081,7 +4082,7 @@ function resetPcr() {
    PMID 41117571). Estado solo en memoria: nunca en localStorage.
    ================================================================== */
 const RT_CICLO = 120000, RT_ADR = 240000;
-const rt = { t0: null, tSva: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, ev: [], avisos: {},
+const rt = { t0: null, tSva: null, tVia: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, ev: [], avisos: {},
   tick: null, voz: false, habla: true, pitido: true, rec: null, recActivo: false, hablando: 0, sordoHasta: 0, wake: null };
 
 function _rtFmt(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
@@ -4152,8 +4153,14 @@ function _rtTareas(now) {
     const n = am + 1, a = _rtAmio(n);
     T.push({ k: 'amio', ya: !!rt.tSva, id: 'am' + n, txt: 'AMIODARONA ' + a.txt + ' (' + n + '.ª dosis)', sub: (n === 1 ? 'Tras la 3.ª descarga' : 'Tras la 5.ª descarga') + (T.some(t => t.k === 'adr') || u === null ? ', junto con la adrenalina.' : ' (adrenalina puesta hace ' + Math.floor((now - u) / 60000) + ' min: sigue su reloj de 4 min).') + (rt.tSva ? '' : ' En cuanto haya acceso vascular.') + ' Alternativa: lidocaína.', voz: 'Amiodarona, ' + a.voz });
   }
-  if (!T.some(t => t.ya)) T.push({ k: 'rcp', txt: 'RCP de calidad, sin pausas', sub: 'Compresiones 100–120/min · capnografía · vía aérea · buscar y tratar 4H/4T.' + (rt.ritmo === 'd' && sh >= 3 && !_pcrEsPed() ? ' Refractaria: revisar los parches o cambiar el vector.' : '') });
+  if (!T.some(t => t.ya)) T.push({ k: 'rcp', txt: 'RCP de calidad, sin pausas', sub: 'Compresiones 100–120/min · capnografía · ' + _rtViaTxt() + ' · buscar y tratar 4H/4T.' + (rt.ritmo === 'd' && sh >= 3 && !_pcrEsPed() ? ' Refractaria: revisar los parches o cambiar el vector.' : '') });
   return T;
+}
+
+/* Vía aérea avanzada: sin hora fija (cuando la ponga alguien experto sin parar las compresiones). */
+function _rtViaTxt() {
+  if (!rt.tVia) return 'vía aérea avanzada cuando haya alguien experto, sin interrumpir las compresiones (pausa <5 s)';
+  return 'con vía aérea avanzada: compresiones continuas y ' + (_pcrEsPed() ? 'ventilación según edad (lactante 25, 1–8 a 20, 8–12 a 15, >12 a 10/min)' : '10 ventilaciones/min') + '; confirmar con capnografía';
 }
 
 /* Flujograma del ritmo actual: los pasos en fila, con el que toca marcado. */
@@ -4226,6 +4233,7 @@ function rtRender() {
   el('rt-reparada').hidden = !rt.fin || rt.fin.motivo !== 'rce';
   if (rt.fin) { el('rt-fin').hidden = true; el('rt-fin-txt').textContent = T[0].txt; }
   el('rt-b-sva').hidden = !!rt.tSva;
+  el('rt-b-via').hidden = !!rt.tVia;
 
   /* Próximos eventos (en gris) y lo ya hecho, lo último arriba. */
   const prox = [];
@@ -4327,7 +4335,7 @@ function _rtDosisDada(id, now) {
   };
 }
 
-const RT_NOMBRES = { inicio: 'iniciar RCP', sva: 'acceso vascular + monitor', desf: 'ritmo desfibrilable', nodesf: 'no desfibrilable', descarga: 'descarga', adrenalina: 'adrenalina', amiodarona: 'amiodarona', rce: 'RCE: terminar con RCE', deshacer: 'deshacer', terminar: 'terminar' };
+const RT_NOMBRES = { inicio: 'iniciar RCP', sva: 'acceso vascular + monitor', via: 'vía aérea avanzada', desf: 'ritmo desfibrilable', nodesf: 'no desfibrilable', descarga: 'descarga', adrenalina: 'adrenalina', amiodarona: 'amiodarona', rce: 'RCE: terminar con RCE', deshacer: 'deshacer', terminar: 'terminar' };
 
 function rtAccion(a, porVoz) {
   _rtAudio();
@@ -4354,6 +4362,11 @@ function rtAccion(a, porVoz) {
     const prevC = rt.ciclo0;
     rt.tSva = now; rt.ciclo0 = now;
     _rtLog(now, 'Acceso vascular + monitorización: empieza el soporte vital avanzado', () => { rt.tSva = null; rt.ciclo0 = prevC; });
+  } else if (a === 'via') {
+    if (rt.tVia) { _rtDecir('La vía aérea avanzada ya consta'); return; }
+    rt.tVia = now;
+    const des = _rtEvento('via_aerea_avanzada', now);
+    _rtLog(now, 'Vía aérea avanzada colocada: compresiones continuas', () => { rt.tVia = null; des(); });
   } else if (a === 'desf' || a === 'nodesf') {
     _rtFijarRitmo(a === 'desf' ? 'd' : 'nd', now);
   } else if (a === 'descarga') {
@@ -4383,7 +4396,7 @@ function rtAccion(a, porVoz) {
 
 function rtReset() {
   clearInterval(rt.tick);
-  Object.assign(rt, { t0: null, tSva: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, fin: null, ev: [], avisos: {}, tick: null });
+  Object.assign(rt, { t0: null, tSva: null, tVia: null, ciclo0: null, ritmo: null, pendDescarga: false, rce: false, fin: null, ev: [], avisos: {}, tick: null });
   document.getElementById('rt-fin').hidden = true;
   if (window.speechSynthesis) speechSynthesis.cancel();
   _rtDespierto(false);
@@ -4522,6 +4535,7 @@ const RT_ORDENES = [
   ['descarga', /\b(descarga|descargado|choque|chocado)\b/],
   ['adrenalina', /adrenalina|epinefrina/],
   ['amiodarona', /amiodarona/],
+  ['via', /via aerea|intubad[oa]|intubacion|\btubo\b|mascarilla laringea|supraglotic|i ?gel/],
   ['sva', /\b(acceso|via venosa|intraosea|monitor|monitorizado)\b/],
   ['inicio', /\b(iniciar|inicio|empezar|empezamos|comenzar)\b/],
   ['terminar', /\b(terminar|terminamos|suspender|suspension|exitus)\b/]
@@ -4564,7 +4578,7 @@ function rtVoz() {
     rt.rec = rt.rec || _rtRecCrear();
     if (!rt.rec) { _rtVozEstado('Este navegador no reconoce la voz: usa Chrome o Safari.'); return; }
     rt.voz = true;
-    _rtVozEstado('Escuchando. Di: «iniciar», «acceso», «desfibrilable», «no desfibrilable», «descarga», «adrenalina», «amiodarona», «deshacer», «pulso» (termina con RCE), «terminar» (pregunta cómo). El 112 se llama con el botón.');
+    _rtVozEstado('Escuchando. Di: «iniciar», «acceso», «vía aérea» (o «intubado»), «desfibrilable», «no desfibrilable», «descarga», «adrenalina», «amiodarona», «deshacer», «pulso» (termina con RCE), «terminar» (pregunta cómo). El 112 se llama con el botón.');
     _rtRecSeguir();
   } else { rt.voz = false; _rtRecPausa(); _rtVozEstado(''); }
   _rtToggle('rt-voz', rt.voz);
