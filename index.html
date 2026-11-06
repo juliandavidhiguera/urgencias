@@ -761,6 +761,8 @@ body.rt-bar-on .toast { bottom: calc(var(--rt-bar-h, 128px) + 12px); }
 .fl-esc:hover, .fl-esc:focus-visible { background: var(--bg2); }
 label.fl-ask-hint { display: block; }
 .fl-esc-bar { margin: 12px 0 4px; }
+.fl-farm.fl-farm-on { border-color: var(--green); background: var(--green-bg); }
+.fl-farm-ok { font-weight: 700; color: var(--green); }
 .esc-res { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); }
 .esc-res-h { font-size: var(--fs-sm); font-weight: 700; margin-bottom: 4px; }
 .esc-res-it { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
@@ -2465,6 +2467,7 @@ function resetProtoEval(pid) {
     const el = document.getElementById('pe-' + pid + '-' + it.k);
     if (it.t === 'chk') el.checked = false; else if (it.t === 'sel') el.selectedIndex = 0; else el.value = '';
   });
+  farmBorrarCaso(pid);
   calcProtoEval(pid);
   escBorrarCaso(pid);
 }
@@ -2480,7 +2483,7 @@ function copyProtoEval(pid) {
   }).filter(Boolean).join(' · ');
   const res = [...document.querySelectorAll('#pe-' + pid + '-out .ficha-section')].map(s =>
     s.querySelector('.ficha-section-title').textContent + '\n' + s.querySelector('.ficha-section-text').innerText).join('\n\n');
-  navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res + _escTxt(pid)).then(showToast).catch(showCopyError);
+  navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res + _farmTxt(pid) + _escTxt(pid)).then(showToast).catch(showCopyError);
 }
 
 /* Flujograma paso a paso dentro de un protocolo (p.flow).
@@ -2544,6 +2547,69 @@ function _escPintar(pid) {
   }).join('') : '';
 }
 
+/* Medicación del caso: el fármaco que se pulsa en un flujograma queda elegido (✓), se lista en
+   #farm-res-<pid> y entra en el texto copiado; con perfusión, con los valores actuales del panel.
+   Solo en memoria (datos de paciente). */
+const _farmRes = {};
+
+function _farmResHtml(pid) {
+  return '<div class="esc-res farm-res" id="farm-res-' + pid + '" aria-live="polite" hidden></div>';
+}
+
+function farmElegir(pid, nid, c, box) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const n = nid[0] === 'x' && !p.flow.nodes[nid] ? p.flow.extras.items[+nid.slice(1)] : p.flow.nodes[nid];
+  const tmp = document.createElement('div');
+  tmp.innerHTML = (n && (n.t || n.l)) || '';
+  (_farmRes[pid] || (_farmRes[pid] = {}))[c.n] = { key: box.id, ctx: tmp.textContent.trim() };
+  box.dataset.pid = pid;
+  _farmPintar(pid);
+}
+
+function farmQuitar(pid, nombre) {
+  if (_farmRes[pid]) delete _farmRes[pid][nombre];
+  _farmPintar(pid);
+}
+
+function farmBorrarCaso(pid) {
+  delete _farmRes[pid];
+  _farmPintar(pid);
+}
+
+function _farmLinea(pid, nombre) {
+  const it = _farmRes[pid][nombre], box = document.getElementById(it.key);
+  const d = box && _farmResolver(_farmCfgDeCaja(box)).inf;
+  if (d) {
+    const dosis = _n(it.key + '-dosis'), mlh = _n(it.key + '-mlh'), mg = _n(it.key + '-mg'), vol = _n(it.key + '-vol'), peso = _n(it.key + '-peso');
+    if (dosis != null && mlh != null && mg != null && vol)
+      return nombre + ' en perfusión: ' + _fmt(mg, 3) + ' ' + (d.unitLabel || 'mg') + ' en ' + _fmt(vol, 1) + ' ml · ' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h' + (peso ? ' (peso ' + _fmt(peso, 1) + ' kg)' : '') + (it.ctx ? ' — ' + it.ctx : '');
+  }
+  return nombre + (it.ctx ? ' — ' + it.ctx : '');
+}
+
+function _farmPintar(pid) {
+  const nombres = Object.keys(_farmRes[pid] || {});
+  document.querySelectorAll('.fl-box[data-pid="' + pid + '"] .fl-farm[data-n]').forEach(b => {
+    const on = nombres.includes(b.dataset.n);
+    b.classList.toggle('fl-farm-on', on);
+    b.setAttribute('aria-pressed', on);
+    const tag = b.querySelector('.fl-farm-tag');
+    b.innerHTML = (on ? '<span class="fl-farm-ok">✓</span> ' : '💊 ') + b.dataset.n.replace(/&/g, '&amp;').replace(/</g, '&lt;') + (tag ? ' ' + tag.outerHTML : '');
+  });
+  const el = document.getElementById('farm-res-' + pid);
+  if (!el) return;
+  el.hidden = !nombres.length;
+  const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  el.innerHTML = nombres.length ? '<div class="esc-res-h">💊 Medicación del caso (entra en «Copiar»)</div>' + nombres.map(nombre =>
+    '<div class="esc-res-it"><div class="esc-res-t">' + esc(_farmLinea(pid, nombre)) + '</div>' +
+    '<button class="esc-res-x" onclick="farmQuitar(\'' + pid + '\',this.dataset.n)" data-n="' + esc(nombre) + '" aria-label="Quitar ' + esc(nombre) + ' del caso">✕</button></div>').join('') : '';
+}
+
+function _farmTxt(pid) {
+  const nombres = Object.keys(_farmRes[pid] || {});
+  return nombres.length ? '\n\nMedicación:\n' + nombres.map(n => '• ' + _farmLinea(pid, n)).join('\n') : '';
+}
+
 function _escTxt(pid) {
   const r = Object.values(_escRes[pid] || {});
   return r.length ? '\n\nEscalas:\n' + r.join('\n\n') : '';
@@ -2566,7 +2632,7 @@ function _flowHtml(p) {
       '<input type="number" step="any" inputmode="decimal" class="num-in" id="fl-' + p.id + '-' + it.k + '" oninput="' + on + '"></label>').join('') +
       '</div><div class="fl-hint">Los datos solo se usan para los cálculos de esta pantalla; no se guardan.</div>' : '') +
     _escBarHtml('fl-' + p.id + '-esc', p.flow.escalas) + (p.eval ? '' : _escResHtml(p.id)) + // con evaluador, las escalas del caso van en él
-    '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' +
+    '<div id="fl-' + p.id + '-body" aria-live="polite"></div>' + _farmResHtml(p.id) +
     (p.flow.extras ? '<div class="fl-extras"><div class="pe-h">' + p.flow.extras.t + '</div>' + (p.flow.extras.help ? '<div class="fl-hint">' + p.flow.extras.help + '</div>' : '') + '<div id="fl-' + p.id + '-extras"></div></div>' : '') +
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
     '<button class="btn btn-copy" onclick="copyFlow(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resumen</button>' +
@@ -2616,7 +2682,8 @@ function _flowFarmBtns(n, pid, nid) {
     const cfg = typeof c === 'string' ? { n: c } : c;
     const r = _farmResolver(cfg);
     if (!r.ficha && !r.inf) return '';
-    return '<button class="fl-farm" onclick="abrirFarmacoLateral(\'' + pid + '\',\'' + nid + '\',' + j + ', this)">💊 ' + cfg.n +
+    const on = !!(_farmRes[pid] && _farmRes[pid][cfg.n]);
+    return '<button class="fl-farm' + (on ? ' fl-farm-on' : '') + '" data-n="' + cfg.n.replace(/"/g, '&quot;') + '" aria-pressed="' + on + '" onclick="abrirFarmacoLateral(\'' + pid + '\',\'' + nid + '\',' + j + ', this)">' + (on ? '<span class="fl-farm-ok">✓</span> ' : '💊 ') + cfg.n +
       (r.inf ? ' <span class="fl-farm-tag">perfusión</span>' : '') + '</button>';
   }).join('') + '</div>';
 }
@@ -2703,6 +2770,7 @@ function resetFlow(pid) {
   delete _flowPath[pid];
   delete _flowExtra[pid];
   if (p.flow.reset) p.flow.reset();
+  farmBorrarCaso(pid);
   renderFlow(pid);
   escBorrarCaso(pid);
 }
@@ -2724,7 +2792,7 @@ function copyFlow(pid) {
     const it = p.flow.extras.items[k];
     lineas.push((it.t || txt(it.l)) + '\n' + txt(typeof it.show === 'function' ? it.show(v) : it.show));
   });
-  navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n') + _escTxt(pid)).then(showToast).catch(showCopyError);
+  navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n') + _farmTxt(pid) + _escTxt(pid)).then(showToast).catch(showCopyError);
 }
 
 function _drugId(name) {
@@ -4717,6 +4785,7 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
     document.getElementById(key + '-peso').value = peso; // el peso del flujograma ha cambiado
     _farmCalc(key, 'dosis');
   }
+  if (pid) farmElegir(pid, nid, c, box);
   _latMostrar(box, 'Medicación: ' + c.n);
 }
 
@@ -4783,6 +4852,7 @@ function _farmCalc(key, origen) {
   const fuera = dosis != null && (dosis < d.doseMin || (d.doseMax != null && dosis > d.doseMax));
   warn.hidden = !fuera;
   warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + d.doseMin + (d.doseMax != null ? '–' + d.doseMax : '') + ' ' + d.unit + '): revisar antes de administrar.' : '';
+  if (box.dataset.pid) _farmPintar(box.dataset.pid);
 }
 
 function _farmCfgDeCaja(box) {
