@@ -2302,7 +2302,7 @@ function calcScale(id, pfx) {
     s = sc.agg === 'max' ? Math.max.apply(null, pts) : pts.reduce((a, b) => a + b, 0);
   }
   const [cls, risk, det] = sc.interp(s);
-  document.getElementById(uid + '-num').textContent = s;
+  document.getElementById(uid + '-num').textContent = sc.numTxt ? sc.numTxt(s) : s;
   const r = document.getElementById(uid + '-risk');
   r.className = 'score-risk risk-' + cls;
   r.innerHTML = risk;

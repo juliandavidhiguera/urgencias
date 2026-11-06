@@ -445,6 +445,25 @@ window.SCALES = [
   {t:'chk', l:'Diagnóstico alternativo al menos tan probable como TVP', p:-2}],
   interp:function(s){return s<=0?['low',s+' pts','Probabilidad baja — dímero-D; si negativo, descarta TVP']:s<=2?['mid',s+' pts','Probabilidad moderada — dímero-D + ecografía si positivo']:['high',s+' pts','Probabilidad alta — ecografía Doppler venosa directa']}},
 
+{id:'tep-ped', src:'Dieckmann RA, Brownstein D, Gausche-Hill M. Pediatr Emerg Care 2010;26(4):312-5 (AAP) · Protocolos SEUP · Pediatría Integral (obstrucción respiratoria)', title:'Triángulo de Evaluación Pediátrica (TEP)', sub:'Impresión inicial visual y auditiva en 30–60 s, sin tocar al niño: dónde está el problema y cuán grave es', badge:'red', tag:'Pediatría', max:3, copyDatos:true,
+  // Cada lado alterado suma un bit distinto (1/2/4): el código 0–7 identifica la combinación
+  numTxt:function(s){return ((s&1)+(s>>1&1)+(s>>2&1))+'/3'},
+  items:[
+  {t:'sel', btn:true, l:'Apariencia — <b>TICLS</b>: Tono, Interacción, Consolabilidad, Mirada (Look), Lenguaje/llanto (Speech). Alterada: hipotonía, poco reactivo, inconsolable, mirada perdida, llanto débil o lenguaje incomprensible', o:[['Normal',0],['Alterada',1]]},
+  {t:'sel', btn:true, l:'Respiración (trabajo respiratorio) — ruidos anormales (estridor, quejido, sibilancias, ronquido), tiraje, aleteo nasal, cabeceo, postura anómala (trípode, olfateo), taquipnea o bradipnea visibles', o:[['Normal',0],['Alterada',2]]},
+  {t:'sel', btn:true, l:'Circulación cutánea — palidez, piel moteada (cutis marmorata), cianosis', o:[['Normal',0],['Alterada',4]]}],
+  info:'Lados alterados → <b>paciente inestable</b>: actuar antes de completar el diagnóstico (ABCDE, O₂ al 100 %, monitorizar) y derivar a urgencias hospitalarias desde Atención Primaria. En obstrucción de la vía aérea, mientras llega el traslado: abrir la vía aérea, aspirar secreciones, ventilar con mascarilla y bolsa si es preciso, posición semiincorporada, O₂ al 100 % y tratamiento de la causa. El TEP no sustituye a la evaluación ABCDE ni a las constantes: las orienta.',
+  interp:function(s){return [
+    ['low','Estable','TEP normal — completar ABCDE, constantes e historia'],
+    ['mid','Disfunción del SNC / problema sistémico','Solo apariencia: valorar hipoglucemia, intoxicación, postcrítico, infección del SNC, TCE; glucemia capilar'],
+    ['mid','Dificultad respiratoria','Solo respiración: O₂ si precisa, posición cómoda, tratamiento según causa; reevaluar'],
+    ['high','Fallo respiratorio','Apariencia + respiración: O₂ al 100 %, abrir y aspirar vía aérea, ventilar con bolsa y mascarilla si es preciso; traslado urgente'],
+    ['mid','Shock compensado','Solo circulación: acceso vascular (IV/IO), monitorizar, valorar líquidos; reevaluar'],
+    ['high','Shock descompensado','Apariencia + circulación: O₂ al 100 %, acceso IV/IO, bolo de líquidos, monitorizar; traslado urgente'],
+    ['high','Respiración + circulación alteradas','Combinación no descrita en la tabla clásica del TEP: tratar como inestable (ABCDE, O₂ al 100 %, acceso vascular) y reevaluar'],
+    ['high','Fallo cardiopulmonar','Los tres lados: soporte vital inmediato (vía aérea, ventilación, acceso IV/IO); valorar PCR (ver pestaña PCR, EPALS)']
+  ][s]}},
+
 {id:'gcsped', src:'Reilly 1988 · Childs Nerv Syst · PMID 3383772', title:'Glasgow pediátrico', sub:'Nivel de conciencia en lactantes y niños pequeños (3–15)', badge:'red', tag:'Neuro', max:15, items:[
   {t:'sel', l:'Apertura ocular', o:[['Espontánea (4)',4],['Al habla (3)',3],['Al dolor (2)',2],['Ausente (1)',1]]},
   {t:'sel', l:'Respuesta verbal', o:[['Arrulla, balbucea, sonríe, sigue objetos (5)',5],['Llanto irritable, consolable (4)',4],['Llanto persistente al dolor, inconsolable (3)',3],['Quejido/gemido al dolor (2)',2],['Ausente (1)',1]]},

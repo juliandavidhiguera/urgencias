@@ -1076,7 +1076,7 @@ window.PROTOCOLS = [
       start: 'fisio',
       nodes: {
         fisio: {
-          escalas: ['gcs', 'gcsped'], q: '¿Tiene algún criterio FISIOLÓGICO?',
+          escalas: ['gcs', 'gcsped', 'tep-ped'], q: '¿Tiene algún criterio FISIOLÓGICO?',
           help: v => {
             const r = fisio(v);
             return 'FR &lt;10 rpm (&lt;20 en &lt;1 año) o >29 rpm · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en &lt;1 año).' +
@@ -2522,6 +2522,7 @@ window.PROTOCOLS = [
     return {
       start: 'inicio',
       escalas: [
+        { id: 'tep-ped', para: 'impresión inicial del niño (TEP)' },
         { id: 'gcsped', para: 'consciencia en el niño' },
         { id: 'flacc', para: 'dolor en el niño que no habla' },
         { id: 'westley', para: 'gravedad del crup' },
@@ -2530,6 +2531,7 @@ window.PROTOCOLS = [
       nodes: {
         inicio: {
           t: 'Vistazo rápido (&lt;10 s, sin tocar)',
+          escalas: ['tep-ped'],
           show: () => '<b>Apariencia</b> (tono, interacción, llanto, mirada) · <b>respiración</b> (ruidos, tiraje, aleteo, cabeceo) · <b>color</b> (palidez, moteado, cianosis).' + sinPeso(),
           q: '¿Responde y respira con normalidad?',
           opts: [{ l: 'No responde y no respira con normalidad (o solo boquea)', go: 'pcr' }, { l: 'Responde o respira, pero está grave', go: 'abcde' }]
