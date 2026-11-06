@@ -9,3 +9,8 @@
 # Directorio de trabajo de la skill impeccable (notas de critica + token de
 # sesion del servidor de vista previa en vivo), local de cada maquina.
 .impeccable/
+
+# Dependencias de la Pages Function (Cloudflare las instala en el build)
+node_modules/
+# Secretos locales de wrangler pages dev
+.dev.vars
