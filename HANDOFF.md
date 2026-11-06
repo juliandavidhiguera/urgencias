@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-05 | **Sesion #:** 17 | **Rama:** main | **HEAD:** `5c7f4ec` (desplegado en produccion)
+**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 18 | **Rama:** main | **HEAD:** `90b6235` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -17,7 +17,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | Ingesta de fichas | Scripts Node puntuales (no pipeline automatizado) | - | `scripts/parse_fichas.js` (parsea `medicamentos/*.md`, extraido de PDF de Guies Cliniques catalanas), `scripts/merge_fichas.js` (75 fichas → `data/fichas.js`), `scripts/patch_fichas_verificacion.js` |
 
 **Decisiones cerradas (no re-discutir):**
-- Sin backend, sin framework, sin build: todo el frontend vive en `index.html` + `data/*.js` cargados directo por `<script>`. Confirmado sin `fetch()`, sin `<form>`, sin secretos en codigo.
+- Sin backend, sin framework, sin build: todo el frontend vive en `index.html` + `data/*.js` cargados directo por `<script>`. Confirmado sin `fetch()`, sin `<form>`, sin secretos en codigo. Excepcion PREPARADA pero NO publicada (sesion 18): rama local `ideas-ia` con una Pages Function `/api/ideas` (Claude); el usuario decidio no publicarla mientras la app sea publica (ver backlog #19).
 - `localStorage` solo para `urg-favs`/`urg-recent`/`urg-theme` (favoritos, recientes, tema) — nunca dato de paciente.
 - `sw.js` es **network-first** desde `urg-v64` (sesion 6): con conexion siempre sirve lo publicado (`fetch` con `cache:'no-cache'`, revalida la cache HTTP) y actualiza la copia local; la cache solo responde sin conexion. Ya **no** hace falta subir `CACHE` en cada cambio de `index.html`/`data/*.js`.
 - Dosis de farmacos siempre con peso real; peso ideal solo para volumen tidal (ver memoria de usuario `peso_real_vs_ideal_dosis`).
@@ -26,7 +26,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 3. MAPA DE ARCHIVOS CRITICOS
 | Ruta | Funcion | Estado |
 |---|---|---|
-| `index.html` | Toda la UI: 9 tabs (cheatsheets, escalas, formulas, protocolos, farmacos, perfusiones, intubacion, fichas, bibliografia), busqueda global, favoritos/recientes, tema | ESTABLE |
+| `index.html` | Toda la UI: 11 tabs (cheatsheets, escalas, formulas, protocolos, farmacos, perfusiones, intubacion, pcr, ideas, fichas, bibliografia), busqueda global, favoritos/recientes, tema | ESTABLE |
+| `#tab-ideas` (index.html) | Traspaso IDEAs (REMI A166): campos I/D/E/A/s, copiar parte, nuevo paciente, pautas de metacomunicacion, 🎤 por campo (Web Speech). Datos solo en memoria (`IDEAS_CAMPOS`, `IDEAS_TEXTOS`) | ESTABLE (sesion 18; micro real sin probar) |
 | `data/drugs.js` | Farmacos de urgencias: dosis, alertas, antidotos, perfusion IV por peso | ESTABLE |
 | `data/fichas.js` | 75 fichas tecnicas de medicamentos (generadas desde `medicamentos/*.md`) | ESTABLE |
 | `data/intubacion.js` + tab `#tab-intubacion` (linea 919) | Checklist SIR, registro de dosis administrada/hora, perfusiones de mantenimiento post-intubacion | EN_CURSO (foco de las ultimas 7 sesiones de commits) |
@@ -57,6 +58,16 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 18 - 2026-11-06/07
+- Anadido: tab `#tab-ideas` «🗣️ Traspaso IDEAs» (metodo IDEAs, Delgado Morales R, REMI 2013 A166; articulo leido con curl, WebFetch fallo): tipo de parte (inicial/sucesivo), receptor, I (paciente, ubicacion, responsable, datos basicos), D, E, A (hecho / pendiente / que hace el receptor), s (alarma), preguntas de la tabla 2, pautas de la tabla 3, `copyIdeas()` (omite vacios) y `resetIdeas()`. Boton «🎤 Dictar aqui» en cada textarea (un `SpeechRecognition` compartido, `es-ES`, continuo con resultados provisionales; el destino es el campo activo). Mapeo `ideas` añadido en `globalSearch()`
+- Modificado: `_headers` `Permissions-Policy` `microphone=()` → `microphone=(self)`: el micro estaba BLOQUEADO en produccion (tambien la voz de la linea de tiempo del PCR de la sesion 17)
+- Anadido: escala `tep-ped` (Triangulo de Evaluacion Pediatrica, Dieckmann 2010 + SEUP): 3 `sel` `btn` con valores 1/2/4 (bits), `interp` indexado por el codigo 0–7 (respiracion + circulacion sin apariencia NO es categoria clasica → «tratar como inestable»), `copyDatos`, nota de actuacion del texto del usuario (obstruccion respiratoria, Pediatria Integral). Nuevo campo opcional `numTxt(s)` en `calcScale` para el numero grande (muestra lados alterados 0–3/3). Enlazada en Codi PPT (nodo `fisio`), barra de escalas de EPALS y nodo `inicio` de EPALS (el «vistazo rapido» es el TEP)
+- Rama LOCAL `ideas-ia` (`c24be12`, NO subida): `functions/api/ideas.js` (Pages Function, `@anthropic-ai/sdk` ^1.6.0, `claude-opus-5-5`, effort low, `output_config.format` json_schema, `fallbacks:'default'`), `package.json`, dictado general + «✨ Optimizar con IA» + «↶ Deshacer» + caja «Revisar» (dudas). No envia paciente/ubicacion/responsable y sustituye el nombre por «[paciente]»; rechaza sin `Origin` propio (403) y >8000 caracteres. Probada en local con `wrangler pages dev` y la clave del entorno: ~6,6 s, reparto correcto, corrige «furo semida», no inventa
+- Commits: `38e1dff` feat(ideas): pestaña de traspaso con el método IDEAs (REMI A166) y dictado por campo · `90b6235` feat(escalas): Triángulo de Evaluación Pediátrica (TEP) enlazado en Codi PPT y EPALS
+- Verificado: `node --check` del `<script>`; node con las 8 combinaciones del TEP y referencias de escalas de todos los `flow` (ninguna falta); produccion con curl (`/` con `navbtn-ideas`/`ideas-mic`/`sc.numTxt`, cabecera `microphone=(self)`, `scales.js` y `protocols.js` con `tep-ped`). NO probado: micro real ni clics en navegador (chrome-devtools MCP no conecto; el usuario lo reviso en su navegador)
+- Decisiones: el usuario quiere ver cada cambio en el navegador antes de subirlo; IA solo cuando este protegida (app publica)
+- Descartado: publicar `/api/ideas` sin control de acceso (cualquiera gastaria la cuenta de Anthropic); subir la rama `ideas-ia` a GitHub (Cloudflare crearia un despliegue de vista previa publico)
 
 ### Sesion 17 - 2026-11-05
 - Anadido: `data/protocols.js` -> `codi-risc-suicidi` con `flow` (algoritmo generico del folleto SEM v.01 jun 2024, sin contenido clinico propio): sospecha (¿tentativa? → activar directo) → MINI m1..m6 uno a uno (1/2/6/10/10/4 p; `v.resp[m]===0` = si) → resultado con total y desglose, sugiere ALTO ≥10 / MEDIO 6–9 / BAJO 1–5 (0 p: el folleto no lo clasifica, sin sugerencia) → medio: ¿subir a alto por comorbilidad/factores? → activar (motivo segun `v.ruta`: tentativa / MINI / medio subido; CECOS 061/112, recursos, contencion, traslado a hospital de referencia CRS, seguimiento 30 d) o consejo (telefonico + dispositivos AP/Salud Mental + seguimiento 061). Extras: factores de riesgo, seguimiento a 30 dias. `steps` sin cambios
@@ -192,6 +203,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
+| 18 | Probar el micro real en movil (ahora permitido por `_headers`): dictado por campo de IDEAs y voz de la linea de tiempo del PCR | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
+| 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
+| 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -261,5 +275,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - `.nav { top: 81px }` (>600px) = altura real de `.header`. Si cambia la cabecera (texto, padding, tamano de h1/p), medir `document.querySelector('.header').offsetHeight` y actualizarlo.
 - Comprobar desbordes: un `<iframe>` del ancho deseado con la pagina, `showTab()` en cada pestana, abrir todos los `<details>` y buscar elementos cuyo `right` supere el de su tarjeta (las tarjetas tienen `overflow:hidden`: lo que se sale NO se ve, no hay scroll).
 
+- **Microfono**: `_headers` debe mantener `microphone=(self)`; con `microphone=()` el navegador bloquea `SpeechRecognition` en produccion sin error visible en local (los servidores locales no aplican `_headers`).
+- **Escalas con codigo por bits** (`tep-ped`): `numTxt(s)` solo cambia lo que se muestra; `_scaleResultTxt` usa `copyDatos`, asi que la copia no depende del numero. Si se reordenan los items, cambian los bits y el orden de `interp`.
+- **Rama `ideas-ia`**: no hacer `git push` de ella (Cloudflare Pages publica una vista previa por rama). Probarla con `npx wrangler pages dev . --port 8790 --binding ANTHROPIC_API_KEY=...` desde la rama (en `main` no existe `functions/`). `node_modules/` y `.dev.vars` ya estan en `.gitignore`.
+
 ## 10. SIGUIENTE ACCION INMEDIATA
-Probar en movil real la linea de tiempo del PCR (voz, avisos hablados, pitido, Guardar como PDF, Utstein) y los flujogramas de EPOC, asma, TEP y Codi Risc Suicidi; preguntar si quiere el bloque hospitalario del Codi Risc Suicidi y que troponina usa el laboratorio.
+Probar en movil real el dictado por campo de IDEAs y la voz de la linea de tiempo del PCR (ahora que `_headers` permite el micro), y preguntar al usuario como quiere proteger `/api/ideas` para activar la rama `ideas-ia`.
