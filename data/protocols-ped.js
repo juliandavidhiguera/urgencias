@@ -1037,7 +1037,7 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
     const F = n => ({ n: n, inf: false });
     const nivel = v => (isNaN(v.dolor) || v.dolor < 0 ? '' : v.dolor === 0 ? 'sin' : v.dolor <= 3 ? 'leve' : v.dolor <= 6 ? 'mod' : 'int');
     const noFarm = '<br>¡Usar <b>siempre medidas no farmacológicas</b> y coadyuvantes si hay indicación (abajo, «Durante la atención»)!';
-    const paraTxt = v => '<b>Paracetamol</b> oral: &gt;10 días–10 años <b>15 mg/kg</b>' + r(v, 15, 15, null, 0, 'mg') + ' cada 4–6 h (máx. 90 mg/kg/día) · &gt;10 años 0,5–1 g cada 4–6 h (máx. 4 g/día) · &lt;10 días 10–15 mg/kg cada 6 h (máx. 60 mg/kg/día). Rectal: 20 mg/kg/día (máx. 90 mg/kg/día) <span class="pe-nota">transcrito tal cual: el PDF lo expresa «/día»</span>.<br>' +
+    const paraTxt = v => '<b>Paracetamol</b> oral: &gt;10 días–10 años <b>15 mg/kg</b>' + r(v, 15, 15, null, 0, 'mg') + ' cada 4–6 h (máx. 75 mg/kg/día) · &gt;10 años 0,5–1 g cada 4–6 h (máx. 4 g/día) · &lt;10 días 10–15 mg/kg cada 6 h (máx. 60 mg/kg/día). Rectal: 20 mg/kg/día (máx. 75 mg/kg/día) <span class="pe-nota">transcrito tal cual: el PDF lo expresa «/día». Máximo diario de 75 mg/kg por decisión del servicio (el PDF SEUP da 90).</span>.<br>' +
       'Paracetamol IV: &lt;10 kg <b>7,5 mg/kg</b> (máx. 30 mg/kg/día) · 10–50 kg <b>15 mg/kg</b> (máx. 60 mg/kg/día; 2 g/día si 10–33 kg, 3 g/día si 33–50 kg) · &gt;50 kg 1 g (máx. 4 g/día)' +
       (P(v) ? ' → con ' + f(P(v), 1) + ' kg: <b>' + (P(v) < 10 ? f(P(v) * 7.5, 0) + ' mg' : P(v) <= 50 ? f(P(v) * 15, 0) + ' mg' : '1 g') + '</b> cada 4–6 h' : '') + '.';
     const ibuTxt = v => '<b>Ibuprofeno</b> oral (&gt;3 meses): <b>5–10 mg/kg</b>' + r(v, 5, 10, null, 0, 'mg') + ' cada 6–8 h (máx. 40 mg/kg/día o 1,2 g/día) · &gt;40 kg o adultos 400 mg cada 6–8 h (máx. 1,2 g/día; 2,4 g/día bajo supervisión).<br>' +
@@ -1518,7 +1518,7 @@ window.PROTOCOLS.push({ id:'seup-sepsis', ped:true, title:'Sepsis pediátrica (S
     const sinPeso = v => hay(v.peso) ? '' : '<br><span class="pe-nota">Introduce el peso real arriba para ver las dosis calculadas.</span>';
     const noUcip = v => v.ruta.includes('hipo');
     const CORREGIR = v => '<b>Corregir hipocalcemia/hipoglucemia</b>:<br>• Hipocalcemia (calcio iónico &lt;1,1 mmol/L o &lt;4,8 mg/dl): <b>gluconato cálcico 10 % 50 mg/kg (0,5 ml/kg)</b>' + d(v, 0.5, 20, 1, 'ml') + ' (máx. 2 g = 20 ml).<br>' +
-      '• Hipoglucemia: <b>dextrosa 10 % 0,3 g/kg (3 ml/kg)</b>' + d(v, 3, null, 0, 'ml') + ' a 2-3 ml/min.';
+      '• Hipoglucemia: <b>dextrosa 10 % 0,2 g/kg (2 ml/kg)</b>' + d(v, 2, null, 0, 'ml') + ' a 2-3 ml/min. <span class="pe-nota">Dosis del ERC 2025 elegida por el servicio; el PDF SEUP de sepsis da 0,3 g/kg (3 ml/kg).</span>';
     const SIGUE = {
       q: '¿Persiste el shock tras 40-60 ml/kg de cristaloide o aparecen signos de sobrecarga de fluidos?',
       help: 'Sobrecarga: crepitantes, hepatomegalia, ritmo de galope.',
