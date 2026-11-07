@@ -4816,7 +4816,7 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
   const d = r.inf;
   const mg = c.mg != null ? c.mg : d ? d.mg : null;
   const vol = c.vol != null ? c.vol : d ? d.vol : null;
-  const key = 'latf-' + (c.n + '-' + mg + '-' + vol).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
+  const key = 'latf-' + (c.n + '-' + mg + '-' + vol + (c.min != null ? '-r' + c.min + '-' + c.max : '')).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
   const body = document.getElementById('lat-body');
   let box = document.getElementById(key);
   if (!box) {
@@ -4840,6 +4840,11 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
   _latMostrar(box, 'Medicación: ' + c.n);
 }
 
+/* Rango de dosis: el del protocolo si el fármaco lo trae (min/max, p. ej. estatus pediátrico), si no el de Perfusión IV. */
+function _farmRango(c, d) {
+  return c && c.min != null ? { min: c.min, max: c.max, txt: ' (' + (c.rango || 'rango del protocolo') + ')' } : { min: d.doseMin, max: d.doseMax, txt: '' };
+}
+
 function _farmCardHTML(key, c, r) {
   const d = r.inf;
   const u = d ? (d.unitLabel || 'mg') : '';
@@ -4853,7 +4858,8 @@ function _farmCardHTML(key, c, r) {
       '<div class="lat-farm-dil">' + fld('dosis', 'Dosis (' + d.unit + ')', 'dosis') + fld('mlh', 'Ritmo (ml/h)', 'mlh') + '</div>' +
       '<div class="lat-farm-res" id="' + key + '-res" aria-live="polite"></div>' +
       '<div class="lat-farm-warn" id="' + key + '-warn" role="alert" hidden></div>' +
-      '<div class="scale-note">Rango: ' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit +
+      '<div class="scale-note">Rango: ' + _farmRango(c, d).min + (_farmRango(c, d).max != null && _farmRango(c, d).max !== _farmRango(c, d).min ? '–' + _farmRango(c, d).max : '') + ' ' + d.unit + _farmRango(c, d).txt +
+      (c.min != null ? ' · en Perfusión IV ' + d.doseMin + (d.doseMax != null ? '–' + d.doseMax : '') : '') +
       ' · Diluyente: ' + d.diluyente + (c.mg != null ? ' · Dilución del protocolo; la de Perfusión IV es ' + d.mg + ' ' + u + ' en ' + d.vol + ' ml' : '') + '</div>' +
       (d.notas ? '<div class="scale-note">⚠ ' + d.notas + '</div>' : '') +
       '<div class="lat-farm-hint">Cambia la dosis o el ritmo según la evolución: el otro valor se recalcula.</div>' +
@@ -4900,9 +4906,10 @@ function _farmCalc(key, origen) {
   res.innerHTML = dosis != null && mlh != null
     ? '<b>' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h</b><br>Concentración ' + _fmt(conc, 3) + ' ' + u + '/ml · 1 ml/h = ' + _fmt(conc / porUnidad, 3) + ' ' + d.unit
     : 'Introduce la dosis o el ritmo.';
-  const fuera = dosis != null && (dosis < d.doseMin || (d.doseMax != null && dosis > d.doseMax));
+  const rg = _farmRango(_farmCfgDeCaja(box), d);
+  const fuera = dosis != null && (dosis < rg.min || (rg.max != null && dosis > rg.max));
   warn.hidden = !fuera;
-  warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + d.doseMin + (d.doseMax != null ? '–' + d.doseMax : '') + ' ' + d.unit + '): revisar antes de administrar.' : '';
+  warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + '): revisar antes de administrar.' : '';
   if (box.dataset.pid) _farmPintar(box.dataset.pid);
 }
 

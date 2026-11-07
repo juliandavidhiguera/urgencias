@@ -558,13 +558,13 @@ window.SCALES = [
   {t:'sel', l:'Consolabilidad', o:[['Contento y relajado (0)',0],['Se tranquiliza con contacto o distracción (1)',1],['Difícil de consolar (2)',2]]}],
   interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}},
 
-{id:'westley', src:'Westley 1978 · Am J Dis Child · PMID 645693', title:'Westley', sub:'Crup / laringotraqueítis — gravedad', badge:'amber', tag:'Pediatría', max:17, items:[
+{id:'westley', src:'Westley 1978 · Am J Dis Child · PMID 645693 · clasificación SEUP (algoritmo de laringitis aguda)', title:'Westley', sub:'Crup / laringotraqueítis — gravedad', badge:'amber', tag:'Pediatría', max:17, items:[
   {t:'sel', l:'Estridor', o:[['Ausente (0)',0],['Con agitación (1)',1],['En reposo (2)',2]]},
   {t:'sel', l:'Tiraje', o:[['Ausente (0)',0],['Leve (1)',1],['Moderado (2)',2],['Grave (3)',3]]},
   {t:'sel', l:'Entrada de aire', o:[['Normal (0)',0],['Disminuida (1)',1],['Muy disminuida (2)',2]]},
   {t:'sel', l:'Cianosis', o:[['Ausente (0)',0],['Con agitación (4)',4],['En reposo (5)',5]]},
   {t:'sel', l:'Nivel de conciencia', o:[['Normal (0)',0],['Alterado (5)',5]]}],
-  interp:function(s){return s<=2?['low',s+' pts','Leve — dexametasona oral, alta con normas']:s<=7?['mid',s+' pts','Moderado — dexametasona + observación estrecha']:s<=11?['high',s+' pts','Grave — adrenalina nebulizada + dexametasona, preparar vía aérea']:['high',s+' pts','Fallo respiratorio inminente — manejo avanzado de la vía aérea']}},
+  interp:function(s){var seup=' · SEUP: '+(s<=3?'leve (≤3)':s<=5?'moderada (4–5)':'grave (≥6)');return s<=2?['low',s+' pts','Leve — dexametasona oral, alta con normas'+seup]:s<=7?['mid',s+' pts','Moderado — dexametasona + observación estrecha'+seup]:s<=11?['high',s+' pts','Grave — adrenalina nebulizada + dexametasona, preparar vía aérea'+seup]:['high',s+' pts','Fallo respiratorio inminente — manejo avanzado de la vía aérea'+seup]}},
 
 {id:'painad', src:'Warden 2003 · J Am Med Dir Assoc · PMID 12807591', title:'PAINAD', sub:'Dolor en demencia avanzada (no verbal)', badge:'blue', tag:'Dolor geriátrico', max:10, items:[
   {t:'sel', l:'Respiración (independiente de la vocalización)', o:[['Normal (0)',0],['Respiración ruidosa ocasional / hiperventilación breve (1)',1],['Respiración ruidosa dificultosa / hiperventilación prolongada / Cheyne-Stokes (2)',2]]},
@@ -803,6 +803,66 @@ window.SCALES = [
   {t:'sel', l:'Cefalea o sensación de cabeza llena', o:[['0 — no',0],['1 — muy leve',1],['2 — leve',2],['3 — moderada',3],['4 — moderadamente intensa',4],['5 — intensa',5],['6 — muy intensa',6],['7 — extremadamente intensa',7]]},
   {t:'sel', l:'Orientación', o:[['0 — orientado, puede sumar en serie',0],['1 — no puede sumar en serie o duda de la fecha',1],['2 — desorientado en la fecha ≤2 días',2],['3 — desorientado en la fecha >2 días',3],['4 — desorientado en lugar o persona',4]]}],
   info:'Requiere un paciente que se comunique de forma fiable: no usar en delirio, intubación o enfermedad que confunda los ítems. Convulsiones o delirium tremens = abstinencia complicada (grave) con cualquier puntuación. Los cortes son la clasificación habitual de ASAM 2020, no de la publicación original',
-  interp:function(s){return s>=19?['high',s+' pts','Abstinencia grave — tratamiento farmacológico y valorar nivel de cuidados']:s>=10?['mid',s+' pts','Abstinencia moderada — tratamiento farmacológico guiado por síntomas']:['low',s+' pts','Abstinencia leve — reevaluar periódicamente']}}
+  interp:function(s){return s>=19?['high',s+' pts','Abstinencia grave — tratamiento farmacológico y valorar nivel de cuidados']:s>=10?['mid',s+' pts','Abstinencia moderada — tratamiento farmacológico guiado por síntomas']:['low',s+' pts','Abstinencia leve — reevaluar periódicamente']}},
+
+// ── Escalas pediátricas usadas por los algoritmos SEUP (sesión 20) ──────────
+
+{id:'pulmonary-score', src:'Smith SR 2002 · Acad Emerg Med · PMID 11825832 · ítems y cortes de FR del algoritmo SEUP de crisis asmática · clasificación 0–3 / 4–6 / 7–9 (Iramain 2026 · PMID 41837861)', title:'Pulmonary Score', sub:'Crisis asmática pediátrica — gravedad', badge:'amber', tag:'Pediatría', max:9, items:[
+  {t:'sel', l:'Frecuencia respiratoria (&lt;6 años · ≥6 años)', o:[['&lt;6 a: ≤30 · ≥6 a: ≤20 (0)',0],['&lt;6 a: 31–45 · ≥6 a: 21–35 (1)',1],['&lt;6 a: 46–60 · ≥6 a: 36–50 (2)',2],['&lt;6 a: &gt;60 · ≥6 a: &gt;50 (3)',3]]},
+  {t:'sel', l:'Sibilancias (sin sibilancias y con ECM aumentado: puntuar 3)', o:[['No (0)',0],['Final de la espiración (1)',1],['Toda la espiración (2)',2],['Inspiración y espiración sin fonendo (3)',3]]},
+  {t:'sel', l:'Uso del esternocleidomastoideo (ECM)', o:[['No (0)',0],['Leve (1)',1],['Moderado (2)',2],['Máximo (3)',3]]}],
+  info:'Valorar junto a la SatO₂: el algoritmo SEUP pide OAF si tras el tratamiento inicial persiste PS &gt;6 o SatO₂ &lt;94 % con reservorio. El PDF de la SEUP escribe «leve &lt;3»; aquí se usa la clasificación publicada del score (leve 0–3). Criterio de alta SEUP: PS ≤2.',
+  interp:function(s){return s<=3?['low',s+'/9','Crisis leve — salbutamol inhalado con cámara']:s<=6?['mid',s+'/9','Crisis moderada — O₂ si SatO₂ &lt;92 %, salbutamol + ipratropio, corticoide oral']:['high',s+'/9','Crisis grave — O₂, salbutamol + ipratropio nebulizados, corticoide; valorar magnesio IV y OAF']}},
+
+{id:'tal-mod', src:'Escala de Tal modificada (Golan-Tripto 2018 · Pediatr Pulmonol · PMID 29655288) · ítems y cortes del algoritmo SEUP de bronquiolitis (mayo 2024)', title:'Tal modificada', sub:'Bronquiolitis — gravedad', badge:'amber', tag:'Pediatría', max:12, items:[
+  {t:'sel', l:'Frecuencia respiratoria (&lt;6 meses · ≥6 meses)', o:[['&lt;6 m: ≤40 · ≥6 m: ≤30 (0)',0],['&lt;6 m: 41–55 · ≥6 m: 31–45 (1)',1],['&lt;6 m: 56–70 · ≥6 m: 46–60 (2)',2],['&lt;6 m: &gt;70 · ≥6 m: &gt;60 (3)',3]]},
+  {t:'sel', l:'Sibilancias / crepitantes', o:[['No (0)',0],['Solo espiratorias (1)',1],['Inspiratorias y espiratorias, audibles con fonendo (2)',2],['Audibles sin fonendo (3)',3]]},
+  {t:'sel', l:'Retracciones', o:[['No (0)',0],['Leves: subcostal, intercostal (1)',1],['Moderadas: intercostales (2)',2],['Intensas: intercostales y supraesternal, cabeceo (3)',3]]},
+  {t:'sel', l:'SatO₂ (aire ambiente)', o:[['≥95 % (0)',0],['92–94 % (1)',1],['90–91 % (2)',2],['≤89 % (3)',3]]}],
+  info:'Puntuar tras aspirar las secreciones. Cortes SEUP: leve &lt;5 · moderada 6–8 · grave &gt;8. <b>El PDF de la SEUP no clasifica la puntuación 5</b>: decidir con la SpO₂, los factores de riesgo y la evolución.',
+  interp:function(s){return s<5?['low',s+'/12','Leve (SEUP) — si SpO₂ &gt;94 % y sin factores de riesgo: alta con medidas generales']:s===5?['mid','5/12','Límite: la SEUP no clasifica el 5 (leve &lt;5, moderada 6–8) — decidir con SpO₂, factores de riesgo y evolución']:s<=8?['mid',s+'/12','Moderada (SEUP) — alta con control en 24 h si no hay factores de riesgo ni criterios de observación']:['high',s+'/12','Grave (SEUP) — O₂ con reservorio; valorar adrenalina nebulizada y OAF']}},
+
+{id:'pecarn-menor2', src:'Kuppermann N 2009 · Lancet · PMID 19758692 · riesgos de LCCI por grupo: PREDICT (Bressan 2021 · Acad Emerg Med · PMID 34236116)', title:'PECARN TCE (<2 años)', sub:'Traumatismo craneal leve (GCS 14–15) — ¿TAC?', badge:'amber', tag:'Pediatría', max:24, items:[
+  {t:'chk', l:'<b>Alto riesgo</b>: GCS 14 u otros signos de alteración del estado mental', p:10},
+  {t:'chk', l:'<b>Alto riesgo</b>: fractura craneal palpable', p:10},
+  {t:'chk', l:'Hematoma de cuero cabelludo no frontal (occipital, parietal o temporal)', p:1},
+  {t:'chk', l:'Pérdida de conciencia (≥5 s)', p:1},
+  {t:'chk', l:'Mecanismo grave (ver abajo)', p:1},
+  {t:'chk', l:'No actúa con normalidad según los padres', p:1}],
+  info:'<b>Mecanismo grave</b>: accidente de tráfico con eyección, muerte de otro pasajero o vuelco; peatón o ciclista sin casco atropellado por un vehículo a motor; caída &gt;0,9 m; impacto en la cabeza con un objeto de alta energía.<br>La regla solo se aplica a TCE leve con GCS 14–15. Con GCS ≤13 → TAC.',
+  interp:function(s){return s>=10?['high','Alto riesgo','TAC recomendado (LCCI 8,5 % en PREDICT)']:s>=1?['mid','Riesgo intermedio','Observación frente a TAC según experiencia, número de hallazgos, empeoramiento, edad &lt;3 meses y preferencia de los padres (LCCI 0,2 %)']:['low','Muy bajo riesgo','TAC no recomendado (LCCI 0 % en PREDICT)']}},
+
+{id:'pecarn-mayor2', src:'Kuppermann N 2009 · Lancet · PMID 19758692 · riesgos de LCCI por grupo: PREDICT (Bressan 2021 · Acad Emerg Med · PMID 34236116)', title:'PECARN TCE (≥2 años)', sub:'Traumatismo craneal leve (GCS 14–15) — ¿TAC?', badge:'amber', tag:'Pediatría', max:24, items:[
+  {t:'chk', l:'<b>Alto riesgo</b>: GCS 14 u otros signos de alteración del estado mental', p:10},
+  {t:'chk', l:'<b>Alto riesgo</b>: signos de fractura de la base del cráneo', p:10},
+  {t:'chk', l:'Pérdida de conciencia', p:1},
+  {t:'chk', l:'Vómitos', p:1},
+  {t:'chk', l:'Mecanismo grave (ver abajo)', p:1},
+  {t:'chk', l:'Cefalea intensa', p:1}],
+  info:'<b>Mecanismo grave</b>: accidente de tráfico con eyección, muerte de otro pasajero o vuelco; peatón o ciclista sin casco atropellado por un vehículo a motor; caída &gt;1,5 m; impacto en la cabeza con un objeto de alta energía.<br>La regla solo se aplica a TCE leve con GCS 14–15. Con GCS ≤13 → TAC.',
+  interp:function(s){return s>=10?['high','Alto riesgo','TAC recomendado (LCCI 5,7 % en PREDICT)']:s>=1?['mid','Riesgo intermedio','Observación frente a TAC según experiencia, número de hallazgos, empeoramiento y preferencia de los padres (LCCI 0,7 %)']:['low','Muy bajo riesgo','TAC no recomendado (LCCI 0 % en PREDICT)']}},
+
+{id:'psofa', src:'Matics TJ, Sanchez-Pinto LN · JAMA Pediatr 2017 · PMID 28783810 (tabla 1)', title:'pSOFA', sub:'Disfunción orgánica pediátrica — sepsis', badge:'red', tag:'Pediatría', max:24, items:[
+  {t:'sel', l:'Respiratorio — PaO₂/FiO₂ (o SpO₂/FiO₂ con SpO₂ ≤97 %)', o:[['≥400 (SF ≥292) (0)',0],['300–399 (SF 264–291) (1)',1],['200–299 (SF 221–264) (2)',2],['100–199 (SF 148–220) con soporte respiratorio (3)',3],['&lt;100 (SF &lt;148) con soporte respiratorio (4)',4]]},
+  {t:'sel', l:'Coagulación — plaquetas (×10³/µl)', o:[['≥150 (0)',0],['100–149 (1)',1],['50–99 (2)',2],['20–49 (3)',3],['&lt;20 (4)',4]]},
+  {t:'sel', l:'Hígado — bilirrubina (mg/dl)', o:[['&lt;1,2 (0)',0],['1,2–1,9 (1)',1],['2,0–5,9 (2)',2],['6,0–11,9 (3)',3],['≥12 (4)',4]]},
+  {t:'sel', l:'Cardiovascular — PAM por edad o vasoactivos (µg/kg/min, ≥1 h)', o:[['PAM ≥ umbral de su edad (0)',0],['PAM &lt; umbral de su edad (1)',1],['Dopamina ≤5 o dobutamina (cualquiera) (2)',2],['Dopamina &gt;5, adrenalina ≤0,1 o noradrenalina ≤0,1 (3)',3],['Dopamina &gt;15, adrenalina &gt;0,1 o noradrenalina &gt;0,1 (4)',4]]},
+  {t:'sel', l:'Neurológico — Glasgow pediátrico', o:[['15 (0)',0],['13–14 (1)',1],['10–12 (2)',2],['6–9 (3)',3],['&lt;6 (4)',4]]},
+  {t:'sel', l:'Renal — creatinina según la edad (tabla de abajo)', o:[['Columna 0 (0)',0],['Columna 1 (1)',1],['Columna 2 (2)',2],['Columna 3 (3)',3],['Columna 4 (4)',4]]}],
+  info:'<strong>Umbrales por edad</strong><table><tr><th>Edad</th><th>PAM (mmHg) 0 / 1</th><th>Creatinina (mg/dl) 0 · 1 · 2 · 3 · 4</th></tr>' +
+    '<tr><td>&lt;1 mes</td><td>≥46 / &lt;46</td><td>&lt;0,8 · 0,8–0,9 · 1,0–1,1 · 1,2–1,5 · ≥1,6</td></tr>' +
+    '<tr><td>1–11 meses</td><td>≥55 / &lt;55</td><td>&lt;0,3 · 0,3–0,4 · 0,5–0,7 · 0,8–1,1 · ≥1,2</td></tr>' +
+    '<tr><td>12–23 meses</td><td>≥60 / &lt;60</td><td>&lt;0,4 · 0,4–0,5 · 0,6–1,0 · 1,1–1,4 · ≥1,5</td></tr>' +
+    '<tr><td>24–59 meses</td><td>≥62 / &lt;62</td><td>&lt;0,6 · 0,6–0,8 · 0,9–1,5 · 1,6–2,2 · ≥2,3</td></tr>' +
+    '<tr><td>60–143 meses</td><td>≥65 / &lt;65</td><td>&lt;0,7 · 0,7–1,0 · 1,1–1,7 · 1,8–2,5 · ≥2,6</td></tr>' +
+    '<tr><td>144–216 meses</td><td>≥67 / &lt;67</td><td>&lt;1,0 · 1,0–1,6 · 1,7–2,8 · 2,9–4,1 · ≥4,2</td></tr>' +
+    '<tr><td>&gt;216 meses</td><td>≥70 / &lt;70</td><td>&lt;1,2 · 1,2–1,9 · 2,0–3,4 · 3,5–4,9 · ≥5</td></tr></table>' +
+    '<p style="margin-top:8px">Peor valor de cada periodo de 24 h; un dato no medido cuenta 0. Bilirrubina ×17,1 = µmol/l; creatinina ×88,4 = µmol/l. El algoritmo SEUP de sepsis define la sepsis como pSOFA ≥2 por infección, no evaluable a la llegada: no retrasar el tratamiento por calcularlo.</p>',
+  interp:function(s){return s<2?['low',s+'/24','pSOFA &lt;2 — sin disfunción orgánica por este criterio; reevaluar']:['high',s+'/24','pSOFA ≥2 — con infección, sepsis (disfunción orgánica)']}},
+
+{id:'dolor-eva', src:'Algoritmo SEUP de dolor (escalas de autoinforme: numérica verbal, EVA, caras FPS-R y Wong-Baker)', title:'Intensidad del dolor (autoinforme)', sub:'Escala numérica, EVA o caras — niño colaborador', badge:'blue', tag:'Dolor pediátrico', max:10, items:[
+  {t:'sel', l:'Puntuación que da el niño (numérica 0–10, EVA en cm o cara elegida)', o:[['0 — no duele (0)',0],['1 (1)',1],['2 — duele un poco (2)',2],['3 (3)',3],['4 — duele algo más (4)',4],['5 (5)',5],['6 — duele todavía más (6)',6],['7 (7)',7],['8 — duele mucho (8)',8],['9 (9)',9],['10 — duele el máximo (10)',10]]}],
+  info:'Numérica verbal: «0 es nada de dolor y 10 el peor dolor imaginable». EVA: línea de 10 cm, se mide la marca. Caras FPS-R/Wong-Baker: 6 caras puntuadas 0, 2, 4, 6, 8, 10; no usar palabras como «contento» o «triste». Son de autoinforme: un tercero no puede puntuarlas por el niño (usar FLACC).',
+  interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado']:['high',s+'/10','Dolor intenso']}},
 
 ];

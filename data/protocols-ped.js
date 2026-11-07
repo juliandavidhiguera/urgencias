@@ -260,7 +260,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }],
       start: 'inicio',
-      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }],
+      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'tal-mod', para: 'gravedad (Tal modificada, cortes SEUP)' }],
       nodes: {
         inicio: {
           t: 'Bronquiolitis aguda',
@@ -275,7 +275,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
           ]
         },
         estable: {
-          t: 'Estable: FR, SpO₂ y score clínico',
+          t: 'Estable: FR, SpO₂ y score clínico', escalas: ['tal-mod'],
           show: TAL + '<br>' + ASP + '<br>Anamnesis y valoración de FFR para observación hospitalaria.<br>' + FFR,
           q: '¿Cumple criterios de bronquiolitis leve (SpO₂ &gt;94 %, score &lt;5 y sin FFR)?',
           help: 'El algoritmo de la SEUP solo dibuja la bronquiolitis leve en la rama estable. Si no la cumple, sigue la rama de reevaluación.',
@@ -396,7 +396,7 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
     const PS = '<b>Pulmonary Score</b> (0–3 por ítem, total 0–9): <b>FR</b> &lt;6 años: &lt;30 / 31–45 / 46–60 / &gt;60 · &gt;6 años: &lt;20 / 21–35 / 36–50 / &gt;50 · ' +
       '<b>Sibilancias</b>: no / final de la espiración / toda la espiración / inspiración y espiración sin fonendo · ' +
       '<b>Uso de ECM</b>: no / leve / moderado / máximo. Sin sibilancias y con ECM aumentado: puntuar 3.<br>' +
-      'Leve PS &lt;3 · moderada PS 4–6 · grave PS &gt;6. (No está como escala en la app.)';
+      'Leve PS 0–3 · moderada PS 4–6 · grave PS 7–9 (el PDF de la SEUP escribe «leve &lt;3» y no asigna el 3; la clasificación publicada del score lo incluye en leve). Calcúlalo con la escala «Pulmonary Score».';
     const SALB = v => '<b>Salbutamol MDI</b> con cámara (mascarilla si &lt;4 años): peso/3 pulsaciones de 100 µg, mín. 5 y máx. 10' + puffs(v) + '. Inicio: 3 dosis en la 1.ª hora (cada 20 min), después a demanda.';
     const SALBNEB = v => '<b>Salbutamol nebulizado</b> (crisis graves) con O₂ a 6–8 l/min: 0,15 mg/kg, mín. 2,5 y máx. 5 mg' + salbNeb(v) + ' (o 2,5 mg si &lt;20 kg y 5 mg si &gt;20 kg).';
     const IPRA = '<b>Bromuro de ipratropio</b> MDI 4 pulsaciones (80 µg), 2–3 dosis junto a las tandas iniciales de salbutamol.';
@@ -406,7 +406,7 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }],
       start: 'inicio',
-      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }],
+      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'pulmonary-score', para: 'gravedad de la crisis (Pulmonary Score)' }],
       nodes: {
         inicio: {
           t: 'Crisis asmática',
@@ -420,13 +420,13 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
           ]
         },
         triaje: {
-          t: 'Triaje y valoración',
+          t: 'Triaje y valoración', escalas: ['pulmonary-score'],
           show: 'Motivo de consulta, <b>FR y SatO₂</b>. Nivel de gravedad (PaedCTAS): I fallo cardiorrespiratorio, atención inmediata · II fallo respiratorio, ≤15 min · III dificultad respiratoria, ≤30 min · IV estable con síntomas respiratorios sin dificultad, 1–2 h.<br>' +
             'Revalorar TEP y ABCDE; historia clínica y exploración física.<br>' + PS,
           q: '¿Qué gravedad tiene según la escala clínica?',
-          help: 'El texto de la SEUP no asigna el PS = 3 (leve &lt;3, moderada 4–6); el criterio de alta exige PS ≤2.',
+          help: 'PS = 3 cuenta como leve (clasificación publicada 0–3; el PDF de la SEUP escribe «&lt;3»). El criterio de alta exige PS ≤2.',
           opts: [
-            { l: 'Leve (PS &lt;3)', go: 'leve' },
+            { l: 'Leve (PS 0–3)', go: 'leve' },
             { l: 'Moderada-grave (PS ≥4)', go: 'modgrave' }
           ]
         },
@@ -523,11 +523,11 @@ window.PROTOCOLS.push({ id:'seup-laringitis', ped:true, title:'Laringitis aguda 
     const ADR = v => '<b>Adrenalina nebulizada 0,5 mg/kg</b>' + d(v, 0.5, 5, 1, 'mg') + ' (máx. 5 mg por nebulización). Efecto a los 10 min, pico a los 30 min, dura 2 h.';
     const ALTA = '<b>Criterios de alta</b>: sin estridor en reposo · SatO₂ &gt;95 % · sin dificultad respiratoria · buena coloración y estado general · buena tolerancia oral a líquidos · posibilidad de volver al hospital si empeora.';
     const WESTLEY = '<b>Escala de Westley</b> (SEUP): estridor inspiratorio no 0 / con la agitación 1 / en reposo 2 · retracciones no 0 / leves 1 / moderadas 2 / severas 3 · ventilación normal 0 / hipoventilación leve 1 / moderada-severa 2 · cianosis no 0 / con la agitación 4 / en reposo 5 · consciencia normal 0 / disminuida 5.<br>' +
-      '<b>≤3 leve · 4–5 moderada · ≥6 grave.</b><br><span class="pe-nota">La escala Westley de la app interpreta con otros cortes; aquí manda la clasificación SEUP.</span>';
+      '<b>≤3 leve · 4–5 moderada · ≥6 grave.</b><br><span class="pe-nota">La escala Westley de la app muestra la clasificación clásica y, al lado, la de la SEUP; en este algoritmo manda la SEUP.</span>';
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }],
       start: 'inicio',
-      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'westley', para: 'gravedad del crup (usar los cortes SEUP)' }],
+      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'westley', para: 'gravedad del crup (muestra la clasificación SEUP)' }],
       nodes: {
         inicio: {
           t: 'Laringitis aguda',
@@ -849,7 +849,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
     {text:'Riesgo intermedio (criterios distintos en &lt;2 y ≥2 años) → observación hospitalaria mínima de 4–6 h frente a TAC.'},
     {text:'Riesgo bajo → alta con recomendaciones y observación domiciliaria 24–48 h.'},
     {text:'Ingreso si GCS &lt;15, focalidad, estado neurológico alterado, intolerancia oral, lesiones extracraneales graves, LIC, sospecha de maltrato o cuidadores inadecuados. UCIP si GCS &lt;13, focalidad o LIC.'},
-    {type:'info', text:'La tabla de grupos de riesgo de la SEUP sigue la línea de PECARN; aquí se aplica con preguntas, sin escala aparte.'}
+    {type:'info', text:'La tabla de grupos de riesgo de la SEUP sigue la línea de PECARN; aquí se aplica con preguntas y se puede puntuar con las escalas PECARN de la app (&lt;2 y ≥2 años).'}
   ],
   flow:(() => {
     const ok = x => typeof x === 'number' && x > 0;
@@ -872,7 +872,9 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
         {id:'tep-ped', para:'impresión inicial (TEP)'},
         {id:'gcsped', para:'Glasgow en el niño (verbal modificada en &lt;2 años)'},
         {id:'gcs', para:'Glasgow en el niño mayor'},
-        {id:'flacc', para:'dolor en el niño que no habla'}
+        {id:'flacc', para:'dolor en el niño que no habla'},
+        {id:'pecarn-menor2', para:'riesgo de lesión intracraneal (&lt;2 años)'},
+        {id:'pecarn-mayor2', para:'riesgo de lesión intracraneal (≥2 años)'}
       ],
       nodes:{
         inicio:{
@@ -923,11 +925,13 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
           ]
         },
         inter2:{
+          escalas:['pecarn-menor2'],
           q:'¿Tiene algún criterio de <b>riesgo intermedio</b> (&lt;2 años)?',
           help:'Cefalohematoma no frontal importante · pérdida de conocimiento &gt;5 s · vómitos · mecanismo de riesgo · actitud anormal según los padres.',
           opts:[{l:'Sí', go:'obs'}, {l:'No', go:'bajo'}]
         },
         interM:{
+          escalas:['pecarn-mayor2'],
           q:'¿Tiene algún criterio de <b>riesgo intermedio</b> (≥2 años)?',
           help:'Pérdida de conocimiento · vómitos · cefalea intensa · mecanismo de riesgo.',
           opts:[{l:'Sí', go:'obs'}, {l:'No', go:'bajo'}]
@@ -1029,7 +1033,7 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
         { k: 'dolor', l: 'Puntuación de dolor', u: '0–10' }
       ],
       start: 'inicio',
-      escalas: [{ id: 'flacc', para: 'dolor en el niño no colaborador o preverbal' }],
+      escalas: [{ id: 'dolor-eva', para: 'intensidad del dolor en el niño colaborador' }, { id: 'flacc', para: 'dolor en el niño no colaborador o preverbal' }],
       nodes: {
         inicio: {
           t: 'Paso 1: medir la intensidad del dolor',
@@ -1041,11 +1045,11 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
           ]
         },
         auto: {
-          t: 'Escalas de autoinforme',
+          t: 'Escalas de autoinforme', escalas: ['dolor-eva'],
           show: '• <b>Escala numérica verbal</b> (0–10: «0 es nada de dolor y 10 el peor dolor imaginable»): 0 no dolor · 2 leve · 4–6 moderado · 8–10 intenso.<br>' +
             '• <b>Escala visual analógica</b> (línea de 100 mm; se mide la marca del niño y da un valor 0–10): 0 no dolor · 1–3 leve · 4–6 moderado · 7–10 intenso.<br>' +
             '• <b>Caras FPS-R</b> (6 caras puntuadas 0, 2, 4, 6, 8, 10) y <b>caras de Wong-Baker</b> («no duele» → «duele el máximo»): 0 no dolor · 2 leve · 4–6 moderado · 8–10 intenso. No usar palabras como «contento» o «triste»; Wong-Baker no sirve para que un tercero valore el dolor.<br>' +
-            'Estas escalas no están en la app: puntúalas y anota el resultado en «Puntuación de dolor».',
+            'Puntúala con la escala «Intensidad del dolor (autoinforme)» y anota el resultado en «Puntuación de dolor».',
           q: 'Paso 2: ¿qué intensidad tiene?',
           opts: [
             { l: 'Sin dolor', go: 'sin', sug: v => nivel(v) === 'sin' },
@@ -1427,7 +1431,7 @@ window.PROTOCOLS.push({ id:'seup-estatus', ped:true, title:'Estatus epiléptico 
         },
         refractario:{
           t:'Minuto 30 · EE refractario: UCIP', c:'high',
-          farmacos:[{n:'Midazolam', dosis:0.05}, {n:'Propofol', dosis:5}],
+          farmacos:[{n:'Midazolam', dosis:0.05, min:0.05, max:0.4, rango:'estatus refractario SEUP'}, {n:'Propofol', dosis:5, min:5, max:10, rango:'estatus refractario SEUP'}],
           show: v => 'Por orden, en la UCIP:<br>' +
             '1. <b>Midazolam 0,2 mg/kg</b>' + d(v, 0.2, null, 1, 'mg') + ' en bolo → <b>0,05–0,4 mg/kg/h</b>' + r(v, 0.05, 0.4, null, 2, 'mg/h') + '.<br>' +
             '2. <b>Propofol 3–5 mg/kg</b>' + r(v, 3, 5, null, 0, 'mg') + ' en bolo → <b>5–10 mg/kg/h</b>' + r(v, 5, 10, null, 0, 'mg/h') + '.<br>' +
@@ -1506,7 +1510,7 @@ window.PROTOCOLS.push({ id:'seup-sepsis', ped:true, title:'Sepsis pediátrica (S
         { k: 'edad', l: 'Edad', u: 'años' }
       ],
       start: 'inicio',
-      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'gcsped', para: 'nivel de conciencia (D)' }],
+      escalas: [{ id: 'tep-ped', para: 'impresión inicial (TEP)' }, { id: 'gcsped', para: 'nivel de conciencia (D)' }, { id: 'psofa', para: 'disfunción orgánica (pSOFA ≥2)' }],
       nodes: {
         inicio: {
           t: '0-5 minutos: sospecha de sepsis', c: 'high',
