@@ -61,6 +61,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
 ### Sesion 23 - 2026-11-07
+- Usuario: probado en pantalla de movil (Geriatria y calculadora de bolo), va bien
 - Dosis pediatricas cerradas (#26): biperideno, clonazepam y dexclorfeniramina se quedan como estaban (usuario: «dejarlos asi todos»); butilescopolamina corregida (`1b8159e`) a 0,3–0,6 mg/kg/dosis, max. diario 1,5 mg/kg/dia, en la MISMA linea que la dosis (en linea aparte `parseDosisPorKg` la tomaria como otra pauta). Verificado con node: 1 pauta, tope 5 mg
 - Modificado (`ed6b28e`): `data/scales.js` 48 escalas sustituidas tras auditar las 70 antiguas contra su fuente (5 agentes, brief `scratchpad/audit_brief.md`, propuestas en `scratchpad/audit/G1–G5.js`, aplicadas por id con `apply_audit.py`). 25 con errores de contenido (CURB-65 undefined con 5, HEART aterosclerosis 2 y edades 45–64/≥65, GBS con dos Hb sumables → max 23, APACHE II GCS = 15−GCS y FRA, RASS −3/−4, RACE facial/afasia/agnosia, PSI clase I por criterios, Anthonisen tipo III, Apgar sin indicar reanimación, CFS 2.0, TASH/RTS/Rockall/EHRA sin cortes inventados, mortalidades de CHA2DS2-VASc/HAS-BLED/AIMS65/Child-Pugh/MELD/SOFA, max de cchr e improve-bleed); 23 solo `src` (Hestia, gcsped y westley citaban PMID ajeno). 22 OK. No verificables (se dejo lo que habia): Downton (libro), Killip II–III, Ranson por grupos, Rockall 1–6, BISAP por puntos
 - Anadido (`f93a1e4`): `index.html` panel lateral del farmaco: `FARM_ESQUEMAS` (alteplasa-ictus, alteplasa-tep con PCR, tnk-iam con ≥75 a media dosis, tnk-ictus) calculados con peso/edad del flujo via `c.esquema` en el nodo (`data/protocols.js`: Codi Ictus `ventana2`/`dosis`, Codi IAM `fib`, TEP `lisis`/`catD`); perfusiones con «Esquema de administracion» (preparar, iniciar, titular); bolos con la dosis de la ficha y **calculadora de bolo** (`_farmBoloHTML/_farmBoloCalc`, mismas pautas que `parseDosisPorKg`). PCR terminada con RCE: boton `rt-sir` → `rtIrSir()` (pestaña Intubacion, estado inestable, peso; si `rt.tVia`, va a mantenimiento y anota en Evolucion la hora de la via aerea y del RCE)
@@ -208,7 +209,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 | 18 | Probar el micro real en movil (ahora permitido por `_headers`): dictado por campo de IDEAs y voz de la linea de tiempo del PCR | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
 | 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
-| 24 | Probar la pestaña Geriatria en movil (375 px) y pegar el informe en Word y en la historia clinica | `index.html` (`#tab-geriatria`) | P2 | Usuario | Se ve sin scroll horizontal y la tabla se pega bien |
+| 24 | Pegar el informe de Geriatria en Word y en la historia clinica (la pantalla de movil y la calculadora de bolo ya probadas por el usuario, 2026-11-07: van bien) | `index.html` (`#tab-geriatria`) | P2 | Usuario | La tabla se pega bien |
 | 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -293,4 +294,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Pedir al usuario que pruebe en el movil la pestaña Geriatria y la calculadora de bolo (#24).
+Pedir al usuario que pegue el informe de Geriatria en Word/historia clinica (#24) y que pruebe el micro real en movil (#18).
