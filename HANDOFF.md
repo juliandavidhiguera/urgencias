@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 23 | **Rama:** main | **HEAD:** `e64fdc9` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 23 | **Rama:** main | **HEAD:** `209383f` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -61,6 +61,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
 ### Sesion 23 - 2026-11-07
+- Corregido (`209383f`): `index.html` dictado de IDEAs repetia el texto 3+ veces en Chrome de Android (reentrega resultados finales / los trae acumulados). Ahora `onstart` guarda `_ideasSes` {id, base} y `onresult` reconstruye lo dictado desde results[0], sustituye si el nuevo final empieza por lo acumulado y omite el que ya esta al final. Simulado en headless (escritorio, reentrega, acumulado, 2 sesiones). Efectos: una frase identica repetida seguida queda una vez; editar el campo mientras se dicta se pisa. En ordenador ya funcionaba (usuario)
 - Anadido (`e64fdc9`): `index.html` 4H/4T por voz en el PCR: «<causa> <estado>» (`RT_CAUSAS_VOZ`, `RT_ESTADOS_VOZ`, `_rtCausaVoz`, `_rtCausaPorVoz`; se evalua antes que `RT_ORDENES`), marca con `marcarCausaPcr`, registra en `rt.ev` con deshacer y lo anuncia; adulto y ped (en ped «TEP»/«infarto» → «Trombosis»). Geriatria: `copyScaleResult('barthel','lat-')` con `_latOrigen` dentro de `#tab-geriatria` llama a `gbTraerBarthel()`. Verificado en Chrome headless (Barthel 50 → basal 50; frases adulto/ped; deshacer). Usuario: voz del PCR e informe de Geriatria (pegado en Word/HC) funcionan en movil
 - Usuario: probado en pantalla de movil (Geriatria y calculadora de bolo), va bien
 - Dosis pediatricas cerradas (#26): biperideno, clonazepam y dexclorfeniramina se quedan como estaban (usuario: «dejarlos asi todos»); butilescopolamina corregida (`1b8159e`) a 0,3–0,6 mg/kg/dosis, max. diario 1,5 mg/kg/dia, en la MISMA linea que la dosis (en linea aparte `parseDosisPorKg` la tomaria como otra pauta). Verificado con node: 1 pauta, tope 5 mg
@@ -208,7 +209,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
-| 18 | Probar el micro real en movil: dictado por campo de IDEAs (la voz del PCR, ordenes del ritmo y 4H/4T, ya confirmada por el usuario en movil 2026-11-07) | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
+| 18 | Probar en movil el dictado de IDEAs tras `209383f` (antes repetia el texto; en ordenador va bien; voz del PCR ya confirmada en movil) | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
 | 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
 | 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
