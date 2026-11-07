@@ -208,7 +208,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 15 | Verificar con fuente primaria lo que GOLD 2026 no cubre en el protocolo EPOC: criterios de UCI del Word (PaO2 <40, pH <7,25, en figura no extraible), parametros de VMNI (EPAP 4–6/IPAP 10–12 → 18–20), gasometria a 30–60 min, metilprednisolona 40 mg IV | `data/protocols.js`, Word del protocolo | P3 | - | Cada dato con cita (ERS/ATS 2017 u otra) o marcado como pauta local |
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
-| 18 | Probar el micro real en movil: dictado por campo de IDEAs y 4H/4T por voz del PCR (las ordenes del ritmo ya funcionan, confirmado por el usuario 2026-11-07) | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
+| 18 | Probar el micro real en movil: dictado por campo de IDEAs (la voz del PCR, ordenes del ritmo y 4H/4T, ya confirmada por el usuario en movil 2026-11-07) | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
 | 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
 | 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
@@ -294,4 +294,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Pedir al usuario que pruebe en el movil las 4H/4T por voz en el PCR («hipoxia descartada», «neumotorax sospecha»).
+Pedir al usuario que pruebe en el movil el dictado por campo de IDEAs (#18).
