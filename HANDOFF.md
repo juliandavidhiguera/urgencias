@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 20 | **Rama:** main | **HEAD:** `3865a38` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 21 | **Rama:** main | **HEAD:** `b7abfdd` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -33,7 +33,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `data/intubacion.js` + tab `#tab-intubacion` (linea 919) | Checklist SIR, registro de dosis administrada/hora, perfusiones de mantenimiento post-intubacion | EN_CURSO (foco de las ultimas 7 sesiones de commits) |
 | `data/pcr.js` + tab `#tab-pcr` (index.html) | Algoritmo de PCR con selector **Adulto (ALS, dosis fija) / Pediátrico (SVAP-EPALS 2025, dosis por peso real)** — sesion 5. Adulto: ritmo (desfibrilable/no), ciclos, desfibrilaciones, farmacos de dosis fija, causas reversibles 4H/4T, cuidados post-RCE, informe copiable/imprimible | EN_CURSO (anadido sesion 4, sin uso clinico real aun) |
 | `registro-utstein.html` | Formulario standalone (no integrado a la navegacion de tabs, precacheado en `sw.js`) — registro Utstein de PCR, combina Anexo N.I (MinSalud) + Anexo IV (Hospital Clinic Barcelona), exporta a `.txt`, sin persistencia ni `localStorage` | EN_CURSO (anadido sesion 4) |
-| `data/scales.js` | 80 escalas clinicas agrupadas por sistema (sesion 20: +Pulmonary Score, Tal modificada, PECARN <2 y ≥2, pSOFA, intensidad del dolor; sesion 18: +TEP; sesion 8: +ADD-RS, Padua, IMPROVE VTE, IMPROVE Bleeding, Ottawa SAH, ICH score, LRINEC, CIWA-Ar; sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
+| `data/scales.js` | 84 escalas clinicas agrupadas por sistema (sesion 21: +LLANTO, r-FLACC, CDS, Gorelick; sesion 20: +Pulmonary Score, Tal modificada, PECARN <2 y ≥2, pSOFA, intensidad del dolor; sesion 18: +TEP; sesion 8: +ADD-RS, Padua, IMPROVE VTE, IMPROVE Bleeding, Ottawa SAH, ICH score, LRINEC, CIWA-Ar; sesion 7: +mRS, PERC, YEARS, DD ajustado por edad, Canadian CT Head, Canadian C-Spine, Oakland, GRACE 1.0, Canadian Syncope) | ESTABLE |
 | `data/formulas.js` | 48 formulas (sesion 9: -f-naloxona, pasada a la ficha; sesion 8: +indice ROX, regla de los 9; sesion 7: +interpretacion de gasometria con lector de informe pegado, CKD-EPI 2021, Cockcroft-Gault, QTc, monitor de correccion de hiponatremia) | ESTABLE |
 | `data/infusions.js` | Perfusiones IV (fuente unica de mL/h); sesion 7: +Urapidilo, +Naloxona | ESTABLE |
 | `data/protocols.js` | Protocolos de codigos de activacion + toxindromes/intoxicaciones + EPOC agudizado (SAE) con evaluador interactivo (`eval`, sesion 12) | ESTABLE (EPOC: EN_CURSO, umbrales locales sin consensuar) |
@@ -59,6 +59,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 21 - 2026-11-07
+- Anadido: `data/scales.js` `llanto` (tabla 21-2 del PDF SEUP de dolor, Reinoso-Barbero 2011), `rflacc` (tabla 21-3 SEUP, Malviya 2006 PMID 16490089; comportamientos individualizados en `info`), `cds` (Friedman 2004 PMID 15289767, validacion Bailey 2010 PMID 20624137: 0 / 1–4 / 5–8, sin % porque no se verifico), `gorelick` (10 chk, PMID 9113963: ≥3 signos = ≥5 %; sin corte de 10 %, el articulo no lo da). Enlazadas: dolor `obsv` y barra; deshidratacion `triaje` y barra
+- Modificado: `data/protocols-ped.js` bronquiolitis: adrenalina nebulizada solo de rescate en moderada-grave que no responde a las demas medidas (decision del usuario); en `grave` primero O₂/OAF y luego «Rescate»; las dos dosis del PDF (0,5 mg/kg max 3 mg y 1–3 mg) siguen visibles. TCE: `picTxt(v)` con HTIC segun BTF pediatrica 2019 (PMID 30830016/31968082): cabecera 30°, SSH 3 % 2–5 ml/kg en 10–20 min, manitol 0,25–1 g/kg sin recomendacion BTF, normocapnia 35–40, sin bolos de sedantes, profilaxis 7 dias (levetiracetam 20 mg/kg max 1,5 g o fenitoina 15–20 mg/kg max 1 g; dosis de compendio ASHP via Vera) en nodos `inestable` y `alto`; input «Peso real». Dolor: diclofenaco con unidades corregidas (0,5–1 mg/kg 1–14 años; ESPA 2018 PMID 29635764) y calculo por peso
+- Commits: `b7abfdd` feat: escalas LLANTO, r-FLACC, CDS y Gorelick; HTIC en TCE; adrenalina de rescate en bronquiolitis
+- Verificado: node (escalas referenciadas existen, textos sin NaN con 4 casos, interp en cortes); Chrome headless: las 4 escalas calculan, botones de nodo abren el panel, textos nuevos presentes, sin errores JS; el usuario lo vio en local. Produccion con curl: `scales.js` con los 4 ids, `protocols-ped.js` con `picTxt`, «solo de rescate» y enlaces
+- Descartado: corte de ≥10 % en Gorelick y % en la CDS (no verificados)
 
 ### Sesion 20 - 2026-11-07
 - Anadido: `data/scales.js` 6 escalas pediatricas al final (bloque «Escalas pediátricas usadas por los algoritmos SEUP»): `pulmonary-score` (Smith 2002 PMID 11825832, FR por edad SEUP; 0–3/4–6/7–9), `tal-mod` (items y cortes del PDF SEUP; el 5 sale «Límite: la SEUP no clasifica el 5», cortes originales no verificados), `pecarn-menor2` / `pecarn-mayor2` (chk con alto riesgo p:10 e intermedio p:1; Kuppermann 2009 PMID 19758692, riesgos PREDICT Bressan 2021 PMID 34236116), `psofa` (Matics 2017 Tabla 1, PMC6583375; PAM y creatinina por edad en `info`), `dolor-eva` (0–10, cortes SEUP). `westley` anade « · SEUP: leve ≤3 / moderada 4–5 / grave ≥6» a su interpretacion clasica
@@ -185,8 +192,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 | 18 | Probar el micro real en movil (ahora permitido por `_headers`): dictado por campo de IDEAs y voz de la linea de tiempo del PCR | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
 | 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
-| 21 | Dudas SEUP que quedan (Westley, PS 3 y Tal 5 resueltas en sesion 20): adrenalina nebulizada en bronquiolitis (0,5 mg/kg max 3 mg vs 1–3 mg, se muestran ambas); flechas inferidas (post-TAC en TCE, «No» de ≥3 bolos en shock); errata tabla 21-4 (dolor) | `data/protocols-ped.js` | P2 | Usuario | Cada duda confirmada por el usuario y el aviso del nodo retirado o mantenido a proposito |
-| 23 | Escalas SEUP que faltan: deshidratacion CDS/Gorelick (solo con la tabla de la fuente original), LLANTO y r-FLACC | `data/scales.js`, `data/protocols-ped.js` | P3 | Fuente verificada | Escala con `src` verificable y enlazada en su nodo |
+| 21 | Dudas SEUP que quedan: dosis unica de adrenalina nebulizada de rescate en bronquiolitis (0,5 mg/kg max 3 mg en `grave` vs 1–3 mg en `obs`); flecha inferida «No» de ≥3 bolos en shock | `data/protocols-ped.js` | P3 | Usuario | El usuario elige y queda una sola dosis / confirma la flecha |
 | 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -267,4 +273,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Repasar con el usuario las dudas SEUP que quedan en el backlog #21 (empezando por la dosis de adrenalina nebulizada en bronquiolitis) y probar en movil real el panel 4H/4T y el dictado (#18).
+Preguntar al usuario que dosis unica de adrenalina nebulizada de rescate deja en bronquiolitis (#21) y probar en movil real el panel 4H/4T y el dictado (#18).
