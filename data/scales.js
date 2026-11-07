@@ -483,41 +483,33 @@ window.SCALES = [
     ['9 — Enfermedad terminal: esperanza de vida <6 meses, por lo demás sin fragilidad grave',9]]}],
   interp:function(s){return s<=3?['low','CFS '+s,'No frágil — pronóstico funcional favorable']:s===4?['mid','CFS 4','Vulnerable/pre-fragilidad — vigilar cambios funcionales']:s<=6?['mid','CFS '+s,'Fragilidad leve-moderada — alto riesgo de delirium, caídas e ingreso prolongado; valorar VIG']:['high','CFS '+s,'Fragilidad grave o final de la vida — revisar objetivos terapéuticos']}},
 
-{id:'fragilvig', src:'Amblàs-Novellas 2018 · BMC Geriatrics · PMID 29373968 (índice); bandas de gravedad: mismo grupo, BMJ Open 2021 · PMID 33883149', title:'Índex Fràgil-VIG', sub:'Índice de fragilidad por acumulación de déficits (25 ítems) — cribado SEM Catalunya', badge:'blue', tag:'Geriatría', max:1, agg:'custom', items:[
-  {t:'sel', l:'Actividades básicas de la vida diaria (Barthel o similar)', o:[['Independiente (0)',0],['Ayuda parcial (0,5)',0.5],['Dependiente total (1)',1]]},
-  {t:'sel', l:'Uso del dinero (manejo de finanzas)', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
-  {t:'sel', l:'Uso del teléfono', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
-  {t:'sel', l:'Responsabilidad sobre la medicación', o:[['Independiente/capaz (0)',0],['Incapaz/dependiente (1)',1]]},
-  {t:'sel', l:'Movilidad habitual (bastón, andador, silla de ruedas)', o:[['Normal (0)',0],['Limitación moderada (0,5)',0.5],['Inmovilidad severa (1)',1]]},
-  {t:'sel', l:'Pérdida de peso involuntaria reciente', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Anorexia o falta de apetito persistente', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Deterioro cognitivo (memoria/orientación)', o:[['Ausente (0)',0],['Leve/moderado (0,5)',0.5],['Severo/demencia (1)',1]]},
-  {t:'sel', l:'Trastorno del ánimo (depresión/ansiedad)', o:[['Ausente (0)',0],['Controlado con fármacos (0,5)',0.5],['Síntomas graves/activos (1)',1]]},
-  {t:'sel', l:'Delirium o síndrome confusional reciente', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Dolor de difícil control', o:[['No (0)',0],['Moderado (0,5)',0.5],['Severo/mal controlado (1)',1]]},
-  {t:'sel', l:'Disnea (reposo o mínimos esfuerzos)', o:[['No (0)',0],['Con esfuerzos moderados (0,5)',0.5],['Con mínimos esfuerzos o en reposo (1)',1]]},
-  {t:'sel', l:'Caídas de repetición (>2 en el último año)', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Incontinencia urinaria o fecal', o:[['No (0)',0],['Ocasional/urinaria (0,5)',0.5],['Doble incontinencia o total (1)',1]]},
-  {t:'sel', l:'Úlceras por presión', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Insomnio crónico / trastorno del sueño', o:[['No (0)',0],['Sí (1)',1]]},
-  {t:'sel', l:'Red social insuficiente o claudicación del cuidador', o:[['Buena red (0)',0],['Soporte justo (0,5)',0.5],['Riesgo social/cuidador claudicado (1)',1]]},
-  {t:'sel', l:'Insuficiencia cardiaca', o:[['Ausente (0)',0],['Leve/moderada (0,5)',0.5],['Avanzada/NYHA III-IV (1)',1]]},
-  {t:'sel', l:'Enfermedad respiratoria crónica (EPOC, etc.)', o:[['Ausente (0)',0],['Estable (0,5)',0.5],['Avanzada/oxigenoterapia (1)',1]]},
-  {t:'sel', l:'Enfermedad renal crónica', o:[['Ausente o leve (0)',0],['Moderada (0,5)',0.5],['Avanzada/diálisis (1)',1]]},
-  {t:'sel', l:'Enfermedad neurológica (ictus crónico, Parkinson, etc.)', o:[['Ausente (0)',0],['Secuelas leves (0,5)',0.5],['Secuelas graves (1)',1]]},
-  {t:'sel', l:'Enfermedad hepática crónica', o:[['Ausente (0)',0],['Cirrosis compensada (0,5)',0.5],['Avanzada/insuficiencia hepática (1)',1]]},
-  {t:'sel', l:'Enfermedad vascular periférica o arterial grave', o:[['Ausente (0)',0],['Moderada (0,5)',0.5],['Avanzada o isquemia (1)',1]]},
-  {t:'sel', l:'Neoplasia (cáncer activo)', o:[['No (0)',0],['En tratamiento o controlado (0,5)',0.5],['Avanzado/metástasis/paliativo (1)',1]]},
-  {t:'sel', l:'Pluripatología (>5 enfermedades activas no listadas antes)', o:[['No (0)',0],['Sí (1)',1]]}],
-  calcCustom:function(vals){return Math.round((vals.reduce(function(a,b){return a+b},0)/25)*100)/100},
-  interp:function(s){
-    if(s<=0.15)return['low','Índice '+s.toFixed(2),'Banda 0–0,15 — sin fragilidad significativa'];
-    if(s<=0.25)return['low','Índice '+s.toFixed(2),'Banda 0,16–0,25 — fragilidad leve o ausente (umbral operativo habitual: frágil si ≥0,20)'];
-    if(s<=0.35)return['mid','Índice '+s.toFixed(2),'Banda 0,26–0,35 — fragilidad leve, valorar VIG'];
-    if(s<=0.45)return['mid','Índice '+s.toFixed(2),'Banda 0,36–0,45 — fragilidad moderada, VIG recomendada'];
-    if(s<=0.55)return['high','Índice '+s.toFixed(2),'Banda 0,46–0,55 — fragilidad moderada-avanzada, VIG y valorar objetivos de cuidado'];
-    return['high','Índice '+s.toFixed(2),'Banda 0,56–1 — fragilidad avanzada, muy prevalente al final de la vida — valorar enfoque paliativo'];
-  }},
+{id:'fragilvig', src:'Amblàs-Novellas J 2018 · BMC Geriatr · PMID 29373968 (tabla 1: 22 preguntas, 25 déficits) · grados de fragilidad: Amblàs-Novellas J 2021 · BMJ Open · PMID 33883149', title:'Índex Fràgil-VIG', sub:'Fragilidad por acumulación de déficits (22 preguntas, 25 déficits) — situación basal', badge:'blue', tag:'Geriatría', max:1, agg:'custom', items:[
+  {t:'sel', btn:true, l:'AIVD · Dinero: necesita ayuda para gestionar asuntos económicos (banco, tiendas, restaurantes)', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'AIVD · Teléfono: necesita ayuda para usar el teléfono', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'AIVD · Medicación: necesita ayuda para preparar o tomar la medicación', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'ABVD · Índice de Barthel basal', o:[['≥95: sin dependencia (0)',0],['90–65: dependencia leve-moderada (1)',1],['60–25: dependencia moderada-grave (2)',2],['≤20: dependencia absoluta (3)',3]]},
+  {t:'sel', btn:true, l:'Nutricional · Malnutrición: pérdida de peso ≥5 % en los últimos 6 meses', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Cognitivo · Grado de deterioro', o:[['Sin deterioro cognitivo (0)',0],['Leve-moderado, equivalente a GDS ≤5 (1)',1],['Grave-muy grave, equivalente a GDS ≥6 (2)',2]]},
+  {t:'sel', btn:true, l:'Emocional · Síndrome depresivo: necesita antidepresivos', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Emocional · Insomnio/ansiedad: necesita con frecuencia benzodiacepinas u otros psicofármacos sedantes', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Social · Los profesionales perciben vulnerabilidad social', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síndrome geriátrico · Delirium y/o trastorno de conducta que ha necesitado antipsicóticos en los últimos 6 meses', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síndrome geriátrico · Caídas: ≥2 caídas o ingreso por caída en los últimos 6 meses', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síndrome geriátrico · Úlcera (por presión o vascular, cualquier grado)', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síndrome geriátrico · Polifarmacia: ≥5 fármacos', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síndrome geriátrico · Disfagia o infecciones respiratorias por aspiración en los últimos 6 meses', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síntoma grave · Dolor: necesita ≥2 analgésicos convencionales y/o opioides mayores', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', btn:true, l:'Síntoma grave · Disnea basal que impide salir de casa y/o opioides frecuentes', o:[['No (0)',0],['Sí (1)',1]]},
+  {t:'sel', l:'Enfermedad · Cáncer activo', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]},
+  {t:'sel', l:'Enfermedad · Respiratoria crónica (EPOC, restrictiva…)', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]},
+  {t:'sel', l:'Enfermedad · Cardiaca crónica (insuficiencia cardiaca, cardiopatía isquémica, arritmia)', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]},
+  {t:'sel', l:'Enfermedad · Neurodegenerativa (Parkinson, ELA…) o ictus previo', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]},
+  {t:'sel', l:'Enfermedad · Digestiva crónica (hepatopatía, cirrosis, pancreatitis crónica, EII…)', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]},
+  {t:'sel', l:'Enfermedad · Insuficiencia renal crónica (FG &lt;60)', o:[['No (0)',0],['Sí (1)',1],['Sí, avanzada por criterios NECPAL (2)',2]]}],
+  info:'Puntúa la situación basal (≥1 mes antes del ingreso o del proceso agudo), por entrevista con el paciente o la familia y revisión de la historia. Índice = déficits / 25. Cada enfermedad suma 2 si cumple criterios de enfermedad crónica avanzada NECPAL; el artículo no aclara qué pasa si así se superan los 25 (aquí se limita a 1). La pestaña «Geriatría» lo calcula junto con el informe de situación basal.',
+  numTxt:function(s){return s.toFixed(2).replace('.',',')},
+  calcCustom:function(vals){return Math.min(1, Math.round(vals.reduce(function(a,b){return a+b},0)/25*100)/100)},
+  interp:function(s){var t=s.toFixed(2).replace('.',',');return s<0.2?['low','Índice '+t,'&lt;0,20 — sin fragilidad']:s<=0.35?['mid','Índice '+t,'0,20–0,35 — fragilidad inicial']:s<=0.5?['high','Índice '+t,'0,36–0,50 — fragilidad moderada']:['high','Índice '+t,'&gt;0,50 — fragilidad avanzada']}},
 
 {id:'nyha', src:'New York Heart Association · Nomenclature and Criteria for Diagnosis, 9.ª ed. 1994', title:'NYHA', sub:'Insuficiencia cardiaca — clase funcional (I–IV)', badge:'blue', tag:'IC', max:4, items:[
   {t:'sel', l:'Clase funcional', o:[['I — Sin limitación de la actividad física (1)',1],['II — Limitación leve; síntomas con actividad ordinaria (2)',2],['III — Limitación marcada; síntomas con actividad menor que la ordinaria (3)',3],['IV — Síntomas en reposo o con cualquier actividad (4)',4]]}],
@@ -574,19 +566,30 @@ window.SCALES = [
   {t:'sel', l:'Consolabilidad', o:[['No necesita ser consolado (0)',0],['Se distrae o tranquiliza con la voz o el tacto (1)',1],['Imposible de consolar, distraer o tranquilizar (2)',2]]}],
   interp:function(s){return s===0?['low','0/10','Sin dolor evidente']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado — analgesia']:['high',s+'/10','Dolor severo — analgesia urgente']}},
 
-{id:'3dplus', src:'García-Pérez 2023 (J Clin Med) · PMID 37892606', title:'3D / 3D+', sub:'Cribado geriátrico en urgencias — fragilidad basal + impacto agudo', badge:'blue', tag:'Geriatría', max:3, items:[
-  {t:'sel', l:'Nivel funcional basal (3D) — situación 2-4 semanas previas', o:[['3D 0 — Independiente (ABVD), sin deterioro cognitivo (0)',0],['3D 1 — Ayuda instrumental o supervisión, deterioro leve (0)',0],['3D 2 — No sale solo, vida casa-sillón, deterioro moderado (0)',0],['3D 3 — Dependiente total (cama-sillón), deterioro severo (0)',0]]},
-  {t:'chk', l:'Pérdida de autonomía aguda (declive brusco para caminar o el autocuidado en los últimos días)', p:1},
-  {t:'chk', l:'Síndrome confusional / delirium de inicio reciente', p:1},
-  {t:'chk', l:'Sospecha de efecto adverso o reacción a medicación (RAM) como causa de la consulta', p:1}],
-  interp:function(s){return s===0?['low','Estable','Mantiene su nivel funcional basal pese al motivo de consulta']:['high','Alterado (3D+)','Alta complejidad: valorar ingreso o derivación a recurso intermedio de cuidados']},
-  info: '<strong>Nivel funcional basal (3D)</strong><table><tr><th>Nivel</th><th>Criterio funcional</th><th>Deterioro cognitivo</th></tr>' +
-    '<tr><td>3D 0</td><td>Independiente (ABVD)</td><td>Sin deterioro</td></tr>' +
-    '<tr><td>3D 1</td><td>Ayuda instrumental o supervisión</td><td>Leve (olvidos)</td></tr>' +
-    '<tr><td>3D 2</td><td>No sale solo, vida casa-sillón</td><td>Moderado</td></tr>' +
-    '<tr><td>3D 3</td><td>Dependiente total (cama-sillón)</td><td>Severo</td></tr></table>' +
-    '<p style="margin-top:8px">3D = fragilidad basal premórbida; 3D+ = impacto agudo del episodio actual. Cualquier dominio agudo alterado marca alta complejidad. Delirium + declive funcional predicen mortalidad a 30 días con AUC 0,80 (García-Pérez 2023, n=278, ≥75 años en urgencias). Implementación en 66.422 episodios asociada a −5 puntos porcentuales de ingresos y menos revisitas a 30 días (García-Pérez, Emergencias 2026 · PMID 42345984).</p>'},
-
+{id:'3dplus', src:'García-Pérez D 2023 · J Clin Med · PMID 37892606 (figuras 1 y 2) · original: García-Pérez D 2022 · Rev Esp Geriatr Gerontol · PMID 35781176', title:'3D / 3D+', sub:'Valoración geriátrica rápida en urgencias (≥75 años): fragilidad basal (3D) + impacto agudo (3D+) → destino al alta', badge:'blue', tag:'Geriatría', max:3, agg:'custom', items:[
+  {t:'sel', l:'3D · Deambulación / ABVD hace 2 semanas', o:[['3D 0 — Hace ejercicio diario o semanal; no necesita ayuda en las ABVD',0],['3D 1 — No hace ejercicio, sale solo cada día; supervisión ocasional en alguna ABVD',1],['3D 2 — Sedentario; no puede salir solo a la calle; necesita ayuda en alguna ABVD',2],['3D 3 — Sillón o cama; totalmente dependiente para las ABVD',3]]},
+  {t:'sel', l:'3D · Demencia / deterioro cognitivo hace 2 semanas', o:[['3D 0 — Sin problemas o solo olvidos que percibe él mismo (≈GDS 1–2)',0],['3D 1 — La familia nota errores ocasionales que él no percibe (≈GDS 3): leve',1],['3D 2 — Supervisión para vestirse; no se le puede dejar solo (≈GDS 4–5): moderado',2],['3D 3 — Necesita cuidador 24 h (≈GDS ≥6): grave-muy grave',3]]},
+  {t:'sel', l:'3D · Domicilio: ¿con quién vive?', o:[['Vive solo en su domicilio',0],['Vive acompañado en su domicilio (familia/cuidador)',0],['Vive en residencia',0]]},
+  {t:'sel', l:'3D+ · Declive: ¿ha necesitado más ayuda de lo habitual para las ABVD/AIVD en las últimas semanas?', o:[['No',0],['Sí, agudo (últimos 15 días)',1],['Sí, progresivo (semanas/meses)',2]]},
+  {t:'sel', l:'3D+ · Delirium: ¿ha cambiado su estado cognitivo respecto al basal?', o:[['No',0],['Sí, hiperactivo',1],['Sí, hipoactivo',2]]},
+  {t:'sel', btn:true, l:'3D+ · Domicilio: ¿sería arriesgado hacer el tratamiento en casa 24/7?', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'3D+ · Fármacos: ¿el inicio o la retirada de un fármaco puede haber desencadenado la consulta?', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'Destino · ¿Hay motivo clínico de ingreso?', o:[['No',0],['Sí',1]]},
+  {t:'sel', btn:true, l:'Destino · ¿Diagnóstico completado en urgencias?', o:[['Sí',0],['No',1]]}],
+  /* s = nivel 3D ×1000 + 3D+ alterado ×100 + ingreso ×10 + diagnóstico pendiente */
+  calcCustom:function(v){return Math.max(v[0],v[1])*1000+((v[3]+v[4]+v[5]+v[6])>0?100:0)+v[7]*10+v[8]},
+  numTxt:function(s){return '3D '+Math.floor(s/1000)+(Math.floor(s/100)%10?' · 3D+':'')},
+  interp:function(s){
+    var n=Math.floor(s/1000), alt=Math.floor(s/100)%10===1, ing=Math.floor(s/10)%10===1, pend=s%10===1;
+    var fr=['sin fragilidad (respuesta al tratamiento como un adulto sano)','fragilidad leve (alta probabilidad de respuesta óptima)','fragilidad moderada (probable respuesta intermedia)','fragilidad avanzada (probable respuesta escasa o nula)'][n];
+    var dest;
+    if(!ing) dest=alt?'sin motivo de ingreso pero 3D+ alterado: <b>intervención específica</b> sobre la dimensión alterada (si no se resuelve en urgencias, Unidad de Transición) e informar a Atención Primaria':'<b>domicilio o residencia</b>';
+    else if(pend) dest=n===3?'<b>hospital de atención intermedia</b>':'<b>hospital de agudos</b>';
+    else dest=[alt?'Unidad de Transición':'Unidad de Transición u hospitalización a domicilio',alt?'hospital de agudos':'Unidad de Transición u hospitalización a domicilio',alt?'hospital de atención intermedia':'Unidad de Transición u hospitalización a domicilio',alt?'hospital de atención intermedia':'hospitalización a domicilio u hospital de atención intermedia'][n];
+    if(ing&&!pend) dest='<b>'+dest+'</b>';
+    return [n===0&&!alt?'low':n>=2||alt?'high':'mid','3D '+n+(alt?' · 3D+ alterado':' · 3D+ sin alteración'),'3D '+n+': '+fr+'. Destino orientativo (fig. 2): '+dest+'.'];
+  },
+  info:'<b>3D</b> (situación de hace 2 semanas, aún compensado): el nivel es el <b>más alto</b> entre deambulación/ABVD y deterioro cognitivo (3D 0 sin fragilidad · 1 leve · 2 moderada · 3 avanzada); el domicilio no cambia el nivel. <b>3D+</b> (situación actual): alterado si alguna de las 4 preguntas es «sí»; el «+» recuerda preguntar por fármacos. El destino es orientativo y no sustituye el juicio clínico.'},
 {id:'paquetes-año', src:'Definición estándar de consumo acumulado de tabaco · umbral de cribado USPSTF 2021 (≥20 paq-año) · PMID 33687470', title:'Índice paquetes-año', sub:'Tabaquismo acumulado — riesgo de EPOC y cáncer de pulmón', badge:'amber', tag:'Respiratorio', max:100, agg:'custom', items:[
   {t:'num', l:'Cigarrillos fumados al día', u:'cig/día', f:function(v){return 0}},
   {t:'num', l:'Años fumando', u:'años', f:function(v){return 0}}],

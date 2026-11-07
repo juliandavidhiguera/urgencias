@@ -1132,6 +1132,15 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 .ideas-mic { align-self: flex-start; min-height: 32px; padding: 2px 10px; font-size: var(--fs-sm); }
 .ideas-mic[aria-pressed="true"] { background: var(--red-bg); color: var(--red-text); border-color: var(--red-text); }
 .ideas-pautas { margin: 0; padding: 10px 14px 12px 34px; font-size: var(--fs-sm); line-height: 1.5; }
+.gb-tgs { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 14px 4px; }
+.gb-tg { min-height: 36px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg3); color: var(--text); font-size: var(--fs-sm); cursor: pointer; }
+.gb-tg[aria-pressed="true"] { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 600; }
+.gb-tg:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.gb-sig { display: inline-block; width: 1ch; font-weight: 700; }
+.gb-vig { font-size: 0.75em; opacity: 0.7; }
+.gb-acc { flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: flex-end; }
+.gb-res { margin: 10px 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg3); font-size: var(--fs-sm); }
+.gb-prev { margin: 0 14px 12px; padding: 12px; border-radius: 8px; background: #fff; color: #111; overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -1154,6 +1163,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
   <button class="nav-btn" id="navbtn-intubacion" role="tab" aria-selected="false" aria-controls="tab-intubacion" tabindex="-1" onclick="showTab('intubacion', this)">🫁 Intubación</button>
   <button class="nav-btn" id="navbtn-pcr" role="tab" aria-selected="false" aria-controls="tab-pcr" tabindex="-1" onclick="showTab('pcr', this)">🫀 PCR</button>
   <button class="nav-btn" id="navbtn-ideas" role="tab" aria-selected="false" aria-controls="tab-ideas" tabindex="-1" onclick="showTab('ideas', this)">🗣️ Traspaso IDEAs</button>
+  <button class="nav-btn" id="navbtn-geriatria" role="tab" aria-selected="false" aria-controls="tab-geriatria" tabindex="-1" onclick="showTab('geriatria', this)">👴 Geriatría</button>
   <button class="nav-btn" id="navbtn-fichas" role="tab" aria-selected="false" aria-controls="tab-fichas" tabindex="-1" onclick="showTab('fichas', this)">📋 Fichas</button>
   <button class="nav-btn" id="navbtn-bibliografia" role="tab" aria-selected="false" aria-controls="tab-bibliografia" tabindex="-1" onclick="showTab('bibliografia', this)">📚 Bibliografía</button>
   <input class="filter-input" type="search" placeholder="🔍 Buscar en todo…" aria-label="Buscar en todo" oninput="debouncedGlobalSearch(this.value)" style="margin-left:auto;max-width:240px">
@@ -1698,6 +1708,87 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 </div>
 </div><!-- end tab-ideas -->
 
+<div id="tab-geriatria" class="tab-content" role="tabpanel" aria-labelledby="navbtn-geriatria">
+<h2 class="section-title">👴 Geriatría — situación basal</h2>
+
+<div class="databox">
+  <div class="databox-header">
+    <div>
+      <h3 class="scale-title">Situación basal e Índex Fràgil-VIG</h3>
+      <div class="scale-subtitle">Valoración geriátrica rápida: funcional, mental, social, síndromes geriátricos, enfermedades → informe copiable</div>
+    </div>
+    <span class="badge badge-blue">Geriatría</span>
+  </div>
+  <div class="tile-aux" style="padding-top:10px">Describe la situación <b>basal</b> (≥1 mes antes del ingreso o del proceso agudo), por entrevista con el paciente o la familia y la historia clínica. Lo marcado con <b>VIG</b> calcula el Índex Fràgil-VIG. Lo escrito aquí no se guarda: se borra al recargar.</div>
+
+  <div class="subhead">Funcional</div>
+  <div class="ideas-q">Instrumentales — ¿necesita ayuda para…? (VIG)</div>
+  <div class="gb-tgs" id="gb-aivd"></div>
+  <div class="fields ideas-1col">
+    <div class="field"><label for="gb-aivd-txt">Otras actividades instrumentales (texto libre)</label><textarea id="gb-aivd-txt" class="ideas-ta" rows="2" placeholder="p. ej. No conduce. Conserva actividades instrumentales."></textarea></div>
+  </div>
+  <div class="ideas-q">Básicas — Índice de Barthel basal (VIG)</div>
+  <div class="fields">
+    <div class="field"><label for="gb-barthel">Barthel basal (0–100)</label><input type="number" id="gb-barthel" min="0" max="100" step="5" inputmode="numeric"></div>
+    <div class="field gb-acc"><button class="btn" type="button" onclick="abrirEscalaLateral('barthel', this)">📊 Calcular con la escala</button><button class="btn" type="button" onclick="gbTraerBarthel()">⬅ Usar el resultado</button></div>
+  </div>
+  <div class="fields ideas-1col">
+    <div class="field"><label for="gb-abvd-txt">Detalle de las básicas (texto libre)</label><textarea id="gb-abvd-txt" class="ideas-ta" rows="2" placeholder="p. ej. Continente doble, independiente para ir al baño. Deambula de forma autónoma por el exterior y sube escaleras."></textarea></div>
+  </div>
+
+  <div class="subhead">Mental</div>
+  <div class="fields">
+    <div class="field"><label for="gb-cog">Cognitivo (VIG)</label>
+      <select id="gb-cog">
+        <option value="0">Sin deterioro cognitivo</option>
+        <option value="1">Deterioro leve-moderado (equivalente a GDS ≤5)</option>
+        <option value="2">Deterioro grave-muy grave (equivalente a GDS ≥6)</option>
+      </select>
+    </div>
+  </div>
+  <div class="fields ideas-1col">
+    <div class="field"><label for="gb-cog-txt">Detalle cognitivo</label><textarea id="gb-cog-txt" class="ideas-ta" rows="1" placeholder="p. ej. No cuadro confusional en ingresos previos."></textarea></div>
+  </div>
+  <div class="ideas-q">Emocional (VIG)</div>
+  <div class="gb-tgs" id="gb-emo"></div>
+  <div class="fields ideas-1col">
+    <div class="field"><label for="gb-emo-txt">Detalle emocional</label><textarea id="gb-emo-txt" class="ideas-ta" rows="1" placeholder="p. ej. Trastorno adaptativo (en proceso de duelo)."></textarea></div>
+  </div>
+
+  <div class="subhead">Social</div>
+  <div class="fields ideas-1col">
+    <div class="field"><label for="gb-social-txt">Con quién vive y soporte</label><input type="text" id="gb-social-txt" placeholder="p. ej. Vive con una hija. Buen soporte familiar."></div>
+  </div>
+  <div class="gb-tgs" id="gb-soc"></div>
+
+  <div class="subhead">Síndromes geriátricos y síntomas</div>
+  <div class="ideas-q">Pulsa para marcar <b>+</b> (presente). Los marcados VIG cuentan con su criterio (mantén el dedo o pasa el ratón para verlo).</div>
+  <div class="gb-tgs" id="gb-sind"></div>
+
+  <div class="subhead">Enfermedades crónicas (VIG)</div>
+  <div class="ideas-q">Suman 2 si cumplen criterios de enfermedad crónica avanzada NECPAL.</div>
+  <div class="fields" id="gb-enf"></div>
+
+  <div class="subhead">3D / 3D+ (urgencias, ≥75 años)</div>
+  <div class="ideas-q">3D: fragilidad basal (hace 2 semanas) · 3D+: impacto del proceso agudo y destino orientativo.</div>
+  <div id="gb-3d"></div>
+
+  <div class="subhead">Identificación en la historia compartida</div>
+  <div class="gb-tgs" id="gb-id"></div>
+
+  <div class="gb-res" id="gb-res" aria-live="polite"></div>
+
+  <div class="ideas-q" style="padding-bottom:6px">Vista previa del informe</div>
+  <div class="gb-prev" id="gb-prev"></div>
+
+  <div class="btn-row" style="padding: 0 14px 14px;">
+    <button class="btn btn-copy" onclick="copyGeriatria()">📋 Copiar situación basal</button>
+    <button class="btn" onclick="resetGeriatria()">↺ Nuevo paciente</button>
+  </div>
+  <div class="tile-aux">Fuente: Amblàs-Novellas J, et al. Frail-VIG index: a concise frailty evaluation tool for rapid geriatric assessment. BMC Geriatr 2018;18:29 (PMID 29373968; tabla 1). Grados: Amblàs-Novellas J, et al. BMJ Open 2021;11:e042645 (PMID 33883149): &lt;0,20 sin fragilidad · 0,20–0,35 inicial · 0,36–0,50 moderada · &gt;0,50 avanzada.</div>
+</div>
+</div><!-- end tab-geriatria -->
+
 <!-- TAB FICHAS -->
 <div id="tab-fichas" class="tab-content" role="tabpanel" aria-labelledby="navbtn-fichas">
 <h2 class="section-title">📋 Fichas técnicas de medicamentos</h2>
@@ -1919,6 +2010,7 @@ function globalSearch(q) {
                : activeName.includes('intubación') ? 'tab-intubacion'
                : activeName.includes('pcr') ? 'tab-pcr'
                : activeName.includes('ideas') ? 'tab-ideas'
+               : activeName.includes('geriatr') ? 'tab-geriatria'
                : activeName.includes('bibliografía') ? 'tab-bibliografia'
                : activeName.includes('ficha') ? 'tab-fichas'
                : 'tab-farmacos';
@@ -4082,6 +4174,138 @@ function resetIdeas() {
   document.getElementById('ideas-paciente').focus();
 }
 
+/* ==================================================================
+   GERIATRÍA — situación basal + Índex Fràgil-VIG (Amblàs-Novellas 2018, PMID 29373968)
+   Solo en memoria, nunca localStorage.
+   ================================================================== */
+// [id, etiqueta, cuenta en el VIG, criterio VIG]
+const GB_AIVD = [['dinero', 'Manejo del dinero', 1, 'Necesita ayuda para gestionar asuntos económicos (banco, tiendas, restaurantes)'], ['telefono', 'Teléfono', 1, 'Necesita ayuda para usar el teléfono'], ['medicacion', 'Medicación', 1, 'Necesita ayuda para preparar o tomar la medicación']];
+const GB_EMO = [['antidep', 'Síndrome depresivo', 1, 'Necesita antidepresivos'], ['ansio', 'Insomnio / ansiedad', 1, 'Necesita con frecuencia benzodiacepinas u otros psicofármacos sedantes por insomnio o ansiedad']];
+const GB_SOC = [['vulner', 'Vulnerabilidad social', 1, 'Los profesionales perciben vulnerabilidad social'], ['hipoac', 'Hipoacusia', 0, ''], ['visual', 'Dism. agudeza visual', 0, '']];
+const GB_SIND = [['caidas', 'Caídas', 1, '≥2 caídas o ingreso por caída en los últimos 6 meses'], ['ulceras', 'Úlceras de decúbito', 1, 'Úlcera por presión o vascular, de cualquier grado'], ['polifarmacia', 'Polifarmacia', 1, '≥5 fármacos'],
+  ['disfagia', 'Disfagia', 1, 'Dificultad para tragar al comer o beber, o infecciones respiratorias por aspiración en los últimos 6 meses'], ['estrenimiento', 'Estreñimiento', 0, ''], ['malnutricion', 'Malnutrición', 1, 'Pérdida de peso ≥5 % en los últimos 6 meses'],
+  ['dolor', 'Dolor', 1, 'Necesita ≥2 analgésicos convencionales y/o opioides mayores'], ['disnea', 'Disnea', 1, 'Disnea basal que impide salir de casa y/o necesita opioides con frecuencia'], ['insomnio', 'Insomnio', 0, ''],
+  ['delirium', 'Delirium', 1, 'Delirium y/o trastorno de conducta que ha necesitado antipsicóticos en los últimos 6 meses']];
+const GB_ID = [['pcc', 'PCC', 0, 'Paciente crónico complejo'], ['maca', 'NECPAL/MACA', 0, 'Enfermedad crónica avanzada']];
+const GB_ENF = [['cancer', 'Cáncer', 'Cáncer activo'], ['resp', 'Respiratoria', 'Enfermedad respiratoria crónica (EPOC, restrictiva…)'], ['card', 'Cardiaca', 'Cardiopatía crónica (insuficiencia cardiaca, cardiopatía isquémica, arritmia)'],
+  ['neuro', 'Neurológica', 'Enfermedad neurodegenerativa (Parkinson, ELA…) o ictus previo'], ['dig', 'Digestiva', 'Enfermedad digestiva crónica (hepatopatía, cirrosis, pancreatitis crónica, EII…)'], ['renal', 'Renal', 'Insuficiencia renal crónica (FG &lt;60)']];
+const _gbOn = id => document.getElementById('gb-tg-' + id).getAttribute('aria-pressed') === 'true';
+const _gbTxt = id => document.getElementById(id).value.trim();
+function _gbToggles(cont, lista) {
+  document.getElementById(cont).innerHTML = lista.map(([id, l, vig, crit]) =>
+    '<button type="button" class="gb-tg" id="gb-tg-' + id + '" aria-pressed="false"' + (crit ? ' title="' + crit + '"' : '') + ' onclick="gbToggle(\'' + id + '\')">' +
+    '<span class="gb-sig">−</span> ' + l + (vig ? ' <span class="gb-vig">VIG</span>' : '') + '</button>').join('');
+}
+function gbToggle(id) {
+  const b = document.getElementById('gb-tg-' + id), on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', on); b.querySelector('.gb-sig').textContent = on ? '+' : '−';
+  gbRender();
+}
+function initGeriatria() {
+  _gbToggles('gb-aivd', GB_AIVD); _gbToggles('gb-emo', GB_EMO); _gbToggles('gb-soc', GB_SOC); _gbToggles('gb-sind', GB_SIND); _gbToggles('gb-id', GB_ID);
+  document.getElementById('gb-enf').innerHTML = GB_ENF.map(([id, l, d]) =>
+    '<div class="field"><label for="gb-enf-' + id + '" title="' + d + '">' + l + '</label><select id="gb-enf-' + id + '"><option value="0">No</option><option value="1">Sí</option><option value="2">Sí, avanzada (NECPAL)</option></select></div>').join('');
+  const c3 = document.getElementById('gb-3d');
+  c3.innerHTML = renderOneScale(SCALES.find(x => x.id === '3dplus'), getFavs(), 'gb-');
+  c3.querySelector('details').open = true;
+  calcScale('3dplus', 'gb-');
+  document.getElementById('tab-geriatria').addEventListener('input', gbRender);
+  document.getElementById('tab-geriatria').addEventListener('change', gbRender);
+  gbRender();
+}
+function gbTraerBarthel() {
+  const el = document.getElementById('lat-barthel-num');
+  if (!el) { showToast('⚠ Abre antes la escala de Barthel', true); return; }
+  document.getElementById('gb-barthel').value = parseInt(el.textContent, 10);
+  gbRender();
+}
+function _gbBarthel() { const v = parseFloat(document.getElementById('gb-barthel').value); return isNaN(v) || v < 0 || v > 100 ? null : v; }
+/* Índice = déficits / 25 (tabla 1). Barthel ≥95: 0 · 90–65: 1 · 60–25: 2 · ≤20: 3. Cognitivo 0/1/2. Enfermedad 1, o 2 si avanzada NECPAL (limitado a 1). */
+function gbVig() {
+  const b = _gbBarthel();
+  const vb = b == null ? 0 : b >= 95 ? 0 : b >= 65 ? 1 : b >= 25 ? 2 : 3;
+  let s = vb + parseInt(document.getElementById('gb-cog').value, 10);
+  [GB_AIVD, GB_EMO, GB_SOC, GB_SIND].forEach(l => l.forEach(([id, , vig]) => { if (vig && _gbOn(id)) s += 1; }));
+  GB_ENF.forEach(([id]) => { s += parseInt(document.getElementById('gb-enf-' + id).value, 10); });
+  const i = Math.min(1, Math.round(s / 25 * 100) / 100);
+  const grado = i < 0.2 ? ['low', 'sin fragilidad'] : i <= 0.35 ? ['mid', 'fragilidad inicial'] : i <= 0.5 ? ['high', 'fragilidad moderada'] : ['high', 'fragilidad avanzada'];
+  return { i: i, s: s, grado: grado, sinBarthel: b == null };
+}
+const _gbF2 = x => x.toFixed(2).replace('.', ',');
+function _gbDatos() {
+  const fl = (lista) => lista.filter(([id]) => _gbOn(id)).map(([, l]) => l.toLowerCase());
+  const aivd = fl(GB_AIVD);
+  const instr = (aivd.length ? 'Necesita ayuda para: ' + aivd.join(', ') + '.' : 'Independiente para manejo del dinero, teléfono y medicación.') + (_gbTxt('gb-aivd-txt') ? ' ' + _gbTxt('gb-aivd-txt') : '');
+  const b = _gbBarthel(), sb = SCALES.find(x => x.id === 'barthel');
+  const bas = (b == null ? 'IB basal: no consta.' : 'IB basal: ' + b + '/100 (' + sb.interp(b)[2].toLowerCase() + ').') + (_gbTxt('gb-abvd-txt') ? ' ' + _gbTxt('gb-abvd-txt') : '');
+  const cogSel = document.getElementById('gb-cog');
+  const cog = ['No consta deterioro cognitivo.', 'Deterioro cognitivo leve-moderado (GDS ≤5).', 'Deterioro cognitivo grave-muy grave (GDS ≥6).'][+cogSel.value] + (_gbTxt('gb-cog-txt') ? ' ' + _gbTxt('gb-cog-txt') : '');
+  const emoM = [_gbOn('antidep') ? 'síndrome depresivo con antidepresivos' : '', _gbOn('ansio') ? 'insomnio/ansiedad con psicofármacos sedantes' : ''].filter(Boolean);
+  const emo = [_gbTxt('gb-emo-txt'), emoM.length ? emoM.join('; ').replace(/^./, c => c.toUpperCase()) + '.' : ''].filter(Boolean).join(' ') || 'Sin tratamiento antidepresivo ni psicofármacos sedantes.';
+  const soc = [_gbTxt('gb-social-txt'), _gbOn('vulner') ? 'Vulnerabilidad social.' : ''].filter(Boolean).join(' ') || 'No consta.';
+  const enf = GB_ENF.filter(([id]) => +document.getElementById('gb-enf-' + id).value > 0).map(([id, l]) => l.toLowerCase() + (+document.getElementById('gb-enf-' + id).value === 2 ? ' (avanzada)' : ''));
+  const o3 = i => { const e = document.getElementById('gb-3dplus_' + i); return e && e.tagName === 'SELECT' ? e.options[e.selectedIndex].text : ''; };
+  const v3 = i => { const e = document.getElementById('gb-3dplus_' + i); return e ? +e.value : 0; };
+  const n3 = Math.max(v3(0), v3(1)), alt3 = [3, 4, 5, 6].filter(i => v3(i) > 0);
+  const t3 = ['3D ' + n3 + ' (' + ['sin fragilidad', 'fragilidad leve', 'fragilidad moderada', 'fragilidad avanzada'][n3] + (n3 ? (v3(0) === n3 && v3(1) === n3 ? ', funcional y cognitiva' : v3(0) === n3 ? ', funcional' : ', cognitiva') : '') + ')',
+    '3D+ ' + (alt3.length ? 'alterado: ' + alt3.map(i => ['', '', '', 'declive ' + (v3(3) === 1 ? 'agudo' : 'progresivo'), 'delirium ' + (v3(4) === 1 ? 'hiperactivo' : 'hipoactivo'), 'tratamiento en domicilio arriesgado', 'posible desencadenante farmacológico'][i]).join(', ') : 'sin alteración')].join(' · ');
+  return { instr, bas, cog, emo, soc, enf, vig: gbVig(), t3d: t3 };
+}
+const _gbEsc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const _gbSig = id => _gbOn(id) ? '+' : '−';
+function _gbHtml(d) {
+  const td = 'style="border:1px solid #999;padding:3px 6px;vertical-align:top"', th = 'style="border:1px solid #999;padding:3px 6px;vertical-align:top;color:#666;font-weight:normal"';
+  const cel = ([id, l]) => '<td ' + td + ' align="right">' + l + '</td><td ' + td + ' align="center"><b>' + _gbSig(id) + '</b></td>';
+  const filas = [], nr = Math.ceil(GB_SIND.length / 3);
+  for (let k = 0; k < GB_SIND.length; k += 3) {
+    const g = GB_SIND.slice(k, k + 3);
+    filas.push('<tr>' + (k === 0 ? '<th ' + th + ' rowspan="' + nr + '">Síndromes geriátricos y síntomas</th>' : '') + g.map(cel).join('') + (g.length < 3 ? '<td ' + td + ' colspan="' + 2 * (3 - g.length) + '"></td>' : '') + '</tr>');
+  }
+  return '<div style="font-family:Arial,sans-serif;font-size:13px"><b>SITUACIÓN BASAL:</b>' +
+    '<table style="border-collapse:collapse;margin-top:4px">' +
+    '<tr><th ' + th + ' rowspan="2">Funcional</th><td ' + td + ' colspan="6"><b>Instrumentales:</b> ' + _gbEsc(d.instr) + '</td></tr>' +
+    '<tr><td ' + td + ' colspan="6"><b>Básicas:</b> ' + _gbEsc(d.bas) + '</td></tr>' +
+    '<tr><th ' + th + ' rowspan="2">Mental</th><td ' + td + ' colspan="6"><b>Cognitivo:</b> ' + _gbEsc(d.cog) + '</td></tr>' +
+    '<tr><td ' + td + ' colspan="6"><b>Emocional:</b> ' + _gbEsc(d.emo) + '</td></tr>' +
+    '<tr><th ' + th + ' rowspan="2">Social</th><td ' + td + ' colspan="4" rowspan="2">' + _gbEsc(d.soc) + '</td>' + cel(GB_SOC[1]) + '</tr><tr>' + cel(GB_SOC[2]) + '</tr>' +
+    filas.join('') +
+    '<tr><th ' + th + '>3D / 3D+</th><td ' + td + ' colspan="6">' + _gbEsc(d.t3d) + '</td></tr>' +
+    (d.enf.length ? '<tr><th ' + th + '>Enfermedades</th><td ' + td + ' colspan="6">' + _gbEsc(d.enf.join(', ')) + '</td></tr>' : '') +
+    '</table><div style="font-size:11px;color:#666;font-style:italic">* Índex Fràgil-VIG &lt;0,20 sin fragilidad // 0,20–0,35 fragilidad inicial // 0,36–0,50 moderada // &gt;0,50 avanzada</div>' +
+    '<div>Índex de Fragilidad (Fràgil-VIG): <b>' + _gbF2(d.vig.i) + '</b> (' + d.vig.grado[1] + ') &nbsp;·&nbsp; PCC <b>' + _gbSig('pcc') + '</b> &nbsp;·&nbsp; NECPAL/MACA <b>' + _gbSig('maca') + '</b></div></div>';
+}
+function _gbTexto(d) {
+  return ['SITUACIÓN BASAL:',
+    'FUNCIONAL', '  Instrumentales: ' + d.instr, '  Básicas: ' + d.bas,
+    'MENTAL', '  Cognitivo: ' + d.cog, '  Emocional: ' + d.emo,
+    'SOCIAL: ' + d.soc + ' Hipoacusia ' + _gbSig('hipoac') + ' · Dism. agudeza visual ' + _gbSig('visual'),
+    'SÍNDROMES GERIÁTRICOS Y SÍNTOMAS: ' + GB_SIND.map(([id, l]) => l + ' ' + _gbSig(id)).join(' · '),
+    d.enf.length ? 'Enfermedades crónicas: ' + d.enf.join(', ') : '',
+    '3D/3D+: ' + d.t3d,
+    'Índex de Fragilidad (Fràgil-VIG): ' + _gbF2(d.vig.i) + ' (' + d.vig.grado[1] + ') · PCC ' + _gbSig('pcc') + ' · NECPAL/MACA ' + _gbSig('maca'),
+    '* Índex Fràgil-VIG <0,20 sin fragilidad // 0,20–0,35 fragilidad inicial // 0,36–0,50 moderada // >0,50 avanzada'].filter(Boolean).join('\n');
+}
+function gbRender() {
+  const d = _gbDatos(), v = d.vig;
+  document.getElementById('gb-res').innerHTML = '<span class="score-risk risk-' + v.grado[0] + '">Fràgil-VIG ' + _gbF2(v.i) + '</span> ' + v.s + ' déficits de 25 · <b>' + v.grado[1] + '</b>' +
+    (v.sinBarthel ? '<br><span class="pe-nota">Sin Barthel basal: las básicas no suman (hasta 3 déficits).</span>' : '') + (v.s > 25 ? '<br><span class="pe-nota">Más de 25 puntos por enfermedades avanzadas: el índice se limita a 1.</span>' : '');
+  document.getElementById('gb-prev').innerHTML = _gbHtml(d);
+}
+function copyGeriatria() {
+  const d = _gbDatos(), html = _gbHtml(d), txt = _gbTexto(d);
+  if (window.ClipboardItem && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([txt], { type: 'text/plain' }) })]).then(() => showToast()).catch(() => navigator.clipboard.writeText(txt).then(() => showToast()).catch(showCopyError));
+  } else navigator.clipboard.writeText(txt).then(() => showToast()).catch(showCopyError);
+}
+function resetGeriatria() {
+  document.querySelectorAll('#tab-geriatria input, #tab-geriatria textarea').forEach(e => { e.value = ''; });
+  document.querySelectorAll('#tab-geriatria select').forEach(e => { e.selectedIndex = 0; });
+  resetGeneric('3dplus', 'gb-');
+  document.querySelectorAll('#tab-geriatria .gb-tg').forEach(b => { b.setAttribute('aria-pressed', 'false'); b.querySelector('.gb-sig').textContent = '−'; });
+  gbRender();
+  document.getElementById('gb-tg-dinero').focus();
+}
+
 // --- Dictado por voz (Web Speech): un reconocedor compartido, destino = campo activo ---
 const IDEAS_TEXTOS = ['ideas-basicos', 'ideas-problema', 'ideas-antecedentes', 'ideas-estado', 'ideas-hecho', 'ideas-pendiente', 'ideas-receptor-hace', 'ideas-alarma'];
 let _ideasRec = null, _ideasDestino = null;
@@ -5487,6 +5711,7 @@ renderCheatsheets();
 renderScales();
 renderFormulas();
 renderProtocols();
+initGeriatria();
 renderDrugs();
 calcSCA();
 renderBibliografia();
