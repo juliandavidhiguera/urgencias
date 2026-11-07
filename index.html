@@ -4319,7 +4319,7 @@ function resetGeriatria() {
 
 // --- Dictado por voz (Web Speech): un reconocedor compartido, destino = campo activo ---
 const IDEAS_TEXTOS = ['ideas-basicos', 'ideas-problema', 'ideas-antecedentes', 'ideas-estado', 'ideas-hecho', 'ideas-pendiente', 'ideas-receptor-hace', 'ideas-alarma'];
-let _ideasRec = null, _ideasDestino = null;
+let _ideasRec = null, _ideasDestino = null, _ideasSes = null;
 function _ideasEstado(txt) { const e = document.getElementById('ideas-voz-estado'); e.hidden = !txt; e.textContent = txt; }
 function _ideasBotonMic(id) { return document.querySelector('.ideas-mic[data-for="' + id + '"]'); }
 function ideasPararDictado() {
@@ -4336,16 +4336,29 @@ function ideasDictar(id) {
   if (!_ideasRec) {
     _ideasRec = new SR();
     _ideasRec.lang = 'es-ES'; _ideasRec.continuous = true; _ideasRec.interimResults = true;
+    /* Chrome de Android repite resultados ya definitivos (resultIndex no avanza) y a veces cada uno
+       trae acumulado el anterior («hola», «hola qué tal»): añadir cada definitivo duplicaba el texto.
+       Se reconstruye todo lo dictado en la sesión desde results[0] y se escribe sobre el texto que
+       tenía el campo al empezar la sesión (_ideasSes.base). */
+    _ideasRec.onstart = () => {
+      const ta = _ideasDestino && document.getElementById(_ideasDestino);
+      _ideasSes = ta ? { id: _ideasDestino, base: ta.value.trim() } : null;
+    };
     _ideasRec.onresult = ev => {
-      if (!_ideasDestino) return;
-      const ta = document.getElementById(_ideasDestino);
-      let provisional = '';
-      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      if (!_ideasSes) return;
+      const ta = document.getElementById(_ideasSes.id);
+      const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+      let dicho = '', provisional = '';
+      for (let i = 0; i < ev.results.length; i++) {
         const t = ev.results[i][0].transcript.trim();
-        if (ev.results[i].isFinal) { if (t) ta.value = (ta.value.trim() ? ta.value.trim() + ' ' : '') + t; }
-        else provisional += t + ' ';
+        if (!t) continue;
+        if (!ev.results[i].isFinal) { if (i >= ev.resultIndex) provisional += t + ' '; continue; }
+        const d = norm(dicho), n = norm(t);
+        if (!d || !n.startsWith(d)) { if (!d.endsWith(n)) dicho = dicho ? dicho + ' ' + t : t; }
+        else dicho = t; /* trae acumulado lo anterior: lo sustituye */
       }
-      _ideasEstado('🔴 Escuchando… ' + (provisional ? '«' + provisional.trim() + '»' : ''));
+      if (dicho) ta.value = (_ideasSes.base ? _ideasSes.base + ' ' : '') + dicho;
+      if (_ideasDestino) _ideasEstado('🔴 Escuchando… ' + (provisional ? '«' + provisional.trim() + '»' : ''));
     };
     _ideasRec.onend = () => { if (_ideasDestino) { try { _ideasRec.start(); } catch (e) { /* arrancando */ } } };
     _ideasRec.onerror = e => {
