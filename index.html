@@ -2475,6 +2475,8 @@ function _scaleResultTxt(id, pfx) {
 
 function copyScaleResult(id, pfx) {
   const txt = _scaleResultTxt(id, pfx);
+  /* Barthel abierto desde Geriatría: al copiar, el resultado pasa también a «Barthel basal». */
+  if (id === 'barthel' && pfx === 'lat-' && _latOrigen && _latOrigen.closest('#tab-geriatria')) gbTraerBarthel();
   navigator.clipboard.writeText(txt).then(() => {
     // Brief visual feedback
     const btn = event.target;
@@ -4922,6 +4924,53 @@ function _rtComando(alts) {
   }
   return null;
 }
+/* 4H/4T por voz: «<causa> <estado>» («hipoxia descartada», «neumotórax sospecha», «taponamiento tratado»).
+   Cada entrada: lo que se oye → nombres de la lista (adulto o pediátrica) a los que corresponde. */
+const RT_CAUSAS_VOZ = [
+  [/hipoxi/, ['Hipoxia']],
+  [/hipovolem|hemorragia|sangrado/, ['Hipovolemia']],
+  [/hiperpotas|hiperkal/, ['Hiperpotasemia']],
+  [/hipopotas|hipokal/, ['Hipopotasemia']],
+  [/hipogluc/, ['Hipoglucemia']],
+  [/hipoterm/, ['Hipotermia']],
+  [/hiperterm/, ['Hipertermia']],
+  [/\btep\b|tromboembolismo|trombosis pulmonar|embolia/, ['Trombosis pulmonar', 'Trombosis']],
+  [/coronari|infarto|\biam\b|sindrome coronario/, ['Trombosis coronaria', 'Trombosis']],
+  [/trombosis/, ['Trombosis']],
+  [/neumotorax/, ['Neumotórax']],
+  [/taponamiento/, ['Taponamiento']],
+  [/toxic|intoxica/, ['Tóxicos']]
+];
+const RT_ESTADOS_VOZ = [['sospecha', /sospech/], ['tratada', /tratad|tratamiento/], ['descartada', /descartad|descarta/]];
+/* {i, k} si la frase nombra una causa con su estado; {i, k: null} si falta el estado; null si no hay causa. */
+function _rtCausaVoz(alts) {
+  const L = _pcrCausasLista();
+  let sinEstado = null;
+  for (const t of alts) {
+    const s = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const v = RT_CAUSAS_VOZ.find(([re, nombres]) => re.test(s) && L.some(c => nombres.some(n => c.n.startsWith(n))));
+    if (!v) continue;
+    const i = v[1].map(n => L.findIndex(c => c.n.startsWith(n))).find(x => x >= 0); /* el nombre más específico primero */
+    const e = RT_ESTADOS_VOZ.find(([, re]) => re.test(s));
+    if (e) return { i, k: e[0] };
+    if (!sinEstado) sinEstado = { i, k: null };
+  }
+  return sinEstado;
+}
+function _rtCausaPorVoz(c) {
+  const L = _pcrCausasLista(), nombre = L[c.i].n;
+  if (!c.k) { _rtVozEstado('Oído: ' + nombre + ' → di también «sospecha», «tratada» o «descartada».'); return; }
+  const est = PCR_CAUSA_ESTADOS.find(x => x[0] === c.k)[1];
+  const prev = pcrCausaEstado[c.i];
+  _rtVozEstado('Oído → ' + nombre + ': ' + est.toLowerCase());
+  if (prev === c.k) return;
+  marcarCausaPcr(c.i, c.k);
+  if (rt.t0) _rtLog(Date.now(), nombre + ': ' + est.toLowerCase(), () => {
+    if (prev) marcarCausaPcr(c.i, prev); else marcarCausaPcr(c.i, c.k);
+  });
+  _rtDecir(nombre + ' ' + est.toLowerCase());
+  rtRender();
+}
 function _rtVozEstado(txt) { const e = document.getElementById('rt-voz-estado'); e.hidden = !txt; e.textContent = txt; }
 function _rtRecCrear() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -4933,6 +4982,8 @@ function _rtRecCrear() {
     for (let i = ev.resultIndex; i < ev.results.length; i++) {
       if (!ev.results[i].isFinal) continue;
       const alts = Array.from(ev.results[i]).map(x => x.transcript);
+      const causa = _rtCausaVoz(alts);
+      if (causa) { _rtCausaPorVoz(causa); continue; }
       const a = _rtComando(alts);
       _rtVozEstado('Oído: «' + alts[0].trim() + '»' + (a ? ' → ' + RT_NOMBRES[a] : ' (sin orden reconocida)'));
       if (a) rtAccion(a, true);
@@ -4952,7 +5003,7 @@ function rtVoz() {
     rt.rec = rt.rec || _rtRecCrear();
     if (!rt.rec) { _rtVozEstado('Este navegador no reconoce la voz: usa Chrome o Safari.'); return; }
     rt.voz = true;
-    _rtVozEstado('Escuchando. Di: «iniciar», «acceso», «vía aérea» (o «intubado»), «desfibrilable», «no desfibrilable», «descarga», «adrenalina», «amiodarona», «deshacer», «pulso» (termina con RCE), «terminar» (pregunta cómo). El 112 se llama con el botón.');
+    _rtVozEstado('Escuchando. Di: «iniciar», «acceso», «vía aérea» (o «intubado»), «desfibrilable», «no desfibrilable», «descarga», «adrenalina», «amiodarona», «deshacer», «pulso» (termina con RCE), «terminar» (pregunta cómo). 4H/4T: la causa y su estado («hipoxia descartada», «neumotórax sospecha», «tóxicos tratados»). El 112 se llama con el botón.');
     _rtRecSeguir();
   } else { rt.voz = false; _rtRecPausa(); _rtVozEstado(''); }
   _rtToggle('rt-voz', rt.voz);
