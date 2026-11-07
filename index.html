@@ -5223,8 +5223,10 @@ function _farmBoloCalc(key) {
   let dMin = o.min * peso, dMax = o.max != null ? o.max * peso : null;
   const tope = _fichaTope(o), topado = tope && (dMin > tope.v || (dMax != null && dMax > tope.v));
   if (tope) { dMin = Math.min(dMin, tope.v); if (dMax != null) dMax = Math.min(dMax, tope.v); }
+  const suelo = _fichaSuelo(o), subido = suelo && dMin < suelo.v;
+  if (suelo) { dMin = Math.max(dMin, suelo.v); if (dMax != null) dMax = Math.max(dMax, suelo.v); }
   const rango = (a, b) => (b != null && b !== a) ? _fmt(a, 2) + '–' + _fmt(b, 2) : _fmt(a, 2);
-  let h = '<b>' + rango(dMin, dMax) + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '') + '</b>' + (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '');
+  let h = '<b>' + rango(dMin, dMax) + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '') + '</b>' + (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '') + (subido ? ' (subido al mínimo de ' + suelo.txt + ')' : '');
   const udEl = document.getElementById(key + '-bud'), cant = udEl ? _n(key + '-bcant') : null, vol = udEl ? _n(key + '-bvol') : null;
   if (_fichaUd(o.unidad) !== 'ml' && udEl && cant > 0 && vol > 0) {
     const aMin = _fichaConvertir(dMin, _fichaUd(o.unidad), udEl.value), aMax = dMax != null ? _fichaConvertir(dMax, _fichaUd(o.unidad), udEl.value) : null;
@@ -5504,6 +5506,14 @@ function parsePresentacion(texto) {
 
 /* Tope por dosis escrito en la misma línea ("máx. 2 mg"), en la unidad de la
    opción. Se ignoran topes por kg ("máx. 2 mg/kg"): ya los recoge la pauta. */
+/* Dosis mínima absoluta («mín. 0,1 mg», p. ej. atropina pediátrica): la dosis calculada no baja de ahí. */
+function _fichaSuelo(o) {
+  const m = o.raw.match(/m[ií]n(?:imo|ima)?\.?\s*(?:de\s*)?(\d+(?:[.,]\d+)?)\s*(mg|mcg|microgramos|g|UI|mEq|mmol)\b(?!\s*\/\s*kg)/i);
+  if (!m) return null;
+  const v = _fichaConvertir(parseFloat(m[1].replace(',', '.')), _fichaUd(m[2]), _fichaUd(o.unidad));
+  return v == null ? null : { v, txt: m[1] + ' ' + m[2] };
+}
+
 function _fichaTope(o) {
   const m = o.raw.match(/m[aá]x(?:imo|ima)?\.?\s*(?:de\s*)?(\d+(?:[.,]\d+)?)\s*(mg|mcg|microgramos|g|UI|mEq|mmol)\b(?!\s*\/\s*kg)/i);
   if (!m) return null;
@@ -5669,9 +5679,11 @@ function calcFichaDosis() {
     dMin = Math.min(dMin, tope.v);
     if (dMax != null) dMax = Math.min(dMax, tope.v);
   }
+  const suelo = _fichaSuelo(o), subido = suelo && dMin < suelo.v;
+  if (suelo) { dMin = Math.max(dMin, suelo.v); if (dMax != null) dMax = Math.max(dMax, suelo.v); }
   const rango = (a, b, dec) => (b != null && b !== a) ? _fmt(a, dec) + '–' + _fmt(b, dec) : _fmt(a, dec);
   resEl.textContent = rango(dMin, dMax, 2) + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '') +
-    (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '');
+    (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '') + (subido ? ' (subido al mínimo de ' + suelo.txt + ')' : '');
   fuenteEl.textContent = 'Texto original: "' + o.raw + '"';
   // Dosis en mL según la presentación comercial
   mlEl.textContent = '';
