@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 21 | **Rama:** main | **HEAD:** `b7abfdd` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-07 | **Sesion #:** 22 | **Rama:** main | **HEAD:** `39e8b4d` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -26,7 +26,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 3. MAPA DE ARCHIVOS CRITICOS
 | Ruta | Funcion | Estado |
 |---|---|---|
-| `index.html` | Toda la UI: 11 tabs (cheatsheets, escalas, formulas, protocolos, farmacos, perfusiones, intubacion, pcr, ideas, fichas, bibliografia), busqueda global, favoritos/recientes, tema | ESTABLE |
+| `index.html` | Toda la UI: 12 tabs (cheatsheets, escalas, formulas, protocolos, farmacos, perfusiones, intubacion, pcr, ideas, geriatria, fichas, bibliografia), busqueda global, favoritos/recientes, tema | ESTABLE |
 | `#tab-ideas` (index.html) | Traspaso IDEAs (REMI A166): campos I/D/E/A/s, copiar parte, nuevo paciente, pautas de metacomunicacion, 🎤 por campo (Web Speech). Datos solo en memoria (`IDEAS_CAMPOS`, `IDEAS_TEXTOS`) | ESTABLE (sesion 18; micro real sin probar) |
 | `data/drugs.js` | Farmacos de urgencias: dosis, alertas, antidotos, perfusion IV por peso | ESTABLE |
 | `data/fichas.js` | 75 fichas tecnicas de medicamentos (generadas desde `medicamentos/*.md`) | ESTABLE |
@@ -59,6 +59,14 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 22 - 2026-11-07
+- Modificado (`fb0a549`): `data/protocols-ped.js` con el contenido que faltaba de las notas numeradas («botones rojos», peticion del usuario: cada uno trae informacion relevante) de los 11 PDF SEUP; auditoria con 4 agentes contra el texto de los PDF (`scratchpad/seup-agente-*/`, lista en `gaps_seup.md`). Lo mas grande: dolor (tablas 21-4/21-5/21-9: paracetamol rectal, metamizol en perfusion, ketorolaco oral/IM/IV, morfina oral, fentanilo bucal, ketamina perfusion/oral, pregabalina, baclofeno por edad). Ambiguedades del PDF transcritas tal cual con `pe-nota` (ketorolaco IV «30 mg/kg/8 h», fentanilo bucal, paracetamol rectal «/dia», «tercio medio de la pierna»). Shock confirmado por el usuario con la imagen (rama «No» de ≥3 bolos = repetir bolo, nota 5A). Bronquiolitis: adrenalina de rescate solo 0,5 mg/kg max 3 mg (eleccion del usuario). `data/protocols.js`: troponinas del laboratorio del hospital (T 0–14, I ≤34,2 pg/ml = Elecsys hs-cTnT y p99 masculino de Architect hs-cTnI; mujeres 15,6) en el nodo `trop` del dolor toracico y en el chk del TEP
+- Anadido (`39e8b4d`): pestaña «👴 Geriatria» (`#tab-geriatria`, funciones `gb*`, `initGeriatria()` al final del script): situacion basal funcional/mental/social/sindromes/enfermedades/PCC-MACA → Fràgil-VIG calculado, vista previa en tabla y copia HTML+texto (ClipboardItem; Word conserva la tabla). Solo memoria. Sin alergias ni habitos toxicos (el usuario los quito). Incrusta la escala `3dplus` con prefijo `gb-`
+- Modificado: `data/scales.js` `fragilvig` reescrita: la anterior NO era el indice original (items y pesos 0,5 inventados). Ahora tabla 1 de Amblàs-Novellas 2018 (PMID 29373968): 22 preguntas, 25 deficits, Barthel 0–3 (≥95/90–65/60–25/≤20), cognitivo 0–2 (GDS), enfermedad 2 si avanzada NECPAL (indice limitado a 1: el articulo no lo aclara); grados de BMJ Open 2021 (PMID 33883149). `3dplus` reescrita: la anterior daba 0 puntos a los 4 niveles. Ahora figura 1 de Garcia-Perez 2023 (PMID 37892606; original 2022 PMID 35781176): nivel = max(deambulacion/ABVD, cognitivo), 3D+ alterado si alguna de 4 preguntas, destino orientativo de la figura 2
+- Commits: `fb0a549` feat: notas de los botones rojos SEUP… · `39e8b4d` feat: pestaña Geriatría con situación basal, Índex Fràgil-VIG y 3D/3D+ corregidos
+- Verificado: node (val3.js: 160 nodos ped sin NaN; logica VIG y 3D en casos), Chrome headless con perfil limpio (caso de la imagen del usuario → VIG 0,20 fragilidad inicial; Barthel lateral → «Usar el resultado»; 3D en el informe; sin errores JS); el usuario lo vio en local. Produccion con curl: `/` con `navbtn-geriatria`, `scales.js` con los nuevos `src`, `protocols-ped.js` y `protocols.js` con los cambios
+- No probado: pegar en Word/ECAP real ni a 375 px
 
 ### Sesion 21 - 2026-11-07
 - Anadido: `data/scales.js` `llanto` (tabla 21-2 del PDF SEUP de dolor, Reinoso-Barbero 2011), `rflacc` (tabla 21-3 SEUP, Malviya 2006 PMID 16490089; comportamientos individualizados en `info`), `cds` (Friedman 2004 PMID 15289767, validacion Bailey 2010 PMID 20624137: 0 / 1–4 / 5–8, sin % porque no se verifico), `gorelick` (10 chk, PMID 9113963: ≥3 signos = ≥5 %; sin corte de 10 %, el articulo no lo da). Enlazadas: dolor `obsv` y barra; deshidratacion `triaje` y barra
@@ -192,7 +200,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 | 18 | Probar el micro real en movil (ahora permitido por `_headers`): dictado por campo de IDEAs y voz de la linea de tiempo del PCR | `index.html` (`#tab-ideas`, `rtVoz`) | P1 | Usuario (movil) | Dicta en el campo correcto, para al pulsar otra vez; el PCR reconoce ordenes |
 | 19 | Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
-| 21 | Dudas SEUP que quedan: dosis unica de adrenalina nebulizada de rescate en bronquiolitis (0,5 mg/kg max 3 mg en `grave` vs 1–3 mg en `obs`); flecha inferida «No» de ≥3 bolos en shock | `data/protocols-ped.js` | P3 | Usuario | El usuario elige y queda una sola dosis / confirma la flecha |
+| 24 | Probar la pestaña Geriatria en movil (375 px) y pegar el informe en Word y en la historia clinica | `index.html` (`#tab-geriatria`) | P2 | Usuario | Se ve sin scroll horizontal y la tabla se pega bien |
+| 25 | Revisar el resto de escalas de geriatria/antiguas contra su fuente (VIG y 3D+ estaban inventadas) | `data/scales.js` | P2 | - | Cada escala con items y cortes verificados contra el articulo citado en `src` |
 | 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -215,6 +224,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - No hay comando de test ni de build.
 
 ## 9. TRAMPAS Y CONTEXTO NO OBVIO
+- **Escalas con `calcCustom`**: `calcScale` le pasa `parseFloat(el.value)` de cada control, y un checkbox da «on» → 0. En escalas custom usar solo `sel` (con `btn:true` para si/no). Para devolver varios datos en un numero, codificarlos (ver `3dplus`: nivel×1000 + alterado×100 + ingreso×10 + pendiente) y mostrarlos con `numTxt`.
+- **Chrome headless de pruebas**: si quedo un Chrome vivo en el puerto 9333, `cdp_run.mjs` se conecta a el y sirve JS viejo de cache; matar los `chrome.exe` con `remote-debugging-port=9333` y usar perfil nuevo.
 - Linea de tiempo PCR: el estado `rt` es aparte de los controles manuales de abajo (cambiar el select de ritmo a mano NO cambia `rt.ritmo`). Las sugerencias de la 3.a/5.a descarga leen `pcrDescargasLog[k].t` (ms): descargas registradas con el boton antiguo no lo tienen. No mapear el 112 a la voz (un falso positivo llamaria)
 - `sed -i` de Git Bash convierte CRLF→LF en todo el fichero y un heredoc `python - <<'EOF'` puede llegar alterado (hook RTK): para editar, script `.py` en el scratchpad. `curl https://urgencias.doctorhiguera.com/index.html` redirige (vacio sin `-L`): comprobar con `/`.
 - **Service worker network-first** (desde sesion 6, commit `432050f`): ya no hay que subir `CACHE` al tocar `index.html` o `data/*.js`. Subirlo **solo** si se añade/quita un fichero de `ASSETS` (si no, el nuevo no queda disponible offline hasta que el usuario lo abra con conexion) o si se cambia la logica de `sw.js`. No volver a cache-first: fue la causa de que usuarios con la app instalada quedaran atascados en contenido clinico viejo hasta borrar datos del sitio a mano.
@@ -273,4 +284,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Preguntar al usuario que dosis unica de adrenalina nebulizada de rescate deja en bronquiolitis (#21) y probar en movil real el panel 4H/4T y el dictado (#18).
+Pedir al usuario que pruebe en el movil la pestaña Geriatria y pegue el informe en su historia clinica (#24); despues revisar las escalas antiguas contra su fuente (#25).
