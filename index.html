@@ -786,6 +786,13 @@ label.fl-ask-hint { display: block; }
 .lat-farm-h { font-weight: 700; color: var(--text); }
 .lat-farm-dil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lat-farm-res { margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: var(--fs-base); }
+.lat-farm-esq { margin: 6px 0 0; padding-left: 20px; line-height: 1.5; }
+.lat-farm-esq li { margin-bottom: 4px; }
+.lat-farm-dosis { margin-top: 10px; }
+.lat-farm-dosis summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+.lat-farm-bolo { margin-top: 10px; }
+.lat-farm-bolo summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+.lat-farm-bolo .field { margin-top: 8px; }
 .lat-farm-warn { margin-top: 8px; padding: 8px 10px; border: 1px solid var(--red); border-radius: 6px; background: var(--red-bg); color: var(--red-text); font-weight: 600; font-size: var(--fs-sm); }
 .lat-farm-hint { margin-top: 8px; font-size: var(--fs-sm); color: var(--text2); }
 .lat-farm .btn { margin-top: 10px; margin-right: 6px; }
@@ -1530,6 +1537,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
       <div class="rt-btns">
         <button class="rt-b" onclick="rtPdf()">🖨️ PDF del registro</button>
         <button class="rt-b" onclick="abrirRegistroUtstein()">📄 Registro Utstein</button>
+        <button class="rt-b rt-ok" id="rt-sir" onclick="rtIrSir()" hidden>🫁 Secuencia de intubación rápida</button>
         <button class="rt-b rt-d" id="rt-reparada" onclick="rtReparada()">🔁 Nueva parada (pierde el pulso)</button>
         <button class="rt-b rt-undo" onclick="rtAccion('deshacer')">↶ Reabrir (terminada por error)</button>
       </div>
@@ -1860,6 +1868,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 <script src="data/intubacion.js"></script>
 <script src="data/pcr.js"></script>
 <script src="data/fichas.js"></script>
+<script src="data/fichas-ped.js"></script>
 <script src="data/bibliografia.js"></script>
 <script>
 /* ==================================================================
@@ -4573,6 +4582,8 @@ function rtRender() {
   box.querySelector('.rt-btns').hidden = !!rt.fin;
   el('rt-fin-ok').hidden = !rt.fin;
   el('rt-reparada').hidden = !rt.fin || rt.fin.motivo !== 'rce';
+  el('rt-sir').hidden = !rt.fin || rt.fin.motivo !== 'rce';
+  el('rt-sir').textContent = rt.tVia ? '🫁 Evolución post-intubación (SIR)' : '🫁 Secuencia de intubación rápida';
   if (rt.fin) { el('rt-fin').hidden = true; el('rt-fin-txt').textContent = T[0].txt; }
   el('rt-b-sva').hidden = !!rt.tSva;
   _rtH4();
@@ -4747,6 +4758,26 @@ function rtReset() {
 }
 
 function rtFinCancelar() { document.getElementById('rt-fin').hidden = true; }
+
+/* Tras el RCE: abre la SIR. Si ya hay vía aérea avanzada, va al mantenimiento/evolución postintubación
+   y deja anotado en «Evolución» cuándo se intubó y cuándo hubo RCE; si no, al inicio del checklist. */
+function rtIrSir() {
+  showTab('intubacion', document.getElementById('navbtn-intubacion'));
+  const est = document.getElementById('itb-estado');
+  if (est && est.value !== 'inestable') { est.value = 'inestable'; calcIntubacion(); }
+  const pp = document.getElementById('pcr-peso'), ip = document.getElementById('itb-peso');
+  if (pp && pp.value && !ip.value) { ip.value = pp.value; calcIntubacion(); }
+  if (rt.tVia) {
+    const ev = document.getElementById('itb-evolucion');
+    const nota = 'Vía aérea avanzada colocada durante la RCP a las ' + _rtHora(rt.tVia) + (rt.fin ? '; RCE mantenido a las ' + _rtHora(rt.fin.t) : '') + '.';
+    if (!ev.value.includes(nota)) ev.value = (ev.value ? ev.value + '\n' : '') + nota;
+    const sel = document.getElementById('itb-mant-add-select');
+    const sub = sel && sel.parentElement && sel.parentElement.previousElementSibling;
+    (sub || ev).scrollIntoView({ block: 'start' });
+  } else {
+    document.querySelector('#tab-intubacion .databox').scrollIntoView({ block: 'start' });
+  }
+}
 
 /* Tras un RCE, si vuelve a perder el pulso: se reanuda sin borrar el RCE (queda en el registro). */
 function rtReparada() {
@@ -5040,7 +5071,7 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
   const d = r.inf;
   const mg = c.mg != null ? c.mg : d ? d.mg : null;
   const vol = c.vol != null ? c.vol : d ? d.vol : null;
-  const key = 'latf-' + (c.n + '-' + mg + '-' + vol + (c.min != null ? '-r' + c.min + '-' + c.max : '')).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
+  const key = 'latf-' + (c.n + '-' + mg + '-' + vol + (c.min != null ? '-r' + c.min + '-' + c.max : '') + (c.esquema ? '-' + c.esquema : '')).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
   const body = document.getElementById('lat-body');
   let box = document.getElementById(key);
   if (!box) {
@@ -5060,8 +5091,61 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
     document.getElementById(key + '-peso').value = peso; // el peso del flujograma ha cambiado
     _farmCalc(key, 'dosis');
   }
+  if (c.esquema) _farmEsquema(key, c, pid); // se recalcula al abrir: el peso o la edad pueden haber cambiado
+  const bp = document.getElementById(key + '-bpeso');
+  if (bp && !isNaN(peso) && peso > 0 && _n(key + '-bpeso') !== peso) bp.value = peso;
+  if (bp) {
+    const sel = document.getElementById(key + '-bop'), ops = box._bolo || (box._bolo = _farmBoloOps(r.ficha));
+    const pr = pid && PROTOCOLS.find(x => x.id === pid), iPed = ops.findIndex(o => o.ped);
+    if (sel && pr && pr.ped && iPed >= 0 && !(ops[+sel.value] || {}).ped) sel.value = iPed;
+    _farmBoloCalc(key);
+  }
   if (pid) farmElegir(pid, nid, c, box);
   _latMostrar(box, 'Medicación: ' + c.n);
+}
+
+function _escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+/* Esquemas de los fibrinolíticos calculados con el peso real (c.esquema en el nodo del flujograma).
+   Mismas pautas que las fichas de la app: ficha técnica Actilyse y Metalyse, ERC 2025, AHA/ASA 2026, ESO 2021/2023, STREAM-2. */
+const _fx = x => (Math.round(x * 10) / 10).toString().replace('.', ',');
+const _tnkTramo = p => p < 60 ? 0 : p < 70 ? 1 : p < 80 ? 2 : p < 90 ? 3 : 4;
+const _tnkFila = (mg, p) => '<b>' + _fx(mg) + ' mg = ' + _fx(mg / 5) + ' ml</b> (5 mg/ml) en bolo IV único en 5–10 s' + (p ? ' (' + _fx(p) + ' kg)' : '') + '.';
+const FARM_ESQUEMAS = {
+  'alteplasa-ictus': (p) => {
+    if (!p) return ['0,9 mg/kg (máx. 90 mg): el 10 % en bolo IV en 1 min y el 90 % con bomba en 60 min. <i>Introduce el peso para calcularlo.</i>'];
+    const tot = Math.min(0.9 * p, 90), bolo = tot / 10, resto = tot - bolo;
+    return ['Reconstituir a <b>1 mg/ml</b> con el agua del envase (sin agitar). Dosis total 0,9 mg/kg' + (0.9 * p > 90 ? ' (máximo)' : '') + ': <b>' + _fx(tot) + ' mg</b>. <b>Desechar antes lo que sobre del vial.</b>',
+      '<b>Bolo IV de ' + _fx(bolo) + ' mg (' + _fx(bolo) + ' ml) en 1 min.</b>',
+      '<b>Perfusión de ' + _fx(resto) + ' mg en 60 min con bomba: ' + _fx(resto) + ' ml/h.</b>',
+      'Al acabar, SF 0,9 % por la misma vía al mismo ritmo (sin bolo). PA &lt;180/105 durante y 24 h después; sin antiagregantes ni heparina 24 h.'];
+  },
+  'alteplasa-tep': (p) => {
+    const tot = p && p < 65 ? 1.5 * p : 100, resto = tot - 10;
+    return ['<b>Con pulso (TEP de alto riesgo):</b> reconstituir a 1 mg/ml; <b>bolo de 10 mg (10 ml) en 1–2 min</b> + <b>' + _fx(resto) + ' mg en 2 h con bomba = ' + _fx(resto / 2) + ' ml/h</b>' + (p && p < 65 ? ' (&lt;65 kg: total 1,5 mg/kg = ' + _fx(tot) + ' mg)' : p ? '' : ' (con &lt;65 kg el total no supera 1,5 mg/kg: introduce el peso)') + '.',
+      '<b>En parada cardiaca:</b> <b>50 mg en bolo IV en 2 min</b>; si no hay RCE a los 15–30 min, segunda dosis de 50 mg (máx. 100 mg). Mantener la RCP 60–90 min tras la lisis.',
+      'Suspender la heparina durante la perfusión; al acabar, SF 0,9 % al mismo ritmo.'];
+  },
+  'tnk-iam': (p, edad) => {
+    const tabla = '&lt;60 kg 30 mg · 60–69 kg 35 mg · 70–79 kg 40 mg · 80–89 kg 45 mg · ≥90 kg 50 mg; con ≥75 años, media dosis.';
+    if (!p) return ['Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. Por tramos de peso: ' + tabla + ' <i>Introduce el peso.</i>'];
+    const mg = [30, 35, 40, 45, 50][_tnkTramo(p)], mayor = edad >= 75;
+    return ['Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. <b>Incompatible con glucosa</b>: vía lavada con SF 0,9 %.',
+      (mayor ? '<b>≥75 años: MEDIA DOSIS</b> → ' + _tnkFila(mg / 2, p) : _tnkFila(mg, p) + (edad ? '' : ' <b>Si tiene ≥75 años: media dosis, ' + _fx(mg / 2) + ' mg (' + _fx(mg / 10) + ' ml).</b>')),
+      '10 ml de SF 0,9 % antes y después del bolo. Junto con la doble antiagregación y la anticoagulación del Codi IAM. Es el doble que la dosis del ictus.'];
+  },
+  'tnk-ictus': (p) => {
+    if (!p) return ['Por tramos de peso (≈0,25 mg/kg, máx. 25 mg): &lt;60 kg 15 mg · 60–69 kg 17,5 mg · 70–79 kg 20 mg · 80–89 kg 22,5 mg · ≥90 kg 25 mg. <i>Introduce el peso.</i>'];
+    return ['Reconstituir a 5 mg/ml (vial de 25 mg con 5 ml); con el vial de 50 mg, <b>desechar antes el sobrante</b>. Incompatible con glucosa.',
+      _tnkFila([15, 17.5, 20, 22.5, 25][_tnkTramo(p)], p),
+      'Es la mitad de la dosis del SCACEST; no usar 0,4 mg/kg. Sin antiagregantes ni heparina 24 h; PA &lt;180/105.'];
+  }
+};
+function _farmEsquema(key, c, pid) {
+  const el = document.getElementById(key + '-esq');
+  if (!el || !FARM_ESQUEMAS[c.esquema]) return;
+  const num = id => { const e = document.getElementById('fl-' + pid + '-' + id) || document.getElementById('pe-' + pid + '-' + id); const v = e ? parseFloat(String(e.value).replace(',', '.')) : NaN; return v > 0 ? v : 0; };
+  el.innerHTML = '<ol class="lat-farm-esq">' + FARM_ESQUEMAS[c.esquema](num('peso'), num('edad')).map(x => '<li>' + x + '</li>').join('') + '</ol>';
 }
 
 /* Rango de dosis: el del protocolo si el fármaco lo trae (min/max, p. ej. estatus pediátrico), si no el de Perfusión IV. */
@@ -5089,12 +5173,65 @@ function _farmCardHTML(key, c, r) {
       '<div class="lat-farm-hint">Cambia la dosis o el ritmo según la evolución: el otro valor se recalcula.</div>' +
       '<button class="btn btn-copy" onclick="_farmCopiar(\'' + key + '\')">📋 Copiar perfusión</button>';
   } else {
-    h += '<div class="scale-note">Bolo o dosis única: dosis y vía en la ficha. Si la ficha da la dosis por kilo, su calculadora se abre con el peso del paciente.</div>';
+    if (c.esquema) h += '<div class="lat-farm-h">📋 Esquema de administración</div><div class="lat-farm-res" id="' + key + '-esq" aria-live="polite"></div>';
+    if (r.ficha && r.ficha.dosis) {
+      h += '<details class="lat-farm-dosis"' + (c.esquema ? '' : ' open') + '><summary>' + (c.esquema ? 'Preparación y todas las pautas (ficha)' : '📋 Dosis y forma de administración (ficha)') + '</summary><div class="scale-note">' +
+        (r.ficha.presentacion ? '<b>Presentación:</b> ' + _escHtml(r.ficha.presentacion) + '<br>' : '') + _escHtml(r.ficha.dosis).replace(/\n/g, '<br>') + '</div></details>';
+    } else {
+      h += '<div class="scale-note">Bolo o dosis única: dosis y vía en la ficha. Si la ficha da la dosis por kilo, su calculadora se abre con el peso del paciente.</div>';
+    }
   }
+  h += _farmBoloHTML(key, r.ficha, !!d);
   if (r.ficha) {
     h += '<button class="btn lat-farm-ficha" onclick="_farmFicha(\'' + key + '\',\'' + r.ficha.file.replace(/'/g, "\\'") + '\')">📄 Ver la ficha</button>';
   }
   return h + '</div></div>';
+}
+
+/* Calculadora de bolo en el panel lateral: las mismas pautas por kilo que la calculadora de la ficha
+   (parseDosisPorKg sobre el texto de la ficha), con ids propios de la caja para no chocar con la ficha. */
+function _farmBoloOps(ficha) {
+  if (!ficha) return [];
+  return _fichaOpsTodas(ficha).filter(o => !o.esPerfusion);
+}
+function _farmBoloHTML(key, ficha, conPerfusion) {
+  const ops = _farmBoloOps(ficha);
+  if (!ops.length) return '';
+  const pres = parsePresentacion(ficha.presentacion);
+  const ud0 = pres ? pres.ud : _fichaUd(ops[0].unidad);
+  const todasMl = ops.every(o => _fichaUd(o.unidad) === 'ml');
+  return '<details class="lat-farm-bolo"' + (conPerfusion ? '' : ' open') + '><summary>🧮 Calculadora de bolo / dosis única</summary>' +
+    '<div class="field"><label for="' + key + '-bpeso">Peso real (kg)</label><input type="number" id="' + key + '-bpeso" min="0" step="any" inputmode="decimal" oninput="_farmBoloCalc(\'' + key + '\')"></div>' +
+    '<div class="field"><label for="' + key + '-bop">Indicación y vía</label><select id="' + key + '-bop" onchange="_farmBoloCalc(\'' + key + '\')">' +
+      ops.map((o, i) => '<option value="' + i + '">' + _escHtml((o.indicacion || FICHA_IND_GENERAL) + (o.rutas.length ? ' · ' + o.rutas.join('/') : '') + ' · ' + _fmt(o.min, 3) + (o.max != null && o.max !== o.min ? '–' + _fmt(o.max, 3) : '') + ' ' + o.unidad + '/kg') + '</option>').join('') + '</select></div>' +
+    (todasMl ? '' : '<div class="field"><label for="' + key + '-bcant">Presentación</label><div class="ficha-pres-row">' +
+      '<input type="number" id="' + key + '-bcant" min="0" step="any" aria-label="Cantidad de fármaco" value="' + (pres ? pres.cant : '') + '" oninput="_farmBoloCalc(\'' + key + '\')">' +
+      '<select id="' + key + '-bud" aria-label="Unidad" onchange="_farmBoloCalc(\'' + key + '\')">' + FICHA_PRES_UDS.map(u => '<option' + (u === ud0 ? ' selected' : '') + '>' + u + '</option>').join('') + '</select>' +
+      '<span>en</span><input type="number" id="' + key + '-bvol" min="0" step="any" aria-label="Volumen en ml" value="' + (pres ? pres.vol : '') + '" oninput="_farmBoloCalc(\'' + key + '\')"><span>ml</span></div></div>') +
+    '<div class="lat-farm-res" id="' + key + '-bres" aria-live="polite">Introduce el peso.</div>' +
+    '<div class="scale-note" id="' + key + '-bsrc"></div>' +
+    '<div class="scale-note">⚠️ Dosis leída del texto de la ficha (peso real). Compruébala con la ficha antes de administrar.</div></details>';
+}
+function _farmBoloCalc(key) {
+  const box = document.getElementById(key);
+  const ops = box._bolo || (box._bolo = _farmBoloOps(_farmResolver(_farmCfgDeCaja(box)).ficha));
+  const sel = document.getElementById(key + '-bop'), res = document.getElementById(key + '-bres');
+  if (!sel || !ops.length) return;
+  const o = ops[+sel.value] || ops[0], peso = _n(key + '-bpeso');
+  document.getElementById(key + '-bsrc').textContent = 'Texto de la ficha: «' + o.raw + '»';
+  if (!peso || peso <= 0) { res.textContent = 'Introduce el peso.'; return; }
+  let dMin = o.min * peso, dMax = o.max != null ? o.max * peso : null;
+  const tope = _fichaTope(o), topado = tope && (dMin > tope.v || (dMax != null && dMax > tope.v));
+  if (tope) { dMin = Math.min(dMin, tope.v); if (dMax != null) dMax = Math.min(dMax, tope.v); }
+  const rango = (a, b) => (b != null && b !== a) ? _fmt(a, 2) + '–' + _fmt(b, 2) : _fmt(a, 2);
+  let h = '<b>' + rango(dMin, dMax) + ' ' + o.unidad + (o.periodo ? '/' + o.periodo : '') + '</b>' + (topado ? ' (limitado al máximo de ' + tope.txt + ')' : '');
+  const udEl = document.getElementById(key + '-bud'), cant = udEl ? _n(key + '-bcant') : null, vol = udEl ? _n(key + '-bvol') : null;
+  if (_fichaUd(o.unidad) !== 'ml' && udEl && cant > 0 && vol > 0) {
+    const aMin = _fichaConvertir(dMin, _fichaUd(o.unidad), udEl.value), aMax = dMax != null ? _fichaConvertir(dMax, _fichaUd(o.unidad), udEl.value) : null;
+    h += aMin == null ? '<br>La dosis va en ' + o.unidad + ' y la presentación en ' + udEl.value + ': no se puede pasar a ml.'
+      : '<br><b>= ' + rango(aMin / (cant / vol), aMax != null ? aMax / (cant / vol) : null) + ' ml</b> (presentación ' + _fmt(cant, 3) + ' ' + udEl.value + ' en ' + _fmt(vol, 3) + ' ml)';
+  }
+  res.innerHTML = h;
 }
 
 function _farmCalc(key, origen) {
@@ -5127,10 +5264,15 @@ function _farmCalc(key, origen) {
     document.getElementById(key + '-mlh').value = dosis != null ? +(dosis * porUnidad / conc).toFixed(1) : '';
   }
   const dosis = _n(key + '-dosis'), mlh = _n(key + '-mlh');
-  res.innerHTML = dosis != null && mlh != null
-    ? '<b>' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h</b><br>Concentración ' + _fmt(conc, 3) + ' ' + u + '/ml · 1 ml/h = ' + _fmt(conc / porUnidad, 3) + ' ' + d.unit
-    : 'Introduce la dosis o el ritmo.';
   const rg = _farmRango(_farmCfgDeCaja(box), d);
+  const sinDiluir = /no se diluye/i.test(d.diluyente || '');
+  res.innerHTML = dosis != null && mlh != null
+    ? '<b>' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h</b><br>Concentración ' + _fmt(conc, 3) + ' ' + u + '/ml · 1 ml/h = ' + _fmt(conc / porUnidad, 3) + ' ' + d.unit +
+      '<div class="lat-farm-h" style="margin-top:8px">📋 Esquema de administración</div><ol class="lat-farm-esq">' +
+      '<li>' + (sinDiluir ? 'Cargar <b>' + _fmt(mg, 3) + ' ' + u + ' en ' + _fmt(vol, 1) + ' ml sin diluir</b>' : 'Preparar <b>' + _fmt(mg, 3) + ' ' + u + ' en ' + _fmt(vol, 1) + ' ml</b> de ' + d.diluyente) + ' (' + _fmt(conc, 3) + ' ' + u + '/ml), en bomba de perfusión y vía propia si es posible.</li>' +
+      '<li>Iniciar a <b>' + _fmt(mlh, 1) + ' ml/h</b> (' + _fmt(dosis, 3) + ' ' + d.unit + ').</li>' +
+      '<li>Titular según la respuesta dentro de ' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + ': cambia aquí la dosis o el ritmo y se recalcula el otro.</li></ol>'
+    : 'Introduce la dosis o el ritmo.';
   const fuera = dosis != null && (dosis < rg.min || (rg.max != null && dosis > rg.max));
   warn.hidden = !fuera;
   warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + '): revisar antes de administrar.' : '';
@@ -5291,6 +5433,14 @@ function limpiarTablaAplanada(texto) {
    de bolo: para eso ya existe la pestaña Perfusión IV. */
 function _fichaEsPerfusion(linea, periodo) {
   return ['h', 'hora', 'min'].includes(periodo) || /perfusi[oó]n continua|infusi[oó]n continua/i.test(linea);
+}
+
+/* Pautas por kilo de una ficha: las de «Dosis» y las pediátricas (data/fichas-ped.js), estas con «Niños ·» delante. */
+function _fichaOpsTodas(f) {
+  const ad = parseDosisPorKg(limpiarTablaAplanada(f.dosis || ''));
+  const ped = parseDosisPorKg(String(f.pedKg || '').replace(/&lt;/g, '<').replace(/&gt;/g, '>'))
+    .map(o => Object.assign(o, { indicacion: 'Niños · ' + (o.indicacion || 'dosis general'), ped: true }));
+  return ad.concat(ped);
 }
 
 function parseDosisPorKg(texto) {
@@ -5558,6 +5708,7 @@ function _fichaHTML(f) {
   html += _fichaSection('Propiedades', f.propiedades);
   html += _fichaSection('Indicaciones', f.indicaciones);
   html += _fichaSection('Dosis / vía de administración', limpiarTablaAplanada(f.dosis));
+  html += _fichaSection('👶 Dosis pediátricas por kg', f.pedKg, 'ficha-nota');
   html += _fichaSection('Pediatría', f.pediatria, 'ficha-nota');
   html += _fichaSection('Contraindicaciones', f.contraindicaciones, 'ficha-riesgo');
   html += _fichaSection('Efectos secundarios', f.efectosSecundarios, 'ficha-adverso');
@@ -5579,7 +5730,7 @@ function showFicha(file) {
   const f = (window.FICHAS || []).find(x => x.file === file);
   if (!f) { console.warn('Ficha no encontrada:', file); return; }
   _fichaTriggerEl = document.activeElement;
-  const todas = parseDosisPorKg(limpiarTablaAplanada(f.dosis || ''));
+  const todas = _fichaOpsTodas(f);
   _fichaCalcOpciones = todas.filter(o => !o.esPerfusion);
   _fichaCalcOpcionesPerfusion = todas.filter(o => o.esPerfusion);
   _fichaCalcPres = parsePresentacion(f.presentacion);

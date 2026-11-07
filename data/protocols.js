@@ -765,7 +765,7 @@ window.PROTOCOLS = [
           t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
           q: 'Continuar', opts: [{ l: 'Pautar la angioplastia primaria', go: 'icp' }]
         },
-        fib: { farmacos: ['Tenecteplasa', 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', 'Heparina sódica'],
+        fib: { farmacos: [{ n: 'Tenecteplasa', esquema: 'tnk-iam' }, 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', 'Heparina sódica'],
           t: 'FIBRINÓLISIS CON TENECTEPLASA', c: 'high',
           show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
             '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
@@ -919,7 +919,7 @@ window.PROTOCOLS = [
         },
         fuera: { t: 'Fuera de la ventana de trombólisis IV', c: 'mid', show: 'Sin trombólisis IV. Si hay oclusión de gran vaso, comentar con el neurólogo de teleictus el traslado a trombectomía.' },
         ventana1: { ...CI },
-        ventana2: { farmacos: ['Alteplasa'],
+        ventana2: { farmacos: [{ n: 'Alteplasa', inf: false, esquema: 'alteplasa-ictus' }],
           q: '¿Hay mismatch en la TC de perfusión o difusión-FLAIR en la RM?',
           help: '4,5–9 h o ictus del despertar: solo con imagen avanzada y solo ALTEPLASA (EXTEND, WAKE-UP). No tenecteplasa si solo hay TC sin contraste (TWIST).',
           opts: [{ l: 'Sí, hay mismatch', go: 'ventana2ci' }, { l: 'No, o solo hay TC sin contraste', go: 'sinimagen' }]
@@ -938,7 +938,7 @@ window.PROTOCOLS = [
           q: '¿Se consigue &lt;185/110?',
           opts: [{ l: 'Sí', go: 'dosis' }, { l: 'No, TA no controlable', go: 'contra' }]
         },
-        dosis: { farmacos: ['Alteplasa', 'Tenecteplasa'],
+        dosis: { farmacos: [{ n: 'Alteplasa', inf: false, esquema: 'alteplasa-ictus' }, { n: 'Tenecteplasa', esquema: 'tnk-ictus' }],
           t: 'TROMBÓLISIS (dosis con el peso real)', c: 'high',
           show: v => {
             let h = '';
@@ -2392,7 +2392,7 @@ window.PROTOCOLS = [
           opts: [{ l: 'Sí', go: 'pertE', sug: v => v.ciLisis === true }, { l: 'No', go: 'lisis' }]
         },
         lisis: {
-          farmacos: [{ n: 'Alteplasa', inf: false }],
+          farmacos: [{ n: 'Alteplasa', inf: false, esquema: 'alteplasa-tep' }],
           t: 'Fibrinólisis en Campdevànol sin esperar el traslado', c: 'high',
           show: '• <b>Alteplasa 100 mg IV en 2 h:</b> 10 mg en bolo + 90 mg en 2 h (&lt;65 kg: máx. 1,5 mg/kg total).<br>' +
             '• <b>En PCR: 50 mg IV en bolo en 2 min</b>; si no hay ROSC a los 15–30 min, segunda dosis de 50 mg (máx. 100 mg; por peso, ERC 2025: 0,6–1,0 mg/kg, máx. 100 mg). RCP 60–90 min tras la lisis.<br>' +
@@ -2455,7 +2455,7 @@ window.PROTOCOLS = [
             '<b>Observación de urgencias con monitor</b> → planta solo con estabilidad confirmada (no por plazo fijo); NEWS2 cada 2 h; troponina/lactato a las 6–12 h. <b>PERT obligado</b> (clase 1). Traslado precoz a Vic si no hay box monitorizado o la tendencia empeora. <i>Discrepancia abierta: traslado precoz de todo C3 estable, pendiente de acuerdo de red.</i>' + DOSIS + '<br>' + NOTA
         },
         catD: {
-          farmacos: [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }, { n: 'Alteplasa', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
+          farmacos: [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }, { n: 'Alteplasa', inf: false, esquema: 'alteplasa-tep' }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'Categoría D1–D2', c: 'high',
           show: '• HBPM por defecto; <b>HNF</b> si se prevé reperfusión o procedimiento, o FG &lt;30.<br>' +
             '• <b>Fibrinólisis sistémica:</b> se puede considerar si el riesgo de sangrado es aceptable y se plantea terapia avanzada (AHA 2026). Decidir con el PERT.<br>' +
