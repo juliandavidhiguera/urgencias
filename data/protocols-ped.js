@@ -236,7 +236,8 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
     {text:'Leve (SpO₂ >94 %, score <5, sin FFR): alta con medidas generales.'},
     {text:'Inestable: ABCDE con SpO₂ (y CO₂ espirado si fallo respiratorio), cabecera elevada, lavado/aspirado nasal; O₂ si SpO₂ <92 % o mascarilla con reservorio a 15 l/min si fallo respiratorio. Reevaluar.'},
     {text:'Moderada (SpO₂ 92–94 %, score 6–8): alta con control en 24 h si no hay FFR ni criterios de observación; si los hay, observación hospitalaria.'},
-    {text:'Grave (mal estado general, SpO₂ <92 % o score >8): O₂ con reservorio 15 l/min; si FR >70, cianosis, consciencia alterada o quejido, valorar adrenalina nebulizada 0,5 mg/kg (máx. 3 mg) y OAF.'},
+    {text:'Grave (mal estado general, SpO₂ <92 % o score >8): O₂ con reservorio 15 l/min; si FR >70, cianosis, consciencia alterada o quejido, OAF.'},
+    {text:'Adrenalina nebulizada: solo como medicación de rescate en la bronquiolitis moderada-grave que no responde a las demás medidas (aspiración, O₂, OAF).'},
     {text:'Si no mejora: OAF y, si no es eficaz, CPAP o doble nivel de presión; no demorarlos en la insuficiencia respiratoria grave. UCI si no mejora o hay apneas recurrentes.'},
     {type:'info', text:'Evitar broncodilatadores de rutina; el suero salino hipertónico no aporta beneficio. La aspiración de secreciones es la medida general más eficaz.'}
   ],
@@ -312,7 +313,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
         },
         moderada: {
           t: 'Bronquiolitis moderada', c: 'mid',
-          show: 'ABCDE. SpO₂ 92–94 %, score clínico 6–8.<br>' + OBS,
+          show: 'ABCDE. SpO₂ 92–94 %, score clínico 6–8.<br>Sin tratamiento farmacológico de rutina. <b>Adrenalina nebulizada solo de rescate</b> si no responde a las demás medidas (aspiración nasal, O₂): en ese caso, a observación hospitalaria.<br>' + OBS,
           q: '¿Tiene FFR o algún criterio de observación hospitalaria?',
           opts: [{ l: 'No', go: 'altaMod' }, { l: 'Sí', go: 'obs' }]
         },
@@ -325,9 +326,8 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
           t: 'Bronquiolitis grave', c: 'high',
           show: v => 'ABCDE. Mal estado general, SpO₂ &lt;92 % o score clínico &gt;8.<br>' +
             '• <b>Oxígeno con mascarilla y reservorio (15 l/min)</b>.<br>' +
-            '• Si <b>FR &gt;70 rpm, cianosis, consciencia alterada o quejido</b>, valorar:<br>' +
-            '&nbsp;&nbsp;– ' + ADR(v) + ', con SSF y flujo de O₂ de 6–8 l/min.<br>' +
-            '&nbsp;&nbsp;– <b>Oxígeno en alto flujo (OAF)</b>: inicio <b>2 l/kg</b>' + d(v, 2, null, 0, 'l/min') + ' y FiO₂ 50–60 %.<br>' +
+            '• Si <b>FR &gt;70 rpm, cianosis, consciencia alterada o quejido</b>: <b>oxígeno en alto flujo (OAF)</b>, inicio <b>2 l/kg</b>' + d(v, 2, null, 0, 'l/min') + ' y FiO₂ 50–60 %.<br>' +
+            '• <b>Rescate</b>, solo si no responde a las medidas anteriores: ' + ADR(v) + ', con SSF y flujo de O₂ de 6–8 l/min.<br>' +
             '• Maniobras de RCP si precisa.<br>' +
             'Si no mejora, considerar OAF en casos seleccionados; si no es eficaz, escalar a <b>CPAP o doble nivel de presión</b>. En la insuficiencia respiratoria grave, no demorar la CPAP o el doble nivel.' + sinPeso(v) +
             '<br><span class="pe-nota">La nota 9 del mismo PDF da para la adrenalina de rescate 1–3 mg nebulizados; el flujograma, 0,5 mg/kg (máx. 3 mg). El PDF escribe «2 litros/kg» para el OAF; se calcula como l/min.</span>',
@@ -342,7 +342,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
           farmacos: [F('Adrenalina'), 'Salbutamol'],
           t: 'Observación hospitalaria', c: 'mid',
           show: v => '<b>Medidas de soporte</b>: cabecera a 30° · aspiración nasal (sobre todo antes de las tomas y de las inhalaciones) · tomas fraccionadas; si mala tolerancia oral o distrés importante, <b>SNG 4–6 ml/kg/h</b>' + r(v, 4, 6, 0, 'ml/h') + ' o perfusión IV al 80 % del mantenimiento si no hay deshidratación · monitor de apneas si &lt;6 semanas o apneas previas · O₂ humidificado y caliente si distrés importante o SatO₂ &lt;92 %.<br>' +
-            '<b>Valorar O₂ y adrenalina nebulizada de rescate</b> si empeora y respondió antes: 1–3 mg con SSF y O₂ a 6–8 l/min. Adrenalina o β2 solo si se ha documentado respuesta, y a demanda.<br>' +
+            '<b>Adrenalina nebulizada solo de rescate</b> si empeora y no responde a las demás medidas (y mejor si respondió antes): 1–3 mg con SSF y O₂ a 6–8 l/min. Adrenalina o β2 solo si se ha documentado respuesta, y a demanda.<br>' +
             '<b>Salbutamol</b> solo en &gt;12 meses con antecedentes personales o familiares de atopia o asma, fuera de la epidemia de VRS (noviembre–febrero): MDI 5 pulsaciones con cámara, o nebulizado 2,5 mg con O₂ a 6–8 l/min si distrés grave. Las nebulizaciones, con SSF; el salino hipertónico no aporta beneficio.<br>' +
             '<b>Valorar OAF</b> (score grave tras optimizar las medidas, o score moderado con SatO₂ &lt;90 % tras fracasar las medidas habituales): flujo &gt;2 l/min en lactantes y &gt;6 l/min en niños.<br>' +
             '<b>Aislamiento</b>: lavado de manos antes y después del contacto, bata y guantes; la enfermera no debe llevar a la vez pacientes de riesgo.' + sinPeso(v),
@@ -674,7 +674,7 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
         { k: 'rir', l: 'RIR ya administrada', u: 'ml' }
       ],
       start: 'inicio',
-      escalas: [{ id: 'tep-ped', para: 'estimación de la gravedad (TEP)' }],
+      escalas: [{ id: 'tep-ped', para: 'estimación de la gravedad (TEP)' }, { id: 'cds', para: 'grado de deshidratación 1–36 meses (CDS)' }, { id: 'gorelick', para: 'deshidratación ≥5 % (Gorelick)' }],
       nodes: {
         inicio: {
           t: 'Estimación de la gravedad: TEP',
@@ -706,7 +706,7 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
           opts: [{ l: 'Estimar déficit de agua y de Na y seguir con la rehidratación IV', go: 'iv' }]
         },
         triaje: {
-          t: 'Triaje y proceso médico',
+          t: 'Triaje y proceso médico', escalas: ['cds', 'gorelick'],
           show: v => '<b>Triaje</b>: motivo de consulta · enfermedades previas (metabolopatías, malabsorción) · alergias · <b>peso siempre</b>; si TEP alterado, TA, FC, FR y glucemia.<br>' +
             'Niveles: <b>I</b> fallo cardiorrespiratorio/shock descompensado con coma o convulsión · <b>II</b> deshidratación grave, hipotensión, taquicardia sin fiebre ni dolor, bradicardia o enfermedad previa importante (15 min) · <b>III</b> moderada con PA normal (30 min) · <b>IV–V</b> leve (1 h).<br>' +
             'Triaje avanzado: se puede <b>iniciar rehidratación oral</b> y antitérmico/analgésico según protocolo del servicio.<br>' +
@@ -839,11 +839,12 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
 /* SEUP · Algoritmo 30: Traumatismo craneal (flujograma interactivo).
    Fuente: https://seup.org/algoritmo-traumatismo-craneal/ (PDF 30_TCE.pdf). */
 window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pediátrico (SEUP)', sub:'Estable o inestable, grupos de riesgo de lesión intracraneal (&lt;2 / ≥2 años), observación frente a TAC y destino', badge:'amber', tag:'Pediatría', rank:6,
-  src:'SEUP · Algoritmo 30: Traumatismo craneal · PDF de septiembre de 2022 (autores no constan en el PDF) · https://seup.org/algoritmo-traumatismo-craneal/',
+  src:'SEUP · Algoritmo 30: Traumatismo craneal · PDF de septiembre de 2022 (autores no constan en el PDF) · https://seup.org/algoritmo-traumatismo-craneal/ · Hipertensión intracraneal: Brain Trauma Foundation, guías pediátricas 3.ª ed. (Kochanek 2019 · Pediatr Crit Care Med · PMID 30830016; resumen Reuter-Rice 2020 · PMID 31968082)',
   docs:[{l:'📄 Algoritmo SEUP completo (PDF)', f:'https://seup.org/pdf_public/algoritmos/30_TCE.pdf'}, {l:'🌐 Página SEUP', f:'https://seup.org/algoritmo-traumatismo-craneal/'}],
   steps:[
     {text:'Triángulo de Evaluación Pediátrica y constantes (incluido el dolor). Tríada de Cushing (bradicardia, HTA, respiración irregular) = aumento de la PIC.'},
-    {text:'Inestable: ABCDE, control cervical si riesgo, O₂ 100 %, intubar si GCS &lt;9, monitorizar (FC, FR, TA, EtCO₂, SatO₂), dolor, acceso venoso, valorar tratamiento de la PIC, TAC si riesgo alto e ingreso.'},
+    {text:'Inestable: ABCDE, control cervical si riesgo, O₂ 100 %, intubar si GCS &lt;9, monitorizar (FC, FR, TA, EtCO₂, SatO₂), dolor, acceso venoso, TAC si riesgo alto e ingreso.'},
+    {text:'Hipertensión intracraneal (BTF 2019): cabecera 30°, salino hipertónico 3 % 2–5 ml/kg en 10–20 min, normocapnia (PaCO₂ 35–40), sin bolos de sedantes en las crisis de PIC; profilaxis anticomicial 7 días en el TCE grave.'},
     {text:'Estable: historia clínica (mecanismo de riesgo, síntomas, sospecha de maltrato) y exploración física (GCS, cabeza, signos de fractura, fontanela).'},
     {text:'Riesgo alto de LIC (focalidad, fractura palpable, signos de fractura basilar, fontanela tensa, convulsiones) → TAC.'},
     {text:'Riesgo intermedio (criterios distintos en &lt;2 y ≥2 años) → observación hospitalaria mínima de 4–6 h frente a TAC.'},
@@ -864,9 +865,19 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
     const ingresoTxt = 'Observación en Urgencias u hospitalización si: GCS &lt;15 · focalidad neurológica · estado neurológico alterado · intolerancia oral · lesiones extracraneales graves · lesión intracraneal · sospecha de maltrato · cuidadores inadecuados para vigilar al niño y reconsultar.';
     const ucipTxt = '<b>UCIP</b> si GCS &lt;13 o focalidad neurológica, o si hay LIC (considerar planta si hematoma no epidural &lt;1 cm).';
     const altaTxt = '<b>Destino: alta</b> con observación domiciliaria por un adulto responsable durante <b>24–48 h</b>. Reconsultar si: cefalea intensa o irritabilidad · vómitos repetidos · salida de líquido o sangre por oídos o nariz · cambios de comportamiento, equilibrio, visión o habla · dificultad para despertarse o mantenerse despierto · movimientos extraños o pérdida de fuerza.';
+    const P = v => (v.peso > 0 ? v.peso : NaN);
+    const fx = (x, d) => (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ',');
+    const rk = (v, a, b, max, d, u) => { const w = P(v); if (!w) return ''; const m = max == null ? Infinity : max; const lo = Math.min(w * a, m), hi = Math.min(w * b, m); return ' <b>= ' + (lo === hi ? fx(lo, d) : fx(lo, d) + '–' + fx(hi, d)) + ' ' + u + '</b>'; };
+    const picTxt = v => '<b>Si hay signos de hipertensión intracraneal</b> (tríada de Cushing, anisocoria, deterioro del GCS):<br>' +
+      '&nbsp;&nbsp;– Cabecera a <b>30°</b> y cabeza en línea media · normotermia · normoglucemia · evitar hipotensión e hipoxia.<br>' +
+      '&nbsp;&nbsp;– <b>Suero salino hipertónico 3 %</b>: bolo <b>2–5 ml/kg en 10–20 min</b>' + rk(v, 2, 5, null, 0, 'ml') + '. Evitar Na &gt;160 mEq/L mantenido.<br>' +
+      '&nbsp;&nbsp;– <b>Manitol</b> 0,25–1 g/kg' + rk(v, 0.25, 1, null, 1, 'g') + ': la guía pediátrica no lo recomienda ni lo rechaza (sin estudios); si se usa, con volemia y TA normales.<br>' +
+      '&nbsp;&nbsp;– Ventilación: <b>normocapnia (PaCO₂ 35–40 mmHg)</b>. Hiperventilación solo breve, como puente ante herniación, sin bajar de 30 mmHg.<br>' +
+      '&nbsp;&nbsp;– Sedoanalgesia en perfusión; en las crisis de PIC <b>evitar bolos de midazolam o fentanilo</b> (hipotensión).<br>' +
+      '&nbsp;&nbsp;– <b>Profilaxis anticomicial</b> los primeros 7 días en el TCE grave: levetiracetam 20 mg/kg IV en 15 min' + rk(v, 20, 20, 1500, 0, 'mg') + ' (máx. 1,5 g) o fenitoína 15–20 mg/kg' + rk(v, 15, 20, 1000, 0, 'mg') + ' (máx. 1 g) con ECG y TA. Si convulsiona, ver «Estatus epiléptico SEUP».';
     const neuroqTxt ='Valoración o tratamiento <b>neuroquirúrgico</b> si: LIC, fractura deprimida, fractura basilar, fractura con diástasis (&gt;3 mm) o deterioro clínico.';
     return {
-      inputs:[{k:'peso', l:'Peso', u:'kg'}, {k:'edad', l:'Edad', u:'años'}, {k:'gcs', l:'Glasgow', u:'3–15'}],
+      inputs:[{k:'peso', l:'Peso real', u:'kg'}, {k:'edad', l:'Edad', u:'años'}, {k:'gcs', l:'Glasgow', u:'3–15'}],
       start:'inicio',
       escalas:[
         {id:'tep-ped', para:'impresión inicial (TEP)'},
@@ -893,7 +904,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
           show: v => '• Valoración <b>ABCDE</b> · control cervical si riesgo de lesión cervical · <b>O₂ 100 %</b>.<br>' +
             '• Estabilizar la vía aérea: <b>intubar si GCS &lt;9</b>, inestabilidad hemodinámica o distrés respiratorio grave.<br>' +
             '• Monitorizar FC, FR, TA, EtCO₂ y SatO₂ · valorar el dolor y analgesia según escala · acceso venoso.<br>' +
-            '• Valorar el tratamiento del <b>aumento de la PIC</b> (fármacos y dosis según protocolo local: el algoritmo SEUP no los detalla) y anticomicial si convulsiona (ver «Estatus epiléptico SEUP»).<br>' +
+            '• ' + picTxt(v) + (P(v) ? '' : '<br><span class="pe-nota">Introduce el peso arriba para ver las dosis calculadas.</span>') + '<br>' +
             '• <b>TAC</b> si riesgo alto de LIC, una vez estabilizado.<br>' + neuroqTxt + gcsNota(v) +
             '<br><b>Destino: ingreso.</b> ' + ucipTxt
         },
@@ -911,7 +922,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
         alto:{
           t:'Riesgo alto de LIC → TAC', c:'high',
           show: v => '<b>TAC craneal</b> una vez estabilizado (prueba de elección para la LIC).<br>' + neuroqTxt +
-            '<br>Anticomicial si convulsiona (ver «Estatus epiléptico SEUP»); control de la PIC según protocolo local.' + gcsNota(v),
+            '<br>' + picTxt(v) + gcsNota(v),
           q:'Tras el TAC, ¿hay LIC u otro criterio de observación o ingreso?',
           help: ingresoTxt,
           opts:[{l:'Sí', go:'ingreso'}, {l:'No', go:'altaTac'}]
@@ -1033,7 +1044,7 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
         { k: 'dolor', l: 'Puntuación de dolor', u: '0–10' }
       ],
       start: 'inicio',
-      escalas: [{ id: 'dolor-eva', para: 'intensidad del dolor en el niño colaborador' }, { id: 'flacc', para: 'dolor en el niño no colaborador o preverbal' }],
+      escalas: [{ id: 'dolor-eva', para: 'intensidad del dolor en el niño colaborador' }, { id: 'flacc', para: 'dolor en el niño no colaborador o preverbal' }, { id: 'llanto', para: 'dolor agudo post-procedimiento en preverbales (LLANTO)' }, { id: 'rflacc', para: 'dolor en discapacidad cognitiva (r-FLACC)' }],
       nodes: {
         inicio: {
           t: 'Paso 1: medir la intensidad del dolor',
@@ -1060,11 +1071,11 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
         },
         obsv: {
           t: 'Escalas observacionales',
-          escalas: ['flacc'],
+          escalas: ['flacc', 'llanto', 'rflacc'],
           show: 'Deben estar validadas para la edad y la situación del paciente. Puntuación 0–10: 0 no dolor · 1–3 leve · 4–6 moderado · 7–10 intenso.<br>' +
             '• <b>FLACC</b> (cara, piernas, actividad, llanto, consuelo; 0–2 cada una): no colaboradores o preverbales; observar 1–2 min al niño despierto.<br>' +
-            '• <b>LLANTO</b> (llanto, actitud, normorrespiración, tono postural, observación facial; 0–2 cada una): dolor agudo post-procedimiento o posquirúrgico en preverbales y no colaboradores (no está en la app).<br>' +
-            '• <b>FLACC revisada (r-FLACC)</b>: niños con discapacidad cognitiva; se añaden con los padres los comportamientos de dolor propios del niño (no está en la app).<br>' +
+            '• <b>LLANTO</b> (llanto, actitud, normorrespiración, tono postural, observación facial; 0–2 cada una): dolor agudo post-procedimiento o posquirúrgico en preverbales y no colaboradores.<br>' +
+            '• <b>FLACC revisada (r-FLACC)</b>: niños con discapacidad cognitiva; se añaden con los padres los comportamientos de dolor propios del niño.<br>' +
             'El algoritmo cita también la escala numérica verbal revisada, sin detallarla.',
           q: 'Paso 2: ¿qué intensidad tiene?',
           opts: [
@@ -1117,7 +1128,8 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
             '• <b>Ketorolaco IV</b> 2–16 años <b>0,5 mg/kg</b>' + r(v, 0.5, 0.5, 15, 1, 'mg') + ' (máx. 15 mg/dosis, 60 mg/día, 2 días) · 1 mes–2 años 0,5 mg/kg cada 6–8 h (máx. 2 días). IM 2–16 años 1 mg/kg (máx. 30 mg).<br>' +
             '• <b>Dexketoprofeno</b> oral &lt;14 años (off-label) 12,5 mg cada 4–6 h o 25 mg cada 8 h (máx. 75 mg/día) · IV/IM 50 mg cada 8–12 h (máx. 150 mg/día, &lt;2 días).<br>' +
             '• <b>Ketoprofeno</b> oral 3–14 años 0,5 mg/kg' + r(v, 0.5, 0.5, null, 1, 'mg') + ' cada 6–8 h (máx. 2 mg/kg/día) · &gt;14 años 50 mg cada 6–8 h.<br>' +
-            '• Diclofenaco: ver la tabla del PDF (las dosis pediátricas impresas tienen erratas de unidades).' + noFarm + sinPeso(v),
+            '• <b>Diclofenaco</b> oral/rectal 1–14 años (off-label) <b>0,5–1 mg/kg</b>' + r(v, 0.5, 1, 50, 0, 'mg') + ' cada 8–12 h (máx. 50 mg/dosis y 150 mg/día) · &gt;14 años 50 mg cada 8–12 h (máx. 150 mg/día). IM 2–14 años (off-label) 0,3–1 mg/kg' + r(v, 0.3, 1, 75, 0, 'mg') + ' cada 12–24 h · &gt;14 años 50–75 mg cada 12 h (máx. 150 mg, 1 día).<br>' +
+            '<span class="pe-nota">El PDF de la SEUP imprime «0,5–1 mg» y «50 mg/kg»: se leen como mg/kg (1–14 años) y mg (&gt;14 años), coherente con la guía ESPA 2018 (1 mg/kg cada 8 h; PMID 29635764).</span>' + noFarm + sinPeso(v),
           q: 'Paso 4:',
           opts: [{ l: 'Reevaluar el dolor', go: 'reeval' }]
         },

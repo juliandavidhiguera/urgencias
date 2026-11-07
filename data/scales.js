@@ -865,4 +865,43 @@ window.SCALES = [
   info:'Numérica verbal: «0 es nada de dolor y 10 el peor dolor imaginable». EVA: línea de 10 cm, se mide la marca. Caras FPS-R/Wong-Baker: 6 caras puntuadas 0, 2, 4, 6, 8, 10; no usar palabras como «contento» o «triste». Son de autoinforme: un tercero no puede puntuarlas por el niño (usar FLACC).',
   interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado']:['high',s+'/10','Dolor intenso']}},
 
+{id:'llanto', src:'Reinoso-Barbero F 2011 · An Pediatr · escala española · tabla 21-2 del algoritmo SEUP de dolor', title:'LLANTO', sub:'Dolor agudo post-procedimiento o posquirúrgico — preverbal o no colaborador', badge:'blue', tag:'Dolor pediátrico', max:10, items:[
+  {t:'sel', l:'Llanto', o:[['No llora (0)',0],['Consolable o intermitente (1)',1],['Inconsolable o continuo (2)',2]]},
+  {t:'sel', l:'Actitud psicológica', o:[['Tranquilo o dormido (0)',0],['Expectante o intranquilo (1)',1],['Agitado o histérico (2)',2]]},
+  {t:'sel', l:'Normorrespiración', o:[['Regular o pausada (0)',0],['Taquipneico (1)',1],['Irregular (2)',2]]},
+  {t:'sel', l:'Tono postural', o:[['Relajado (0)',0],['Indiferente (1)',1],['Contraído (2)',2]]},
+  {t:'sel', l:'Observación facial', o:[['Contento o dormido (0)',0],['Serio (1)',1],['Triste (2)',2]]}],
+  interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado']:['high',s+'/10','Dolor intenso']}},
+
+{id:'rflacc', src:'Malviya S 2006 · Paediatr Anaesth · PMID 16490089 · tabla 21-3 del algoritmo SEUP de dolor', title:'FLACC revisada (r-FLACC)', sub:'Dolor en niños con discapacidad cognitiva', badge:'blue', tag:'Dolor pediátrico', max:10, items:[
+  {t:'sel', l:'Cara', o:[['Sin expresión particular o sonríe (0)',0],['Muecas o ceño ocasional; retraído, desinteresado, triste o intranquilo (1)',1],['Muecas o ceño continuo; temblor de barbilla, mandíbula encajada; angustia, susto o pánico (2)',2]]},
+  {t:'sel', l:'Piernas', o:[['Posición normal o relajada; tono y movimiento habituales (0)',0],['Incómodo, intranquilo, tenso; temblores ocasionales (1)',1],['Patadas o piernas levantadas; marcado aumento de espasticidad, temblores constantes o sacudidas (2)',2]]},
+  {t:'sel', l:'Actividad', o:[['Tranquilo, posición normal, se mueve fácilmente, respiración regular (0)',0],['Se retuerce, se mueve de un lado a otro, movimientos tensos; ligeramente agitado; suspiros intermitentes (1)',1],['Arqueado, rígido o con sacudidas; agitación intensa; se golpea la cabeza; respiración agitada o a boqueadas (2)',2]]},
+  {t:'sel', l:'Llanto', o:[['No llora ni verbaliza (0)',0],['Gritos o gemidos; queja ocasional; exabruptos verbales o gruñidos ocasionales (1)',1],['Llanto, gritos o sollozos constantes; quejas frecuentes; explosiones repetidas (2)',2]]},
+  {t:'sel', l:'Consuelo', o:[['Contento, relajado (0)',0],['Se tranquiliza si se le toca, abraza o habla; distraíble (1)',1],['Difícil de consolar; aleja al cuidador, rechaza los cuidados (2)',2]]}],
+  info:'Antes de puntuar, revisar con los padres o cuidadores los comportamientos propios del niño cuando tiene dolor (p. ej., labios fruncidos, rechinar de dientes, clonus, se agarra la zona, «pupa», contiene la respiración) y contarlos en el ítem que corresponda (0–2, como el resto).',
+  interp:function(s){return s===0?['low','0/10','Sin dolor']:s<=3?['low',s+'/10','Dolor leve']:s<=6?['mid',s+'/10','Dolor moderado']:['high',s+'/10','Dolor intenso']}},
+
+{id:'cds', src:'Friedman JN 2004 · J Pediatr · PMID 15289767 · validación externa: Bailey B 2010 · Acad Emerg Med · PMID 20624137', title:'Deshidratación clínica (CDS)', sub:'Gastroenteritis, 1–36 meses — grado de deshidratación', badge:'amber', tag:'Pediatría', max:8, items:[
+  {t:'sel', l:'Aspecto general', o:[['Normal (0)',0],['Sediento, inquieto o letárgico pero irritable al tocarlo (1)',1],['Somnoliento, flácido, frío o sudoroso; comatoso (2)',2]]},
+  {t:'sel', l:'Ojos', o:[['Normales (0)',0],['Ligeramente hundidos (1)',1],['Muy hundidos (2)',2]]},
+  {t:'sel', l:'Mucosas (lengua)', o:[['Húmedas (0)',0],['Pegajosas (1)',1],['Secas (2)',2]]},
+  {t:'sel', l:'Lágrimas', o:[['Presentes (0)',0],['Disminuidas (1)',1],['Ausentes (2)',2]]}],
+  info:'Validada en niños de 1 a 36 meses con gastroenteritis. El algoritmo SEUP valora la gravedad con la tabla NICE y la pérdida aguda de peso; la CDS es un apoyo.',
+  interp:function(s){return s===0?['low','0/8','Sin deshidratación']:s<=4?['mid',s+'/8','Algo de deshidratación (1–4)']:['high',s+'/8','Deshidratación moderada-grave (5–8)']}},
+
+{id:'gorelick', src:'Gorelick MH 1997 · Pediatrics · PMID 9113963', title:'Gorelick (10 signos)', sub:'Deshidratación 1 mes–5 años — ¿déficit ≥5 %?', badge:'amber', tag:'Pediatría', max:10, items:[
+  {t:'chk', l:'Mal aspecto general', p:1},
+  {t:'chk', l:'Relleno capilar &gt;2 s', p:1},
+  {t:'chk', l:'Lágrimas ausentes', p:1},
+  {t:'chk', l:'Mucosas secas', p:1},
+  {t:'chk', l:'Ojos hundidos', p:1},
+  {t:'chk', l:'Pulso radial anormal (débil)', p:1},
+  {t:'chk', l:'Respiración anormal', p:1},
+  {t:'chk', l:'Turgencia cutánea disminuida', p:1},
+  {t:'chk', l:'Taquicardia', p:1},
+  {t:'chk', l:'Diuresis disminuida (referida por los padres)', p:1}],
+  info:'≥3 signos: sensibilidad 87 % y especificidad 82 % para un déficit ≥5 %. Versión de 4 signos (relleno capilar &gt;2 s, lágrimas ausentes, mucosas secas, mal aspecto): ≥2 indica ≥5 %. El estudio no da un corte validado para ≥10 %. Excluía desnutrición e hipo/hipernatremia.',
+  interp:function(s){return s<3?['low',s+' signos','&lt;3 signos — déficit &lt;5 % probable']:['high',s+' signos','≥3 signos — deshidratación ≥5 % probable']}},
+
 ];
