@@ -69,7 +69,7 @@ window.PROTOCOLS.push({ id:'seup-fiebre-sin-foco', ped:true, title:'Fiebre sin f
           show: v => '<b>A</b>: O₂ suplementario al 100 %; SatO₂ y, si se dispone, CO₂ espirado. <b>B</b>: puede precisar instrumentalizar la vía aérea; FR. ' +
             '<b>C</b>: vía periférica (idealmente dos) o intraósea; FC y PA; <b>bolos de cristaloide 10-20 ml/kg</b>' + rg(v, 10, 20, 0, 'ml') + ' lo antes posible. ' +
             '<b>D</b>: glucemia capilar, pupilas, alerta. <b>E</b>: temperatura, evitar la hipotermia.<br>' +
-            '<b>Pruebas</b> (sin retrasar el antibiótico): tira reactiva de orina y urocultivo por sondaje, HRF, PCR, PCT, hemocultivo; rt-PCR de enterovirus (≤60 días) o de S. pneumoniae y N. meningitidis (&gt;60 días). Considerar protocolo de sepsis; posponer la PL si sigue inestable tras estabilizar.<br>' +
+            '<b>Pruebas</b> (si es posible, antes del antibiótico, sin retrasarlo): tira reactiva de orina y urocultivo por sondaje, HRF, PCR, PCT, hemocultivo; rt-PCR de enterovirus (≤60 días) o de S. pneumoniae y N. meningitidis (&gt;60 días). Considerar protocolo de sepsis; posponer la PL si sigue inestable tras estabilizar.<br>' +
             '<b>Antibiótico empírico</b>:<br>• &lt;1 mes: <b>ampicilina 75 mg/kg</b>' + d(v, 75, null, 0, 'mg') + ' + <b>cefotaxima 50 mg/kg</b>' + d(v, 50, null, 0, 'mg') + '; valorar aciclovir 20 mg/kg' + d(v, 20, null, 0, 'mg') + ' si sospecha de VHS.<br>' +
             '• 1-3 meses (Figura 14-1): <b>cefotaxima 75 mg/kg</b>' + d(v, 75, null, 0, 'mg') + '.<br>' +
             '• &gt;1 mes (nota 2) y 2-24 meses (Figura 14-2): <b>cefotaxima 75 mg/kg</b>' + d(v, 75, 2000, 0, 'mg') + ' (máx. 2 g). Alergia a betalactámicos: aztreonam 30 mg/kg' + d(v, 30, 2000, 0, 'mg') + ' (máx. 2 g). Asociar vancomicina 15 mg/kg' + d(v, 15, 1000, 0, 'mg') + ' (máx. 1 g) si alta prevalencia de SARM o neumococo resistente a cefalosporinas; clindamicina 10 mg/kg' + d(v, 10, 650, 0, 'mg') + ' (máx. 650 mg) si sospecha de shock tóxico estreptocócico.<br>' +
@@ -91,13 +91,13 @@ window.PROTOCOLS.push({ id:'seup-fiebre-sin-foco', ped:true, title:'Fiebre sin f
         },
         orina: {
           q: '¿Leucocituria o nitrituria?',
-          help: 'Despistaje inicial por bolsa perineal; confirmación por sondaje uretral.',
+          help: 'Despistaje inicial por bolsa perineal; confirmación por sondaje uretral.<br><b>Pruebas (22-60 días)</b>: tira reactiva de orina; hemograma, PCR y PCT; cultivos de sangre y de orina (este, si leucocituria y/o nitrituria).',
           opts: [{ l: 'Sí', go: 'itu60' }, { l: 'No', go: 'temp' }]
         },
         itu60: {
           t: '22-60 días con leucocituria/nitrituria', c: 'mid',
           show: v => '• Urocultivo por sondaje uretral.<br>• HRF, PCR, PCT, hemocultivo y rt-PCR de enterovirus en sangre.<br>' +
-            'Pruebas alteradas → <b>antibiótico</b> (apartado 12):<br>' + ATB12(v) + '<br>' +
+            'Pruebas alteradas → <b>antibiótico</b> (apartado 12):<br>' + ATB12(v) + '<br>' + ACICLOVIR(v) + '<br>' +
             '<b>Destino: individualizar ingreso hospitalario o Unidad de Observación de Urgencias</b> según edad y parámetros analíticos.' + sinPeso(v)
         },
         temp: {
@@ -133,7 +133,7 @@ window.PROTOCOLS.push({ id:'seup-fiebre-sin-foco', ped:true, title:'Fiebre sin f
         pcralta: {
           t: 'PCR &gt;20 mg/L o neutrófilos &gt;10.000/µl', c: 'mid',
           farmacos: ['Ceftriaxona'],
-          show: v => '• Urocultivo por sondaje.<br>• <b>Ceftriaxona 50 mg/kg IV</b>' + d(v, 50, null, 0, 'mg') + '.<br>' +
+          show: v => '• Urocultivo por sondaje.<br>• <b>Ceftriaxona 50 mg/kg IV</b>' + d(v, 50, null, 0, 'mg') + '.<br>' + ACICLOVIR(v) + '<br>' +
             '<b>Destino: ingreso o Unidad de Observación de Urgencias</b> (pruebas alteradas, algoritmo general).' +
             '<br><span class="pe-nota">La Figura 14-1 no indica el destino en esta rama; se toma del algoritmo general (pruebas alteradas → antibiótico + ingreso/Unidad de Observación).</span>' + sinPeso(v)
         },
@@ -149,7 +149,7 @@ window.PROTOCOLS.push({ id:'seup-fiebre-sin-foco', ped:true, title:'Fiebre sin f
         },
         reval: {
           t: 'Empeora en observación', c: 'high',
-          show: v => '• Control analítico.<br>• <b>Considerar punción lumbar, antibiótico e ingreso.</b><br>' + ATB12(v) + NOTA_TABLA + sinPeso(v)
+          show: v => '• Control analítico.<br>• <b>Considerar punción lumbar, antibiótico e ingreso.</b><br>' + ATB12(v) + NOTA_TABLA + '<br>' + ACICLOVIR(v) + sinPeso(v)
         },
         m2: {
           q: '¿Edad (2-24 meses)?',
@@ -292,7 +292,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
         dr: {
           t: 'Dificultad respiratoria', c: 'mid',
           show: 'ABCDE con SpO₂ · elevar la cabecera de la camilla · lavado/aspirado nasal · <b>oxigenoterapia si SpO₂ &lt;92 %</b>.<br>' +
-            'O₂ humidificado y caliente (gafas nasales o mascarilla) si la SatO₂ se mantiene &lt;90–92 %, o si SatO₂ &lt;92 % y score ≥3 tras aspirar secreciones. Monitorización continua de SpO₂ solo si recibe O₂.',
+            'O₂ humidificado y caliente (gafas nasales o mascarilla) si la SatO₂ se mantiene &lt;90–92 %, o si SatO₂ &lt;92 % y score ≥3 tras aspirar secreciones. SpO₂ en general intermitente, junto al resto de constantes (incluida la FR), e interpretada con el estado clínico (alerta, somnoliento, tosiendo…); no se recomienda la monitorización continua de rutina, solo si recibe O₂.',
           q: 'Reevaluación: ¿cómo está?',
           opts: [{ l: 'Dificultad respiratoria', go: 'reev' }, { l: 'Fallo respiratorio', go: 'grave' }]
         },
@@ -330,7 +330,7 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
             '• <b>Rescate</b>, solo si no responde a las medidas anteriores: ' + ADR(v) + ', con SSF y flujo de O₂ de 6–8 l/min.<br>' +
             '• Maniobras de RCP si precisa.<br>' +
             'Si no mejora, considerar OAF en casos seleccionados; si no es eficaz, escalar a <b>CPAP o doble nivel de presión</b>. En la insuficiencia respiratoria grave, no demorar la CPAP o el doble nivel.' + sinPeso(v) +
-            '<br><span class="pe-nota">La nota 9 del mismo PDF da para la adrenalina de rescate 1–3 mg nebulizados; el flujograma, 0,5 mg/kg (máx. 3 mg). El PDF escribe «2 litros/kg» para el OAF; se calcula como l/min.</span>',
+            '<br><span class="pe-nota">El PDF escribe «2 litros/kg» para el OAF; se calcula como l/min.</span>',
           q: '¿Cómo evoluciona?',
           help: '<b>UCI</b> si insuficiencia respiratoria grave que no mejora con el tratamiento o vuelve a empeorar en &lt;1 h, o apneas recurrentes con desaturación.',
           opts: [
@@ -342,10 +342,10 @@ window.PROTOCOLS.push({ id:'seup-bronquiolitis', ped:true, title:'Bronquiolitis 
           farmacos: [F('Adrenalina'), 'Salbutamol'],
           t: 'Observación hospitalaria', c: 'mid',
           show: v => '<b>Medidas de soporte</b>: cabecera a 30° · aspiración nasal (sobre todo antes de las tomas y de las inhalaciones) · tomas fraccionadas; si mala tolerancia oral o distrés importante, <b>SNG 4–6 ml/kg/h</b>' + r(v, 4, 6, 0, 'ml/h') + ' o perfusión IV al 80 % del mantenimiento si no hay deshidratación · monitor de apneas si &lt;6 semanas o apneas previas · O₂ humidificado y caliente si distrés importante o SatO₂ &lt;92 %.<br>' +
-            '<b>Adrenalina nebulizada solo de rescate</b> si empeora y no responde a las demás medidas (y mejor si respondió antes): 1–3 mg con SSF y O₂ a 6–8 l/min. Adrenalina o β2 solo si se ha documentado respuesta, y a demanda.<br>' +
+            '<b>Adrenalina nebulizada solo de rescate</b> si empeora y no responde a las demás medidas (y mejor si respondió antes): ' + ADR(v) + ', con SSF y O₂ a 6–8 l/min. Adrenalina o β2 solo si se ha documentado respuesta, y a demanda.<br>' +
             '<b>Salbutamol</b> solo en &gt;12 meses con antecedentes personales o familiares de atopia o asma, fuera de la epidemia de VRS (noviembre–febrero): MDI 5 pulsaciones con cámara, o nebulizado 2,5 mg con O₂ a 6–8 l/min si distrés grave. Las nebulizaciones, con SSF; el salino hipertónico no aporta beneficio.<br>' +
-            '<b>Valorar OAF</b> (score grave tras optimizar las medidas, o score moderado con SatO₂ &lt;90 % tras fracasar las medidas habituales): flujo &gt;2 l/min en lactantes y &gt;6 l/min en niños.<br>' +
-            '<b>Aislamiento</b>: lavado de manos antes y después del contacto, bata y guantes; la enfermera no debe llevar a la vez pacientes de riesgo.' + sinPeso(v),
+            '<b>Valorar OAF</b> (score grave tras optimizar las medidas, o score moderado con SatO₂ &lt;90 % tras fracasar las medidas habituales): flujo &gt;2 l/min en lactantes y &gt;6 l/min en niños; gas humidificado (95–100 %) y calentado (34–40 °C). Objetivos: mejorar el patrón respiratorio y el confort, y disminuir el trabajo respiratorio, la FR, la FC y la FiO₂.<br>' +
+            '<b>Aislamiento</b>: las secreciones nasales son infectantes 6 h; las manos se contaminan a los 25 min de manipular al niño y la ropa a los 30 min; elimina VRS durante 6 días. Lavado de manos de todo el personal y de los padres antes y después del contacto, bata y guantes desechables; la enfermera no debe llevar a la vez pacientes de riesgo (trasplantados, inmunodeficientes…).' + sinPeso(v),
           q: '¿Mejora?',
           help: 'Si no mejora o tiene FFR asociados, considerar ingreso en UCI.',
           opts: [{ l: 'Sí', go: 'planta' }, { l: 'No mejora o FFR asociados', go: 'uci' }]
@@ -397,7 +397,7 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
       '<b>Sibilancias</b>: no / final de la espiración / toda la espiración / inspiración y espiración sin fonendo · ' +
       '<b>Uso de ECM</b>: no / leve / moderado / máximo. Sin sibilancias y con ECM aumentado: puntuar 3.<br>' +
       'Leve PS 0–3 · moderada PS 4–6 · grave PS 7–9 (el PDF de la SEUP escribe «leve &lt;3» y no asigna el 3; la clasificación publicada del score lo incluye en leve). Calcúlalo con la escala «Pulmonary Score».';
-    const SALB = v => '<b>Salbutamol MDI</b> con cámara (mascarilla si &lt;4 años): peso/3 pulsaciones de 100 µg, mín. 5 y máx. 10' + puffs(v) + '. Inicio: 3 dosis en la 1.ª hora (cada 20 min), después a demanda.';
+    const SALB = v => '<b>Salbutamol MDI</b> con cámara (mascarilla si &lt;4 años): peso/3 pulsaciones de 100 µg, mín. 5 y máx. 10' + puffs(v) + ' (efecto en segundos, máximo a los 30 min, vida media 2–4 h). Inicio: 3 dosis en la 1.ª hora (cada 20 min), después a demanda.';
     const SALBNEB = v => '<b>Salbutamol nebulizado</b> (crisis graves) con O₂ a 6–8 l/min: 0,15 mg/kg, mín. 2,5 y máx. 5 mg' + salbNeb(v) + ' (o 2,5 mg si &lt;20 kg y 5 mg si &gt;20 kg).';
     const IPRA = '<b>Bromuro de ipratropio</b> MDI 4 pulsaciones (80 µg), 2–3 dosis junto a las tandas iniciales de salbutamol.';
     const IPRANEB = v => '<b>Bromuro de ipratropio nebulizado</b>: 250 µg si &lt;20 kg, 500 µg si &gt;20 kg' + ipraNeb(v) + ', 2–3 dosis con las tandas iniciales de salbutamol.';
@@ -441,10 +441,10 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
         modgrave: {
           farmacos: ['Salbutamol', 'Bromuro de ipratropio'],
           t: 'Crisis moderada-grave', c: 'mid',
-          show: v => '• <b>Oxigenoterapia</b> humidificada, con el dispositivo más cómodo y la menor concentración que mantenga <b>SatO₂ ≥92 %</b>.<br>' +
+          show: v => '• <b>Oxigenoterapia</b> (en crisis graves y en moderadas con gran trabajo respiratorio y/o hipoxemia) humidificada, con el dispositivo más cómodo y la menor concentración que mantenga <b>SatO₂ ≥92 %</b>. Sin pulsioxímetro, según criterios clínicos y sin retirarla mientras persistan los síntomas.<br>' +
             '• ' + SALB(v) + '<br>• ' + IPRA + '<br>' +
             '• Vía nebulizada solo en crisis graves: ' + SALBNEB(v) + ' ' + IPRANEB(v) + '<br>' +
-            '• <b>Corticoide oral</b>: ' + CORT_VO(v) + sinPeso(v),
+            '• <b>Corticoide oral</b>: ' + CORT_VO(v) + ' Efecto a las 2–4 h, completo a las 12–24 h. Vía oral de elección; IV si mayor gravedad o intolerancia oral. En ciclos cortos no se han observado efectos secundarios, aunque se describen alteraciones transitorias de conducta (hiperactividad, ansiedad) y aumento del apetito.' + sinPeso(v),
           q: '¿Cumple criterios de alta?',
           help: ALTA_CRIT,
           opts: [{ l: 'Sí', go: 'alta' }, { l: 'No', go: 'obs' }]
@@ -458,8 +458,8 @@ window.PROTOCOLS.push({ id:'seup-asma', ped:true, title:'Crisis asmática pediá
             '<b>C</b>: vía periférica, analítica con gasometría.<br>' +
             '• ' + SALBNEB(v) + '<br>• ' + IPRANEB(v) + '<br>' +
             '• <b>Corticoide IV</b>: metilprednisolona 1–2 mg/kg' + r(v, 1, 2, null, 0, 'mg') + ', después 1–2 mg/kg/día.<br>' +
-            '• <b>Sulfato de magnesio IV 40 mg/kg</b>' + d(v, 40, 2000, 0, 'mg') + ' (máx. 2 g) en perfusión lenta de 20 min, dosis única. Vigilar la TA (hipotensión); contraindicado en insuficiencia renal.<br>' +
-            '• Considerar <b>Rx de tórax</b> (auscultación asimétrica o hipoxemia persistente, casos graves).<br>' +
+            '• En pacientes seleccionados con crisis grave o hipoxemia persistente pese al tratamiento inicial de rescate (reduce la hospitalización): <b>sulfato de magnesio IV 40 mg/kg</b>' + d(v, 40, 2000, 0, 'mg') + ' (máx. 2 g) en perfusión lenta de 20 min, dosis única. Vigilar la TA (hipotensión); contraindicado en insuficiencia renal.<br>' +
+            '• Considerar <b>Rx de tórax</b> (auscultación asimétrica o hipoxemia persistente, casos graves): busca aire extrapulmonar (neumotórax, enfisema subcutáneo), consolidación neumónica o atelectasia, y ayuda al diagnóstico diferencial (silueta cardiaca, signos de cuerpo extraño).<br>' +
             '<b>OAF</b> si tras el tratamiento intensivo inicial persiste PS &gt;6, SatO₂ &lt;94 % con mascarilla reservorio o pCO₂/EtCO₂ &gt;45 mmHg; si fracasa, ventilación no invasiva.' + sinPeso(v),
           q: '¿Mejoría?',
           opts: [{ l: 'Sí', go: 'modgrave' }, { l: 'No', go: 'ucip' }]
@@ -519,11 +519,11 @@ window.PROTOCOLS.push({ id:'seup-laringitis', ped:true, title:'Laringitis aguda 
     const r = (v, k1, k2, max, dec, u) => { const w = W(v); if (!w) return ''; return ' <b>= ' + f(Math.min(w * k1, max), dec) + '–' + f(Math.min(w * k2, max), dec) + ' ' + u + '</b>' + (w * k2 > max ? ' (con tope)' : ''); };
     const sinPeso = v => W(v) ? '' : '<br><span class="pe-nota">Introduce el peso real arriba para ver las dosis calculadas.</span>';
     const F = n => ({ n: n, inf: false });
-    const CORT = v => '<b>Dexametasona oral 0,15–0,6 mg/kg</b>' + r(v, 0.15, 0.6, 10, 1, 'mg') + ' (máx. 10 mg); si no hay dexametasona, <b>prednisona o prednisolona 1 mg/kg/día</b>' + d(v, 1, null, 0, 'mg') + ' durante 3 días.';
-    const ADR = v => '<b>Adrenalina nebulizada 0,5 mg/kg</b>' + d(v, 0.5, 5, 1, 'mg') + ' (máx. 5 mg por nebulización). Efecto a los 10 min, pico a los 30 min, dura 2 h.';
+    const CORT = v => '<b>Dexametasona oral 0,15–0,6 mg/kg</b>' + r(v, 0.15, 0.6, 10, 1, 'mg') + ' (máx. 10 mg; inicio de acción 2–3 h, vida media 36–72 h); si no hay dexametasona, <b>prednisona o prednisolona 1 mg/kg/día</b>' + d(v, 1, null, 0, 'mg') + ' durante 3 días.';
+    const ADR = v => '<b>Adrenalina nebulizada 0,5 mg/kg</b>' + d(v, 0.5, 5, 1, 'mg') + ' (máx. 5 mg por nebulización). Efecto a los 10 min, pico a los 30 min, dura 2 h. <span class="pe-nota">El PDF la llama «adrenalina L».</span>';
     const ALTA = '<b>Criterios de alta</b>: sin estridor en reposo · SatO₂ &gt;95 % · sin dificultad respiratoria · buena coloración y estado general · buena tolerancia oral a líquidos · posibilidad de volver al hospital si empeora.';
     const WESTLEY = '<b>Escala de Westley</b> (SEUP): estridor inspiratorio no 0 / con la agitación 1 / en reposo 2 · retracciones no 0 / leves 1 / moderadas 2 / severas 3 · ventilación normal 0 / hipoventilación leve 1 / moderada-severa 2 · cianosis no 0 / con la agitación 4 / en reposo 5 · consciencia normal 0 / disminuida 5.<br>' +
-      '<b>≤3 leve · 4–5 moderada · ≥6 grave.</b><br><span class="pe-nota">La escala Westley de la app muestra la clasificación clásica y, al lado, la de la SEUP; en este algoritmo manda la SEUP.</span>';
+      '<b>≤3 leve · 4–5 moderada · ≥6 grave.</b> También puede usarse la escala de Taussig (no está en la app).<br><span class="pe-nota">La escala Westley de la app muestra la clasificación clásica y, al lado, la de la SEUP; en este algoritmo manda la SEUP.</span>';
     return {
       inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }],
       start: 'inicio',
@@ -680,7 +680,7 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
           t: 'Estimación de la gravedad: TEP',
           escalas: ['tep-ped'],
           show: v => 'En la deshidratación la mayoría tiene <b>TEP estable</b>. Lo primero que se altera es el lado <b>circulatorio</b> (palidez, cutis reticular, cianosis) = <b>shock compensado</b> (la fiebre alta también puede alterarlo).<br>' +
-            'Si se altera la <b>apariencia</b> (irritabilidad, decaimiento, bajo nivel de conciencia; descartar hipoglucemia) = <b>shock descompensado</b>. Cianosis con bradipnea = <b>fallo cardiorrespiratorio</b>.<br>' +
+            'Si se altera la <b>apariencia</b> (irritabilidad, decaimiento, bajo nivel de conciencia; descartar hipoglucemia) = <b>shock descompensado</b>. Cianosis con bradipnea = <b>fallo cardiorrespiratorio</b>. La taquipnea puede ser signo de acidosis metabólica (aunque también aparece con fiebre alta).<br>' +
             'No incluye el periodo neonatal.' + sinPeso(v),
           q: '¿Cómo está el TEP?',
           opts: [
@@ -696,7 +696,7 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
         shock: {
           farmacos: ['Cloruro sódico 0,9%', 'Plasmalyte', 'Glucosa'],
           t: 'Shock hipovolémico', c: 'high',
-          show: v => 'Signos: taqui- o bradicardia, pulsos débiles o ausentes, hipotensión, relleno capilar &gt;3 s, frialdad, piel moteada, oligoanuria, bajo nivel de conciencia, ojos y fontanela muy hundidos, mucosas muy secas.<br>' +
+          show: v => 'Signos: taqui- o bradicardia, pulsos periféricos rápidos, débiles o ausentes, hipotensión, relleno capilar &gt;3 s, frialdad distal, piel moteada, oligoanuria, bajo nivel de conciencia, taquipnea, bradipnea o apnea, ojos y fontanela muy hundidos, mucosas muy secas, pérdida de turgencia de la piel.<br>' +
             '• <b>Acceso venoso</b>; monitor (FC, PA, FR, ECG, SatO₂); <b>oxígeno</b>.<br>' +
             '• Analítica: gasometría venosa, iones, creatinina, glucosa.<br>' +
             '• <b>SSF o solución balanceada 10 ml/kg en bolo</b>' + ml(v, 10) + ', repetir si es preciso.<br>' +
@@ -710,8 +710,9 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
           show: v => '<b>Triaje</b>: motivo de consulta · enfermedades previas (metabolopatías, malabsorción) · alergias · <b>peso siempre</b>; si TEP alterado, TA, FC, FR y glucemia.<br>' +
             'Niveles: <b>I</b> fallo cardiorrespiratorio/shock descompensado con coma o convulsión · <b>II</b> deshidratación grave, hipotensión, taquicardia sin fiebre ni dolor, bradicardia o enfermedad previa importante (15 min) · <b>III</b> moderada con PA normal (30 min) · <b>IV–V</b> leve (1 h).<br>' +
             'Triaje avanzado: se puede <b>iniciar rehidratación oral</b> y antitérmico/analgésico según protocolo del servicio.<br>' +
-            '<b>Proceso médico</b>: SAMPLE y exploración. La <b>pérdida aguda de peso</b> es el mejor indicador del déficit.<br>' +
-            '<b>Tabla NICE</b> — deshidratación clínica: alerta alterada (irritable, letárgico)*, diuresis disminuida, mucosas secas, ojos hundidos*, taquipnea*, taquicardia*, pérdida de turgencia*; piel, extremidades, TA, relleno capilar y pulsos normales. <b>Shock clínico</b>: alteración de conciencia, pálido o moteado, frialdad distal, hipotensión, relleno &gt;2 s, pulsos débiles. (*signos de alarma)<br>' +
+            '<b>Proceso médico</b> (SAMPLE): <b>S</b> grado de pérdida de volumen, tipo (iso-, hipo- o hipernatrémica), otras alteraciones electrolíticas (p. ej., clínica de hipopotasemia), acidosis (aliento cetónico) y, si es posible, etiología · <b>A</b> alergias · <b>M</b> medicación habitual · <b>P</b> patologías previas (metabolopatías: diabetes, hipoglucemias; malabsorción crónica; cirugía abdominal) · <b>L</b> último alimento · <b>E</b> desencadenantes (intoxicación alimentaria, escolarización, viajes). La <b>pérdida aguda de peso</b> es el mejor indicador del déficit.<br>' +
+            '<b>Tabla NICE</b> — deshidratación clínica: alerta alterada (irritable, letárgico)*, diuresis disminuida, mucosas secas, ojos hundidos*, taquipnea*, taquicardia*, pérdida de turgencia*; piel, extremidades, TA, relleno capilar y pulsos normales. <b>Shock clínico</b>: alteración de conciencia, pálido o moteado, frialdad distal, hipotensión, relleno &gt;2 s, pulsos débiles. (*signos de alarma) Mucosas: no valorarlas nada más beber; secas no cuentan si respira por la boca.<br>' +
+            'Leve: pulso normal o algo aumentado, diuresis algo disminuida y sed. Iso- o hiponatrémica: predominan los signos de hipovolemia (sequedad de piel y mucosas, palidez, taquipnea, vasoconstricción, frialdad acra, taquicardia, signo del pliegue, fontanela hundida en lactantes).<br>' +
             'Leve 3–5 % · moderada 5–10 % · grave &gt;10 % (las &lt;2 % no suelen dar clínica).<br>' + defTxt(v),
           q: '¿Gravedad de la deshidratación?',
           opts: [
@@ -761,7 +762,8 @@ window.PROTOCOLS.push({ id:'seup-deshidratacion', ped:true, title:'Deshidrataci�
           show: v => { const w = P(v), de = deficit(v); return 'Suero <b>isotónico</b>: SSF 0,9 % o solución balanceada, con o sin glucosa (2,5–3 %).<br>' +
             '<b>20 ml/kg/h durante 1–4 h</b>' + (w ? ' <b>= ' + f(Math.min(w * 20, 700), 0) + ' ml/h</b>' + (w * 20 > 700 ? ' (máximo 700 ml/h)' : '') : '') + ' (cada hora repone ≈ 2 % del déficit).<br>' +
             '<b>No superar el déficit calculado</b>' + (!isNaN(de) ? ' (≈ ' + f(de, 0) + ' ml)' : '') + ' ni 700 ml/h.<br>' +
-            'Reevaluar tras cada hora para pasar a vía oral en cuanto se pueda; vigilar diuresis y signos de sobrecarga. Control analítico al terminar si la analítica basal era alterada o la evolución es desfavorable.' + sinPeso(v); },
+            'La glucosa es opcional: reduciría la cetonemia, pero no parece disminuir el riesgo de ingreso.<br>' +
+            'Reevaluar tras cada hora para pasar a vía oral en cuanto se pueda; vigilar diuresis y signos de sobrecarga. Control analítico al terminar (iones, glucosa, urea, creatinina, gasometría venosa) si la analítica basal era alterada o la evolución es desfavorable.' + sinPeso(v); },
           q: 'Tras cada hora de RIR:',
           opts: [
             { l: 'Mejora: pasar a rehidratación oral', go: 'destino' },
@@ -910,11 +912,13 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
         },
         historia:{
           t:'Historia clínica y exploración física',
-          show: v => '<b>Antecedentes</b> que aumentan el riesgo: coagulopatía, fármacos, válvula de derivación, malformaciones vasculares. Lugar, localización y tiempo de evolución (el daño secundario es más frecuente en las primeras 6 h).<br>' +
+          show: v => '<b>Edad</b>: los &lt;2 años tienen más riesgo (clínica más inespecífica, más riesgo de LIC y de maltrato como causa).<br>' +
+            '<b>Antecedentes</b> que aumentan el riesgo: coagulopatía, fármacos, válvula de derivación, malformaciones vasculares. Lugar, localización y tiempo de evolución (el daño secundario es más frecuente en las primeras 6 h).<br>' +
             '<b>Mecanismo de riesgo</b>: caída &gt;1,5 m (<b>&gt;1 m en &lt;2 años</b>), impacto directo con objeto contundente, accidente de tráfico con desplazamiento, muerte de un pasajero o vuelco, traumatismo no presenciado, peatón o ciclista sin casco atropellado, zambullida, colisión en bicicleta, accidente de moto, herida penetrante.<br>' +
             '<b>Síntomas</b>: pérdida de consciencia y duración, vómitos (sobre todo &gt;1 h tras el TCE), cefalea, irritabilidad, convulsión, cambio de comportamiento, ceguera, confusión.<br>' +
             '<b>Sospecha de maltrato</b> (sobre todo lactantes): lesiones incongruentes con la historia, demora injustificada, lesiones geométricas, en zonas protegidas o en distinto estadio, otras fracturas o hemorragias retinianas, actitud inadecuada de los padres, conducta inhabitual del lactante.<br>' +
-            '<b>Exploración</b>: neurológica completa (pares craneales, reflejos) y repetida; cabeza: hematoma subgaleal o cefalohematoma (más riesgo si no frontal en &lt;2 años, &gt;3 cm y blando, o cualquier localización en &lt;3 meses), escalón o crepitación, signos de fractura de base (hemotímpano, Battle, ojos de mapache, licuorrea), fontanela tensa, heridas del cuero cabelludo, fondo de ojo, lesiones asociadas.' + gcsNota(v),
+            '<b>Exploración</b>: neurológica completa (pares craneales, reflejos) y repetida; GCS y otros signos de alteración de la consciencia (irritabilidad, agitación, somnolencia, falta de contacto visual en lactantes, preguntas repetitivas o bradipsiquia).<br>' +
+            '<b>Cabeza</b>: hematoma subgaleal o cefalohematoma (más riesgo si no frontal en &lt;2 años, &gt;3 cm y blando, o cualquier localización en &lt;3 meses) · escalón o crepitación (la fractura aumenta el riesgo de LIC sobre todo si es deprimida, abierta o cruza la zona de la arteria meníngea media; su ausencia no descarta LIC) · signos de fractura de base (hemotímpano, Battle, ojos de mapache, licuorrea) · fontanela tensa · heridas del cuero cabelludo (pueden sangrar mucho: si la compresión directa no basta, infiltrar lidocaína con adrenalina; si la herida es amplia y abierta, explorar con un dedo enguantado) · fondo de ojo (sin papiledema al inicio no se descarta HTIC; las hemorragias retinianas sugieren maltrato) · lesiones asociadas.' + gcsNota(v),
           q:'¿Tiene algún criterio de <b>riesgo alto</b> de lesión intracraneal?',
           help:'Riesgo alto: focalidad neurológica · fractura craneal palpable · signos de fractura basilar · fontanela tensa · convulsiones.',
           opts:[{l:'Sí', go:'alto'}, {l:'No', go:'edad'}]
@@ -960,7 +964,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
         },
         tac:{
           t:'TAC craneal', c:'mid',
-          show: v => 'LIC más frecuentes: hematoma epidural (puede quedar oculto), subdural (interhemisférico en lactantes: pensar en maltrato), lesión axonal difusa y contusión.<br>' + neuroqTxt + gcsNota(v),
+          show: v => 'LIC más frecuentes: <b>hematoma epidural</b> (igual de frecuente que en adultos; más probable que quede clínicamente oculto; cefalea, vómitos y alteración de la consciencia por aumento de la PIC) · <b>subdural</b> (menos frecuente que en adultos, evolución más lenta que el epidural; el interhemisférico, más en lactantes y secundario a maltrato) · <b>lesión axonal difusa</b> (más frecuente en niños; aumento de la PIC que puede llevar a coma profundo e incluso la muerte) · <b>contusión parenquimatosa</b> (alteración de la consciencia, convulsiones, focalidad neurológica).<br>' + neuroqTxt + gcsNota(v),
           q:'¿Hay LIC u otro criterio de observación o ingreso?',
           help: ingresoTxt,
           opts:[{l:'Sí', go:'ingreso'}, {l:'No', go:'altaTac'}]
@@ -984,7 +988,8 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
         help:'Ábrelos en cualquier momento del flujograma.',
         items:[
           {l:'Grupos de riesgo de LIC (tabla 30-2)', t:'Grupos de riesgo de lesión intracraneal',
-            show:'<b>Alto</b>: focalidad neurológica · fractura craneal palpable · signos de fractura basilar · fontanela tensa · convulsiones.<br>' +
+            show:'Objetivo: identificar la <b>lesión traumática clínicamente importante</b> (LIC que requiere neurocirugía, cuidados de soporte, monitorización intensiva u hospitalización prolongada · fractura deprimida · fractura de la base del cráneo) sin hacer pruebas a quien no está en riesgo.<br>' +
+              '<b>Alto</b>: focalidad neurológica · fractura craneal palpable · signos de fractura basilar · fontanela tensa · convulsiones.<br>' +
               '<b>Intermedio &lt;2 años</b>: cefalohematoma no frontal importante · pérdida de conocimiento &gt;5 s · vómitos · mecanismo de riesgo · actitud anormal según los padres.<br>' +
               '<b>Intermedio ≥2 años</b>: pérdida de conocimiento · vómitos · cefalea intensa · mecanismo de riesgo.<br>' +
               '<b>Bajo</b>: GCS 15 · sin signos de fractura · sin mecanismo de riesgo · sin focalidad · asintomático.'},
@@ -1032,11 +1037,11 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
     const F = n => ({ n: n, inf: false });
     const nivel = v => (isNaN(v.dolor) || v.dolor < 0 ? '' : v.dolor === 0 ? 'sin' : v.dolor <= 3 ? 'leve' : v.dolor <= 6 ? 'mod' : 'int');
     const noFarm = '<br>¡Usar <b>siempre medidas no farmacológicas</b> y coadyuvantes si hay indicación (abajo, «Durante la atención»)!';
-    const paraTxt = v => '<b>Paracetamol</b> oral: &gt;10 días–10 años <b>15 mg/kg</b>' + r(v, 15, 15, null, 0, 'mg') + ' cada 4–6 h (máx. 90 mg/kg/día) · &gt;10 años 0,5–1 g cada 4–6 h (máx. 4 g/día) · &lt;10 días 10–15 mg/kg cada 6 h (máx. 60 mg/kg/día).<br>' +
+    const paraTxt = v => '<b>Paracetamol</b> oral: &gt;10 días–10 años <b>15 mg/kg</b>' + r(v, 15, 15, null, 0, 'mg') + ' cada 4–6 h (máx. 90 mg/kg/día) · &gt;10 años 0,5–1 g cada 4–6 h (máx. 4 g/día) · &lt;10 días 10–15 mg/kg cada 6 h (máx. 60 mg/kg/día). Rectal: 20 mg/kg/día (máx. 90 mg/kg/día) <span class="pe-nota">transcrito tal cual: el PDF lo expresa «/día»</span>.<br>' +
       'Paracetamol IV: &lt;10 kg <b>7,5 mg/kg</b> (máx. 30 mg/kg/día) · 10–50 kg <b>15 mg/kg</b> (máx. 60 mg/kg/día; 2 g/día si 10–33 kg, 3 g/día si 33–50 kg) · &gt;50 kg 1 g (máx. 4 g/día)' +
       (P(v) ? ' → con ' + f(P(v), 1) + ' kg: <b>' + (P(v) < 10 ? f(P(v) * 7.5, 0) + ' mg' : P(v) <= 50 ? f(P(v) * 15, 0) + ' mg' : '1 g') + '</b> cada 4–6 h' : '') + '.';
-    const ibuTxt = v => '<b>Ibuprofeno</b> oral (&gt;3 meses): <b>5–10 mg/kg</b>' + r(v, 5, 10, null, 0, 'mg') + ' cada 6–8 h (máx. 40 mg/kg/día o 1,2 g/día) · &gt;40 kg o adultos 400 mg cada 6–8 h.<br>' +
-      'Ibuprofeno IV (&gt;6 años o &gt;20 kg): <b>10 mg/kg</b>' + r(v, 10, 10, 400, 0, 'mg') + ' cada 6 h (máx. 400 mg/dosis y 30 mg/kg/día).';
+    const ibuTxt = v => '<b>Ibuprofeno</b> oral (&gt;3 meses): <b>5–10 mg/kg</b>' + r(v, 5, 10, null, 0, 'mg') + ' cada 6–8 h (máx. 40 mg/kg/día o 1,2 g/día) · &gt;40 kg o adultos 400 mg cada 6–8 h (máx. 1,2 g/día; 2,4 g/día bajo supervisión).<br>' +
+      'Ibuprofeno IV (&gt;6 años o &gt;20 kg): <b>10 mg/kg</b>' + r(v, 10, 10, 400, 0, 'mg') + ' cada 6 h (máx. 400 mg/dosis y 30 mg/kg/día) · 400 mg cada 4–6 h (máx. 2,4 g/día) <span class="pe-nota">el PDF no precisa la edad de esta línea</span>.';
     return {
       inputs: [
         { k: 'peso', l: 'Peso', u: 'kg' },
@@ -1125,9 +1130,9 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
           t: 'Moderado inflamatorio: ibuprofeno y otros AINE', c: 'mid',
           show: v => ibuTxt(v) + '<br>Otros AINE (tabla SEUP):<br>' +
             '• <b>Naproxeno</b> oral &gt;2 años <b>5–7,5 mg/kg</b>' + r(v, 5, 7.5, null, 0, 'mg') + ' cada 8–12 h (máx. 1 g/día) · &gt;12 años 200 mg cada 8–12 h · adultos 250–500 mg cada 12 h.<br>' +
-            '• <b>Ketorolaco IV</b> 2–16 años <b>0,5 mg/kg</b>' + r(v, 0.5, 0.5, 15, 1, 'mg') + ' (máx. 15 mg/dosis, 60 mg/día, 2 días) · 1 mes–2 años 0,5 mg/kg cada 6–8 h (máx. 2 días). IM 2–16 años 1 mg/kg (máx. 30 mg).<br>' +
+            '• <b>Ketorolaco IV</b> 2–16 años <b>0,5 mg/kg</b>' + r(v, 0.5, 0.5, 15, 1, 'mg') + ' (máx. 15 mg/dosis, 60 mg/día, 2 días) · 1 mes–2 años 0,5 mg/kg cada 6–8 h (máx. 2 días) · &gt;16 años o &gt;50 kg «30 mg/kg/8 h» (máx. 90 mg/día, 2 días) <span class="pe-nota">así lo imprime el PDF; en IM la misma franja es 30 mg cada 8 h</span>. IM 2–16 años 1 mg/kg (máx. 30 mg) · &gt;16 años o &gt;50 kg 30 mg cada 8 h (máx. 90 mg/día, 2 días). Oral 2–16 años (off-label) 1 mg/kg' + r(v, 1, 1, 40, 0, 'mg') + ' (máx. 40 mg, dosis única) · &gt;16 años 10 mg cada 4–6 h (máx. 40 mg/día, 7 días).<br>' +
             '• <b>Dexketoprofeno</b> oral &lt;14 años (off-label) 12,5 mg cada 4–6 h o 25 mg cada 8 h (máx. 75 mg/día) · IV/IM 50 mg cada 8–12 h (máx. 150 mg/día, &lt;2 días).<br>' +
-            '• <b>Ketoprofeno</b> oral 3–14 años 0,5 mg/kg' + r(v, 0.5, 0.5, null, 1, 'mg') + ' cada 6–8 h (máx. 2 mg/kg/día) · &gt;14 años 50 mg cada 6–8 h.<br>' +
+            '• <b>Ketoprofeno</b> oral 3–14 años 0,5 mg/kg' + r(v, 0.5, 0.5, null, 1, 'mg') + ' cada 6–8 h (máx. 2 mg/kg/día) · &gt;14 años 50 mg cada 6–8 h (máx. 200 mg/día). IM &gt;14 años 100 mg cada 12–24 h (máx. 2 días).<br>' +
             '• <b>Diclofenaco</b> oral/rectal 1–14 años (off-label) <b>0,5–1 mg/kg</b>' + r(v, 0.5, 1, 50, 0, 'mg') + ' cada 8–12 h (máx. 50 mg/dosis y 150 mg/día) · &gt;14 años 50 mg cada 8–12 h (máx. 150 mg/día). IM 2–14 años (off-label) 0,3–1 mg/kg' + r(v, 0.3, 1, 75, 0, 'mg') + ' cada 12–24 h · &gt;14 años 50–75 mg cada 12 h (máx. 150 mg, 1 día).<br>' +
             '<span class="pe-nota">El PDF de la SEUP imprime «0,5–1 mg» y «50 mg/kg»: se leen como mg/kg (1–14 años) y mg (&gt;14 años), coherente con la guía ESPA 2018 (1 mg/kg cada 8 h; PMID 29635764).</span>' + noFarm + sinPeso(v),
           q: 'Paso 4:',
@@ -1136,7 +1141,7 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
         modNoInf: {
           farmacos: ['Metamizol', 'Tramadol'],
           t: 'Moderado no inflamatorio: metamizol y opioides menores', c: 'mid',
-          show: v => '<b>Metamizol</b> oral (&gt;3 meses o &gt;5 kg): <b>12,5–20 mg/kg</b>' + r(v, 12.5, 20, 2000, 0, 'mg') + ' cada 6 h (máx. 2 g/8 h y 6 g/día). IV/IM (&gt;3 meses): 12,5–20 mg/kg (el PDF lo expresa «/día»); dosis puntual de 40 mg/kg' + r(v, 40, 40, 2000, 0, 'mg') + '; máx. 2 g/8 h. Rectal: 1–3 años 250 mg · 3–11 años 500 mg · adolescentes 1 g, cada 6–8 h.<br>' +
+          show: v => '<b>Metamizol</b> oral (&gt;3 meses o &gt;5 kg): <b>12,5–20 mg/kg</b>' + r(v, 12.5, 20, 2000, 0, 'mg') + ' cada 6 h (máx. 2 g/8 h y 6 g/día). IV/IM (&gt;3 meses): 12,5–20 mg/kg (el PDF lo expresa «/día»); dosis puntual de 40 mg/kg' + r(v, 40, 40, 2000, 0, 'mg') + '; máx. 2 g/8 h. Rectal: 1–3 años 250 mg · 3–11 años 500 mg · adolescentes 1 g, cada 6–8 h. Perfusión continua (&gt;1 año): 6,6 mg/kg/h' + r(v, 6.6, 6.6, null, 1, 'mg/h') + '.<br>' +
             '<b>Opioides menores</b>:<br>' +
             '• <b>Tramadol</b> &gt;12 años 50–100 mg cada 4–6 h (máx. 400 mg/día) · &lt;12 años (off-label) <b>1–2 mg/kg</b>' + r(v, 1, 2, null, 0, 'mg') + ' en dosis única.<br>' +
             '• <b>Codeína</b> oral/rectal solo &gt;12 años: <b>0,5–1 mg/kg</b>' + r(v, 0.5, 1, 60, 0, 'mg') + ' cada 6 h (máx. 60 mg/dosis o 240 mg/día).' +
@@ -1149,9 +1154,9 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
           t: 'Dolor intenso: opiáceos mayores', c: 'high',
           show: v => 'Tratamiento con <b>opiáceos mayores (fentanilo o cloruro mórfico)</b>. Intentar <b>analgesia multimodal</b> para reducir en lo posible la dosis de opiáceos.<br>' +
             '• <b>Fentanilo IV/IM</b> 2–12 años (off-label &lt;2 años): <b>1–2 µg/kg</b>' + r(v, 1, 2, 50, 0, 'µg') + ' cada 30–60 min (máx. 50 µg/dosis) · &gt;12 años 25–50 µg cada 1–2 h (máx. 500 µg/4 h).<br>' +
-            '• <b>Fentanilo intranasal</b> (&gt;10 kg): <b>1–2 µg/kg</b>' + r(v, 1, 2, 100, 0, 'µg') + ', repetir 0,3–0,5 µg/kg' + r(v, 0.3, 0.5, null, 0, 'µg') + ' cada 3–5 min (máx. 100 µg/dosis o 3 µg/kg)' + (P(v) && P(v) <= 10 ? ' — <b>con ≤10 kg no está indicado por vía IN</b>' : '') + '. Nebulizado 3 µg/kg (máx. 200 µg).<br>' +
-            '• <b>Morfina (cloruro mórfico) IV</b>: <b>0,05–0,1 mg/kg</b>' + r(v, 0.05, 0.1, null, 2, 'mg') + ' cada 2–4 h, en 5 min (máx. 15 mg/día) · IM/SC 0,1–0,2 mg/kg' + r(v, 0.1, 0.2, null, 2, 'mg') + ' cada 4 h · perfusión 0,01 mg/kg/h (máx. 0,04 mg/kg/h).<br>' +
-            '• <b>Ketamina</b> (tabla de dolor intenso) IV <b>0,5–2 mg/kg</b>' + r(v, 0.5, 2, 50, 1, 'mg') + ' (máx. 50 mg) · IM 4–5 mg/kg' + r(v, 4, 5, 100, 0, 'mg') + ' (máx. 100 mg) · IN off-label 0,5–4 mg/kg.' + noFarm + sinPeso(v),
+            '• <b>Fentanilo intranasal</b> (&gt;10 kg): <b>1–2 µg/kg</b>' + r(v, 1, 2, 100, 0, 'µg') + ', repetir 0,3–0,5 µg/kg' + r(v, 0.3, 0.5, null, 0, 'µg') + ' cada 3–5 min (máx. 100 µg/dosis o 3 µg/kg)' + (P(v) && P(v) <= 10 ? ' — <b>con ≤10 kg no está indicado por vía IN</b>' : '') + '. Nebulizado 3 µg/kg (máx. 200 µg). Mucosa bucal/sublingual (&lt;16 años off-label): 10–15 µg/kg · 1–3 µg/kg/dosis <span class="pe-nota">transcrito tal cual: la tabla del PDF no deja claro a qué se refiere cada cifra</span>.<br>' +
+            '• <b>Morfina (cloruro mórfico) IV</b>: <b>0,05–0,1 mg/kg</b>' + r(v, 0.05, 0.1, null, 2, 'mg') + ' cada 2–4 h, en 5 min (máx. 15 mg/día) · IM/SC 0,1–0,2 mg/kg' + r(v, 0.1, 0.2, null, 2, 'mg') + ' cada 4 h (máx. 15 mg/día) · perfusión 0,01 mg/kg/h (máx. 0,04 mg/kg/h). Oral: 2–12 años 0,2–0,5 mg/kg' + r(v, 0.2, 0.5, null, 1, 'mg') + ' cada 4–6 h · &gt;12 años 15–20 mg cada 4–6 h · retard 0,2–0,8 mg/kg cada 12 h; máx. 20 mg/día <span class="pe-nota">el PDF da un único máximo oral sin precisar a qué línea se aplica</span>.<br>' +
+            '• <b>Ketamina</b> (tabla de dolor intenso) IV <b>0,5–2 mg/kg</b>' + r(v, 0.5, 2, 50, 1, 'mg') + ' (máx. 50 mg) · IM 4–5 mg/kg' + r(v, 4, 5, 100, 0, 'mg') + ' (máx. 100 mg) · IN off-label 0,5–4 mg/kg · perfusión 5–20 µg/kg/min (máx. 3,6 mg/kg/h) · oral off-label 6–10 mg/kg' + r(v, 6, 10, null, 0, 'mg') + '.' + noFarm + sinPeso(v),
           q: 'Paso 4:',
           opts: [{ l: 'Reevaluar el dolor', go: 'reeval' }]
         },
@@ -1168,18 +1173,18 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
           {
             l: 'Medidas no farmacológicas', t: 'Medidas no farmacológicas (tablas 21-6 y 21-7)',
             show: '<b>Recomendación A</b>: familia presente en los procedimientos · información previa · distracción (cartas, caleidoscopio, globos) · móvil/tablet · música · ejercicios de respiración · pecho, piel con piel, coger en brazos · sacarosa en lactantes de 0–3 meses. <b>Recomendación B</b>: frío local y vibración en la venopunción.<br>' +
-              '<b>Recién nacidos</b>: piel con piel, contención en flexión, voz de los padres, pecho o leche materna, succión no nutritiva, sacarosa 24 % (hasta 3 meses).<br>' +
-              '<b>Hasta 1 año</b>: brazos, caricias, música suave, sonajeros, pompas. <b>1–3 años</b>: pompas, molinillos, juguetes con ruido, libros pop-up, canciones, cuentos.<br>' +
+              '<b>Recién nacidos</b>: piel con piel, contención en flexión, voz de los padres, evitar estimulación sensorial excesiva, pecho o leche materna, succión no nutritiva, sacarosa 24 % (hasta 3 meses).<br>' +
+              '<b>Hasta 1 año</b>: brazos, caricias, música suave, sonajeros, objetos que cambien de forma y color, pompas. <b>1–3 años</b>: pompas, molinillos, juguetes con ruido, libros pop-up, canciones, cuentos.<br>' +
               '<b>3–6 años</b>: además juegos de conteo y hablar de sus cosas favoritas. <b>6–12 años</b>: música, pelota antiestrés, caleidoscopio, conteo, su serie favorita.<br>' +
               '<b>13–18 años</b>: música con auriculares, relajación y respiración, humor, realidad virtual, imágenes mentales, móvil o tablet.'
           },
           {
             farmacos: ['Diazepam'],
             l: 'Coadyuvantes', t: 'Coanalgésicos y coadyuvantes (tablas 21-8 y 21-9)',
-            show: v => '<b>Neuropático</b>: amitriptilina (inicio 0,1 mg/kg al acostarse' + r(v, 0.1, 0.1, null, 1, 'mg') + '; máx. 0,5–2 mg/kg/día), gabapentina (6–12 años: 5 mg/kg al acostarse el 1.er día, cada 12 h el 2.º, cada 8 h el 3.º; titular a 8–35 mg/kg/día), carbamazepina 10–30 mg/kg/día en 3–4 dosis, anestésicos tópicos o locales.<br>' +
+            show: v => '<b>Neuropático</b>: amitriptilina (inicio 0,1 mg/kg al acostarse' + r(v, 0.1, 0.1, null, 1, 'mg') + '; aumentar cada 2–3 semanas hasta el máx. de 0,5–2 mg/kg/día), gabapentina (6–12 años: 5 mg/kg al acostarse el 1.er día, cada 12 h el 2.º, cada 8 h el 3.º; titular a 8–35 mg/kg/día cada 8 h, máx. 50 mg/kg/día · &gt;12 años: 300 mg el 1.er día, cada 12 h el 2.º, cada 8 h el 3.º; titular hasta 1.800–3.600 mg/día), carbamazepina 10–30 mg/kg/día en 3–4 dosis, pregabalina (25–75 mg; 150–300 mg al día; máx. 150 mg cada 12 h), anestésicos tópicos o locales.<br>' +
               '<b>Espasmo muscular agudo</b>: diazepam oral 0,12–0,8 mg/kg/día cada 8 h (≥6 meses y &lt;12 años)' + r(v, 0.12, 0.8, null, 1, 'mg/día') + '; ≥12 años 2–10 mg 2–4 veces al día (máx. 10 mg/dosis).<br>' +
-              '<b>Espasticidad</b>: baclofeno 0,75–2 mg/kg/día, siempre progresivo; diazepam.<br>' +
-              '<b>Dolor óseo, inflamación o compresión</b>: dexametasona 0,2–0,5 mg/kg/día en 3 dosis oral o IV' + r(v, 0.2, 0.5, null, 1, 'mg/día') + '.' + sinPeso(v)
+              '<b>Espasticidad</b>: baclofeno 0,75–2 mg/kg/día, siempre progresivo (repartido cada 6 h: 1–2 años 10–20 mg/día, máx. 40 mg/día · 2–6 años 20–30 mg/día, máx. 60 mg/día · 6–10 años 30–60 mg/día, máx. 120 mg/día); diazepam.<br>' +
+              '<b>Dolor óseo</b>: dexametasona o bifosfonatos. <b>Dolor óseo, inflamación o compresión</b>: dexametasona 0,2–0,5 mg/kg/día en 3 dosis oral o IV' + r(v, 0.2, 0.5, null, 1, 'mg/día') + '.' + sinPeso(v)
           }
         ]
       }
@@ -1219,7 +1224,7 @@ window.PROTOCOLS.push({ id:'seup-anafilaxia', ped:true, title:'Anafilaxia pediá
     const hipoTA = v => { const u = umbral(v); return !isNaN(u) && v.tas > 0 && v.tas < u; };
     const taTxt = v => { const u = umbral(v); if (isNaN(u)) return 'Pon la edad para ver el umbral de hipotensión.'; return 'Umbral de hipotensión para esta edad: <b>TAS &lt;' + f(u, 0) + ' mmHg</b>' + (v.tas > 0 ? (hipoTA(v) ? ' → <b>TAS ' + f(v.tas, 0) + ': hipotensión</b>' : ' → TAS ' + f(v.tas, 0) + ': no cumple el criterio de hipotensión') : '') + '.'; };
     const salbu = v => (P(v) ? (P(v) < 20 ? ' <b>= 2,5 mg</b> (&lt;20 kg)' : P(v) > 20 ? ' <b>= 5 mg</b> (&gt;20 kg)' : ' (con 20 kg exactos el PDF no precisa: 2,5 o 5 mg)') : '');
-    const adreIM = v => '<b>Adrenalina IM 0,01 mg/kg</b>' + d(v, 0.01, 0.5, 2, 'mg') + ' (máx. 0,5 mg) = <b>0,01 ml/kg de adrenalina 1 mg/ml sin diluir</b>' + d(v, 0.01, 0.5, 2, 'ml') + ' (máx. 0,5 ml), en la <b>cara anterolateral del muslo</b>.';
+    const adreIM = v => '<b>Adrenalina IM 0,01 mg/kg</b>' + d(v, 0.01, 0.5, 2, 'mg') + ' (máx. 0,5 mg) = <b>0,01 ml/kg de adrenalina 1 mg/ml sin diluir</b>' + d(v, 0.01, 0.5, 2, 'ml') + ' (máx. 0,5 ml), en la <b>cara anterolateral del tercio medio del muslo</b> (menor probabilidad de alcanzar nervios o vasos principales). <span class="pe-nota">El PDF escribe «tercio medio de la pierna».</span>';
     return {
       inputs: [
         { k: 'peso', l: 'Peso', u: 'kg' },
@@ -1307,7 +1312,7 @@ window.PROTOCOLS.push({ id:'seup-anafilaxia', ped:true, title:'Anafilaxia pediá
         obs: {
           t: 'Observación hospitalaria', c: 'mid',
           show: '<b>Alta tras 2 h</b> desde el control de los síntomas si se cumple todo: buena respuesta (5–10 min) a <b>una única dosis</b> de adrenalina dada en los primeros 30 min · resolución completa · dispone de autoinyector y sabe usarlo · vigilancia adecuada al alta.<br>' +
-            '<b>Mínimo 6 h</b> tras la resolución si: ha precisado <b>2 dosis</b> de adrenalina o tiene reacciones bifásicas previas.<br>' +
+            '<b>Mínimo 6 h</b> tras la resolución si: ha precisado <b>2 dosis</b> de adrenalina o tiene reacciones bifásicas previas. Con 2 dosis, en algunos casos puede ser razonable el alta a las 2 h (p. ej., tras una provocación controlada en una consulta de Alergología).<br>' +
             '<b>Mínimo 12 h</b> si alguno: anafilaxia grave con <b>más de 2 dosis</b> · asma grave o insuficiencia respiratoria grave · absorción continuada del alérgeno (p. ej., medicamento de liberación prolongada) · consulta de noche o puede no responder si empeora · difícil acceso a Urgencias.',
           q: '¿Reaparecen los síntomas durante la observación?',
           opts: [
@@ -1317,7 +1322,7 @@ window.PROTOCOLS.push({ id:'seup-anafilaxia', ped:true, title:'Anafilaxia pediá
         },
         alta: {
           t: 'Alta con recomendaciones y control en Alergología Infantil', c: 'low',
-          show: v => { const w = P(v); return '• Informar del <b>alérgeno sospechado</b> y de los productos que lo contienen; enseñar a reconocer los primeros síntomas.<br>' +
+          show: v => { const w = P(v); return '• Informar del <b>alérgeno sospechado</b> y de los productos que lo contienen (si no se identifica el desencadenante, orientarse por la frecuencia de los alérgenos según la edad); enseñar a reconocer los primeros síntomas.<br>' +
             '• <b>Autoinyector de adrenalina</b>: 0,15 mg para 10–25 kg; 0,3 mg para &gt;25 kg; &lt;10 kg, riesgo-beneficio individual' +
             (w ? ' → con ' + f(w, 1) + ' kg: <b>' + (w < 10 ? 'valoración individual' : w <= 25 ? '0,15 mg' : '0,3 mg') + '</b>' : '') + '.<br>' +
             '• Técnica: sentar al niño en las piernas y sujetarle las piernas con las propias; quitar el tapón y agarrar el autoinyector con todo el puño; apoyarlo en el muslo (sin golpear) y apretar contando 10 s desde el chasquido; masajear 10 s; llamar a Emergencias.<br>' +
@@ -1372,9 +1377,9 @@ window.PROTOCOLS.push({ id:'seup-estatus', ped:true, title:'Estatus epiléptico 
     const segunda = ['lev', 'vpa', 'pht'];
     const segTxt = {
       lev: v => '<b>Levetiracetam IV 40–60 mg/kg</b>' + r(v, 40, 60, 4500, 0, 'mg') + ' en 5 min (máx. 4.500 mg). Si cede: 25–30 mg/kg' + r(v, 25, 30, null, 0, 'mg') + ' cada 12 h IV.<br><span class="pe-nota">Indicado sobre todo en EE mioclónico y no convulsivo. Si ya toma &gt;40 mg/kg/día, probar otro anticonvulsivo; si toma menos, dar la carga.</span>',
-      vpa: v => '<b>Valproato sódico IV 40 mg/kg</b>' + d(v, 40, 3000, 0, 'mg') + ' en 5 min (máx. 3.000 mg). Si cede: 1–2 mg/kg/h' + r(v, 1, 2, null, 1, 'mg/h') + ' IV.<br><span class="pe-nota">No en &lt;2 años; precaución de 2 a 4 años. Contraindicado en hepatopatía, pancreatopatía, hiperamoniemia, coagulopatía, enfermedad mitocondrial y metabolopatía. No darlo si ya lo toma a dosis correctas. Fármaco de riesgo reproductivo: precauciones de preparación.</span>' +
+      vpa: v => '<b>Valproato sódico IV 40 mg/kg</b>' + d(v, 40, 3000, 0, 'mg') + ' en 5 min (máx. 3.000 mg). Si cede: 1–2 mg/kg/h' + r(v, 1, 2, null, 1, 'mg/h') + ' IV.<br><span class="pe-nota">No en &lt;2 años; precaución de 2 a 4 años. Contraindicado en hepatopatía, pancreatopatía, hiperamoniemia, coagulopatía, enfermedad mitocondrial y metabolopatía. No darlo si ya lo toma a dosis correctas. Fármaco de riesgo reproductivo (FDA): preparación sin protección salvo que quien lo manipule esté en riesgo reproductivo (no debe preparar los viales; contactar con SPRL); administrar con doble guante y bata, protección ocular si hay riesgo de salpicadura y respiratoria si puede inhalarse.</span>' +
         (ok(v.edad) && v.edad < 2 ? '<br><b>Menor de 2 años: no usar valproato.</b>' : ''),
-      pht: v => '<b>Fenitoína IV 20 mg/kg</b>' + d(v, 20, 1500, 0, 'mg') + ' en 20 min (1 mg/kg/min; máx. 1.500 mg). Si cede: 7 mg/kg/día' + d(v, 7, null, 0, 'mg/día') + ' en 2 o 3 dosis IV.<br><span class="pe-nota">No indicada en cardiopatía ni en crisis febril parcial unilateral &lt;12 meses. No darla si ya la toma a dosis correctas. Fármaco de riesgo reproductivo: precauciones de preparación.</span>'
+      pht: v => '<b>Fenitoína IV 20 mg/kg</b>' + d(v, 20, 1500, 0, 'mg') + ' en 20 min (1 mg/kg/min; máx. 1.500 mg). Si cede: 7 mg/kg/día' + d(v, 7, null, 0, 'mg/día') + ' en 2 o 3 dosis IV.<br><span class="pe-nota">No indicada en cardiopatía ni en crisis febril parcial unilateral &lt;12 meses. No darla si ya la toma a dosis correctas. Fármaco de riesgo reproductivo (FDA): abrir y manipular la ampolla en cabina CSB IIb o AE con doble guante, bata y mascarilla; sin cabina, protección ocular y respiratoria. Administrar con doble guante y bata, protección ocular si hay riesgo de salpicadura y respiratoria si puede inhalarse.</span>'
     };
     const piridoxina = v => 'Considerar <b>piridoxina 100 mg IV</b>, dosis única, en <b>menores de 3 años</b>' + (ok(v.edad) && v.edad < 3 ? ' <b>(aplica por edad)</b>' : '') + '.';
     const F = n => ({ n: n, inf: false });
@@ -1475,8 +1480,11 @@ window.PROTOCOLS.push({ id:'seup-estatus', ped:true, title:'Estatus epiléptico 
           {l:'Causas y pruebas', t:'Diagnóstico y tratamiento de la causa',
             show:'Buscar a la vez causas potencialmente mortales: hipoglucemia, intoxicaciones, meningitis, lesiones ocupantes de espacio.<br>' +
               '• Tóxicos si hay sospecha · errores innatos del metabolismo según contexto.<br>' +
-              '• Punción lumbar (Gram, PCR, cultivo) si se sospecha infección.<br>' +
-              '• <b>TAC</b> si crisis focales, traumatismo previo, enfermedad neoplásica, sospecha de infección o hemorragia, y en lactantes. <b>RM</b> si EE refractario de mala evolución y en el seguimiento.'},
+              '• Considerar punción lumbar (Gram, PCR, cultivo de LCR) si se sospecha infección y en casos de sospecha de hemorragia o no recuperación del nivel de consciencia. <span class="pe-nota">El PDF escribe «sospecha de hemorragia no recuperación del nivel de conciencia», sin nexo.</span><br>' +
+              '• Neuroimagen según el cuadro: si la causa está claramente establecida, puede omitirse la inmediata; más urgente si traumatismo, paciente oncológico o etiología desconocida. <b>TAC</b> si crisis focales, traumatismo previo, enfermedad neoplásica, sospecha de infección o hemorragia, y en lactantes. <b>RM</b> si EE refractario de mala evolución y en el seguimiento; es superior a la TC en algunas causas (sobre todo encefalitis) y mucho más sensible para lesiones epileptógenas sutiles (malformaciones del desarrollo cortical, esclerosis mesial, tumores neurogliales).'},
+          {l:'Objetivos del tratamiento', t:'Objetivos del tratamiento del EE',
+            show:'• Mantener las funciones vitales · finalizar la crisis (clínica y eléctrica) · diagnóstico y tratamiento inicial de las causas potencialmente mortales (hipoglucemia, intoxicaciones, meningitis, lesiones ocupantes de espacio) · evitar recurrencias · minimizar las complicaciones del tratamiento · evaluar y tratar las causas subyacentes.<br>' +
+              'Si el tratamiento se retrasa o es inadecuado, las convulsiones pueden hacerse autosuficientes. Metas: <b>detener la crisis rápidamente</b> y anticiparse a la necesidad de anticomiciales de 2.ª y 3.ª línea para tenerlos disponibles. Diagnóstico y tratamiento, simultáneos e inmediatos.'},
           {l:'Revaloración', t:'Revaloración ABC y constantes',
             show:'Al menos: después de cada dosis de anticomicial · cada 5 min mientras siga convulsionando · cada 15 min tras la crisis hasta recuperar la consciencia.'},
           {l:'Fases del estatus', t:'Definición y fases (ILAE 2015)',
@@ -1531,6 +1539,8 @@ window.PROTOCOLS.push({ id:'seup-sepsis', ped:true, title:'Sepsis pediátrica (S
             '• Valoración del <b>TEP y ABCDE</b>. Si dos lados del TEP alterados: órdenes de estabilización ya y pedir ayuda.<br>' +
             '• <b>O₂ al 100 %</b>. Considerar instrumentalizar la vía aérea.<br>' +
             '• Monitorización: ECG, TA, EtCO₂, FR y SatO₂.<br>' +
+            '• B: taquipnea sin esfuerzo (compensa la acidosis metabólica); si dificultad respiratoria o auscultación patológica, sospechar foco pulmonar o edema pulmonar.<br>' +
+            '• C: taquicardia, PA normal o baja (la hipotensión indica un cuadro más evolucionado, con menos probabilidad de revertir); habitualmente piel pálida y fría, pulsos débiles y relleno capilar enlentecido. No se recomienda distinguir clínicamente shock frío y caliente para tomar decisiones.<br>' +
             '• <b>2 vías venosas periféricas</b>; intraósea si shock y no se logra vía periférica en 5 min.<br>' +
             '• D: nivel de conciencia, pupilas, <b>glucemia</b>. E: temperatura, púrpura/petequias (meningococo), antitérmicos, evitar hipotermia.<br>' +
             '• Protección individual del personal sanitario.' + sinPeso(v),
@@ -1588,6 +1598,7 @@ window.PROTOCOLS.push({ id:'seup-sepsis', ped:true, title:'Sepsis pediátrica (S
             '• <b>Secuencia rápida de intubación</b> (considerar ketamina como sedante; dosis según protocolo local).<br>' +
             '• Canalización de vía central.<br>' +
             '• Refractario a catecolaminas: individualizar 2.º inotrópico, milrinona, levosimendán o terlipresina según PA, SvcO₂ o índice cardiaco.<br>' +
+            '• El shock séptico es dinámico: según la evolución, en las horas siguientes puede ser necesario cambiar de inotrópico o asociar un segundo fármaco.<br>' +
             '<b>Destino: UCIP.</b>' + sinPeso(v) +
             '<br><span class="pe-nota">El algoritmo no indica el destino de forma explícita.</span>'
         },
@@ -1864,7 +1875,7 @@ window.PROTOCOLS.push({ id:'seup-toxicos', ped:true, title:'Exposición a tóxic
             '• <b>Analítica</b> si toxicidad moderada o grave, parámetros que vigilar o niveles útiles (paracetamol, aspirina, etanol, etilenglicol, metanol, teofilina, digoxina, hierro, litio): gasometría, iones, anion gap, glucosa, transaminasas, urea, creatinina; coagulación si hepatotoxicidad; CK si rabdomiólisis.<br>' +
             '• <b>ECG</b> si sustancia cardiotóxica o desconocida, o clínica cardiovascular.<br>' +
             '• <b>Tóxicos en orina</b> solo si cambia el manejo: clínica cardiológica, neurológica o psiquiátrica no explicada · coma con intoxicación etílica · &lt;12 años con sospecha de droga de abuso · sospecha de sumisión química. Muchos falsos positivos: confirmar si tiene repercusión legal.<br>' +
-            '• <b>Rx de tórax</b>: volátiles con neumonitis, cáusticos con neumomediastino, sospecha de aspiración o edema pulmonar. <b>Rx de abdomen</b>: sustancias radioopacas (hierro, plomo, mercurio, yoduros, potasio, bismuto) y paquetes de drogas.<br>' +
+            '• <b>Rx de tórax</b>: volátiles con neumonitis, cáusticos con neumomediastino, sospecha de aspiración o edema pulmonar. <b>Ecografía pulmonar</b> clínica: útil si sospecha de neumonía aspirativa, neumotórax o edema agudo de pulmón. <b>Rx de abdomen</b>: sustancias radioopacas (hierro, plomo, mercurio, yoduros, potasio, bismuto) y paquetes de drogas.<br>' +
             '• <b>TAC craneal</b>: sospecha de hemorragia (cocaína, simpaticomiméticos), TCE asociado o edema cerebral por hipoxemia.',
           q:'Siguiente paso:', opts:[{l:'Continuar', go:'social'}]
         },
@@ -1909,11 +1920,13 @@ window.PROTOCOLS.push({ id:'seup-toxicos', ped:true, title:'Exposición a tóxic
           {l:'Sobreingesta con fin suicida', t:'Sobreingesta medicamentosa con fin suicida',
             show:'El algoritmo pide tener en cuenta sus peculiaridades. En las notas: la anamnesis no es fiable y la exposición se considera siempre potencialmente tóxica · parte judicial en el adolescente con intoxicación voluntaria · el ingreso puede indicarse por necesidad de protección o evaluación psiquiátrica.'},
           {l:'Falsos positivos en orina', t:'Falsos positivos del inmunoensayo (tabla 13-1)',
-            show:'<b>Anfetaminas</b> (muy poco específica): bupropión, metilfenidato, pseudoefedrina, efedrina, fenilefrina, labetalol, metformina, ranitidina, trazodona, aripiprazol, atomoxetina, inhaladores con L-metanfetamina, entre otros.<br>' +
+            show:'<b>Anfetaminas/metanfetaminas/MDMA</b> (técnica muy poco específica): amantadina, aripiprazol, atomoxetina, bupropión, ceftarolina, clorpromazina, cloroquina (en sobredosis), desimipramina, DMAA (dimetilamilamina: suplemento energético), efedrina, esmolol, fenilefrina, fenilpropanolamina, imatinib, labetalol, metformina, metildopa, metilfenidato, metoprolol, moxifloxacino, ofloxacino, procainamida, prometazina, pseudoefedrina, ranitidina, ritodrina, selegilina, tetracaína, trazodona, trimipramina; también anticongestivos (p. ej., Vicks inhalador, con L-metanfetamina) o adelgazantes con aminas simpaticomiméticas (clobenzorex, fentermina, fendimetrazina, fenproporex).<br>' +
               '<b>Antidepresivos tricíclicos</b>: antihistamínicos, carbamazepina, ciclobenzaprina, cicloheptadina, fenotiacinas, quetiapina.<br>' +
-              '<b>Barbitúricos</b>: AINE, fenitoína. <b>Benzodiacepinas</b>: efavirenz, sertralina, fluoxetina, entre otros.<br>' +
+              '<b>Barbitúricos</b>: AINE (ibuprofeno, naproxeno), fenitoína. <b>Benzodiacepinas</b>: efavirenz, diazóxido, ketoprofeno, oxaprozina, raltegravir, sertralina, fluoxetina.<br>' +
               '<b>Cannabis</b>: AINE, efavirenz, IBP, raltegravir, dronabinol. <b>Cocaína</b>: té de coca, anestésicos tópicos con cocaína.<br>' +
-              '<b>Metadona</b>: difenhidramina, doxilamina, verapamilo, entre otros. <b>Opiáceos</b>: fluoroquinolonas, quinina, rifampicina, semillas de amapola, dextrometorfano.'},
+              '<b>Fenciclidina</b> (consumo excepcional en España y numerosos falsos positivos): dextrometorfano, difenhidramina, doxilamina, ibuprofeno, imipramina, ketamina, lamotrigina, MDPV (catinona sintética de las «sales de baño»), meperidina, metronidazol, tramadol, venlafaxina. <span class="pe-nota">La maquetación del PDF mezcla esta fila; se reconstruye así.</span><br>' +
+              '<b>Metadona</b>: difenhidramina, doxilamina, pazopanib, propafenona, verapamilo, vortioxetina. <b>Opiáceos</b> (codeína y morfina): fluoroquinolonas, quinina, rifampicina; también semillas de amapola en gran cantidad, dextrometorfano o, en ocasiones, opiáceos semisintéticos.<br>' +
+              'Algunos falsos positivos solo se dan con kits concretos; solo se listan medicamentos comercializados en España.'},
           {l:'Normas preventivas al alta', t:'Normas preventivas al alta', show: prevencion}
         ]
       }

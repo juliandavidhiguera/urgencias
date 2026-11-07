@@ -521,7 +521,8 @@ window.PROTOCOLS = [
         },
         trop: {
           escalas: ['heart'], q: 'Resultado del algoritmo de troponina ESC 0 h/1 h',
-          help: 'Umbrales <b>propios de cada ensayo</b> (ng/l); confirma cuál usa tu laboratorio:<br>' +
+          help: '<b>Laboratorio del hospital</b> (pg/ml = ng/l): <b>troponina T</b> normal 0–14 (p99 del Elecsys hs-cTnT) · <b>troponina I</b> normal ≤34,2 (p99 del Architect hs-cTnI en hombres; en mujeres el p99 del Architect es 15,6).<br>' +
+            'Umbrales <b>propios de cada ensayo</b> (ng/l):<br>' +
             '<b>Elecsys hs-cTnT (Roche)</b> · descartado: 0 h &lt;5 (si el dolor empezó hace >3 h) o 0 h &lt;12 y Δ1 h &lt;3 · confirmado: 0 h ≥52 o Δ1 h ≥5.<br>' +
             '<b>Architect hs-cTnI (Abbott)</b> · descartado: 0 h &lt;4 (si el dolor empezó hace >3 h) o 0 h &lt;5 y Δ1 h &lt;2 · confirmado: 0 h ≥64 o Δ1 h ≥6.<br>' +
             'Alternativa 0 h/2 h · Elecsys: descartado 0 h &lt;14 y Δ2 h &lt;4, confirmado Δ2 h ≥10 · Architect: descartado 0 h &lt;6 y Δ2 h &lt;2, confirmado Δ2 h ≥15.<br>' +
@@ -2210,7 +2211,7 @@ window.PROTOCOLS = [
       {k:'conf', t:'chk', l:'TEP confirmado por angio-TC (o TVP proximal en ecografía con sospecha de TEP)'},
       {k:'incid', t:'chk', l:'TEP incidental asintomático'},
       {k:'vd', t:'chk', l:'VD alterado: VD/VI ≥1,0 en angio-TC o criterio POCUS (septo en D, TAPSE &lt;16, McConnell)'},
-      {k:'trop', t:'chk', l:'Troponina hs &gt; p99 del laboratorio'},
+      {k:'trop', t:'chk', l:'Troponina hs &gt; p99 del laboratorio (T &gt;14 o I &gt;34,2 pg/ml; I en mujeres &gt;15,6)'},
       {k:'bnp', t:'num', l:'NT-proBNP', u:'pg/mL'},
       {t:'h', l:'Hestia, dosis y lisis'},
       {k:'peso', t:'num', l:'Peso real', u:'kg'},
