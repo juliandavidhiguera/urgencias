@@ -996,6 +996,19 @@ label.fl-ask-hint { display: block; }
 
 /* 4H/4T con tres estados (sospecha / tratada / descartada); pulsar el activo lo quita */
 .causas-list { padding: 2px 14px 12px; }
+.rt-h4 { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--amber); border-radius: 8px; background: var(--amber-bg); display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 14px; }
+.rt-h4[hidden] { display: none; }
+.rt-h4-h, .rt-h4-pie { grid-column: 1 / -1; }
+.rt-h4-h { font-weight: 700; }
+.rt-h4-h small { font-weight: 400; }
+.rt-h4-pie { font-size: var(--fs-xs); color: var(--text2); }
+.rt-h4-sub { font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.06em; color: var(--text2); margin: 4px 0; }
+.rt-h4-it { border-top: 1px solid var(--border); padding: 4px 0; }
+.rt-h4-it summary { cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.rt-h4-g { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: var(--fs-xs); background: var(--bg2); border: 1px solid var(--border); }
+.rt-h4-est { font-weight: 400; color: var(--text2); }
+.rt-h4-fl { margin: 4px 0 8px; padding-left: 20px; font-size: var(--fs-sm); line-height: 1.45; }
+.rt-h4-fl li { margin: 3px 0; }
 .causa-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .causa-row:last-child { border-bottom: 0; }
 .causa-txt { flex: 1 1 220px; font-size: var(--fs-sm); }
@@ -1481,6 +1494,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
     <div class="rt-ritmo" id="rt-ritmo">Ritmo: sin evaluar · soporte vital básico</div>
     <div class="rt-next" id="rt-next" aria-live="assertive"></div>
     <ol class="rt-flow" id="rt-flow" aria-label="Flujograma del ritmo actual"></ol>
+    <div class="rt-h4" id="rt-h4" hidden></div>
     <div class="rt-btns">
       <button class="rt-b" id="rt-b-inicio" data-a="inicio" onclick="rtAccion('inicio')">▶ Iniciar RCP</button>
       <button class="rt-b" id="rt-b-sva" data-a="sva" onclick="rtAccion('sva')">🩸 Acceso vascular + monitor</button>
@@ -1749,6 +1763,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 <script src="data/scales.js"></script>
 <script src="data/formulas.js"></script>
 <script src="data/protocols.js"></script>
+<script src="data/protocols-ped.js"></script>
 <script src="data/drugs.js"></script>
 <script src="data/infusions.js"></script>
 <script src="data/intubacion.js"></script>
@@ -2388,8 +2403,8 @@ function renderProtocols() {
     if (fa !== fb) return fb - fa;
     return (a.rank || 99) - (b.rank || 99);
   });
-  container.innerHTML = '<h2 class="section-title">🔀 Protocolos de actuación — códigos de activación primero, luego por relevancia clínica</h2>' +
-    sorted.map(p =>
+  /* p.ped: algoritmos pediátricos (SEUP, data/protocols-ped.js) en su propia sección, al final. */
+  const card = p =>
       '<details class="protocol-card">' +
         '<summary class="scale-header"><div>' +
           '<h3 class="scale-title">' + (p.codigo ? '🚨 ' : '') + p.title + '</h3>' +
@@ -2415,8 +2430,11 @@ function renderProtocols() {
           '</div>' : '') +
           (p.galeria ? '<div class="btn-row" style="padding:6px 0 0"><button class="btn" onclick="event.stopPropagation();openGaleria(\'' + p.id + '\')">🫀 Ver patrones IAM nuevos (OMI)</button></div>' : '') +
         '</div>' +
-      '</details>'
-    ).join('');
+      '</details>';
+  const ped = sorted.filter(p => p.ped);
+  container.innerHTML = '<h2 class="section-title">🔀 Protocolos de actuación — códigos de activación primero, luego por relevancia clínica</h2>' +
+    sorted.filter(p => !p.ped).map(card).join('') +
+    (ped.length ? '<h2 class="section-title" id="protocolos-ped">👶 Pediatría — algoritmos de la SEUP (Sociedad Española de Urgencias de Pediatría)</h2>' + ped.map(card).join('') : '');
   PROTOCOLS.forEach(p => { if (p.eval) calcProtoEval(p.id); if (p.flow) renderFlow(p.id); });
 }
 
@@ -3723,8 +3741,9 @@ const PCR_CAUSA_ESTADOS = [['sospecha', 'Sospecha'], ['tratada', 'Tratada'], ['d
 
 function renderPcrCausas() {
   pcrCausaEstado = {};
+  _rtH4Firma = '';
   document.getElementById('pcr-causas').innerHTML = _pcrCausasLista().map((c, i) =>
-    '<div class="causa-row" role="group" aria-label="' + _pcrCausaCorta(c) + '"><span class="causa-txt">' + c + '</span><span class="causa-ops">' +
+    '<div class="causa-row" role="group" aria-label="' + c.n + '"><span class="causa-txt"><b>' + c.n + '</b> — ' + c.r + '</span><span class="causa-ops">' +
       PCR_CAUSA_ESTADOS.map(([k, l]) => '<button class="causa-op ' + k + '" id="pcr-causa-' + i + '-' + k + '" aria-pressed="false" onclick="marcarCausaPcr(' + i + ', \'' + k + '\')">' + l + '</button>').join('') +
     '</span></div>'
   ).join('');
@@ -3732,11 +3751,16 @@ function renderPcrCausas() {
 
 function marcarCausaPcr(i, k) {
   if (pcrCausaEstado[i] === k) delete pcrCausaEstado[i]; else pcrCausaEstado[i] = k;
-  PCR_CAUSA_ESTADOS.forEach(([e]) => document.getElementById('pcr-causa-' + i + '-' + e).setAttribute('aria-pressed', pcrCausaEstado[i] === e ? 'true' : 'false'));
+  PCR_CAUSA_ESTADOS.forEach(([e]) => ['pcr-causa-', 'rt-causa-'].forEach(pre => {
+    const b = document.getElementById(pre + i + '-' + e);
+    if (b) b.setAttribute('aria-pressed', pcrCausaEstado[i] === e ? 'true' : 'false');
+  }));
+  const est = document.getElementById('rt-causa-' + i + '-est');
+  if (est) est.textContent = pcrCausaEstado[i] ? ' · ' + PCR_CAUSA_ESTADOS.find(x => x[0] === pcrCausaEstado[i])[1] : '';
 }
 
 /* Nombre corto de la causa (sin la pauta de tratamiento) para el informe y el Utstein. */
-function _pcrCausaCorta(c) { return c.split(' — ')[0].split(' (')[0]; }
+function _pcrCausaCorta(c) { return typeof c === 'string' ? c.split(' — ')[0].split(' (')[0] : c.n; }
 
 /* ['Sospecha: …', 'Tratada: …', 'Descartada: …'] solo con los grupos que tienen alguna. */
 function _pcrCausasGrupos() {
@@ -4254,6 +4278,32 @@ function _rtFlujo(T) {
   ];
 }
 
+/* 4H/4T en pantalla con ritmo no desfibrilable: cada causa como mini-flujograma (sospechar →
+   confirmar → tratar) con los mismos estados que la lista de comprobación (pcrCausaEstado).
+   Solo se repinta si cambia el modo, el peso o la visibilidad (rtRender corre cada segundo y
+   un repintado cerraría los desplegables abiertos). */
+let _rtH4Firma = '';
+function _rtH4() {
+  const box = document.getElementById('rt-h4');
+  const ver = !!(rt.t0 && !rt.rce && !rt.fin && rt.ritmo === 'nd');
+  const ped = _pcrEsPed(), p = ped ? _pcrPeso() : 0;
+  const firma = ver + '|' + ped + '|' + p;
+  if (firma === _rtH4Firma) return;
+  _rtH4Firma = firma;
+  box.hidden = !ver;
+  if (!ver) return;
+  const abiertos = new Set([...box.querySelectorAll('details[open]')].map(d => d.dataset.i));
+  const fila = (c, i) => '<details class="rt-h4-it" data-i="' + i + '"' + (abiertos.has(String(i)) ? ' open' : '') + '><summary><span class="rt-h4-g">' + c.g + '</span>' + c.n +
+    '<span class="rt-h4-est" id="rt-causa-' + i + '-est">' + (pcrCausaEstado[i] ? ' · ' + PCR_CAUSA_ESTADOS.find(x => x[0] === pcrCausaEstado[i])[1] : '') + '</span></summary>' +
+    '<ol class="rt-h4-fl"><li><b>Sospechar:</b> ' + c.s + '</li><li><b>Confirmar:</b> ' + c.c + '</li><li><b>Tratar:</b> ' + (typeof c.t === 'function' ? c.t(p) : c.t) + '</li></ol>' +
+    '<div class="causa-ops">' + PCR_CAUSA_ESTADOS.map(([k, l]) => '<button class="causa-op ' + k + '" id="rt-causa-' + i + '-' + k + '" aria-pressed="' + (pcrCausaEstado[i] === k) + '" onclick="marcarCausaPcr(' + i + ', \'' + k + '\')">' + l + '</button>').join('') + '</div></details>';
+  const L = _pcrCausasLista();
+  box.innerHTML = '<div class="rt-h4-h">🔎 No desfibrilable: buscar y tratar las 4H y 4T' + (ped && !p ? ' <small>(introduce el peso arriba para ver las dosis)</small>' : '') + '</div>' +
+    '<div class="rt-h4-col"><div class="rt-h4-sub">4H</div>' + L.map((c, i) => c.g === 'H' ? fila(c, i) : '').join('') + '</div>' +
+    '<div class="rt-h4-col"><div class="rt-h4-sub">4T</div>' + L.map((c, i) => c.g === 'T' ? fila(c, i) : '').join('') + '</div>' +
+    '<div class="rt-h4-pie">Ecografía solo por alguien experto y sin alargar las pausas. ERC 2025' + (ped ? ' (PLS)' : ' (ALS y circunstancias especiales)') + '.</div>';
+}
+
 /* Botones «✓ Hecho» de lo sugerido: cada tarea se acepta con la misma acción que su botón. */
 const RT_ACEPTAR = {
   inicio: [['inicio', '▶ Iniciar RCP']], sva: [['sva', '✓ Acceso + monitor puestos']],
@@ -4301,6 +4351,7 @@ function rtRender() {
   el('rt-reparada').hidden = !rt.fin || rt.fin.motivo !== 'rce';
   if (rt.fin) { el('rt-fin').hidden = true; el('rt-fin-txt').textContent = T[0].txt; }
   el('rt-b-sva').hidden = !!rt.tSva;
+  _rtH4();
   el('rt-b-via').hidden = !!rt.tVia;
 
   /* Próximos eventos (en gris) y lo ya hecho, lo último arriba. */
