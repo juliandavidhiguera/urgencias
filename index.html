@@ -776,6 +776,9 @@ label.fl-ask-hint { display: block; }
 .fl-form-l .num-in { display: block; width: 100%; min-height: 48px; margin-top: 6px; }
 .fl-msg { margin: 8px 0 0; padding: 12px 14px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue-bg); color: var(--text); font-weight: 600; line-height: 1.5; }
 .fl-sel { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 10px 12px; border: 1px solid var(--blue); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: var(--fs-base); }
+.fl-calc { margin: 6px 0; padding: 6px 10px; border-left: 3px solid var(--blue); background: var(--bg); font-size: .92em; }
+.fl-pdf { margin: 0 0 8px; } .fl-pdf summary { cursor: pointer; font-weight: 600; padding: 6px 0; } .fl-pdf img { display: block; width: 100%; max-width: 760px; height: auto; border: 1px solid var(--border, #ccc); border-radius: 6px; } .fl-pdf-a { display: inline-block; margin-top: 4px; }
+.fl-nota { display: block; width: 100%; box-sizing: border-box; margin: 4px 0 8px; padding: 8px 10px; border: 1px solid var(--border, #ccc); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: var(--fs-base); resize: vertical; }
 .fl-omi-img { display: block; max-width: 100%; max-height: 280px; margin: 4px 0 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
 .fl-farm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .fl-farm { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
@@ -2775,7 +2778,8 @@ function _flowShow(n, v, pid, nid) {
 
 /* n.escalas = ids de SCALES: botón para hacer la escala en el panel lateral sin salir del protocolo. */
 function _flowEscBtns(n, pid) {
-  return (n.galeria ? '<button class="fl-esc" onclick="openGaleria(\'' + pid + '\')">🫀 Ver los nuevos patrones de IAM con imagen</button>' : '') +
+  return (n.pcr ? '<button class="fl-esc" onclick="showTab(\'pcr\', document.getElementById(\'navbtn-pcr\'))">🫀 Abrir el protocolo de PCR (SVA)</button>' : '') +
+    (n.galeria ? '<button class="fl-esc" onclick="openGaleria(\'' + pid + '\')">🫀 Ver los nuevos patrones de IAM con imagen</button>' : '') +
     (n.escalas || []).map(id => {
     const sc = SCALES.find(x => x.id === id);
     return sc ? '<button class="fl-esc" onclick="abrirEscalaLateral(\'' + id + '\', this)">📊 Hacer la escala ' + sc.title + ' al lado</button>' : '';
@@ -2811,6 +2815,16 @@ function _flowFarmBtns(n, pid, nid) {
   }).join('') + '</div>';
 }
 
+/* n.nota = texto guía: caja libre bajo la pregunta para anotar la evolución. Solo en memoria (datos de
+   paciente); entra en «Copiar resumen» y se borra con «Empezar de nuevo». */
+const _flowNota = {};
+function _flowNotaHtml(n, pid, nid) {
+  if (!n.nota) return '';
+  const val = ((_flowNota[pid] || {})[nid] || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return '<label class="fl-ask-hint" for="fl-' + pid + '-nota-' + nid + '">Nota de evolución (no se guarda):</label>' +
+    '<textarea class="fl-nota" id="fl-' + pid + '-nota-' + nid + '" rows="3" placeholder="' + n.nota + '" oninput="(_flowNota[\'' + pid + '\'] || (_flowNota[\'' + pid + '\'] = {}))[\'' + nid + '\'] = this.value">' + val + '</textarea>';
+}
+
 function _flowResp(path) {
   const r = {};
   path.forEach(st => { if (st.o !== null) r[st.n] = st.o; });
@@ -2832,7 +2846,8 @@ function renderFlow(pid) {
     if (!n.q) return h + _flowEscBtns(n, pid);
     nq++;
     if (st.o !== null) {
-      return h + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta a la pregunta ' + nq + '">' +
+      const nt = n.nota && _flowNota[pid] && _flowNota[pid][st.n] ? '<div class="fl-help">📝 ' + _flowNota[pid][st.n].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>' : '';
+      return h + nt + '<button class="fl-done" onclick="flowBack(\'' + pid + '\',' + i + ')" aria-label="Cambiar la respuesta a la pregunta ' + nq + '">' +
         '<span class="fl-done-n">' + nq + '</span><span class="fl-done-q">' + n.q + '</span>' +
         '<span class="fl-done-a">✓ ' + n.opts[st.o].l + '</span><span class="fl-done-edit">cambiar</span></button>';
     }
@@ -2841,7 +2856,7 @@ function renderFlow(pid) {
       '<div class="fl-ask-n">Pregunta ' + nq + '</div>' +
       '<div class="fl-q" id="' + qid + '">' + n.q + '</div>' +
       (n.help ? '<div class="fl-help">' + (typeof n.help === 'function' ? n.help(v) : n.help) + '</div>' : '') +
-      _flowEscBtns(n, pid) +
+      _flowEscBtns(n, pid) + _flowNotaHtml(n, pid, st.n) +
       (n.desplegable
         ? '<label class="fl-ask-hint" for="' + qid + '-sel">Elige una opción:</label>' +
           '<select class="fl-sel" id="' + qid + '-sel" onchange="if (this.value !== \'\') flowGo(\'' + pid + '\',' + i + ',+this.value)">' +
@@ -2892,6 +2907,7 @@ function resetFlow(pid) {
   (p.flow.inputs || []).forEach(it => { const el = document.getElementById('fl-' + pid + '-' + it.k); if (el) el.value = ''; });
   delete _flowPath[pid];
   delete _flowExtra[pid];
+  delete _flowNota[pid];
   if (p.flow.reset) p.flow.reset();
   farmBorrarCaso(pid);
   renderFlow(pid);
@@ -2909,7 +2925,8 @@ function copyFlow(pid) {
   const lineas = (_flowPath[pid] || []).map(st => {
     const n = p.flow.nodes[st.n];
     const s = typeof n.show === 'function' ? n.show(v) : n.show;
-    return [s ? (n.t ? n.t + '\n' : '') + txt(s) : '', n.q && st.o !== null ? '• ' + txt(n.q) + ' → ' + txt(n.opts[st.o].l) : ''].filter(Boolean).join('\n');
+    const nota = (_flowNota[pid] || {})[st.n];
+    return [s ? (n.t ? n.t + '\n' : '') + txt(s) : '', n.q && st.o !== null ? '• ' + txt(n.q) + ' → ' + txt(n.opts[st.o].l) : '', nota ? 'Nota: ' + nota : ''].filter(Boolean).join('\n');
   }).filter(Boolean);
   (_flowExtra[pid] || []).forEach(k => {
     const it = p.flow.extras.items[k];
@@ -5210,6 +5227,12 @@ const FARM_ESQUEMAS = {
     return ['Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. <b>Incompatible con glucosa</b>: vía lavada con SF 0,9 %.',
       (mayor ? '<b>≥75 años: MEDIA DOSIS</b> → ' + _tnkFila(mg / 2, p) : _tnkFila(mg, p) + (edad ? '' : ' <b>Si tiene ≥75 años: media dosis, ' + _fx(mg / 2) + ' mg (' + _fx(mg / 10) + ' ml).</b>')),
       '10 ml de SF 0,9 % antes y después del bolo. Junto con la doble antiagregación y la anticoagulación del Codi IAM. Es el doble que la dosis del ictus.'];
+  },
+  'tnk-tep': (p) => {
+    const tabla = '&lt;60 kg 30 mg · 60–&lt;70 kg 35 mg · 70–&lt;80 kg 40 mg · 80–&lt;90 kg 45 mg · ≥90 kg 50 mg';
+    return ['<b>Solo si no hay alteplasa</b> (fuera de ficha en TEP; con el PERT y Farmacia). Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. <b>Incompatible con glucosa</b>: vía lavada con SF 0,9 %.',
+      p ? _tnkFila([30, 35, 40, 45, 50][_tnkTramo(p)], p) : 'Por tramos de peso: ' + tabla + '. <i>Introduce el peso.</i>',
+      '10 ml de SF 0,9 % antes y después del bolo.'];
   },
   'tnk-ictus': (p) => {
     if (!p) return ['Por tramos de peso (≈0,25 mg/kg, máx. 25 mg): &lt;60 kg 15 mg · 60–69 kg 17,5 mg · 70–79 kg 20 mg · 80–89 kg 22,5 mg · ≥90 kg 25 mg. <i>Introduce el peso.</i>'];
