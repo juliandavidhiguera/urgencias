@@ -471,13 +471,13 @@ window.SCALES = [
   info:'Lados alterados → <b>paciente inestable</b>: actuar antes de completar el diagnóstico (ABCDE, O₂ al 100 %, monitorizar) y derivar a urgencias hospitalarias desde Atención Primaria. En obstrucción de la vía aérea, mientras llega el traslado: abrir la vía aérea, aspirar secreciones, ventilar con mascarilla y bolsa si es preciso, posición semiincorporada, O₂ al 100 % y tratamiento de la causa. El TEP no sustituye a la evaluación ABCDE ni a las constantes: las orienta.',
   interp:function(s){return [
     ['low','Estable','TEP normal — completar ABCDE, constantes e historia'],
-    ['mid','Disfunción del SNC / problema sistémico','Solo apariencia: valorar hipoglucemia, intoxicación, postcrítico, infección del SNC, TCE; glucemia capilar'],
+    ['mid','Disfunción del Sistema Nervioso Central (SNC)','Solo apariencia: valorar hipoglucemia, intoxicación, postcrítico, infección del SNC, TCE; glucemia capilar'],
     ['mid','Dificultad respiratoria','Solo respiración: O₂ si precisa, posición cómoda, tratamiento según causa; reevaluar'],
     ['high','Fallo respiratorio','Apariencia + respiración: O₂ al 100 %, abrir y aspirar vía aérea, ventilar con bolsa y mascarilla si es preciso; traslado urgente'],
     ['mid','Shock compensado','Solo circulación: acceso vascular (IV/IO), monitorizar, valorar líquidos; reevaluar'],
     ['high','Shock descompensado','Apariencia + circulación: O₂ al 100 %, acceso IV/IO, bolo de líquidos, monitorizar; traslado urgente'],
-    ['high','Respiración + circulación alteradas','Combinación no descrita en la tabla clásica del TEP: tratar como inestable (ABCDE, O₂ al 100 %, acceso vascular) y reevaluar'],
-    ['high','Fallo cardiopulmonar','Los tres lados: soporte vital inmediato (vía aérea, ventilación, acceso IV/IO); valorar PCR (ver pestaña PCR, EPALS)']
+    ['high','Fallo respiratorio (o compromiso cardiopulmonar grave en transición)','Respiración + circulación con apariencia normal: O₂ al 100 %, abrir y aspirar vía aérea, ventilar con bolsa y mascarilla si es preciso, acceso IV/IO y monitorizar; reevaluar a menudo (puede evolucionar a fallo cardiopulmonar); traslado urgente'],
+    ['high','Fallo cardiopulmonar (riesgo inminente de paro)','Los tres lados: soporte vital inmediato (vía aérea, ventilación, acceso IV/IO); valorar PCR (ver pestaña PCR, EPALS)']
   ][s]}},
 
 {id:'gcsped', src:'James HE 1986 · Pediatr Ann · PMID 3951884 · uso en menores de 2 años: Borgialli DA 2016 (PECARN) · Acad Emerg Med · PMID 27197686', title:'Glasgow pediátrico', sub:'Nivel de conciencia en lactantes y niños preverbales (3–15)', badge:'red', tag:'Neuro', max:15, items:[
