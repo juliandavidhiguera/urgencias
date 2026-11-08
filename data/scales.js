@@ -117,8 +117,8 @@ window.SCALES = [
   {t:'chk', l:'Troponina cardiaca elevada (&gt; p99 del ensayo del laboratorio)', p:2},
   {t:'chk', l:'Disfunción del VD por ecocardiografía o angio-TC (VD/VI ≥1,0)', p:2},
   {t:'chk', l:'FC ≥110 lpm', p:1}],
-  info:'Solo en TEP confirmado con paciente normotenso. Complicaciones a 30 días = muerte por TEP, colapso hemodinámico o TEP recurrente. Estratifica el pronóstico; no indica por sí sola ingreso en UCI. Al incluir troponina y VD, para decidir entre B y C son preferibles PESI, sPESI o Hestia.',
-  interp:function(s){return s<=2?['low','Estadio I · 4,2 % a 30 días','Según el resto de indicadores (B o C1–C2)']:s<=4?['mid','Estadio II · 10,8 % a 30 días','Incluye troponina y/o VD: suele ser C2–C3. Planta con NEWS2 o monitor según subcategoría; evaluación por el PERT']:['high','Estadio III · 29,2 % a 30 días','Habitualmente C3: monitor continuo en observación, evaluación PERT prioritaria, reevaluación seriada; reperfusión solo si deterioro (D–E)']}},
+  info:'Solo en TEP confirmado con paciente normotenso. Complicaciones a 30 días = muerte por TEP, colapso hemodinámico o TEP recurrente. Estratifica el pronóstico; no indica por sí sola ingreso en UCI. Al incluir troponina y VD, usarla como escala de gravedad duplicaría esos indicadores: la gravedad la deciden PESI, sPESI y Hestia.',
+  interp:function(s){return s<=2?['low','Estadio I · 4,2 % a 30 días','Categoría habitual: B o C1–C2. Conducta según la categoría']:s<=4?['mid','Estadio II · 10,8 % a 30 días','Con sPESI 0: B* (no alta precoz); con gravedad elevada: C2–C3. Planta con NEWS2 o monitor según subcategoría; evaluación por el PERT']:['high','Estadio III · 29,2 % a 30 días','Habitualmente C2–C3 (PAS 90–100 o FC ≥110 ya elevan el sPESI): monitor continuo en observación, evaluación PERT prioritaria, reevaluación seriada; reperfusión solo si deterioro (D–E)']}},
 
 {id:'pesi', src:'Aujesky 2005 · PMID 16020800', title:'PESI original', sub:'TEP — clases I–V de mortalidad a 30 días', badge:'red', tag:'TEP', max:310, items:[
   {t:'num', l:'Edad (años) — suma su valor directo', u:'años', f:function(v){return v}},
