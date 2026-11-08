@@ -1141,7 +1141,7 @@ window.PROTOCOLS.push({ id:'seup-dolor', ped:true, title:'Dolor agudo en urgenci
         modNoInf: {
           farmacos: ['Metamizol', 'Tramadol'],
           t: 'Moderado no inflamatorio: metamizol y opioides menores', c: 'mid',
-          show: v => '<b>Metamizol</b> oral (&gt;3 meses o &gt;5 kg): <b>12,5–20 mg/kg</b>' + r(v, 12.5, 20, 2000, 0, 'mg') + ' cada 6 h (máx. 2 g/8 h y 6 g/día). IV/IM (&gt;3 meses): 12,5–20 mg/kg (el PDF lo expresa «/día»); dosis puntual de 40 mg/kg' + r(v, 40, 40, 2000, 0, 'mg') + '; máx. 2 g/8 h. Rectal: 1–3 años 250 mg · 3–11 años 500 mg · adolescentes 1 g, cada 6–8 h. Perfusión continua (&gt;1 año): 6,6 mg/kg/h' + r(v, 6.6, 6.6, null, 1, 'mg/h') + '.<br>' +
+          show: v => '<b>Metamizol</b> oral/IV/IM (&gt;3 meses o &gt;5 kg): <b>10–15 mg/kg/dosis</b>' + (v.edad >= 0 && v.edad < 1 ? '; con &lt;12 meses, <b>la mitad: 5–7,5 mg/kg/dosis</b>' + r(v, 5, 7.5, 2000, 0, 'mg') : r(v, 10, 15, 2000, 0, 'mg') + ' (&lt;12 meses: la mitad, 5–7,5 mg/kg/dosis)') + ' cada 6 h (máx. 2 g/8 h y 6 g/día; pauta del servicio). Dosis puntual de 40 mg/kg' + r(v, 40, 40, 2000, 0, 'mg') + '; máx. 2 g/8 h. Rectal: 1–3 años 250 mg · 3–11 años 500 mg · adolescentes 1 g, cada 6–8 h. Perfusión continua (&gt;1 año): 6,6 mg/kg/h' + r(v, 6.6, 6.6, null, 1, 'mg/h') + '.<br>' +
             '<b>Opioides menores</b>:<br>' +
             '• <b>Tramadol</b> &gt;12 años 50–100 mg cada 4–6 h (máx. 400 mg/día) · &lt;12 años (off-label) <b>1–2 mg/kg</b>' + r(v, 1, 2, null, 0, 'mg') + ' en dosis única.<br>' +
             '• <b>Codeína</b> oral/rectal solo &gt;12 años: <b>0,5–1 mg/kg</b>' + r(v, 0.5, 1, 60, 0, 'mg') + ' cada 6 h (máx. 60 mg/dosis o 240 mg/día).' +

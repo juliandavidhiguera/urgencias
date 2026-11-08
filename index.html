@@ -786,6 +786,7 @@ label.fl-ask-hint { display: block; }
 .lat-farm-h { font-weight: 700; color: var(--text); }
 .lat-farm-dil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lat-farm-res { margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: var(--fs-base); }
+.lat-farm-pauta { margin-top: 4px; background: var(--blue-bg); border-left: 3px solid var(--blue); }
 .lat-farm-esq { margin: 6px 0 0; padding-left: 20px; line-height: 1.5; }
 .lat-farm-esq li { margin-bottom: 4px; }
 .lat-farm-dosis { margin-top: 10px; }
@@ -1869,6 +1870,7 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea
 <script src="data/pcr.js"></script>
 <script src="data/fichas.js"></script>
 <script src="data/fichas-ped.js"></script>
+<script src="data/pautas-protocolo.js"></script>
 <script src="data/bibliografia.js"></script>
 <script>
 /* ==================================================================
@@ -5126,16 +5128,25 @@ function _latMostrar(box, titulo) {
 /* Medicación en el panel lateral: perfusión editable (dosis ↔ ml/h) cargada con el peso del
    flujograma y la dilución del protocolo, y botón a la ficha con el peso ya puesto. Cada fármaco
    (con su dilución) conserva lo que se ajuste mientras dure la sesión; no se guarda nada. */
+/* Peso tecleado en los fármacos de un protocolo sin campo de peso propio: se reutiliza en sus otros fármacos. */
+const _latPesoPid = {};
 function abrirFarmacoLateral(pid, nid, j, btn) {
-  const c = _flowFarm(pid, nid, j);
+  /* Copia: no se modifica el nodo. La pauta del protocolo (nodo o data/pautas-protocolo.js) va delante en la calculadora. */
+  const c = Object.assign({}, _flowFarm(pid, nid, j));
+  const PP = (window.PAUTAS_PROTOCOLO || {})[pid] || {}; /* «Fármaco@nodo» manda sobre «Fármaco» ('' = sin pauta en ese nodo) */
+  if (!c.pauta) { const t = PP[c.n + '@' + nid] !== undefined ? PP[c.n + '@' + nid] : PP[c.n]; if (t) c.pauta = t; }
+  const pr = pid && PROTOCOLS.find(x => x.id === pid), esPed = !!(pr && (pr.ped || pid === 'epals'));
+  c._adulto = !!pr && !esPed; /* en adultos, la calculadora no ofrece las pautas «Niños ·» */
   const r = _farmResolver(c);
   if (btn) _latOrigen = btn;
-  const pesoEl = document.getElementById('fl-' + pid + '-peso') || document.getElementById('pe-' + pid + '-peso'); // con evaluador, el peso está en él
-  const peso = pesoEl ?parseFloat(String(pesoEl.value).replace(',', '.')) : NaN;
+  const pesoEl = document.getElementById('fl-' + pid + '-peso') || document.getElementById('pe-' + pid + '-peso') || // con evaluador, el peso está en él
+    (pid === 'epals' ? document.getElementById('pcr-peso') : null); // EPALS se pinta en la pestaña PCR
+  let peso = pesoEl ? parseFloat(String(pesoEl.value).replace(',', '.')) : NaN;
+  if (!pesoEl && _latPesoPid[pid]) peso = parseFloat(String(_latPesoPid[pid]).replace(',', '.'));
   const d = r.inf;
   const mg = c.mg != null ? c.mg : d ? d.mg : null;
   const vol = c.vol != null ? c.vol : d ? d.vol : null;
-  const key = 'latf-' + (c.n + '-' + mg + '-' + vol + (c.min != null ? '-r' + c.min + '-' + c.max : '') + (c.esquema ? '-' + c.esquema : '')).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
+  const key = 'latf-' + (c.n + '-' + mg + '-' + vol + (c.min != null ? '-r' + c.min + '-' + c.max : '') + (c.esquema ? '-' + c.esquema : '') + (c.pauta ? '-p' + pid + (PP[c.n + '@' + nid] !== undefined ? '-' + nid : '') : c._adulto ? '-ad' : '')).normalize('NFD').replace(/[^A-Za-z0-9]+/g, '');
   const body = document.getElementById('lat-body');
   let box = document.getElementById(key);
   if (!box) {
@@ -5145,6 +5156,7 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
     box._cfg = c;
     box.innerHTML = _farmCardHTML(key, c, r);
     body.appendChild(box);
+    box.addEventListener('input', e => { if (/-b?peso$/.test(e.target.id) && box.dataset.pid) _latPesoPid[box.dataset.pid] = e.target.value; });
     if (d) {
       if (!isNaN(peso) && peso > 0) document.getElementById(key + '-peso').value = peso;
       const ini = c.dosis != null ? c.dosis : d.doseMin;
@@ -5159,9 +5171,10 @@ function abrirFarmacoLateral(pid, nid, j, btn) {
   const bp = document.getElementById(key + '-bpeso');
   if (bp && !isNaN(peso) && peso > 0 && _n(key + '-bpeso') !== peso) bp.value = peso;
   if (bp) {
-    const sel = document.getElementById(key + '-bop'), ops = box._bolo || (box._bolo = _farmBoloOps(r.ficha));
-    const pr = pid && PROTOCOLS.find(x => x.id === pid), iPed = ops.findIndex(o => o.ped);
-    if (sel && pr && pr.ped && iPed >= 0 && !(ops[+sel.value] || {}).ped) sel.value = iPed;
+    const sel = document.getElementById(key + '-bop'), ops = box._bolo || (box._bolo = _farmBoloOps(r.ficha, c));
+    const iPed = ops.findIndex(o => o.ped), actual = sel ? ops[+sel.value] || {} : {};
+    /* Con pauta del protocolo, esa (opción 0). Si no, en niños la pediátrica. */
+    if (sel && esPed && !actual.prot && iPed >= 0 && !actual.ped) sel.value = iPed;
     _farmBoloCalc(key);
   }
   if (pid) farmElegir(pid, nid, c, box);
@@ -5222,6 +5235,7 @@ function _farmCardHTML(key, c, r) {
   const u = d ? (d.unitLabel || 'mg') : '';
   let h = '<div class="scale-card lat-farm"><div class="scale-header"><div><h3 class="scale-title">' + c.n + '</h3>' +
     (r.ficha && r.ficha.subtitulo ? '<div class="scale-subtitle">' + r.ficha.subtitulo + '</div>' : '') + '</div></div><div class="scale-body">';
+  if (c.pauta) h += '<div class="lat-farm-h">📌 Dosis de este protocolo</div><div class="lat-farm-res lat-farm-pauta">' + _escHtml(c.pauta).replace(/\n/g, '<br>') + '</div>';
   if (d) {
     const fld = (id, l, extra) => '<div class="field"><label for="' + key + '-' + id + '">' + l + '</label><input type="number" id="' + key + '-' + id + '" min="0" step="any" inputmode="decimal" oninput="_farmCalc(\'' + key + '\',\'' + extra + '\')"></div>';
     h += '<div class="lat-farm-h">💧 Perfusión continua</div>' +
@@ -5245,7 +5259,7 @@ function _farmCardHTML(key, c, r) {
       h += '<div class="scale-note">Bolo o dosis única: dosis y vía en la ficha. Si la ficha da la dosis por kilo, su calculadora se abre con el peso del paciente.</div>';
     }
   }
-  h += _farmBoloHTML(key, r.ficha, !!d);
+  if (!c.esquema) h += _farmBoloHTML(key, r.ficha, !!d, c); /* con esquema (fibrinolíticos), lo calcula el esquema */
   if (r.ficha) {
     h += '<button class="btn lat-farm-ficha" onclick="_farmFicha(\'' + key + '\',\'' + r.ficha.file.replace(/'/g, "\\'") + '\')">📄 Ver la ficha</button>';
   }
@@ -5254,13 +5268,17 @@ function _farmCardHTML(key, c, r) {
 
 /* Calculadora de bolo en el panel lateral: las mismas pautas por kilo que la calculadora de la ficha
    (parseDosisPorKg sobre el texto de la ficha), con ids propios de la caja para no chocar con la ficha. */
-function _farmBoloOps(ficha) {
-  if (!ficha) return [];
-  return _fichaOpsTodas(ficha).filter(o => !o.esPerfusion);
+function _farmBoloOps(ficha, c) {
+  const prot = c && c.pauta ? parseDosisPorKg(c.pauta).filter(o => !o.esPerfusion)
+    .map(o => Object.assign(o, { indicacion: 'Protocolo · ' + (o.indicacion || 'dosis'), prot: true })) : [];
+  /* El protocolo da dosis fija (sin «/kg»): sin calculadora, para que no proponga una pauta por kilo de otra indicación. */
+  if (c && c.pauta && !prot.length) return [];
+  return prot.concat(ficha ? _fichaOpsTodas(ficha).filter(o => !o.esPerfusion && !(c && c._adulto && o.ped)) : []);
 }
-function _farmBoloHTML(key, ficha, conPerfusion) {
-  const ops = _farmBoloOps(ficha);
+function _farmBoloHTML(key, ficha, conPerfusion, c) {
+  const ops = _farmBoloOps(ficha, c);
   if (!ops.length) return '';
+  ficha = ficha || {};
   const pres = parsePresentacion(ficha.presentacion);
   const ud0 = pres ? pres.ud : _fichaUd(ops[0].unidad);
   const todasMl = ops.every(o => _fichaUd(o.unidad) === 'ml');
@@ -5278,7 +5296,7 @@ function _farmBoloHTML(key, ficha, conPerfusion) {
 }
 function _farmBoloCalc(key) {
   const box = document.getElementById(key);
-  const ops = box._bolo || (box._bolo = _farmBoloOps(_farmResolver(_farmCfgDeCaja(box)).ficha));
+  const ops = box._bolo || (box._bolo = _farmBoloOps(_farmResolver(_farmCfgDeCaja(box)).ficha, _farmCfgDeCaja(box)));
   const sel = document.getElementById(key + '-bop'), res = document.getElementById(key + '-bres');
   if (!sel || !ops.length) return;
   const o = ops[+sel.value] || ops[0], peso = _n(key + '-bpeso');
@@ -5362,7 +5380,8 @@ function _farmCopiar(key) {
 
 function _farmFicha(key, file) {
   const pesoEl = document.getElementById(key + '-peso');
-  let peso = pesoEl ? pesoEl.value : '';
+  const bpEl = document.getElementById(key + '-bpeso');
+  let peso = (pesoEl && pesoEl.value) || (bpEl && bpEl.value) || '';
   if (!peso) { // fármaco sin perfusión: el peso del flujograma que abrió el panel
     const fl = _latOrigen && _latOrigen.closest('.fl-box');
     const inp = fl && fl.querySelector('input[id$="-peso"]');

@@ -566,7 +566,7 @@ window.PROTOCOLS = [
           {
             farmacos: ANTI,
             l: 'Antiagregación y anticoagulación', t: 'Antiagregación y anticoagulación (SCASEST)', c: 'mid',
-            show: '<b>AAS</b>: carga de 150–300 mg VO (o 75–250 mg IV) y después 75–100 mg/24 h.<br>' +
+            show: '<b>AAS</b> (oral): carga de 150–300 mg VO y después 75–100 mg/24 h. Si no puede tomar VO: <b>acetilsalicilato de lisina IV</b>, dosis equivalente a 75–250 mg de AAS (450 mg de acetilsalicilato de lisina ≈ 250 mg de AAS).<br>' +
               '<b>Enoxaparina</b>: 1 mg/kg/12 h SC con el peso real; con ClCr 15–30 ml/min, 1 mg/kg/24 h; con ClCr &lt;15, heparina sódica.<br>' +
               '<b>Fondaparinux</b>: 2,5 mg/24 h SC (no con FG &lt;20 ml/min según la ESC; la ficha técnica es más restrictiva). No sirve como único anticoagulante durante la ICP.<br>' +
               '<b>Heparina sódica</b>: si se va a hacer coronariografía inmediata o hay insuficiencia renal grave.<br><span class="pe-nota">ESC 2023.</span>'
