@@ -112,6 +112,14 @@ window.SCALES = [
   {t:'chk', l:'SpO₂ <90%', p:1}],
   interp:function(s){return s===0?['low','Bajo riesgo','Mortalidad 30 d ~1% — valorar alta precoz (criterios Hestia)']:['high','Alto riesgo','Mortalidad 30 d ~10% — ingreso + troponina y función VD']}},
 
+{id:'bova', src:'Bova C, Sanchez O, Prandoni P, et al. Eur Respir J 2014;44(3):694-703 · doi:10.1183/09031936.00006114 · Protocolo TEP Campdevànol v2.0, anexo A7', title:'Bova', sub:'TEP confirmado en normotensos — riesgo de complicación a 30 días', badge:'red', tag:'TEP', max:7, items:[
+  {t:'chk', l:'PAS entre 90 y 100 mmHg', p:2},
+  {t:'chk', l:'Troponina cardiaca elevada (&gt; p99 del ensayo del laboratorio)', p:2},
+  {t:'chk', l:'Disfunción del VD por ecocardiografía o angio-TC (VD/VI ≥1,0)', p:2},
+  {t:'chk', l:'FC ≥110 lpm', p:1}],
+  info:'Solo en TEP confirmado con paciente normotenso. Complicaciones a 30 días = muerte por TEP, colapso hemodinámico o TEP recurrente. Estratifica el pronóstico; no indica por sí sola ingreso en UCI. Al incluir troponina y VD, para decidir entre B y C son preferibles PESI, sPESI o Hestia.',
+  interp:function(s){return s<=2?['low','Estadio I · 4,2 % a 30 días','Según el resto de indicadores (B o C1–C2)']:s<=4?['mid','Estadio II · 10,8 % a 30 días','Incluye troponina y/o VD: suele ser C2–C3. Planta con NEWS2 o monitor según subcategoría; evaluación por el PERT']:['high','Estadio III · 29,2 % a 30 días','Habitualmente C3: monitor continuo en observación, evaluación PERT prioritaria, reevaluación seriada; reperfusión solo si deterioro (D–E)']}},
+
 {id:'pesi', src:'Aujesky 2005 · PMID 16020800', title:'PESI original', sub:'TEP — clases I–V de mortalidad a 30 días', badge:'red', tag:'TEP', max:310, items:[
   {t:'num', l:'Edad (años) — suma su valor directo', u:'años', f:function(v){return v}},
   {t:'chk', l:'Sexo masculino', p:10},

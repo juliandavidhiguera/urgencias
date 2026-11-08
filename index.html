@@ -5200,7 +5200,7 @@ const FARM_ESQUEMAS = {
   'alteplasa-tep': (p) => {
     const tot = p && p < 65 ? 1.5 * p : 100, resto = tot - 10;
     return ['<b>Con pulso (TEP de alto riesgo):</b> reconstituir a 1 mg/ml; <b>bolo de 10 mg (10 ml) en 1–2 min</b> + <b>' + _fx(resto) + ' mg en 2 h con bomba = ' + _fx(resto / 2) + ' ml/h</b>' + (p && p < 65 ? ' (&lt;65 kg: total 1,5 mg/kg = ' + _fx(tot) + ' mg)' : p ? '' : ' (con &lt;65 kg el total no supera 1,5 mg/kg: introduce el peso)') + '.',
-      '<b>En parada cardiaca:</b> <b>50 mg en bolo IV en 2 min</b>; si no hay RCE a los 15–30 min, segunda dosis de 50 mg (máx. 100 mg). Mantener la RCP 60–90 min tras la lisis.',
+      '<b>En parada cardiaca (ERC 2025):</b> <b>50 mg en bolo IV</b>, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg). Mantener la RCP ≥60–90 min tras la lisis.',
       'Suspender la heparina durante la perfusión; al acabar, SF 0,9 % al mismo ritmo.'];
   },
   'tnk-iam': (p, edad) => {
