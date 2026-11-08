@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-08 | **Sesion #:** 24 | **Rama:** main | **HEAD:** `5e66213` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-08 | **Sesion #:** 24 | **Rama:** main | **HEAD:** `ba7e859` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -66,6 +66,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Modificado (`5e66213`), pautas del servicio dadas por el usuario: **metamizol** 10–15 mg/kg/dosis y en <12 meses la mitad (`protocols-ped.js` nodo `modNoInf` calcula la mitad si `v.edad < 1`; `fichas-ped.js`; `pautas-protocolo.js`); **AAS solo VO**, la via IV es el **acetilsalicilato de lisina** (`protocols.js` dolor toracico: equivalente a 75–250 mg de AAS, 450 mg de lisina ≈ 250 mg de AAS). **Adrenalina**: cada protocolo mantiene su propia dosis/max (usuario: «usar la dosis de la adrenalina segun cada protocolo»)
 - Sin cambiar (no mencionados por el usuario): metamizol dosis puntual 40 mg/kg, rectal y perfusion; tramadol sin via en su protocolo; «Ver la ficha» recibe el peso pero no preselecciona la pauta del protocolo; farmacos sin dosis en su protocolo (noradrenalina, dobutamina, vasopresina, toxicos SEUP, varios de dolor toracico) muestran las pautas de la ficha
 - Usuario: probado en movil (dosis del protocolo en las fichas), va bien
+- Modificado (`ba7e859`): `data/scales.js` `tep-ped` con la tabla del usuario: solo apariencia = «Disfuncion del Sistema Nervioso Central (SNC)», los tres = «Fallo cardiopulmonar (riesgo inminente de paro)», respiracion + circulacion con apariencia normal = «Fallo respiratorio (o compromiso cardiopulmonar grave en transicion)». Verificado con node las 8 combinaciones. Cierra #20
 - Archivadas en `docs/HANDOFF_ARCHIVE.md` las sesiones 14–19
 
 ### Sesion 23 - 2026-11-07
@@ -124,7 +125,6 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 | 19 | (NO hacer todavia, decision del usuario 2026-11-07) Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
-| 20 | Ajustar los signos del TEP a la Fig. 1 / Tabla I de la fuente del usuario (no venian en el texto pegado) | `data/scales.js` (`tep-ped`) | P3 | Usuario (pegar la tabla) | Etiquetas iguales a su documento |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |
@@ -209,4 +209,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Sin tarea abierta: preguntar al usuario. Pendiente de su parte: tabla del Triangulo de Evaluacion Pediatrica (#20) y corregir en su Word del TEP la alteplasa en PCR.
+Sin tarea abierta: preguntar al usuario. Pendiente de su parte: corregir en su Word del TEP la alteplasa en PCR.
