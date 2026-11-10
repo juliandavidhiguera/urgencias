@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-10 | **Sesion #:** 25 | **Rama:** main | **HEAD:** `c680509` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 26 | **Rama:** main | **HEAD:** `40c10f7` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -42,7 +42,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | `codigos/*.pdf` + `codigos/Fitxa_resum_codis_activacio.md` | Documentos fuente de los codigos de activacion (IAM, ictus, PPT, sepsia, riesgo suicidio) — referencia, no se parsean a JS | ESTABLE |
 | `codigos/patrones iam nuevos/*.jpg` | Galeria de patrones ECG de oclusion coronaria (OMI) usada en tab codi-IAM | ESTABLE |
 | `medicamentos/*.md` (75 archivos) | Texto fuente en catalan extraido de PDF de Guies Cliniques — input de `parse_fichas.js` | ESTABLE (fuente, no se edita a mano salvo error de OCR) |
-| `sw.js` | Service worker network-first, `CACHE='urg-v77'`, precachea tambien `codigos/*.pdf`, `protocolos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
+| `sw.js` | Service worker network-first, `CACHE='urg-v78'`, precachea tambien `codigos/*.pdf`, `protocolos/*.pdf` y `codigos/patrones iam nuevos/*.jpg` como respaldo offline; al relevar a un SW anterior recarga las pestanas abiertas | ESTABLE — subir `CACHE` solo si cambia `ASSETS` o el propio `sw.js` |
 | `data/pautas-protocolo.js` | `window.PAUTAS_PROTOCOLO[pid]`: pauta de cada farmaco segun el texto de su protocolo (126 entradas, 15 protocolos, cita en comentario); `Farmaco@nodo` manda sobre `Farmaco`, `''` = sin pauta en ese nodo | ESTABLE |
 | `Calculadora_Index_Fragil_VIG.md` | Plantilla original (catalan) del Index Fragil-VIG, trackeada como referencia | ESTABLE |
 
@@ -60,6 +60,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 26 - 2026-11-11
+- Modificado (`40c10f7`): `tep-agudo` segun **Protocolo TEP v3.0 clinica** (`Downloads/TEP_Campdevanol_v3.0_clinica_vista_previa.pdf`, reorganiza v2.1 sin cambio de criterio). Tenecteplasa = fibrinolitico disponible hoy (alteplasa de eleccion pendiente de stock): primero en `LISIS`, evaluador calcula mg por peso real (misma dosis en PCR), con TNK suspender perfusion de HNF; `pautas-protocolo.js` y `FARM_ESQUEMAS['tnk-tep']` (index.html) actualizados. HUV → CHV/Vic en todo el TEP. Criterios ya cerrados: parar HNF con alteplasa = criterio CHV; lisis local D2 sin nota; C3 estable = discrepancia abierta. Nuevos nodos del flujograma 4: `trasCrit` (desde planta), `pertD` (llamada PERT ≤30 min), `optim` (A-B-C + pregunta PERT catéter/ECMO → `clinic`/`vic`), `SALIR` (SBAR + durante el traslado + plan de desvio). Extra nuevo «Red flags y No hacer»; recursos, R y checklist actualizados.
+- Anadido: `protocolos/Flujograma4_TEP_Traslado_Campdevanol.jpg` (imagen del anexo I pag. 9 del PDF v3.0, = PNG del usuario) y `.pdf` (generado con pymupdf; el `Flujograma4_...pdf` de Descargas era una version anterior con TNK «util si el traslado no admite perfusion»), `Protocolo_TEP_Campdevanol_v3.pdf` (boton docs). Eliminado `Protocolo_TEP_Campdevanol_v2.pdf`. `sw.js` `urg-v78`.
+- Verificado: Chrome headless 5650 caminos, 0 errores JS, E1 72 kg → TNK 40 mg, PDFs/JPG 200; Chrome del usuario (nodo optim).
+- Pendiente: flujogramas 1–3 de la v3.0 no sustituidos (sigue la imagen v1.0_1); solo estan dentro del PDF completo.
 
 ### Sesion 25 - 2026-11-10
 - Modificado (`c680509`): `epoc-agudizado` segun **Protocolo SAE v3.0 clinica** (anexo flujograma v2.4; el usuario aporto v2.3 + imagen del v2.4, se uso el v3.0 que coincide con el flujograma). Roma: GRAVE solo con PaCO2 >45 y pH <7,35 (PaO2 <=60 sin acidosis = moderada). Quitados gravedad GesEPOC 2021 y riesgo basal (items `disAct`, `fev1`, `mmrc`, `exac`) y la escala DECAF del selector; DECAF calculado en el evaluador (`emrcd`, `eos`, `consol`, `fa` + pH): <=2 planta, >=3 valorar HUV. Antibioticos v3.0 (Pseudomonas pip-tazo/cefepima, alternativas cipro/levo; azitro en leve; ajuste renal si `fg` <60). MgSO4 2 g IV (evitar FG <30), enoxaparina 40 mg (20 si FG <30), pauta pMDI de planta, tipos A/B/C con pH >7,35 y FiO2 35 %, planta/HUV/alta v3.0, extras «Situaciones especiales» y «No hacer».
