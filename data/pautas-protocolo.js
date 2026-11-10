@@ -73,13 +73,18 @@ window.PAUTAS_PROTOCOLO = {
   'Salbutamol': '• Nebulizado con aire (NEB): 2,5–5 mg cada hora × 2–3, después cada 2–4 h\n• Alternativa MDI con cámara (inh): 400–600 mcg (4–6 pulsaciones), misma pauta', // nodo trat: «salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE» · «MDI con cámara, salbutamol 400–600 µg (4–6 pulsaciones)»
   'Bromuro de ipratropio': '• Nebulizado con aire (NEB): 0,5 mg cada hora × 2–3, después cada 2–4 h\n• Alternativa MDI con cámara (inh): 80–120 mcg, misma pauta', // nodo trat: «ipratropio 0,5 mg nebulizados con AIRE» · «ipratropio 80–120 µg con la misma pauta»
   'Metilprednisolona': '• Si no tolera la vía oral (IV): 40 mg', // nodo trat: «metilprednisolona 40 mg IV si no tolera la vía oral»
+  'Sulfato de magnesio': '• Sin respuesta al tratamiento inicial (IV en 20 min): 2 g, dosis única; evitar si FG <30', // protocolo SAE v3.0, tabla 3 · nodo trat
+  'Enoxaparina': '• Profilaxis si ingresa (SC): 40 mg cada 24 h\n• FG <30 (SC): 20 mg cada 24 h', // protocolo SAE v3.0 · nodos trat y planta
 },
 'asma-crisis': {
   'Adrenalina': '• Anafilaxia (IM): 0,5 mg (1 mg/ml) en el vasto lateral, repetible cada 5–15 min', // nodo anafil: «<b>Adrenalina 0,5 mg IM</b> (1 mg/mL) en el vasto lateral, repetible cada 5–15 min»
   'Salbutamol': '• Crisis no grave (inh, MDI + cámara): 4–10 inh (100 mcg/inh) cada 20 min en la 1.ª hora\n• Crisis grave (inh, MDI + cámara): 4–10 inh cada 10–15 min en la 1.ª hora\n• Crisis grave (NEB): 2,5–5 mg cada 20 min\n• Crisis vital (NEB continua): 10–15 mg/h\n• Rescate en crisis refractaria, con acuerdo de UCI (IV): 200 mcg en 30 min, después perfusión', // nodo noGrave: «MDI + cámara 4–10 inh (100 µg/inh) cada 20 min» · nodo grave: «4–10 inh de salbutamol … cada 10–15 min … o NEB cada 20 min: salbutamol 2,5–5 mg» · nodo muyGrave: «NEB continua: salbutamol 10–15 mg/h» · nodo respC: «200 µg en 30 min → 0,1–0,2 µg/kg/min»
   'Bromuro de ipratropio': '• Crisis grave (inh, MDI + cámara): 4–8 inh (20 mcg/inh) cada 10–15 min en la 1.ª hora\n• Crisis grave (NEB): 0,5 mg cada 20 min\n• Crisis vital (NEB): 0,5 mg con la NEB continua de salbutamol', // nodo grave: «4–8 inh de ipratropio (20 µg/inh) cada 10–15 min … NEB cada 20 min: … ipratropio 0,5 mg» · nodo muyGrave: «salbutamol 10–15 mg/h + ipratropio 0,5 mg»
   'Budesonida': '• Crisis grave, 1.ª hora (NEB): 0,5 mg cada 20 min\n• Crisis grave, 1.ª hora (inh, MDI + cámara): 4 inh × 200 mcg cada 10–15 min', // nodo grave: «budesonida NEB 0,5 mg cada 20 min, o … budesonida 4 inh × 200 µg MDI + cámara cada 10–15 min»
-  'Hidrocortisona': '• Crisis vital (IV): 250 mg\n• Crisis grave si no tolera la VO (IV): 100–200 mg', // nodo muyGrave: «<b>Hidrocortisona 250 mg IV</b> (SEMES)» · nodo grave: «hidrocortisona 100–200 mg IV si no tolera la VO»
+  'Hidrocortisona': '• Crisis vital (IV): 250 mg', // nodo muyGrave: «<b>Hidrocortisona 250 mg IV</b> (SEMES)»
+  'Metilprednisolona': '• Crisis grave si no tolera la VO (IV): 40 mg\n• Ingreso en planta (IV): 20–40 mg cada 8–12 h', // protocolo v3.2, tabla 4 · nodos grave y planta
+  'Ketamina': '• Inducción de la IOT (IV): 1–2 mg/kg', // protocolo v3.2, 6.3 · nodo iot
+  'Rocuronio': '• Inducción de la IOT (IV): 1–1,2 mg/kg', // protocolo v3.2, 6.3 · nodo iot
   'Sulfato de magnesio': '• Crisis vital, ya (IV en 20 min): 2 g en 50–100 ml de SSF, dosis única\n• Crisis grave sin mejoría en 1 h o respuesta B/C (IV en 20 min): 2 g, dosis única', // nodo muyGrave: «sulfato de magnesio 2 g IV</b> en 50–100 mL de SSF en 20 min, dosis única» · nodo grave/respB: «sulfato de magnesio 2 g IV en 20 min»
 },
 'tep-agudo': {
