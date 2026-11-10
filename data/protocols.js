@@ -2226,9 +2226,9 @@ window.PROTOCOLS = [
   {type:'info', text:'Al alta: siempre con GCI (MART preferente), prednisona 0,5–1 mg/kg de peso ideal VO (máx. 50 mg) 5–7 días sin descenso, técnica inhalatoria y plan escrito, AP en ~7 días, Neumología/Alergología <2 semanas si crisis vital, embarazo o anafilaxia. Vacunas: gripe, neumococo, COVID-19; VRS ≥65 años'}],
   src:'Protocolo Asma en Urgencias Hospital de Campdevànol v3.2 (nov 2026) y flujograma v1.1 · GEMA 5.5 (2025) · GINA 2026 · SEMES/REUE 2026: Piñera Salmerón P, Rev Esp Urg Emerg 2026;5:134-43, doi:10.55633/s3me/REUE014.2026 · ALAT-SEPAR 2025: Stok AM, Open Respir Arch 2025;7:100469, doi:10.1016/j.opresp.2025.100469 · Mg IV: Kew 2014, Cochrane CD010909 · GALAXIA 2022 · GINA (Reddel 2021, PMID 34658302) · ERS/EAACI 2019 (Bourdin, PMID 31467120) · 3Mg (Goodacre 2014, PMID 24731521) · Budesonida NEB a dosis altas (Kornthatchapong 2024, PMID 39694823)'},
 
-{id:'tep-agudo', title:'TEP agudo', sub:'Diagnóstico en una sola vía, categoría A–E (AHA/ACC 2026), anticoagulación, fibrinólisis local y traslado (protocolo de Campdevànol v2.0)', badge:'red', tag:'Crítico', rank:12.7,
+{id:'tep-agudo', title:'TEP agudo', sub:'Diagnóstico en una sola vía, categoría A–E (AHA/ACC 2026), anticoagulación, fibrinólisis local y traslado (protocolo de Campdevànol v3.0)', badge:'red', tag:'Crítico', rank:12.7,
   flujograma:'protocolos/Flujograma_TEP_Campdevanol.pdf',
-  docs:[{l:'📄 Protocolo completo v2.0 (PDF)', f:'protocolos/Protocolo_TEP_Campdevanol_v2.pdf'}],
+  docs:[{l:'📄 Protocolo completo v3.0 (PDF)', f:'protocolos/Protocolo_TEP_Campdevanol_v3.pdf'}, {l:'🚑 Flujograma 4 · Traslado (PDF)', f:'protocolos/Flujograma4_TEP_Traslado_Campdevanol.pdf'}],
   eval:{
     /* Sin desplegable de escalas: Wells, Ginebra, PERC, YEARS, PESI, sPESI, Hestia y Bova se calculan con estos
        mismos datos, para no preguntar dos veces la edad, la FC, el cáncer, los antecedentes, etc. */
@@ -2381,6 +2381,8 @@ window.PROTOCOLS = [
       const enox = pesoOk ? P(1) + ' mg' : '1 mg/kg';
       const enoxTxt = has(renal) && renal < 15 ? 'ClCr &lt;15: <b>HNF</b> (HBPM contraindicada)' : has(renal) && renal < 30 ? '<b>Enoxaparina ' + enox + ' SC cada 24 h</b> (ClCr 15–30)' : '<b>Enoxaparina ' + enox + ' SC cada 12 h</b> (peso real, sin tope fijo)';
       const hnf = '<b>HNF</b> bolo 80 U/kg' + (pesoOk ? ' (' + P(80) + ' U)' : '') + ' IV + perfusión 18 U/kg/h' + (pesoOk ? ' (' + P(18) + ' U/h = ' + (v.peso * 0.18).toFixed(1).replace('.', ',') + ' mL/h con 25.000 U en 250 mL SF, 100 U/mL)' : ' (25.000 U en 250 mL SF = 100 U/mL; 70 kg → 12,6 mL/h)') + ', peso real; topes solo si los fija el nomograma local; TTPa a las 6 h y tras cada cambio (rango del laboratorio, ≈1,5–2,5 × control); Hb y plaquetas diarias';
+      const tnkMg = pesoOk ? [30, 35, 40, 45, 50][v.peso < 60 ? 0 : v.peso < 70 ? 1 : v.peso < 80 ? 2 : v.peso < 90 ? 3 : 4] : null;
+      const tnkTxt = '<b>tenecteplasa</b> (disponible actualmente; fuera de ficha) bolo IV único en 5–10 s por peso real' + (pesoOk ? ': <b>' + tnkMg + ' mg</b>' : ' (&lt;60 kg 30 mg · 60–69 kg 35 · 70–79 kg 40 · 80–89 kg 45 · ≥90 kg 50 mg)');
       const altStd = pesoOk && v.peso < 65 ? 'total máx. ' + Math.round(v.peso * 1.5) + ' mg (1,5 mg/kg, bolo incluido): 10 mg en bolo + ' + (Math.round(v.peso * 1.5) - 10) + ' mg en 2 h' : '100 mg IV en 2 h: 10 mg en bolo (1–2 min) + 90 mg en 2 h' + (pesoOk ? '' : ' (&lt;65 kg: máx. 1,5 mg/kg total, bolo incluido)');
       if (v.tih) t.push('<b>TIH previa:</b> evitar HNF y HBPM → anticoagulante no heparínico.');
       if (v.sangr && cat !== 'E1' && cat !== 'E2') t.push('<b>Sangrado activo / contraindicación absoluta de anticoagular:</b> suspender la anticoagulación; filtro de VCI recuperable en casos seleccionados y reevaluar a diario.');
@@ -2388,14 +2390,13 @@ window.PROTOCOLS = [
       if (!confirmado && wells > 6) t.push('Probabilidad alta: si hay demora de imagen y el riesgo hemorrágico es aceptable, ' + enoxTxt + ' empírica.');
       if (cat === 'E1' || cat === 'E2') {
         t.push(hnf.replace(' + perfusión', ' en cuanto se sospecha; perfusión') + '.');
-        if (cat === 'E2') t.push('<b>Si está en PCR — alteplasa (ERC 2025): 50 mg IV en bolo, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg' + (pesoOk ? ' (' + Math.min(100, P(0.6)) + '–' + Math.min(100, P(1)) + ' mg)' : '') + ', máx. 100 mg.</b> Las contraindicaciones se ponderan frente a la muerte segura; mantener la RCP ≥60–90 min tras la lisis. Ningún régimen ha demostrado superioridad.');
+        if (cat === 'E2') t.push('<b>Si está en PCR — alteplasa (ERC 2025): 50 mg IV en bolo, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg' + (pesoOk ? ' (' + Math.min(100, P(0.6)) + '–' + Math.min(100, P(1)) + ' mg)' : '') + ', máx. 100 mg; mientras no haya alteplasa, ' + tnkTxt + ' (misma dosis en PCR).</b> Las contraindicaciones se ponderan frente a la muerte segura; mantener la RCP ≥60–90 min tras la lisis. Ningún régimen ha demostrado superioridad.');
         t.push(v.ciLisis ? '<b>Sin PCR, con contraindicación absoluta → PERT de inmediato</b>: extracción por catéter, embolectomía o ECMO-VA en el Clínic. Si el riesgo vital es inminente y no hay alternativa a tiempo, la lisis es una decisión excepcional, ponderada y documentada (la dosis reducida no anula la contraindicación).' :
-          '<b>' + (cat === 'E2' ? 'Shock refractario con pulso' : 'Sin PCR') + ', sin contraindicación absoluta — alteplasa estándar (IIa):</b> ' + altStd + '. <b>Dosis reducida</b> (puede considerarse para disminuir el sangrado, IIb): 25–50 mg, p. ej. 50 mg = 10 mg en bolo + 40 mg en 2 h. Acelerada solo en inestabilidad extrema (fuera de ficha): 0,6 mg/kg' + (pesoOk ? ' (' + Math.min(50, P(0.6)) + ' mg)' : '') + ' en 15 min, máx. 50 mg. ' +
-          '<b>Tenecteplasa solo si no hay alteplasa</b> (fuera de ficha; decidir con el PERT y Farmacia): bolo único ' + (pesoOk ? (v.peso < 60 ? '30' : v.peso < 70 ? '35' : v.peso < 80 ? '40' : v.peso < 90 ? '45' : '50') + ' mg' : '&lt;60 kg 30 mg · 60–&lt;70 kg 35 · 70–&lt;80 kg 40 · 80–&lt;90 kg 45 · ≥90 kg 50 mg') + '.');
-        t.push('<b>Parar la HNF durante la alteplasa</b> (criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT; ESC permite mantenerla); al terminar, TTPa cada 2–4 h y reiniciar sin bolo cuando TTPa ≤2 × normal, después por nomograma. Contraindicaciones relativas: se individualizan.');
+          '<b>' + (cat === 'E2' ? 'Shock refractario con pulso' : 'Sin PCR') + ', sin contraindicación absoluta — fibrinólisis (IIa).</b> Alteplasa de elección, pendiente de stock en Urgencias; <b>hoy, ' + tnkTxt + '</b> (PEITHO: más hemorragia mayor en normotensos; reservar para E). <b>Alteplasa estándar</b> si está disponible: ' + altStd + '. <b>Dosis reducida</b> (puede considerarse para disminuir el sangrado, IIb): 25–50 mg, p. ej. 50 mg = 10 mg en bolo + 40 mg en 2 h. Acelerada solo en inestabilidad extrema (fuera de ficha): 0,6 mg/kg' + (pesoOk ? ' (' + Math.min(50, P(0.6)) + ' mg)' : '') + ' en 15 min, máx. 50 mg.');
+        t.push('<b>Parar la HNF durante la alteplasa</b> (criterio CHV; ESC permite mantenerla); <b>con tenecteplasa, suspender la perfusión</b>. Al terminar, TTPa cada 2–4 h y reiniciar sin bolo cuando TTPa ≤2 × normal, después por nomograma (criterio de HNF tras tenecteplasa pendiente de acordar con el CHV). Contraindicaciones relativas: se individualizan.');
       } else if (cat === 'D1' || cat === 'D2') {
         t.push(cat === 'D2' || (has(renal) && renal < 30) ? hnf + (cat === 'D2' ? ' (D2: reperfusión posible).' : ' (FG &lt;30).') : enoxTxt + ' por defecto (AHA 2026, clase 1). Si se prevé reperfusión o procedimiento: ' + hnf + '.');
-        t.push(cat === 'D2' ? '<b>Alteplasa en D2 seleccionado:</b> si empeora o el traslado previsto es &gt;60–90 min, sin contraindicación y con consenso del PERT (IIb C-LD; catéter IIb B-NR): ' + altStd + '. <i>Lisis local en D2: criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT.</i>' : '<b>Reperfusión:</b> IIb (lisis C-LD; catéter o trombectomía B-NR); decidir con el PERT.');
+        t.push(cat === 'D2' ? '<b>Lisis local en D2</b> si empeora o el traslado previsto es &gt;60–90 min, sin contraindicación y con el PERT (IIb C-LD; catéter IIb B-NR): ' + tnkTxt + ', o alteplasa ' + altStd + '.' : '<b>Reperfusión:</b> IIb (lisis C-LD; catéter o trombectomía B-NR); decidir con el PERT.');
       } else if (cat === 'C3') t.push((has(renal) && renal < 30 ? hnf + ' (FG &lt;30).' : enoxTxt + '. HNF si FG &lt;30 o posible procedimiento.') + ' Reperfusión no rutinaria (lisis sistémica IIb, beneficio incierto en C3). Paso a ACOD tras 2–3 días de anticoagulación parenteral si está estable y sin procedimiento previsto.');
       else if (cat === 'C1' || cat === 'C2' || cat === 'B*') t.push((has(renal) && renal < 30 ? hnf + ' (preferente con ClCr ≤30, ESC 2019)' + (renal >= 15 ? '; alternativa: enoxaparina ' + enox + ' SC cada 24 h' : '') + '.' : enoxTxt + '.') + ' → ACOD a las 24–48 h si está estable y sin procedimiento previsto. Lisis sistémica: III, daño, en A–C2.');
       else if (cat === 'A' || cat === 'B') t.push('<b>ACOD:</b> apixabán 10 mg/12 h VO × 7 días → 5 mg/12 h, o rivaroxabán 15 mg/12 h VO × 21 días → 20 mg/24 h con comida' + (has(renal) && renal < 15 ? ' (<b>ClCr &lt;15: evitar rivaroxabán</b>)' : '') + '.');
@@ -2406,26 +2407,26 @@ window.PROTOCOLS = [
       if (confirmado) t.push('<b>Siempre:</b> anticoagulación ≥3 meses. Hemograma, creatinina/FG (CKD-EPI), coagulación y perfil hepático' + (cat && /^[DE]/.test(cat) ? '; grupo y pruebas cruzadas' : '') + '.');
       if (t.length) out.push({t:'Tratamiento' + (cat ? ' (' + cat + ')' : ''), c:'', h:t.map(x => '• ' + x).join('<br>') + (pesoOk ? '' : '<br><span class="pe-nota">Introduce el peso real para calcular las dosis.</span>')});
 
-      /* 5. Destino (red Campdevànol – HUV – PERT Clínic) */
+      /* 5. Destino (red Campdevànol – CHV Vic – PERT Clínic) */
       const dest = {
         A:'<b>Ambulatorio</b> con ACOD.',
         B:'<b>Alta precoz u observación corta.</b> Requisitos: Hestia 0 y sPESI 0, estable, sin disfunción del VD ni biomarcadores elevados, bajo riesgo hemorrágico, sin barreras sociales, anticoagulante disponible y comprendido, control a las 48 h–7 días.',
         'B*':'<b>Observación o planta; NO alta precoz.</b> PERT si VD y biomarcador están alterados.',
         C1:'<b>Planta Campdevànol.</b> Evaluación por el PERT (AHA 2026: C–E, clase I, B-NR).',
         C2:'<b>Planta Campdevànol</b> con NEWS2 cada 4 h. Evaluación por el PERT.',
-        C3:'<b>Observación de urgencias con monitor</b> → planta solo con estabilidad confirmada (no por plazo fijo); NEWS2 cada 2 h; troponina/lactato a las 6–12 h. <b>Evaluación por el PERT, prioritaria.</b> Traslado precoz al HUV si no hay box monitorizado o empeora. <i>C3 en Campdevànol: criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT (alternativa en discusión: traslado precoz al HUV de todo C3 estable).</i>',
-        D1:'<b>Anticoagulación parenteral + PERT del Clínic en ≤30 min</b> → según el PERT, Clínic o Medicina Interna monitorizada del HUV; si no es candidato, guardia del HUV. Si pasa a E: fibrinólisis local sin esperar al traslado.',
-        D2:'<b>Anticoagulación parenteral + PERT del Clínic en ≤30 min + UCI del HUV</b> → según el PERT, Clínic o UCI del HUV. Si empeora o el traslado es &gt;60–90 min: lisis local con el PERT (<i>criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT</i>). Si pasa a E: fibrinólisis local sin esperar al traslado.',
-        E1:'<b>Fibrinólisis en Campdevànol sin esperar traslado.</b> Llamada simultánea a PERT Clínic + UCI del HUV (no condiciona el inicio de la lisis). <b>No trasladar antes de estabilizar</b> (AHA 2026, clase 3: daño). Post-lisis: llamar al PERT; solo si no lo considera tributario de traslado → UCI del HUV.',
-        E2:'<b>Fibrinólisis en Campdevànol sin esperar traslado</b> (en PCR la lisis va primero). PERT Clínic + UCI del HUV de inmediato. No trasladar antes de estabilizar. Post-lisis: PERT decide Clínic; si no → UCI del HUV.'
+        C3:'<b>Observación de urgencias con monitor</b> → planta solo con estabilidad confirmada (no por plazo fijo); NEWS2 cada 2 h; troponina/lactato a las 6–12 h. <b>Evaluación por el PERT, prioritaria.</b> Traslado precoz al CHV si no hay box monitorizado o empeora. <i>Discrepancia abierta: destino del C3 estable (Campdevànol frente a traslado precoz a Vic), pendiente de acuerdo de red.</i>',
+        D1:'<b>Anticoagulación parenteral + PERT del Clínic en ≤30 min</b> → según el PERT, Clínic o Medicina Interna monitorizada del CHV (Vic) si no es candidato. Si pasa a E: fibrinólisis local sin esperar al traslado.',
+        D2:'<b>Anticoagulación parenteral + PERT del Clínic en ≤30 min + UCI de Vic</b> → según el PERT, Clínic o UCI de Vic. Si empeora o el traslado es &gt;60–90 min: lisis local con el PERT. Si pasa a E: fibrinólisis local sin esperar al traslado.',
+        E1:'<b>Fibrinólisis en Campdevànol sin esperar traslado.</b> Llamada simultánea a PERT Clínic + UCI de Vic (no condiciona el inicio de la lisis). <b>No trasladar antes de estabilizar</b> (AHA 2026, clase 3: daño). Post-lisis: llamar al PERT; solo si no lo considera tributario de traslado → UCI de Vic.',
+        E2:'<b>Fibrinólisis en Campdevànol sin esperar traslado</b> (en PCR la lisis va primero). PERT Clínic + UCI de Vic de inmediato. No trasladar antes de estabilizar. Post-lisis: PERT decide Clínic; si no → UCI de Vic.'
       };
       if (cat) {
         const extra = [];
-        if (/^[ABC]/.test(cat)) extra.push('Traslado al HUV al margen de la categoría (si el PERT no indica Clínic): arritmia significativa · hipoxemia que no se controla con Ventimask o reservorio con deterioro respiratorio rápido · cualquier C que evoluciona a D · C3 sin box monitorizado.');
+        if (/^[ABC]/.test(cat)) extra.push('Traslado al margen de la categoría: C3 sin box monitorizado o que empeora, arritmia, hipoxemia no controlable con reservorio u OAF → Medicina Interna monitorizada del CHV (UCI si empeora) · trombo en tránsito o FOP con embolia paradójica → Clínic (decide el PERT) · embarazo con TEP D–E, comorbilidad grave o sangrado tras lisis no tratable aquí → según el PERT, Clínic o UCI de Vic.');
         if (/^C/.test(cat)) extra.push('Señales de deterioro → reclasificar a D y llamar al PERT: ↑FC progresiva · ↓PA sin hipotensión franca · ↓SpO₂ o ↑FiO₂ · oliguria · confusión · relleno capilar &gt;3 s o moteado · ↑lactato o troponina.');
         out.push({t:'Destino inicial', c:cc, h:dest[cat] + (extra.length ? '<br>' + extra.join('<br>') : '') +
-          '<br>PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E.' +
-          '<br><span class="pe-nota">Protocolo v2.0 (08/11/2026) pendiente de revisión clínica por UCI y Medicina Interna del HUV, PERT del Clínic y Farmacia.</span>'});
+          '<br>PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E. Vic solo tiene UCI y Medicina Interna: catéter, embolectomía y ECMO-VA únicamente en el Clínic.' +
+          '<br><span class="pe-nota">Protocolo v3.0 (nov 2026) pendiente de validación con UCI y Medicina Interna del CHV, PERT del Clínic, Farmacia y Dirección médica.</span>'});
       }
       return out;
     }
@@ -2439,30 +2440,33 @@ window.PROTOCOLS = [
     const sec = pre => ev().find(s => s.t.indexOf(pre) === 0) || { t: '', h: '' };
     const cat = () => sec('Categoría AHA/ACC 2026: ').t.slice(24).split(' ')[0].replace(/R$/, '');
     const fx = n => String(Math.round(n * 10) / 10).replace('.', ',');
-    const NOTA = '<span class="pe-nota">Protocolo v2.0 (08/11/2026) pendiente de revisión clínica por UCI y Medicina Interna del HUV, PERT del Clínic y Farmacia.</span>';
+    const NOTA = '<span class="pe-nota">Protocolo v3.0 (nov 2026) pendiente de validación con UCI y Medicina Interna del CHV, PERT del Clínic, Farmacia y Dirección médica. Teléfonos directos de UCI y MI de guardia del CHV pendientes.</span>';
     const PERT = 'PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E.';
-    const DOSIS = '<br><span class="pe-nota">Dosis por peso real (HNF, HBPM, alteplasa): las calcula el evaluador de arriba con el peso y el aclaramiento.</span>';
+    const DOSIS = '<br><span class="pe-nota">Dosis por peso real (HNF, HBPM, tenecteplasa, alteplasa): las calcula el evaluador de arriba con el peso y el aclaramiento.</span>';
     const SOPORTE = '<b>Soporte:</b> cristaloide ≤500 mL en 15–30 min solo sin congestión · noradrenalina 0,05–0,1 µg/kg/min si PAM &lt;65 o PAS &lt;90, titular sin techo fijo (ESC: 0,2–1,0); vía periférica válida hasta tener CVC · dobutamina 2–10 µg/kg/min (ESC hasta 20) si bajo gasto con PA conservada, no en monoterapia si hay hipotensión · O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF). Sedación profunda/IOT sin indicación: clase 3 (daño); si es imprescindible, soporte hemodinámico preparado, inductor a dosis reducida (ketamina o etomidato), Vt 6 mL/kg de peso ideal, PEEP baja y avisar a UCI.';
     const EMPEORA = '<b>Empeoramiento</b> = ↑FC progresiva · ↓PA sin hipotensión franca · ↓SpO₂ o ↑FiO₂ · oliguria · confusión · relleno capilar &gt;3 s o moteado · ↑lactato o troponina.';
     const ACOD = '<b>ACOD:</b> apixabán 10 mg/12 h VO × 7 días → 5 mg/12 h, o rivaroxabán 15 mg/12 h VO × 21 días → 20 mg/24 h con comida (ClCr &lt;15: evitar rivaroxabán). Embarazo, cáncer activo, SAF triple positivo o ERC grave → «Situaciones especiales» abajo.';
     const HEP = [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }];
-    const LISIS = [{ n: 'Alteplasa', inf: false, esquema: 'alteplasa-tep' }, { n: 'Tenecteplasa', inf: false, esquema: 'tnk-tep' }];
+    const LISIS = [{ n: 'Tenecteplasa', inf: false, esquema: 'tnk-tep' }, { n: 'Alteplasa', inf: false, esquema: 'alteplasa-tep' }];
     const TNK = v => {
       const ok = v.peso > 0, mg = ok ? [30, 35, 40, 45, 50][v.peso < 60 ? 0 : v.peso < 70 ? 1 : v.peso < 80 ? 2 : v.peso < 90 ? 3 : 4] : 0;
-      return '<b>Alternativa · tenecteplasa, solo si no hay alteplasa</b> (fuera de ficha en TEP; decisión con el PERT y Farmacia; PEITHO: más hemorragia mayor en normotensos): vial de 50 mg con 10 mL del agua del envase (5 mg/mL), sin agitar; <b>bolo IV único en 5–10 s</b> por peso: &lt;60 kg 30 mg · 60–&lt;70 kg 35 mg · 70–&lt;80 kg 40 mg · 80–&lt;90 kg 45 mg · ≥90 kg 50 mg' +
-        (ok ? ' → <b>' + mg + ' mg = ' + fx(mg / 5) + ' mL</b> (' + fx(v.peso) + ' kg)' : ' (introduce el peso en el evaluador)') + '. Incompatible con glucosa: lavar la vía con SF 0,9 % antes y después.';
+      return '<b>Tenecteplasa, disponible actualmente en Urgencias</b> (alteplasa, de elección, pendiente de stock; fuera de ficha en TEP; PEITHO: más hemorragia mayor en normotensos, reservar para E): vial de 50 mg con 10 mL del agua del envase (5 mg/mL), sin agitar; <b>bolo IV único en 5–10 s</b> por peso real (misma dosis en PCR): &lt;60 kg 30 mg · 60–&lt;70 kg 35 mg · 70–&lt;80 kg 40 mg · 80–&lt;90 kg 45 mg · ≥90 kg 50 mg' +
+        (ok ? ' → <b>' + mg + ' mg = ' + fx(mg / 5) + ' mL</b> (' + fx(v.peso) + ' kg)' : ' (introduce el peso en el evaluador)') + '. Incompatible con glucosa: lavar la vía con SF 0,9 % antes y después. No deja perfusión (práctico si hay traslado); suspender la perfusión de HNF.';
     };
     const FLUJO = '<details class="fl-form fl-pdf"><summary>🗺️ Flujograma del protocolo (PDF)</summary><a href="protocolos/Flujograma_TEP_Campdevanol.pdf" target="_blank" rel="noopener"><img src="protocolos/Flujograma_TEP_Campdevanol.jpg" alt="Flujograma TEP de Campdevànol, pasos 1 a 8. Toca para abrir el PDF" loading="lazy"></a><a class="fl-pdf-a" href="protocolos/Flujograma_TEP_Campdevanol.pdf" target="_blank" rel="noopener">Abrir el PDF</a></details>';
     const DATOS = '<span class="pe-nota">Los datos del paciente se rellenan <b>una sola vez</b> en el evaluador de arriba: Wells, Ginebra, PERC, YEARS, PESI, sPESI, Hestia, Bova y las dosis salen de ahí; el flujograma solo pregunta las decisiones.</span><br>';
     const CALC = (pre, falta) => { const s = sec(pre); return s.t ? '<div class="fl-calc"><b>Con los datos de arriba:</b> ' + s.t + '<br>' + s.h + '</div>' : '<div class="fl-calc">' + falta + '</div>'; };
-    const PERT_Q = { q: 'PERT: ¿traslado al Clínic?', opts: [{ l: 'Sí', go: 'clinic' }, { l: 'No', go: 'vic' }] };
+    const FLUJO4 = '<details class="fl-form fl-pdf"><summary>🚑 Flujograma 4 · Traslado interhospitalario (PDF)</summary><a href="protocolos/Flujograma4_TEP_Traslado_Campdevanol.pdf" target="_blank" rel="noopener"><img src="protocolos/Flujograma4_TEP_Traslado_Campdevanol.jpg" alt="Flujograma 4 del TEP: traslado interhospitalario de Campdevànol a Vic o al Clínic. Toca para abrir el PDF" loading="lazy"></a><a class="fl-pdf-a" href="protocolos/Flujograma4_TEP_Traslado_Campdevanol.pdf" target="_blank" rel="noopener">Abrir el PDF</a></details>';
+    const SALIR = '<b>Antes de salir · checklist SBAR:</b> categoría A–E ± R, PESI/sPESI, VD/VI, troponina, NT-proBNP, lactato · peso y talla · fármaco, dosis y hora de HNF/HBPM y de la lisis · último TTPa · contraindicaciones de lisis revisadas y riesgo de sangrado · angio-TC accesible en HC3/PACS, ECG, informe · nivel de intensidad terapéutica (PIIC) · consentimiento informado (el traslado no garantiza terapia avanzada) · plan si empeora mientras espera.<br>' +
+      '<b>Durante el traslado:</b> monitorización continua (ECG, PA invasiva si vasoactivos, SpO₂, EtCO₂ si IOT) · post-lisis: neurológico cada 15 min; cefalea o sangrado (hematuria, melena, puntos de punción) → parar la perfusión y avisar · alteplasa sin terminar: completar en bomba (avisar al SEM); la tenecteplasa no deja perfusión · bombas y movilizaciones mínimas, registro escrito · <b>plan de desvío:</b> deterioro en ruta al Clínic → UCI de Vic (en el trayecto) · si pasa de D a E antes de salir → lisis local primero.<br>' +
+      '<b>No retrasar el traslado</b> por ecocardiografía, TTPa de control, segunda analítica ni ingreso administrativo.<br>';
     return {
       start: 'llegada',
       nodes: {
         /* 1 · Llegada */
         llegada: {
           t: '1 · Llegada: primeros 15 min',
-          show: FLUJO + DATOS + 'ABC, constantes (PA, FC, FR, SpO₂, consciencia, relleno capilar y diuresis), ECG y monitor; <b>peso real y talla</b>; 2 vías · troponina hs, NT-proBNP, lactato, hemograma, creatinina/FG, coagulación, grupo si D–E. O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF); evitar IOT (riesgo de PCR en la inducción).<br>' +
+          show: FLUJO + FLUJO4 + DATOS + 'ABC, constantes (PA, FC, FR, SpO₂, consciencia, relleno capilar y diuresis), ECG y monitor; <b>peso real y talla</b>; 2 vías · troponina hs, NT-proBNP, lactato, hemograma, creatinina/FG, coagulación, grupo si D–E. O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF); evitar IOT (riesgo de PCR en la inducción).<br>' +
             '<b>Riesgo hemorrágico:</b> sangrado activo, ictus, cirugía o trauma reciente, anticoagulación previa, embarazo, TIH. POCUS si hay urgenciólogo formado (no retrasa el angio-TC ni la anticoagulación).',
           q: '¿PCR o shock?',
           opts: [
@@ -2474,7 +2478,7 @@ window.PROTOCOLS = [
         shock: {
           farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Noradrenalina' }],
           t: 'Shock', c: 'high',
-          show: '<b>HNF bolo 80 U/kg</b> (peso real) ya. <b>Llamada simultánea: PERT Clínic + UCI del HUV.</b> Trasladable = PAS sostenida con fluidos/noradrenalina → angio-TC inmediato, monitorizado y acompañado por médico.<br>' + SOPORTE + DOSIS,
+          show: '<b>HNF bolo 80 U/kg</b> (peso real) ya. <b>Llamada simultánea: PERT Clínic + UCI de Vic.</b> Trasladable = PAS sostenida con fluidos/noradrenalina → angio-TC inmediato, monitorizado y acompañado por médico.<br>' + SOPORTE + DOSIS,
           q: '¿Trasladable a la sala de TC?',
           opts: [{ l: 'Sí: angio-TC inmediato', go: 'angioTCi' }, { l: 'No: POCUS a pie de cama', go: 'pocus' }]
         },
@@ -2610,28 +2614,38 @@ window.PROTOCOLS = [
           opts: [
             { l: 'Estable: ACOD y alta cuando cumpla los criterios', go: 'alta' },
             { l: 'Empeoramiento: reclasificar a D y llamar al PERT', go: 'catD' },
+            { l: 'Otro criterio de traslado (arritmia, hipoxemia no controlable, comorbilidad grave…)', go: 'trasCrit' },
             { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' }
+          ]
+        },
+        trasCrit: {
+          t: '¿Criterio de traslado? (flujograma 4)', c: 'high',
+          show: 'C3 sin box monitorizado o que empeora · D1–D2 · E · arritmia · hipoxemia no controlable con reservorio u OAF · contraindicación de anticoagulación o lisis · trombo en tránsito, FOP, embarazo · comorbilidad grave · deterioro pese a anticoagulación.<br>Sin criterio: manejo en Campdevànol (A–C2, y C3 con box monitorizado); si empeora → D.<br>Ningún D sale sin anticoagulación parenteral en curso (HBPM en C–D1 · HNF en D2–E o si se prevé reperfusión).',
+          q: '¿Categoría E (shock persistente o PCR)?',
+          opts: [
+            { l: 'Sí: fibrinólisis local antes de salir', go: 'catE', sug: v => v.hemo >= 2 },
+            { l: 'No (C3, D1–D2 u otro criterio): llamada al PERT', go: 'pertD', sug: v => v.hemo < 2 }
           ]
         },
         catC3: {
           farmacos: HEP,
           t: 'Categoría C3: box con monitor en observación', c: 'mid',
           show: '<b>Monitor continuo</b> en observación de urgencias + <b>PERT prioritario</b>. NEWS2 cada 2 h; troponina y lactato a las 6–12 h; HNF si FG &lt;30 o posible procedimiento. Lisis sistémica: IIb (incierta), solo si deterioro.<br>' + EMPEORA + '<br>' +
-            '<i>C3 en Campdevànol: criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT (alternativa en discusión: traslado precoz al HUV de todo C3 estable).</i>' + DOSIS,
+            '<i>Discrepancia abierta: destino del C3 estable (Campdevànol frente a traslado precoz a Vic), pendiente de acuerdo de red.</i>' + DOSIS,
           q: 'Evolución en monitorización continua',
           nota: 'Anota la evolución (FC, PA, SpO₂/FiO₂, diuresis, lactato, troponina)…',
           opts: [
             { l: 'Estable: desmonitorizar y pasar a planta', go: 'planta' },
             { l: 'Empeoramiento: reclasificar a D y llamar al PERT', go: 'catD' },
             { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' },
-            { l: 'Sin box monitorizado: traslado al HUV', go: 'vic' }
+            { l: 'Sin box monitorizado: PERT y traslado', go: 'pertD' }
           ]
         },
         catD: {
           farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Enoxaparina', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'Categoría D1–D2: monitor + PERT', c: 'high',
           show: 'D1 hipotensión transitoria (PAS &lt;90 o caída &gt;40, &lt;15 min o responde a fluidos) sin hipoperfusión · D2 + hipoperfusión (lactato &gt;2, LRA, diuresis &lt;0,5 mL/kg/h, alteración mental, PAM &lt;60).<br>' +
-            '• <b>HNF</b> (D1 sin reperfusión prevista: HBPM) · <b>PERT del Clínic en ≤30 min</b>; si no es candidato → guardia del HUV (UCI en D2, MI monitorizada en D1). Ningún D sale sin anticoagulación parenteral en curso.<br>' +
+            '• <b>HNF</b> (D1 sin reperfusión prevista: HBPM) · <b>PERT del Clínic en ≤30 min</b>; si no es candidato → CHV (Vic): UCI en D2, MI monitorizada en D1. Ningún D sale sin anticoagulación parenteral en curso.<br>' +
             '• ' + SOPORTE + '<br>' + PERT + DOSIS,
           q: 'Evolución en monitorización continua',
           nota: 'Anota la evolución (PA, lactato, diuresis, O₂, hora de la llamada al PERT)…',
@@ -2642,15 +2656,21 @@ window.PROTOCOLS = [
             { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' }
           ]
         },
-        pertD: Object.assign({
-          t: 'Traslado según el PERT', c: 'high',
-          show: 'Anticoagulación parenteral en curso, monitor y desfibrilador. Ver «Traslado interhospitalario» abajo.'
-        }, PERT_Q),
+        pertD: {
+          t: 'Llamada al PERT del Clínic (≤30 min)', c: 'high',
+          show: '<b>932 27 54 00 · busca 380396.</b> Anticoagulación parenteral en curso (HBPM en C–D1 · HNF en D2–E o si se prevé reperfusión), monitor y desfibrilador.<br>D2 que empeora o traslado previsto &gt;60–90 min → valorar lisis local con el PERT. Si pasa a E durante la espera → lisis local.',
+          q: '¿Siguiente paso?',
+          opts: [
+            { l: 'Preparar el traslado: optimización A-B-C', go: 'optim' },
+            { l: 'D2 que empeora o traslado &gt;60–90 min: lisis local', go: 'lisis' },
+            { l: 'Pasa a shock persistente: categoría E', go: 'catE' }
+          ]
+        },
         /* E · Fibrinólisis */
         catE: {
           farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'Categoría E: fibrinólisis local', c: 'high',
-          show: 'E1 hipotensión persistente con shock (SCAI C) · E2 shock refractario (SCAI D–E) o PCR.<br><b>HNF bolo 80 U/kg IV</b> (si no se ha puesto) · <b>PERT Clínic + UCI del HUV</b> (no retrasa la lisis).',
+          show: 'E1 hipotensión persistente con shock (SCAI C) · E2 shock refractario (SCAI D–E) o PCR.<br><b>HNF bolo 80 U/kg IV</b> (si no se ha puesto) · <b>PERT Clínic + UCI de Vic</b> (no retrasa la lisis).',
           q: '¿Contraindicación absoluta a la fibrinólisis?',
           help: '<b>Absolutas:</b> ictus hemorrágico o de origen desconocido previo · ictus isquémico &lt;6 meses · neoplasia o malformación del SNC · trauma mayor, cirugía o TCE &lt;3 semanas · diátesis hemorrágica · sangrado activo · sospecha de disección aórtica.<br><b>Relativas</b> (en E se individualizan): AIT &lt;6 meses · anticoagulación oral · embarazo o primera semana posparto · punción en lugar no compresible · RCP traumática · PAS &gt;180 refractaria · hepatopatía avanzada, endocarditis infecciosa, úlcera péptica activa (ESC 2019, tabla 10).',
           opts: [
@@ -2664,19 +2684,19 @@ window.PROTOCOLS = [
           t: 'Fibrinólisis: administración', c: 'high',
           show: v => {
             const pk = v.peso > 0, tot = pk && v.peso < 65 ? 1.5 * v.peso : 100, resto = tot - 10;
-            return '<b>Alteplasa (de elección)</b>: viales reconstituidos con el agua del envase a <b>1 mg/mL</b>, sin agitar.<br>' +
+            return '<b>Fibrinolítico:</b> alteplasa de elección, <b>pendiente de stock</b>; hoy en Urgencias se usa <b>tenecteplasa</b>.<br>• ' + TNK(v) + '<br>' +
+              '<b>Alteplasa</b> (si está disponible): viales reconstituidos con el agua del envase a <b>1 mg/mL</b>, sin agitar.<br>' +
               '• <b>Estándar, 100 mg en 2 h</b> (IIa): <b>bolo de 10 mg (10 mL) en 1–2 min</b> + <b>' + fx(resto) + ' mg en 2 h con bomba = ' + fx(resto / 2) + ' mL/h</b>' +
               (pk ? (v.peso < 65 ? ' (&lt;65 kg: total 1,5 mg/kg = ' + fx(tot) + ' mg, bolo incluido)' : '') : ' (con &lt;65 kg el total no supera 1,5 mg/kg: introduce el peso en el evaluador)') + '. Al acabar, SF 0,9 % por la misma vía al mismo ritmo.<br>' +
               '• <b>Dosis reducida</b> (IIb C-LD, para disminuir el sangrado): 25–50 mg, p. ej. 50 mg = 10 mg en bolo + 40 mg en 2 h (20 mL/h). No convierte una contraindicación en indicación.<br>' +
               '• Acelerada solo en inestabilidad extrema (fuera de ficha, ESC 2019): 0,6 mg/kg en 15 min, máx. 50 mg.<br>' +
-              '• <b>Parar la HNF durante la alteplasa</b> (criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT; ESC permite mantenerla); al terminar, TTPa cada 2–4 h → reiniciar sin bolo si TTPa ≤2 × normal.<br>' +
-              '• ' + TNK(v) + '<br>' +
+              '• <b>Parar la HNF durante la alteplasa</b> (criterio CHV; ESC permite mantenerla); <b>con tenecteplasa, suspender la perfusión</b>. Al terminar, TTPa cada 2–4 h → reiniciar sin bolo si TTPa ≤2 × normal (criterio tras tenecteplasa pendiente de acordar con el CHV).<br>' +
               '<b>Vigilar:</b> cefalea intensa, déficit neurológico o sangrado mayor → parar alteplasa/HNF y TC craneal urgente.';
           },
           q: '¿Estabilizado tras la lisis?',
           nota: 'Anota hora de inicio y fin de la lisis y la evolución…',
           opts: [
-            { l: 'Sí: traslado según el PERT', go: 'postLisis' },
+            { l: 'Sí: preparar el traslado', go: 'postLisis' },
             { l: 'No: no trasladar, soporte local', go: 'noEstab' },
             { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' }
           ]
@@ -2684,8 +2704,8 @@ window.PROTOCOLS = [
         lisisPCR: {
           farmacos: LISIS,
           t: 'PCR + TEP: RCP y fibrinólisis (ERC 2025)', c: 'high', pcr: true,
-          show: v => '<b>SVA en curso</b> (botón «Abrir el protocolo de PCR»: cronómetro, ritmos, adrenalina) y aquí la fibrinólisis del TEP.<br><b>Alteplasa 50 mg (50 mL a 1 mg/mL) en bolo IV</b>, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg)' + (v.peso > 0 ? ' = ' + fx(Math.min(0.6 * v.peso, 100)) + '–' + fx(Math.min(v.peso, 100)) + ' mg' : '') + '. <b>RCP ≥60–90 min tras la lisis.</b> Las contraindicaciones se ponderan frente a la muerte segura; ningún régimen ha demostrado superioridad.<br>' +
-            '• ' + TNK(v) + '<br>HNF bolo 80 U/kg · PERT + UCI del HUV sin retrasar la lisis.' + DOSIS,
+          show: v => '<b>SVA en curso</b> (botón «Abrir el protocolo de PCR»: cronómetro, ritmos, adrenalina) y aquí la fibrinólisis del TEP.<br>Mientras no haya alteplasa: <b>tenecteplasa en bolo por peso</b> (abajo). <b>Alteplasa 50 mg (50 mL a 1 mg/mL) en bolo IV</b>, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg)' + (v.peso > 0 ? ' = ' + fx(Math.min(0.6 * v.peso, 100)) + '–' + fx(Math.min(v.peso, 100)) + ' mg' : '') + '. <b>RCP ≥60–90 min tras la lisis.</b> Las contraindicaciones se ponderan frente a la muerte segura; ningún régimen ha demostrado superioridad.<br>' +
+            '• ' + TNK(v) + '<br>HNF bolo 80 U/kg · PERT + UCI de Vic sin retrasar la lisis.' + DOSIS,
           q: '¿Recupera la circulación (RCE)?',
           opts: [
             { l: 'Sí: estabilizar', go: 'postLisis' },
@@ -2701,30 +2721,45 @@ window.PROTOCOLS = [
           show: 'Catéter, embolectomía o ECMO-VA en el Clínic (CHEST 2021 sugiere catéter en TEP hipotensivo con alto riesgo hemorrágico).<br>' +
             'Riesgo vital inminente sin alternativa a tiempo: <b>lisis excepcional, ponderada y documentada</b> (la dosis reducida no anula la contraindicación).<br>' + PERT,
           q: '¿Continuar?',
-          opts: [{ l: 'Estabilizar y trasladar según el PERT', go: 'postLisis' }]
+          opts: [{ l: 'Estabilizar y preparar el traslado', go: 'optim' }]
         },
         noEstab: {
           farmacos: [{ n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'No estabilizado: no trasladar', c: 'high',
-          show: '<b>No trasladar un E antes de estabilizarlo</b> (AHA 2026: clase 3, daño, C-EO). ' + SOPORTE + '<br>PERT (catéter, ECMO) y UCI del HUV en contacto.',
+          show: '<b>No trasladar un E antes de estabilizarlo</b> (AHA 2026: clase 3, daño, C-EO). ' + SOPORTE + '<br>PERT (catéter, ECMO) y UCI de Vic en contacto.',
           q: 'Evolución',
           nota: 'Anota la evolución y las decisiones con el PERT…',
-          opts: [{ l: 'Se estabiliza: traslado según el PERT', go: 'postLisis' }, { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' }]
+          opts: [{ l: 'Se estabiliza: preparar el traslado', go: 'postLisis' }, { l: 'PCR: RCP + fibrinólisis (protocolo PCR + TEP)', go: 'lisisPCR' }]
         },
-        postLisis: Object.assign({
-          t: 'Estabilizado: traslado', c: 'high',
-          show: 'Control neurológico y de sangrado estrecho las primeras 24 h; hemograma, coagulación y pruebas cruzadas. Ningún E sale sin lisis salvo contraindicación absoluta. Ver «Traslado interhospitalario» abajo.'
-        }, PERT_Q),
+        postLisis: {
+          t: 'Estabilizado tras la lisis', c: 'high',
+          show: 'Control neurológico y de sangrado estrecho las primeras 24 h; hemograma, coagulación y pruebas cruzadas. Cefalea intensa, déficit o sangrado mayor → parar alteplasa/HNF y TC craneal urgente. Ningún E sale sin lisis previa salvo contraindicación absoluta.',
+          q: '¿Continuar?',
+          opts: [{ l: 'Optimización A-B-C antes del traslado', go: 'optim' }]
+        },
+        optim: {
+          farmacos: [{ n: 'Noradrenalina' }, { n: 'Dobutamina' }],
+          t: '7 · Optimización antes del traslado (A-B-C)', c: 'high',
+          show: FLUJO4 + '<b>A · Vía aérea:</b> evitar IOT (riesgo de PCR en la inducción). Si es imprescindible: el más experto, noradrenalina en marcha, inductor a dosis reducida (ketamina o etomidato), preoxigenación; Vt 6 mL/kg de peso ideal, PEEP baja, evitar hipoxemia e hipercapnia.<br>' +
+            '<b>B · Oxigenación:</b> SpO₂ ≥90 %: Ventimask → reservorio → OAF · VMNI con presiones bajas (reduce la precarga del VD) · vasodilatadores inhalados: no.<br>' +
+            '<b>C · Circulación:</b> fluidos ≤500 mL solo sin congestión (POCUS: VD/VCI) · noradrenalina 0,05–0,1 µg/kg/min y titular · dobutamina 2–10 µg/kg/min si bajo gasto con PA conservada · 2 vías de 18 G · sin punciones no compresibles.',
+          q: 'PERT: ¿necesita terapia por catéter, embolectomía o ECMO-VA?',
+          help: 'Contraindicación o fracaso de la lisis, shock refractario, trombo en tránsito o FOP con embolia paradójica, D2 seleccionado.',
+          opts: [
+            { l: 'Sí: H. Clínic (~90 min)', go: 'clinic', sug: v => v.ciLisis === true },
+            { l: 'No: CHV · Vic (~30 min)', go: 'vic' }
+          ]
+        },
         clinic: {
-          t: '7 · Traslado al Clínic', c: 'high',
-          show: 'SEM 061, unidad SVA (en E valorar medio aéreo); anticoagulación y noradrenalina en bomba. Ver «Traslado interhospitalario» abajo.<br>' + PERT + '<br>' + NOTA
+          t: '8 · H. Clínic (~90 min) · PERT', c: 'high',
+          show: 'Catéter · embolectomía · ECMO-VA. <b>SEM 061, unidad SVA</b> (valorar medio aéreo en E); anticoagulación y vasoactivos en bomba.<br>' + SALIR + PERT + '<br>' + NOTA
         },
         vic: {
-          t: '7 · Guardia del HUV (Vic)', c: 'high',
-          show: '<b>UCI:</b> D2 y E post-lisis · <b>Medicina Interna monitorizada:</b> D1 y C3 sin box monitorizado. Teléfono directo de la guardia del HUV pendiente de incluir.<br>' + NOTA
+          t: '8 · CHV · Vic (~30 min): solo UCI y MI', c: 'high',
+          show: 'Sin intervencionismo. <b>UCI:</b> D2–E y post-lisis no tributario del Clínic · <b>Medicina Interna monitorizada:</b> D1, C3 sin box, arritmia (UCI si empeora). SEM 061.<br>' + SALIR + NOTA
         },
         alta: {
-          t: '8 · Alta', c: 'low',
+          t: 'Alta', c: 'low',
           show: 'Requisitos: Hestia 0 y sPESI 0, estabilidad, sin disfunción del VD ni biomarcadores elevados, bajo riesgo hemorrágico, sin barreras sociales, anticoagulante disponible y comprendido, <b>control a las 48 h–7 días</b>. Categoría A: ambulatorio con ACOD.<br>' +
             'Anticoagulación ≥3 meses; a los ~3 meses decidir continuar o suspender. Disnea, intolerancia al esfuerzo, síncope o hipoxemia persistentes → ecocardiografía y estudio de ETEPC/HPTEC.<br>' +
             '<b>Educación (informe de alta):</b> no suspender ni duplicar dosis · consultar por sangrado, cefalea intensa, síncope o déficit neurológico · acudir de inmediato por disnea súbita, dolor torácico nuevo o hemoptisis · evitar AINE y revisar interacciones · avisar de la anticoagulación antes de procedimientos.'
@@ -2736,13 +2771,12 @@ window.PROTOCOLS = [
         items: [
           {
             l: 'Red y recursos de Campdevànol', t: 'Red asistencial y recursos locales',
-            show: '<b>Campdevànol:</b> diagnóstico, estratificación A–E, anticoagulación, ingreso A–C, fibrinólisis sistémica en E (y en D2 seleccionado con el PERT). Angio-TC, troponina, NT-proBNP, lactato 24 h y alteplasa en stock; POCUS si hay urgenciólogo formado. Sin UCI, ecocardiografía reglada ni telemetría en planta (C3 monitorizado en observación).<br>' +
-              '<b>HUV (Hospital Universitari de Vic) ~30 min:</b> UCI (D2–E no candidatos al Clínic, post-lisis no trasladable) y Medicina Interna monitorizada (D1, arritmias, C3 no monitorizable).<br><b>H. Clínic (PERT) ~90 min:</b> catéter, embolectomía, ECMO-VA; decide el traslado en D–E.<br>' + PERT
+            show: '<b>Campdevànol:</b> diagnóstico, estratificación A–E, anticoagulación, ingreso A–C, fibrinólisis sistémica en E (y en D2 seleccionado con el PERT). Angio-TC, troponina, NT-proBNP y lactato 24 h; fibrinolítico: <b>tenecteplasa disponible</b> (alteplasa, de elección, pendiente de stock); OAF; POCUS si hay urgenciólogo formado. Sin UCI, ecocardiografía reglada ni telemetría en planta (C3 monitorizado en observación).<br>' +
+              '<b>CHV · Vic (~30 min):</b> UCI y Medicina Interna monitorizada, <b>sin intervencionismo</b>; teléfono de UCI y MI de guardia pendiente.<br><b>H. Clínic (~90 min):</b> PERT, terapia por catéter, embolectomía, ECMO-VA; decide el traslado en C3–E.<br>' + PERT
           },
           {
-            l: 'Modificador R y traslado al HUV', t: 'Modificador R y traslado al HUV al margen de la categoría',
-            show: '<b>Modificador R</b> (AHA 2026; p. ej. C3R, D2R): en C, hipoxemia, taquipnea o necesidad de O₂ · en D, &gt;6 L/min en gafas o mascarilla con reservorio · en E, VMNI o ventilación invasiva. OAF antes que VMNI si está disponible. Eleva la vigilancia aunque la categoría sea baja.<br>' +
-              '<b>Traslado al HUV al margen de la categoría</b> (si el PERT no indica Clínic): arritmia significativa · hipoxemia que no se controla con Ventimask o reservorio con deterioro respiratorio rápido · cualquier C que pasa a D · C3 sin box monitorizado.'
+            l: 'Modificador R', t: 'Modificador R (AHA 2026)',
+            show: '<b>Modificador R</b> (AHA 2026; p. ej. C3R, D2R): en C, hipoxemia, taquipnea o necesidad de O₂ · en D, &gt;6 L/min en gafas o mascarilla con reservorio · en E, VMNI o ventilación invasiva. OAF antes que VMNI si está disponible. Eleva la vigilancia aunque la categoría sea baja.'
           },
           {
             l: 'Reperfusión por categoría (AHA 2026)', t: 'Clase de recomendación de la reperfusión',
@@ -2751,7 +2785,7 @@ window.PROTOCOLS = [
           },
           {
             l: 'Peso de dosificación', t: 'Peso de dosificación',
-            show: 'Pesar o registrar peso declarado y talla. <b>Peso real</b> para HNF (bolo 80 U/kg, perfusión 18 U/kg/h; sin tope en las guías, solo si lo fija el nomograma institucional), enoxaparina (1 mg/kg/12 h, sin tope fijo; obesidad clase III: reducir puede ser razonable, IIb; anti-Xa no rutinario) y alteplasa (&lt;65 kg: máx. 1,5 mg/kg total). Noradrenalina y dobutamina en µg/kg/min. Inductor sin dosis específica en guías de TEP: reducir en shock (ketamina no garantiza estabilidad). <b>Peso ideal solo para el Vt</b> (6 mL/kg): ♂ 50 + 0,91 × (talla − 152,4) · ♀ 45,5 + 0,91 × (talla − 152,4). ACOD a dosis fija; IMC &gt;40 o &gt;120 kg: apixabán o rivaroxabán (evitar dabigatrán/edoxabán).'
+            show: 'Pesar o registrar peso declarado y talla. <b>Peso real</b> para HNF (bolo 80 U/kg, perfusión 18 U/kg/h; sin tope en las guías, solo si lo fija el nomograma institucional), enoxaparina (1 mg/kg/12 h, sin tope fijo; obesidad clase III: reducir puede ser razonable, IIb; anti-Xa no rutinario), tenecteplasa (tramos de peso) y alteplasa (&lt;65 kg: máx. 1,5 mg/kg total). Noradrenalina y dobutamina en µg/kg/min. Inductor sin dosis específica en guías de TEP: reducir en shock (ketamina no garantiza estabilidad). <b>Peso ideal solo para el Vt</b> (6 mL/kg): ♂ 50 + 0,91 × (talla − 152,4) · ♀ 45,5 + 0,91 × (talla − 152,4). ACOD a dosis fija; IMC &gt;40 o &gt;120 kg: apixabán o rivaroxabán (evitar dabigatrán/edoxabán).'
           },
           {
             l: 'POCUS: criterios de VD y uso', t: 'POCUS por urgenciólogo',
@@ -2762,12 +2796,9 @@ window.PROTOCOLS = [
           },
           {
             l: 'Traslado interhospitalario', t: 'Traslado interhospitalario',
-            show: 'Con 90 min hasta el Clínic, <b>ningún E sale sin fibrinólisis previa</b> salvo contraindicación absoluta, y <b>ningún D sale sin anticoagulación parenteral</b> en curso.<br>' +
-              '1. <b>Destino:</b> PERT Clínic; si no es candidato → guardia del HUV (UCI D2–E, MI D1).<br>2. <b>Transporte:</b> SEM 061, unidad SVA; en E valorar medio aéreo.<br>' +
-              '3. <b>Paciente:</b> 2 vías periféricas gruesas, anticoagulación y noradrenalina en bomba, O₂ titulado, monitor y desfibrilador.<br>' +
-              '4. <b>Informe:</b> categoría A–E (y R), PESI/sPESI, VD/VI del TC, troponina, NT-proBNP, lactato; peso real y talla; hora del bolo de HNF, ritmo actual, inicio/fin de la alteplasa y último TTPa.<br>' +
-              '5. <b>Imágenes:</b> angio-TC accesible al centro receptor (HC3/PACS).<br>6. <b>Antes de salir:</b> si pasa de D a E → fibrinólisis local antes del traslado.<br>' +
-              '<b>No retrasar el traslado por:</b> ecocardiografía, control de TTPa, segunda analítica ni ingreso administrativo.<br>' + PERT
+            show: FLUJO4 + '<b>Ningún E sale sin fibrinólisis previa</b> (salvo contraindicación absoluta) y <b>ningún D sale sin anticoagulación parenteral</b> en curso. Vic solo tiene UCI y Medicina Interna monitorizada; catéter, embolectomía y ECMO-VA solo en el Clínic.<br>' +
+              '<b>Destino según necesidad:</b> C3 sin box o que empeora · D1 · arritmia · hipoxemia no controlable con reservorio u OAF → <b>CHV Vic, MI monitorizada</b> (UCI si empeora) · D2 no candidato a terapia avanzada · E tras lisis, estabilizado y no tributario del Clínic → <b>CHV Vic, UCI</b> · contraindicación de lisis en E o D2 · lisis fallida · shock refractario · trombo en tránsito o FOP con embolia paradójica · candidato a catéter, embolectomía o ECMO-VA → <b>H. Clínic</b> (decide el PERT) · embarazo con TEP D–E · comorbilidad grave o compleja · sangrado tras lisis no tratable en Campdevànol → <b>según el PERT, Clínic o UCI de Vic</b>.<br>' +
+              '<b>Optimización A-B-C:</b> evitar IOT (si imprescindible: noradrenalina en marcha, inductor a dosis reducida, Vt 6 mL/kg, PEEP baja) · SpO₂ ≥90 % (reservorio → OAF), VMNI con presiones bajas · fluidos ≤500 mL solo sin congestión, noradrenalina/dobutamina en bomba, 2 vías de 18 G, sin punciones no compresibles. SEM 061 unidad SVA (valorar medio aéreo en E).<br>' + SALIR + PERT
           },
           {
             l: 'Situaciones especiales de anticoagulación', t: 'Situaciones especiales de anticoagulación',
@@ -2775,15 +2806,20 @@ window.PROTOCOLS = [
               '<b>Filtro de VCI</b> solo si contraindicación absoluta para anticoagular, recurrencia pese a anticoagulación correcta o imposibilidad de anticoagular en fase aguda; no rutinario añadido a una anticoagulación eficaz.'
           },
           {
+            l: 'Red flags y «No hacer»', t: 'Red flags y «No hacer»',
+            show: '<b>Red flags → reclasificar y llamar al PERT:</b> taquicardia progresiva, descenso de la PA (aunque no haya hipotensión franca) o síncope · lactato &gt;2 mmol/L, oliguria, confusión, relleno capilar &gt;3 s o piel moteada (shock normotenso) · aumento de la necesidad de O₂ o paso a reservorio u OAF · trombo móvil en cavidades derechas en POCUS · cefalea intensa, déficit neurológico o sangrado tras la lisis.<br>' +
+              '<b>No hacer:</b> fibrinólisis sistémica en A–C2 (daño, AHA 2026 clase III) · trasladar un E sin estabilizar o sin lisis si no hay contraindicación (clase III) · sedación profunda o IOT sin indicación (riesgo de colapso del VD y PCR) · sobrecarga de volumen (&gt;500 mL sin valorar el VD) · esperar a ecocardiografía, TTPa o segunda analítica para trasladar · punciones no compresibles (subclavia, yugular sin ecografía) · ACOD en el TEP inestable o si se prevé reperfusión.'
+          },
+          {
             l: 'Checklist en urgencias', t: 'Checklist en urgencias',
-            show: '☐ Probabilidad clínica documentada: PERC si gestalt bajo + vía A (Wells/Ginebra) o vía B (YEARS), no ambas<br>☐ Dímero D interpretado en las unidades del laboratorio (FEU/DDU)<br>☐ Angio-TC con cociente VD/VI informado<br>☐ POCUS registrada si hubo operador (VD/VI, septo, TAPSE, McConnell, VCI, compresión venosa)<br>☐ Troponina, NT-proBNP y lactato antes de categorizar; relleno capilar y diuresis anotados<br>☐ PESI/sPESI/Hestia y categoría A–E (± R) escrita en la historia<br>☐ Peso real y talla registrados; peso ideal si IOT<br>☐ Anticoagulante iniciado (HNF en E, D2 y D con reperfusión prevista; HBPM en el resto) o contraindicación documentada<br>☐ C3–E: PERT llamado (hora) y guardia del HUV si procede<br>☐ E: PCR valorada primero; contraindicaciones revisadas, alteplasa iniciada (hora), HNF parada<br>☐ Alta: anticoagulante entregado, control 48 h–7 d, signos de alarma explicados'
+            show: '☐ Probabilidad clínica documentada: PERC si gestalt bajo + vía A (Wells/Ginebra) o vía B (YEARS), no ambas<br>☐ Dímero D interpretado en las unidades del laboratorio (FEU/DDU)<br>☐ Angio-TC con cociente VD/VI informado<br>☐ POCUS registrada si hubo operador (VD/VI, septo, TAPSE, McConnell, VCI, compresión venosa)<br>☐ Troponina, NT-proBNP y lactato antes de categorizar; relleno capilar y diuresis anotados<br>☐ PESI/sPESI/Hestia y categoría A–E (± R) escrita en la historia<br>☐ Peso real y talla registrados; peso ideal si IOT<br>☐ Anticoagulante iniciado (HNF en E, D2 y D con reperfusión prevista; HBPM en el resto) o contraindicación documentada<br>☐ C3–E: PERT llamado (hora)<br>☐ E: PCR valorada primero; contraindicaciones revisadas, alteplasa o tenecteplasa (hora), HNF parada<br>☐ Traslado: destino según necesidad (Vic sin intervencionismo), optimización A-B-C, SBAR, imagen en HC3/PACS, consentimiento, plan de desvío<br>☐ Alta: anticoagulante entregado, control 48 h–7 d, signos de alarma explicados'
           }
         ]
       }
     };
   })(),
   steps:[
-  {type:'info', text:'Campdevànol resuelve A, B y C in situ; D se coordina con el PERT del Clínic y E se fibrinoliza localmente sin esperar traslado. Sin UCI ni ecocardiografía reglada; POCUS si hay urgenciólogo formado. Red: HUV (Vic, ~30 min: UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO)'},
+  {type:'info', text:'Campdevànol resuelve A, B y C in situ; D se coordina con el PERT del Clínic y E se fibrinoliza localmente sin esperar traslado (hoy con tenecteplasa; alteplasa de elección pendiente de stock). Sin UCI ni ecocardiografía reglada; POCUS si hay urgenciólogo formado. Red: CHV Vic (~30 min: solo UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO)'},
   {type:'action', text:'ABC, constantes, ECG y monitor; peso real y talla; dos vías si hay compromiso hemodinámico. O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF); VMNI/IOT con precaución'},
   {type:'decision', text:'¿PCR, hipotensión persistente o shock?', yes:'Sí', no:'No'},
   {type:'action', branch:'yes', text:'HNF bolo 80 U/kg. Trasladable a TC → angio-TC inmediato acompañado. No trasladable: PCR con sospecha fundada → lisis empírica sin imagen (ERC 2025); shock con pulso → POCUS: VD dilatado sin otra causa → tratar como E; VD normal → otra causa'},
@@ -2791,11 +2827,11 @@ window.PROTOCOLS = [
   {type:'action', text:'Angio-TC con VD/VI. TEP confirmado: hemodinámica + PESI/sPESI/Hestia + VD (TC/POCUS) + troponina, NT-proBNP y lactato → categoría A–E (± R) en la historia. Subsegmentario aislado: revisar con Radiología y anticoagular'},
   {type:'action', text:'A–B (gravedad baja, VD y biomarcadores normales): ACOD (apixabán 10 mg/12 h × 7 d → 5 mg/12 h o rivaroxabán 15 mg/12 h × 21 d → 20 mg/24 h) y alta precoz, control 48 h–7 d. B* (VD o biomarcador alterado): no alta precoz'},
   {type:'action', text:'C1–C3 (gravedad elevada): enoxaparina 1 mg/kg/12 h SC (ClCr 15–30 → cada 24 h; <15 → HNF) → planta Campdevànol; C3 con monitor en observación. PERT en C–E (prioritario en C3)'},
-  {type:'action', text:'D1 (hipotensión transitoria/relativa) / D2 (hipoperfusión: lactato >2, LRA, diuresis <0,5 mL/kg/h, alteración mental, PAM <60): HBPM en D1, HNF en D2 + PERT Clínic en ≤30 min; no candidato → guardia del HUV. D2 que empeora o traslado >60–90 min → lisis local con el PERT'},
-  {type:'action', text:'E: HNF 80 U/kg + PERT + UCI del HUV. ¿PCR? → alteplasa 50 mg en bolo ± 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg), RCP ≥60–90 min. Sin PCR y sin contraindicación absoluta → alteplasa 100 mg en 2 h (10 + 90; <65 kg máx. 1,5 mg/kg); dosis reducida 50 mg IIb. Contraindicación absoluta → PERT (catéter/ECMO)'},
-  {type:'info', text:'Nunca trasladar un E antes de estabilizarlo (AHA 2026, clase 3) ni un D sin anticoagulación parenteral en curso. Parar la HNF durante la alteplasa (criterio local propuesto, a consensuar con la Dirección Asistencial, el HUV y el PERT); reiniciar sin bolo cuando TTPa ≤2 × normal'},
+  {type:'action', text:'D1 (hipotensión transitoria/relativa) / D2 (hipoperfusión: lactato >2, LRA, diuresis <0,5 mL/kg/h, alteración mental, PAM <60): HBPM en D1, HNF en D2 + PERT Clínic en ≤30 min; no candidato → CHV Vic (UCI en D2, MI en D1). D2 que empeora o traslado >60–90 min → lisis local con el PERT'},
+  {type:'action', text:'E: HNF 80 U/kg + PERT + UCI de Vic. ¿PCR? → alteplasa 50 mg en bolo ± 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg), RCP ≥60–90 min. Sin PCR y sin contraindicación absoluta → alteplasa 100 mg en 2 h (10 + 90; <65 kg máx. 1,5 mg/kg); dosis reducida 50 mg IIb. Mientras no haya alteplasa: tenecteplasa en bolo único por peso real (<60 kg 30 mg · 60–69 35 · 70–79 40 · 80–89 45 · ≥90 kg 50 mg; misma dosis en PCR). Contraindicación absoluta → PERT (catéter/ECMO)'},
+  {type:'info', text:'Traslado (flujograma 4): optimización A-B-C → PERT decide Clínic (catéter, embolectomía, ECMO-VA) o CHV Vic (UCI/MI) → checklist SBAR y plan de desvío. Nunca trasladar un E antes de estabilizarlo (AHA 2026, clase 3) ni un D sin anticoagulación parenteral en curso. Parar la HNF durante la alteplasa (criterio CHV; con tenecteplasa, suspender la perfusión); reiniciar sin bolo cuando TTPa ≤2 × normal'},
   {type:'info', text:'Al alta: anticoagulación ≥3 meses, control a las 48 h–7 d y a los ~3 meses; signos de alarma (sangrado, disnea súbita, síncope); evitar AINE. Disnea o intolerancia persistente → estudio de HPTEC'}],
-  src:'Protocolo TEP agudo Hospital de Campdevànol v2.0 (08/11/2026, revisión v2.2: anexos A3 YEARS y A7 Bova como dato pronóstico; sustituye a la v1.1) · 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN PE Guideline (Creager MA, Circulation 2026;153:e977; corrección Circulation 2026;154:e24) · ESC/ERS 2019: Konstantinides SV, Eur Heart J 2020;41:543-603 · ERC 2025 ALS y Special Circumstances (Lott C, PMID 41117569) · ISTH 2026 (Talerico R) e ISTH 2021 (Martin KA) · CHEST 2021: Stevens SM, Chest 2021;160:e545 · ASH 2020 · Hunsicker O, Crit Care 2026 · Barco S, Eur Heart J 2019;40:902 · HOME-PE: Roy PM 2021 · Bova C, Eur Respir J 2014;44:694-703 · PERC/PROPER (Kline 2004; Freund 2018) · ADJUST-PE (Righini 2014) · YEARS (van der Hulle 2017) y YEARS modificado (Freund, JAMA 2021) · Artemis (van der Pol, NEJM 2019) · Le Gal, Ann Intern Med 2022 · Wang C, Chest 2010 · Ficha técnica de alteplasa (CIMA) · protocolo del Consorci Hospitalari de Vic (HUV) 2026'},
+  src:'Protocolo TEP agudo Hospital de Campdevànol v3.0 clínica (nov 2026; reorganiza la v2.1/v2.2 sin cambios de criterio; tenecteplasa disponible mientras la alteplasa está pendiente de stock) y flujograma 4 de traslado interhospitalario · Rali P, Chest 2021;160:1844-52 (traslado del TEP) · 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN PE Guideline (Creager MA, Circulation 2026;153:e977; corrección Circulation 2026;154:e24) · ESC/ERS 2019: Konstantinides SV, Eur Heart J 2020;41:543-603 · ERC 2025 ALS y Special Circumstances (Lott C, PMID 41117569) · ISTH 2026 (Talerico R) e ISTH 2021 (Martin KA) · CHEST 2021: Stevens SM, Chest 2021;160:e545 · ASH 2020 · Hunsicker O, Crit Care 2026 · Barco S, Eur Heart J 2019;40:902 · HOME-PE: Roy PM 2021 · Bova C, Eur Respir J 2014;44:694-703 · PERC/PROPER (Kline 2004; Freund 2018) · ADJUST-PE (Righini 2014) · YEARS (van der Hulle 2017) y YEARS modificado (Freund, JAMA 2021) · Artemis (van der Pol, NEJM 2019) · Le Gal, Ann Intern Med 2022 · Wang C, Chest 2010 · Ficha técnica de alteplasa (CIMA) · protocolo del Consorci Hospitalari de Vic (CHV) 2026'},
 
 {id:'epals', soloPcr:true, title:'Niño grave y PCR pediátrica (EPALS 2025)', sub:'Reconocimiento ABCDE, PCR, arritmias, shock, anafilaxia, insuficiencia respiratoria y convulsiones', badge:'red', tag:'Crítico', rank:99, steps:[],
   src:'Curso EPALS 2025 del ERC (módulo online, versión española; resumen de estudio propio) · ERC Guidelines 2025 Paediatric Life Support: Djakow J, Resuscitation 2025;110767 · PMID 41117571',

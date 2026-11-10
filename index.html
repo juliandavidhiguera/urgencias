@@ -5230,7 +5230,7 @@ const FARM_ESQUEMAS = {
   },
   'tnk-tep': (p) => {
     const tabla = '&lt;60 kg 30 mg · 60–&lt;70 kg 35 mg · 70–&lt;80 kg 40 mg · 80–&lt;90 kg 45 mg · ≥90 kg 50 mg';
-    return ['<b>Solo si no hay alteplasa</b> (fuera de ficha en TEP; con el PERT y Farmacia). Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. <b>Incompatible con glucosa</b>: vía lavada con SF 0,9 %.',
+    return ['<b>Disponible actualmente en Urgencias</b> (alteplasa, de elección, pendiente de stock); fuera de ficha en TEP, peso real, misma dosis en PCR. Reconstituir el vial de 50 mg con 10 ml del agua del envase (5 mg/ml), sin agitar. <b>Incompatible con glucosa</b>: vía lavada con SF 0,9 %.',
       p ? _tnkFila([30, 35, 40, 45, 50][_tnkTramo(p)], p) : 'Por tramos de peso: ' + tabla + '. <i>Introduce el peso.</i>',
       '10 ml de SF 0,9 % antes y después del bolo.'];
   },
