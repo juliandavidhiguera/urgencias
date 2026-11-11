@@ -2292,15 +2292,17 @@ window.PROTOCOLS = [
       const fc = has(v.fc) ? v.fc : NaN;
       const confirmado = v.conf || v.incid || v.hemo > 0;
 
+      /* Escalas de probabilidad: se calculan siempre (también entran en el resumen para la historia) */
+      const w = (v.wTvp ? 3 : 0) + (v.wAlt ? 3 : 0) + (has(fc) && fc > 100 ? 1.5 : 0) + (v.wInm || v.wInmov ? 1.5 : 0) + (v.wPrev ? 1.5 : 0) + (v.wHemop ? 1 : 0) + (v.cancer ? 1 : 0);
+      /* Ginebra revisada (Le Gal 2006): 0–3 baja · 4–10 intermedia · ≥11 alta */
+      const g = (has(v.edad) && v.edad > 65 ? 1 : 0) + (v.wPrev ? 3 : 0) + (v.wInm ? 2 : 0) + (v.cancer ? 2 : 0) + (v.dolorMI ? 3 : 0) + (v.wHemop ? 2 : 0) + (has(fc) ? (fc >= 95 ? 5 : fc >= 75 ? 3 : 0) : 0) + (v.wTvp ? 4 : 0);
+      const perc = [has(v.edad) ? v.edad >= 50 : null, has(fc) ? fc >= 100 : null, has(v.spo2) ? v.spo2 < 95 : null, v.wTvp, v.wHemop, v.wInm, v.wPrev, v.estrog];
+      const percPos = perc.filter(x => x === true).length, percFalta = perc.filter(x => x === null).length;
+
       /* 1. Probabilidad clínica (solo si no está confirmado): vía A, Wells */
       if (!v.conf && !v.incid && v.hemo < 2) {
-        const w = (v.wTvp ? 3 : 0) + (v.wAlt ? 3 : 0) + (has(fc) && fc > 100 ? 1.5 : 0) + (v.wInm || v.wInmov ? 1.5 : 0) + (v.wPrev ? 1.5 : 0) + (v.wHemop ? 1 : 0) + (v.cancer ? 1 : 0);
-        /* Ginebra revisada (Le Gal 2006): 0–3 baja · 4–10 intermedia · ≥11 alta */
-        const g = (has(v.edad) && v.edad > 65 ? 1 : 0) + (v.wPrev ? 3 : 0) + (v.wInm ? 2 : 0) + (v.cancer ? 2 : 0) + (v.dolorMI ? 3 : 0) + (v.wHemop ? 2 : 0) + (has(fc) ? (fc >= 95 ? 5 : fc >= 75 ? 3 : 0) : 0) + (v.wTvp ? 4 : 0);
         const gen = v.via === 3, g3 = g <= 3 ? 'baja' : g <= 10 ? 'intermedia' : 'alta';
         const w3 = gen ? g3 : w < 2 ? 'baja' : w <= 6 ? 'intermedia' : 'alta', alta = w3 === 'alta', baja = w3 === 'baja';
-        const perc = [has(v.edad) ? v.edad >= 50 : null, has(fc) ? fc >= 100 : null, has(v.spo2) ? v.spo2 < 95 : null, v.wTvp, v.wHemop, v.wInm, v.wPrev, v.estrog];
-        const percPos = perc.filter(x => x === true).length, percFalta = perc.filter(x => x === null).length;
         const resumen = '<br><b>Con estos datos:</b> Wells ' + String(w).replace('.', ',') + ' (' + (w < 2 ? 'baja' : w <= 6 ? 'intermedia' : 'alta') + ') · Ginebra revisada ' + g + (has(fc) ? '' : '*') + ' (' + g3 + ') · PERC ' + (percFalta ? 'incompleto' : percPos + ' de 8 positivos') + (has(fc) ? '' : ' <span class="pe-nota">*falta la FC</span>');
         const corte = has(v.edad) && v.edad > 50 ? v.edad * 10 : 500;
         let conducta;
@@ -2428,6 +2430,17 @@ window.PROTOCOLS = [
           '<br>PERT Clínic: 932 27 54 00, busca 380396 · SEM 061 (SVA) para D–E. Vic solo tiene UCI y Medicina Interna: catéter, embolectomía y ECMO-VA únicamente en el Clínic.' +
           '<br><span class="pe-nota">Protocolo v3.0 (nov 2026) pendiente de validación con UCI y Medicina Interna del CHV, PERT del Clínic, Farmacia y Dirección médica.</span>'});
       }
+
+      /* Resumen de puntuaciones para la historia clínica: sale al final del flujograma y entra en «Copiar resumen» */
+      const probDatos = v.wTvp || v.wAlt || v.wInm || v.wInmov || v.wPrev || v.wHemop || v.dolorMI || v.estrog || has(v.dd) || v.via > 0;
+      const niv = (x, a, b) => x <= a ? 'baja' : x <= b ? 'intermedia' : 'alta';
+      const yItems = (v.wTvp ? 1 : 0) + (v.wHemop ? 1 : 0) + (v.wAlt ? 1 : 0);
+      const probH = (out.find(s => /^Probabilidad clínica/.test(s.t)) || { h: '' }).h;
+      const probFin = /PERC 8\/8 negativos → TEP descartado|→ TEP descartado/.test(probH) ? ' → TEP descartado' : /angio-TC directo|→ angio-TC/.test(probH) ? ' → angio-TC' : '';
+      out.resumen = [
+        probDatos ? 'Probabilidad clínica (vía elegida: ' + ['Wells', 'YEARS', 'YEARS modificado', 'Ginebra revisada'][v.via || 0] + '): Wells ' + String(w).replace('.', ',') + ' (' + (w < 2 ? 'baja' : w <= 6 ? 'intermedia' : 'alta') + ') · Ginebra revisada ' + g + ' (' + niv(g, 3, 10) + ')' + (has(fc) ? '' : ' (falta FC)') +
+          ' · PERC ' + (percFalta ? 'incompleto' : percPos + ' de 8 positivos') + ' · YEARS ' + yItems + (yItems === 1 ? ' ítem' : ' ítems') + (has(v.dd) ? ' · dímero D ' + v.dd + ' ng/mL FEU' : '') + probFin : ''
+      ].concat(out.filter(s => /^(Gravedad|Categoría)/.test(s.t)).map(s => s.t)).filter(Boolean);
       return out;
     }
   },

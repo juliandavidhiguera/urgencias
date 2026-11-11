@@ -2671,6 +2671,8 @@ function _escPintar(pid) {
     return '<div class="esc-res-it"><div class="esc-res-t"><b>' + esc(l1) + '</b>' + (rest.join(' ').trim() ? '<span>' + esc(rest.join(' ').trim()) + '</span>' : '') + '</div>' +
       '<button class="esc-res-x" onclick="escQuitar(\'' + pid + '\',\'' + id + '\')" aria-label="Quitar ' + esc(l1.split(':')[0]) + ' del caso">✕</button></div>';
   }).join('') : '';
+  const p = PROTOCOLS.find(x => x.id === pid);
+  if (p && p.flow && document.getElementById('fl-' + pid + '-body')) renderFlow(pid); // el recuadro de puntuaciones del flujo las recoge
 }
 
 /* Medicación del caso: el fármaco que se pulsa en un flujograma queda elegido (✓), se lista en
@@ -2763,6 +2765,17 @@ function _flowHtml(p) {
     '<button class="reset-btn" onclick="resetFlow(\'' + p.id + '\')">↺ Empezar de nuevo</button>' +
     '<button class="btn btn-copy" onclick="copyFlow(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resumen</button>' +
     '</div>';
+}
+
+/* Puntuaciones del caso (protocolos con evaluador): las escalas que salen de los datos de arriba, en
+   líneas cortas para la historia clínica. El evaluador puede dar su propio resumen (out.resumen); si no,
+   se usan los títulos de sus apartados salvo tratamiento y destino. */
+function _flowPunt(p) {
+  if (!p.eval) return [];
+  const r = p.eval.calc(_evalVals(p));
+  const tmp = document.createElement('div');
+  const txt = h => { tmp.innerHTML = h; return tmp.textContent.trim(); };
+  return (r.resumen || r.filter(s => !/^(Tratamiento|Destino|Respuesta y destino|Introduce)/.test(s.t)).map(s => s.t)).map(txt).filter(Boolean);
 }
 
 function _flowShow(n, v, pid, nid) {
@@ -2869,6 +2882,12 @@ function renderFlow(pid) {
           (sug ? '<span class="fl-sug-tag">según los datos</span>' : '') + '</button>';
       }).join('') + '</div></div>');
   }).join('');
+  const punt = _flowPunt(p).concat(Object.values(_escRes[pid] || {}).map(t => t.split('\n')[0]));
+  if (punt.length) {
+    const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    body.insertAdjacentHTML('beforeend', '<div class="esc-res fl-punt"><div class="esc-res-h">📊 Puntuaciones del caso (entran en «Copiar resumen»)</div>' +
+      punt.map(l => '<div class="esc-res-it"><div class="esc-res-t"><b>' + esc(l) + '</b></div></div>').join('') + '</div>');
+  }
   const ex = document.getElementById('fl-' + pid + '-extras');
   if (ex) {
     const abiertos = _flowExtra[pid] || [];
@@ -2932,6 +2951,8 @@ function copyFlow(pid) {
     const it = p.flow.extras.items[k];
     lineas.push((it.t || txt(it.l)) + '\n' + txt(typeof it.show === 'function' ? it.show(v) : it.show));
   });
+  const punt = _flowPunt(p);
+  if (punt.length) lineas.push('Puntuaciones:\n' + punt.map(l => '• ' + l).join('\n'));
   navigator.clipboard.writeText(p.title + (datos ? '\nDatos: ' + datos : '') + '\n\n' + lineas.join('\n\n') + _farmTxt(pid) + _escTxt(pid)).then(showToast).catch(showCopyError);
 }
 
