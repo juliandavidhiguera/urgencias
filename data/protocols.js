@@ -805,7 +805,7 @@ window.PROTOCOLS = [
     muyAltoCrit:function(v){
       const has = x => !isNaN(x);
       return [has(v.tas) && v.tas < 90 ? 'TAS ' + v.tas + ' &lt;90 mmHg (inestabilidad hemodinámica)' : '', v.killip === 4 ? 'shock cardiogénico (Killip IV)' : '',
-        v.killip === 2 || v.killip === 3 ? 'insuficiencia cardiaca (Killip ' + (v.killip === 2 ? 'II' : 'III') + '), si es por isquemia' : '',
+        v.killip === 3 ? 'insuficiencia cardiaca (Killip III), si es por isquemia' : '',
         v.pcr ? 'parada cardiaca recuperada' : '', v.muyAlto ? 'otro criterio clínico de muy alto riesgo' : ''].filter(Boolean);
     },
     calc:function(v){
@@ -1109,7 +1109,7 @@ window.PROTOCOLS = [
     /* SCASEST de muy alto riesgo (ficha SEM, criterio 1). Killip IV = shock; Killip II–III = insuficiencia cardiaca. */
     muyAlto:function(v){
       return [v.inest ? 'inestabilidad hemodinámica o shock' : v.killip === 4 ? 'shock cardiogénico (Killip IV)' : '', v.refr ? 'dolor recurrente o refractario' : '', v.arrit ? 'arritmias potencialmente mortales' : '',
-        v.mec ? 'complicación mecánica' : '', v.icr ? 'insuficiencia cardiaca relacionada' : v.killip === 2 || v.killip === 3 ? 'insuficiencia cardiaca (Killip ' + (v.killip === 2 ? 'II' : 'III') + '), si es por el SCA' : '',
+        v.mec ? 'complicación mecánica' : '', v.icr ? 'insuficiencia cardiaca relacionada' : v.killip === 3 ? 'insuficiencia cardiaca (Killip III), si es por el SCA' : '',
         v.sttr ? 'elevación transitoria del ST' : ''].filter(Boolean);
     },
     /* Estrategia por el tiempo ECG → llegada al hospital con ICP: &lt;90 ICP · 90–120 individualizar · &gt;120 fibrinólisis. */
