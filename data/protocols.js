@@ -83,6 +83,185 @@ window.PROTOCOLS = [
   src:'ERC 2025 Special Circumstances · PMID 41117569 · ERC 2025 First Aid · PMID 41117568 · Actualizacion de evidencia en anafilaxia: Dodd 2021 · PMID 33895231 · Preparacion de la perfusion IV: LoVerde 2017 · PMID 28800865'},
 
 {id:'fa-rapida', title:'FA con respuesta ventricular rápida', sub:'Control de frecuencia vs cardioversión — ESC 2024', badge:'amber', tag:'Urgente', rank:13,
+  /* Evaluador: los datos se meten una vez. Calcula CHA₂DS₂-VA, CHA₂DS₂-VASc, HAS-BLED y mEHRA (ítems, puntos
+     y cortes de data/scales.js: chadsva, chadsvasc, hasbled, ehra) y propone la estrategia, la cardioversión,
+     la anticoagulación y las dosis por peso real según el algoritmo, la hoja de anticoagulantes y la de sedación
+     de Campdevànol (protocolos/FA_*_Campdevanol.pdf, v2.0). El flujograma usa estos mismos datos (v.peso, v.tas…). */
+  eval:{
+    items:[
+      {t:'h', l:'Datos del paciente (sirven para las escalas y las dosis)'},
+      {k:'edad', t:'num', l:'Edad', u:'años'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'tas', t:'num', l:'TAS', u:'mmHg'},
+      {k:'fc', t:'num', l:'FC', u:'lpm'},
+      {k:'mujer', t:'chk', l:'Sexo femenino (solo cuenta en la CHA₂DS₂-VASc de la ACC/AHA)'},
+      {t:'h', l:'Situación (algoritmo de FA de Campdevànol)'},
+      {k:'preex', t:'chk', l:'Sospecha de FA preexcitada: QRS ancho, de morfología cambiante, muy irregular, a menudo FC &gt;250 lpm; onda delta en ECG previos'},
+      {k:'inest', t:'chk', l:'Inestabilidad hemodinámica atribuible a la FA: hipotensión, shock, edema agudo de pulmón, síncope o isquemia en curso'},
+      {k:'fevi', t:'sel', l:'Función ventricular', o:[['Sin indicar',0],['FEVI &gt;40 % (o desconocida sin signos de insuficiencia cardiaca)',1],['FEVI ≤40 %, insuficiencia cardiaca o TAS límite',2]]},
+      {k:'estruct', t:'sel', l:'Cardiopatía estructural: IC o FEVI reducida, hipertrofia ventricular grave, valvulopatía significativa o cardiopatía isquémica', o:[['Sin indicar',0],['No',1],['Sí',2]]},
+      {k:'durac', t:'sel', l:'Duración del episodio', o:[['Sin indicar',0],['&lt;24 h de inicio seguro',1],['&gt;24 h o duración desconocida',2]]},
+      {k:'acoPrev', t:'chk', l:'Anticoagulado eficazmente ≥3 semanas'},
+      /* mEHRA: opciones y puntos de scales.js (ehra) */
+      {k:'ehra', t:'sel', l:'Síntomas atribuibles a la FA (mEHRA)', o:[['Sin valorar',0],['1 — sin síntomas',1],['2a — leves: actividad diaria normal, síntomas no molestos',2],['2b — moderados: actividad diaria normal pero síntomas molestos',3],['3 — graves: actividad diaria afectada',4],['4 — incapacitantes: actividad diaria interrumpida',5]]},
+      {t:'h', l:'CHA₂DS₂-VA (ESC 2024; la edad sale de arriba)'},
+      {k:'ic', t:'chk', l:'C — IC crónica (síntomas con cualquier FEVI, o FEVI ≤40 % asintomática)'},
+      {k:'hta', t:'chk', l:'H — Hipertensión (&gt;140/90 en ≥2 ocasiones o en tratamiento)'},
+      {k:'dm', t:'chk', l:'D — Diabetes mellitus (tipo 1 o 2, o en tratamiento)'},
+      {k:'ictus', t:'sel', l:'S — Ictus, AIT o tromboembolismo arterial previo (en HAS-BLED solo puntúa el ictus)', o:[['No',0],['AIT o tromboembolismo arterial, sin ictus',1],['Ictus',2]]},
+      {k:'vasc', t:'chk', l:'V — Enfermedad vascular (IAM, angina, revascularización, EAP)'},
+      {t:'h', l:'HAS-BLED (la edad y el ictus salen de arriba)'},
+      {k:'hbHta', t:'chk', l:'H — HTA no controlada (TAS &gt;160 mmHg)'},
+      {k:'renal', t:'chk', l:'A — Función renal alterada (diálisis, trasplante, Cr ≥200 µmol/L ≈ 2,26 mg/dL)'},
+      {k:'hepat', t:'chk', l:'A — Función hepática alterada (cirrosis, o Bil &gt;2× LSN + AST/ALT/FA &gt;3× LSN)'},
+      {k:'sangr', t:'chk', l:'B — Sangrado previo o predisposición (anemia)'},
+      {k:'inrLab', t:'chk', l:'L — INR lábil (TRT &lt;60 %)'},
+      {k:'farm', t:'chk', l:'D — Fármacos (AINE, antiagregantes)'},
+      {k:'alcohol', t:'chk', l:'D — Alcohol ≥8 UBE/semana'},
+      {t:'h', l:'Anticoagulante: dosis y contraindicaciones'},
+      {k:'cr', t:'num', l:'Creatinina', u:'mg/dl'},
+      {k:'fg', t:'num', l:'FG por Cockcroft-Gault', u:'ml/min'},
+      {k:'verap', t:'chk', l:'Toma verapamilo'},
+      {k:'protesis', t:'chk', l:'Prótesis valvular mecánica o estenosis mitral moderada-grave'},
+      {k:'ciAco', t:'chk', l:'Contraindicación de los ACOD: sangrado activo significativo o lesión de alto riesgo hemorrágico, embarazo o lactancia, hepatopatía grave (Child-Pugh C), cirugía o procedimiento reciente de alto riesgo hemorrágico'}
+    ],
+    calc:function(v){
+      const has = x => typeof x === 'number' && !isNaN(x);
+      const out = [];
+      const SEL = ['fevi', 'estruct', 'durac', 'ehra', 'ictus'];
+      if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !(SEL.includes(k) && v[k] === 0)))) return [{t:'Introduce los datos del paciente', c:'', h:'Edad, peso, TAS, FC, estabilidad, duración y factores de riesgo: CHA₂DS₂-VA, HAS-BLED, mEHRA, la estrategia (frecuencia, ritmo, cardioversión), la anticoagulación y las dosis por peso real se calculan al momento.'}];
+      const f1 = n => String(Math.round(n * 10) / 10).replace('.', ',');
+      const pesoOk = has(v.peso) && v.peso > 0, edadOk = has(v.edad) && v.edad > 0;
+      const pk = (a, b, u, max) => pesoOk ? ' (<b>' + f1(Math.min(v.peso * a, max || Infinity)) + (b ? '–' + f1(Math.min(v.peso * b, max || Infinity)) : '') + ' ' + u + '</b> con ' + f1(v.peso) + ' kg)' : '';
+      const fg = has(v.fg) && v.fg > 0 ? v.fg : NaN;
+      const tasBaja = has(v.tas) && v.tas < 100;
+      const NOTA = '<span class="pe-nota">Algoritmo de FA de Campdevànol v2.0 (ESC 2024), pendiente de validación por la autora.</span>';
+      const ALG = '<span class="pe-nota">Algoritmo de FA de Campdevànol v2.0 · ';
+
+      /* Dosis de anticoagulantes (hoja de anticoagulantes en FA de Campdevànol v2.0, ESC 2024 y EHRA 2018) */
+      const crit = [edadOk ? v.edad >= 80 : null, pesoOk ? v.peso <= 60 : null, has(v.cr) ? v.cr >= 1.5 : null];
+      const nCrit = crit.filter(x => x === true).length, critFalta = crit.filter(x => x === null).length;
+      const apixRed = nCrit >= 2, apixPend = !apixRed && nCrit + critFalta >= 2;
+      const apix = has(fg) && fg < 15 ? 'apixabán: no (FG &lt;15)' : has(fg) && fg < 30 ? '<b>apixabán 2,5 mg/12 h</b> (FG 15–29, precaución)' :
+        apixRed ? '<b>apixabán 2,5 mg/12 h</b> (' + nCrit + ' de 3 criterios: ≥80 años, ≤60 kg, creatinina ≥1,5)' : '<b>apixabán 5 mg/12 h</b>' + (apixPend ? ' (faltan datos para los criterios de reducción: ≥80 años, ≤60 kg, creatinina ≥1,5 mg/dl)' : '');
+      const riva = has(fg) && fg < 15 ? 'rivaroxabán: no (FG &lt;15)' : has(fg) && fg < 50 ? '<b>rivaroxabán 15 mg/24 h</b> con la cena (FG ' + (fg < 30 ? '15–29, precaución' : '30–49') + ')' : '<b>rivaroxabán 20 mg/24 h</b> con la cena';
+      const dabi = has(fg) && fg < 30 ? 'dabigatrán: contraindicado (FG &lt;30)' :
+        (edadOk && v.edad >= 80) || v.verap ? '<b>dabigatrán 110 mg/12 h</b> (' + (edadOk && v.edad >= 80 ? '≥80 años' : 'verapamilo') + ')' :
+        '<b>dabigatrán 150 mg/12 h</b>' + (has(fg) && fg <= 50 ? ' (FG 30–50: 110 mg/12 h solo si el riesgo hemorrágico es alto)' : '') + (edadOk && v.edad >= 75 ? ' (75–80 años: valorar 110 mg de forma individual)' : '');
+      const acod = (has(fg) ? '' : '<b>Falta el FG (Cockcroft-Gault)</b> para ajustar. ') + apix + ' · ' + riva + ' · ' + dabi + '.';
+      const hep = '<b>HNF</b> bolo 60–80 UI/kg IV (máx. 5.000)' + (pesoOk ? ' (<b>' + Math.min(Math.round(v.peso * 60), 5000) + '–' + Math.min(Math.round(v.peso * 80), 5000) + ' UI</b>)' : '') +
+        ' + 12–18 UI/kg/h' + (pesoOk ? ' (<b>' + Math.round(v.peso * 12) + '–' + Math.round(v.peso * 18) + ' UI/h</b>)' : '') + ', TTPa 1,5–2,5 veces el control (60–100 s), control a las 4–6 h; sin ajuste por FG. O <b>enoxaparina 1 mg/kg/12 h SC</b>' +
+        (pesoOk ? ' (<b>' + Math.round(v.peso) + ' mg</b>)' : '') + (has(fg) && fg < 30 ? (fg < 15 ? '; <b>FG &lt;15: usar HNF IV</b>' : '; <b>FG 15–29: 1 mg/kg/24 h</b>') : '; FG 15–29: 1 mg/kg/24 h; FG &lt;15: HNF IV') + '.';
+      const ciTxt = (v.protesis ? '<br><b>Prótesis valvular mecánica o estenosis mitral moderada-grave: solo acenocumarol o warfarina (INR 2–3), no ACOD.</b>' : '') +
+        (v.ciAco ? '<br><b>Contraindicación de los ACOD marcada</b> (sangrado activo, embarazo o lactancia, Child-Pugh C, cirugía de alto riesgo): no usar ACOD.' : '');
+
+      /* 1. Preexcitación y estabilidad (algoritmo, pasos 0 y 1) */
+      let estado;
+      if (v.preex) {
+        estado = 'preexcitada';
+        out.push({t:'FA preexcitada: NO frenar el nodo AV', c:'high', h:'No betabloqueante, verapamilo, diltiazem, digoxina, adenosina ni amiodarona IV (aceleran la vía accesoria → FV). <b>Cardioversión eléctrica</b>' +
+          (v.inest ? ' inmediata (inestable).' : '; si está estable, alternativa: procainamida o <b>flecainida 2 mg/kg IV</b> en 10 min (máx. 150 mg)' + pk(2, 0, 'mg', 150) + '.') + ' Avisar a cardiología.<br>' + ALG + 'paso 0.</span>'});
+      } else if (v.inest) {
+        estado = 'inestable';
+        out.push({t:'Inestable: cardioversión eléctrica sincronizada urgente', c:'high', h:'<b>200 J bifásicos, sincronizada</b>, con sedación (abajo). No esperar a la anticoagulación ni a la duración: heparina en cuanto sea posible, sin retrasar la descarga. Monitorización continua.' +
+          (has(v.tas) ? ' TAS ' + v.tas + ' mmHg.' : '') + '<br>Heparina: ' + hep + '<br>' + ALG + 'paso 1.</span>'});
+      } else {
+        estado = 'estable';
+        const icT = v.fevi === 2 || tasBaja;
+        out.push({t:'Estable: control de frecuencia' + (icT ? ' (FEVI ≤40 %, insuficiencia cardiaca o TAS límite)' : v.fevi === 1 ? ' (FEVI &gt;40 %)' : ' (falta la función ventricular)'), c:'mid', h:
+          'Objetivo inicial <b>FC &lt;110 lpm</b>; tratar el desencadenante.' + (has(v.fc) ? ' FC ' + v.fc + ' lpm: ' + (v.fc >= 110 ? 'por encima del objetivo.' : 'dentro del objetivo.') : '') +
+          (has(v.tas) && v.tas < 90 ? ' <b>TAS ' + v.tas + ' mmHg: si la hipotensión se debe a la FA, es inestable → cardioversión eléctrica.</b>' : '') + '<br>' +
+          (icT ? (tasBaja && v.fevi !== 2 ? 'TAS ' + v.tas + ' mmHg: se trata como TAS límite. ' : '') + '<b>Evitar verapamilo y diltiazem.</b> Betabloqueante a dosis bajas (<b>metoprolol 2,5 mg IV</b>) si no hay IC descompensada ni hipotensión. <b>Digoxina 0,5 mg IV lenta</b>, después 0,25 mg cada 6 h (máx. 1,5 mg/24 h; reducir en insuficiencia renal). Amiodarona si está inestable o es refractaria (puede revertir la FA).'
+            : (v.fevi === 0 ? 'Si no hay ecocardiograma previo, trata como FEVI reducida a quien tenga signos de insuficiencia cardiaca. ' : '') + '<b>Metoprolol 2,5–5 mg IV</b> en 2 min; repetir cada 5 min (máx. 15 mg). <b>Verapamilo 2,5–10 mg IV</b> en 5 min (el diltiazem IV no está comercializado en España). No juntar betabloqueante IV y verapamilo IV sin monitorización estrecha.') +
+          '<br>Si no se controla: revisar la causa (sepsis, hipovolemia, anemia, hipoxemia, TEP, tirotoxicosis, iones); combinar betabloqueante o verapamilo + digoxina; amiodarona IV si no basta. Si aparece inestabilidad → cardioversión eléctrica; consultar con cardiología.<br>' + ALG + 'paso 2.</span>'});
+      }
+
+      /* 2. Duración, ritmo y cardioversión (algoritmo, pasos 3 y 4; corte de 24 h, ESC 2024) */
+      const estr = v.estruct === 2 || v.fevi === 2, sinEstr = v.estruct === 1 && v.fevi !== 2;
+      const CV_SIN = '<b>Sin cardiopatía estructural: cardioversión farmacológica o eléctrica.</b> Frenar antes el nodo AV (evita el flutter 1:1): bisoprolol 2,5–5 mg VO 30–60 min antes de la flecainida o propafenona VO; con la IV, asociar un frenador; si ya toma betabloqueante, dar directamente.<br>' +
+        '• <b>Flecainida 2 mg/kg IV</b> en 10 min (máx. 150 mg)' + pk(2, 0, 'mg', 150) + ' o 200–300 mg VO. Parar si el QRS se ensancha &gt;25 %. No con Brugada ni ClCr &lt;35' + (has(fg) && fg < 35 ? ' <b>(FG ' + fg + ': no usar flecainida)</b>' : '') + '.<br>' +
+        '• <b>Propafenona</b> 450–600 mg VO, dosis única.<br>' +
+        '• <b>Vernakalant 3 mg/kg IV</b> en 10 min (máx. 339 mg)' + pk(3, 0, 'mg', 339) + '; si no revierte en 15 min, 2 mg/kg en 10 min (máx. 226 mg)' + pk(2, 0, 'mg', 226) + '. No con TAS &lt;100' + (tasBaja ? ' <b>(TAS ' + v.tas + ': contraindicado)</b>' : '') + ', SCA &lt;30 días, NYHA III–IV, QT largo ni estenosis aórtica grave.<br>' +
+        '• O <b>CVE 200 J bifásicos sincronizada</b>.';
+      const CV_CON = '<b>Con cardiopatía estructural: amiodarona o CVE.</b> <b>Amiodarona 300 mg IV</b> en 30–60 min (≈5 mg/kg), después 900–1.200 mg en 24 h (≈50 mg/h); revierte en horas; vía venosa gruesa y diluida, mejor central si la perfusión es larga. O <b>CVE 200 J bifásicos sincronizada</b>, con sedación. No flecainida ni propafenona.';
+      const CV_PEND = 'Indica si hay <b>cardiopatía estructural</b>: sin ella, cardioversión farmacológica (flecainida, propafenona, vernakalant) o eléctrica; con ella, amiodarona o CVE.';
+      let cvAhora = false;
+      if (estado === 'estable') {
+        if (!v.acoPrev && v.durac === 0) out.push({t:'Duración del episodio: sin indicar', c:'', h:'Si la duración es desconocida → tratar como <b>&gt;24 h</b>. Punto de corte para cardiovertir: 24 h (ESC 2024; antes 48 h; la ACC/AHA 2023 mantiene 48 h).'});
+        else if (v.acoPrev || v.durac === 1) {
+          cvAhora = true;
+          const antes = v.acoPrev ? 'Ya anticoagulado eficazmente ≥3 semanas: continuar la anticoagulación y cardiovertir.' :
+            has(fg) && fg < 30 ? '<b>Anticoagular antes de cardiovertir.</b> FG &lt;30: ' + hep + ' → cardiovertir → anticoagulación crónica (apixabán 2,5 mg/12 h o rivaroxabán 15 mg/24 h si FG 15–29; si FG &lt;15, valorar con nefrología).' :
+            '<b>Anticoagular antes de cardiovertir</b> (ACOD en dosis única y después continuar): <b>apixabán ' + (apixRed ? '5' : '10') + ' mg VO</b>' + (apixRed ? ' (cumple ≥2 criterios de reducción)' : ' (5 mg si ≥2 de: ≥80 años, ≤60 kg, creatinina ≥1,5)') + ' y cardiovertir ≥2 h después; o rivaroxabán 20 mg VO con comida; o dabigatrán 150 mg VO. Después: ' + acod + ' Heparina en urgencia o FG &lt;30: ' + hep;
+          out.push({t:(v.acoPrev ? 'Anticoagulado ≥3 semanas' : 'FA &lt;24 h de inicio seguro') + ': puede cardiovertirse', c:'low', h:antes +
+            '<br><b>¿Cardiovertir ya o esperar?</b> Opción ESC 2024: esperar y ver hasta 48 h con control de frecuencia y anticoagulación (el 69 % revierte solo, no inferior a la cardioversión precoz; RACE 7). Si no revierte → cardioversión.<br>' +
+            (estr ? CV_CON : sinEstr ? CV_SIN : CV_PEND) + ciTxt + '<br>' + ALG + 'pasos 3 y 4; hoja de anticoagulantes.</span>'});
+        } else {
+          out.push({t:'FA &gt;24 h o de duración desconocida: no cardiovertir; anticoagular de inmediato', c:'mid', h:
+            '<b>ACOD a dosis de FA, sin dosis de carga:</b> ' + acod + ' No usar apixabán 10 mg/12 h × 7 días (es la pauta de la trombosis venosa). Acenocumarol (INR 2–3) solo con prótesis mecánica o estenosis mitral moderada-grave. Heparina si FG &lt;30 o ingreso: ' + hep + ciTxt +
+            '<br><b>Vía A — CV diferida:</b> anticoagulación eficaz ≥3 semanas → cardioversión electiva (programar con cardiología).<br><b>Vía B — CV precoz guiada por ETE:</b> con la anticoagulación ya iniciada, la ETE descarta trombo en la orejuela → cardioversión. Si hay trombo: anticoagular ≥3 semanas y repetir la ETE.' +
+            '<br>Mientras tanto: control de frecuencia. Evitar los fármacos que pueden revertir la FA (amiodarona, flecainida) salvo que no haya alternativa.' +
+            (estr ? ' Cuando se cardiovierta: con cardiopatía, amiodarona o CVE.' : sinEstr ? ' Cuando se cardiovierta: sin cardiopatía, farmacológica o eléctrica.' : '') + '<br>' + ALG + 'pasos 3 y 4 (columna &gt;24 h).</span>'});
+        }
+      }
+
+      /* 3. Sedación para la cardioversión eléctrica (hoja de sedación de Campdevànol v2.0, «Elección rápida»; dosis con peso real) */
+      if (v.inest || v.preex || cvAhora) {
+        const anc = edadOk && v.edad > 70;
+        const elige = v.inest ? '<b>Shock, hipotensión o inestable: etomidato 0,1–0,2 mg/kg IV</b>' + pk(0.1, 0.2, 'mg') + ' (inicio en 30–60 s). Si no hay: midazolam 2–3 mg + fentanilo 50 µg IV. Priorizar la CVE.' :
+          anc ? '<b>Anciano (&gt;70 años), ASA III o PA límite: propofol 0,25–0,5 mg/kg</b>' + pk(0.25, 0.5, 'mg') + ', o <b>etomidato 0,1–0,15 mg/kg</b>' + pk(0.1, 0.15, 'mg') + '.' :
+          '<b>Joven, sano y estable: propofol 0,5–1 mg/kg IV lento</b>' + pk(0.5, 1, 'mg') + ' + bolos de 10–20 mg cada 1–2 min.' + (tasBaja ? ' Con PA límite: propofol 0,25–0,5 mg/kg' + pk(0.25, 0.5, 'mg') + ' o etomidato 0,1–0,15 mg/kg' + pk(0.1, 0.15, 'mg') + '.' : '');
+        out.push({t:'Sedación para la cardioversión eléctrica', c:'', h:elige +
+          '<br>Otras: etomidato 0,1–0,2 mg/kg (mínima repercusión hemodinámica) · midazolam 1 mg IV y después 0,5–1 mg cada 2–3 min + fentanilo 25–50 µg · broncoespasmo: propofol a dosis bajas o ketamina 0,5–1 mg/kg IV' + pk(0.5, 1, 'mg') + ' (sube la FC: no es de elección en la FA rápida). Antídotos: flumazenilo 0,2 mg IV cada 1 min (máx. 1 mg); naloxona 0,04–0,2 mg IV cada 2–3 min.' +
+          '<br>Modo <b>sincronizado</b> antes de cada descarga · 200 J bifásicos, si no revierte subir hasta la máxima (360 J) · electrodos anterolaterales o anteroposteriores · monitor, capnografía, vía venosa, O₂, bolsa y aspirador. Si no revierte con 3 descargas: consultar con cardiología.' +
+          '<br><span class="pe-nota">Hoja de sedación para la CVE de Campdevànol v2.0 (ACEP 2014; RAFF2; CHESS).</span>'});
+      }
+
+      /* 4. CHA₂DS₂-VA (scales.js 'chadsva': C1 H1 A₂≥75 2 D1 S₂ 2 V1 A 65–74 1; 0 no · 1 considerar · ≥2 recomendada) */
+      const ageP = edadOk ? (v.edad >= 75 ? 2 : v.edad >= 65 ? 1 : 0) : 0;
+      const chaF = [[v.ic ? 1 : 0, 'C'], [v.hta ? 1 : 0, 'H'], [ageP === 2 ? 2 : 0, 'A₂ ≥75 años'], [v.dm ? 1 : 0, 'D'], [v.ictus > 0 ? 2 : 0, 'S₂'], [v.vasc ? 1 : 0, 'V'], [ageP === 1 ? 1 : 0, 'A 65–74 años']];
+      const cha = chaF.reduce((a, x) => a + x[0], 0);
+      /* CHA₂DS₂-VASc (scales.js 'chadsvasc'): los mismos ítems + Sc sexo femenino 1 */
+      const vasc = cha + (v.mujer ? 1 : 0);
+      const vascI = v.mujer ? (vasc <= 1 ? 'riesgo bajo (solo el sexo): sin anticoagulación' : vasc === 2 ? 'riesgo intermedio: anticoagulación razonable (IIa)' : 'anticoagulación recomendada') :
+        (vasc === 0 ? 'riesgo bajo: anticoagulación no indicada' : vasc === 1 ? 'riesgo intermedio: anticoagulación razonable (IIa)' : 'anticoagulación recomendada');
+      /* HAS-BLED (scales.js 'hasbled': 1 punto por ítem; ≤2 bajo, ≥3 alto; sangrado mayor/100 pacientes-año) */
+      const hbF = [[v.hbHta, 'H'], [v.renal, 'A renal'], [v.hepat, 'A hepática'], [v.ictus === 2, 'S ictus'], [v.sangr, 'B'], [v.inrLab, 'L'], [edadOk && v.edad > 65, 'E &gt;65 años'], [v.farm, 'D fármacos'], [v.alcohol, 'D alcohol']];
+      const hb = hbF.filter(x => x[0]).length;
+      const escDatos = edadOk || chaF.some(x => x[0]) || hbF.some(x => x[0]) || v.mujer;
+      const chaT = cha >= 2 ? 'anticoagulación recomendada' : cha === 1 ? 'considerar anticoagulación' : 'no anticoagular';
+      const hbT = hb <= 2 ? 'bajo' : 'alto';
+      if (escDatos) {
+        out.push({t:'CHA₂DS₂-VA ' + cha + ': ' + chaT, c:cha >= 2 ? 'high' : cha === 1 ? 'mid' : 'low', h:
+          (cha ? '<b>Puntúa:</b> ' + chaF.filter(x => x[0]).map(x => x[1] + ' (' + x[0] + ')').join(' · ') + '. ' : '') + (edadOk ? '' : '<b>Falta la edad</b> (suma 1–2 puntos). ') +
+          '≥2 → anticoagulación recomendada · 1 → considerarla (decisión compartida) · 0 → no anticoagular. Igual en hombres y mujeres.' +
+          (cha >= 1 && !v.protesis ? '<br><b>Dosis de ACOD en FA:</b> ' + acod : '') + ciTxt +
+          '<br><b>Tras cualquier cardioversión: anticoagulación ≥4 semanas</b>' + (cha === 0 && v.durac === 1 && !v.acoPrev ? ' (con CHA₂DS₂-VA 0 e inicio seguro &lt;24 h es opcional)' : ' (opcional solo si el inicio era seguro &lt;24 h y CHA₂DS₂-VA = 0)') + '; después, indefinida según CHA₂DS₂-VA. Pauta local: observación 4 h monitorizado y ECG de control tras la cardioversión.' +
+          '<br>CHA₂DS₂-VASc (ACC/AHA 2023) ' + vasc + ': ' + vascI + '.<br>' + ALG + 'hoja de anticoagulantes; ESC 2024.</span>'});
+        out.push({t:'HAS-BLED ' + hb + ': riesgo hemorrágico ' + hbT, c:hb <= 2 ? 'low' : 'high', h:
+          (hb ? '<b>Puntúa:</b> ' + hbF.filter(x => x[0]).map(x => x[1]).join(' · ') + '. ' : '') + (edadOk ? '' : '<b>Falta la edad.</b> ') +
+          (hb <= 2 ? 'Sangrado mayor ' + ['1,13', '1,02', '1,88'][hb] + '/100 pacientes-año.' : (hb <= 4 ? 'Sangrado mayor ' + ['3,74', '8,70'][hb - 3] + '/100 pacientes-año' : 'Sangrado mayor &gt;8,7/100 pacientes-año (pocos datos)') + ': corregir los factores modificables.') +
+          ' HAS-BLED sirve para corregir los factores de sangrado (HTA, fármacos, alcohol, INR lábil), <b>no para negar la anticoagulación</b>.'});
+      }
+
+      /* 5. mEHRA (scales.js 'ehra') */
+      const ehraC = ['', '1', '2a', '2b', '3', '4'][v.ehra] || '';
+      if (v.ehra > 0) out.push({t:'mEHRA ' + ehraC, c:v.ehra <= 2 ? 'low' : 'high', h:
+        v.ehra === 1 ? 'Asintomático: el control del ritmo no se indica por síntomas; valorar control precoz del ritmo en pacientes seleccionados (ESC 2024, IIa).' :
+        v.ehra === 2 ? 'Síntomas leves: decisión compartida; el control del ritmo está indicado si el objetivo es reducir síntomas y mejorar la calidad de vida (ESC 2024, I).' :
+        'Síntomas que molestan o limitan: control del ritmo para reducir síntomas (ESC 2024, I); 2b es el umbral de tratamiento propuesto para la ablación (Wynn 2014).'});
+
+      /* Resumen para la historia clínica (sale al final del flujograma y entra en «Copiar resumen») */
+      out.resumen = [
+        'FA ' + estado + (has(v.fc) ? ' · FC ' + v.fc + ' lpm' : '') + (has(v.tas) ? ' · TAS ' + v.tas + ' mmHg' : ''),
+        v.acoPrev ? 'Anticoagulado eficazmente ≥3 semanas' : v.durac === 1 ? 'Duración: &lt;24 h de inicio seguro' : v.durac === 2 ? 'Duración: &gt;24 h o desconocida' : '',
+        escDatos ? 'CHA₂DS₂-VA ' + cha + (edadOk ? '' : ' (falta la edad)') + ' → ' + chaT + ' · CHA₂DS₂-VASc ' + vasc : '',
+        escDatos ? 'HAS-BLED ' + hb + ' (riesgo ' + hbT + ')' : '',
+        ehraC ? 'mEHRA ' + ehraC : ''
+      ].filter(Boolean);
+      return out;
+    }
+  },
   flow:(() => {
     const num = x => !isNaN(x) && x > 0;
     const kg = (v, f, max) => num(v.peso) ? ' (' + String(Math.round(Math.min(v.peso * f, max || Infinity))).replace('.', ',') + ' mg con ' + v.peso + ' kg)' : '';
@@ -91,14 +270,7 @@ window.PROTOCOLS = [
     const ANTICO = ['Enoxaparina', 'Heparina sódica'];
     const POSTCV = 'Tras cualquier cardioversión: <b>anticoagulación ≥4 semanas</b> (opcional solo si no hay factores de riesgo y el ritmo sinusal se recuperó en &lt;24 h desde un inicio seguro); después, según el CHA₂DS₂-VA.';
     return {
-      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }],
       start: 'ecg',
-      escalas: [
-        { id: 'chadsva', para: 'riesgo embólico (ESC 2024)' },
-        { id: 'hasbled', para: 'riesgo hemorrágico: factores corregibles' },
-        { id: 'ehra', para: 'gravedad de los síntomas' },
-        { id: 'chadsvasc', para: 'riesgo embólico (versión anterior, ACC/AHA)' }
-      ],
       nodes: {
         ecg: {
           t: 'Primeros minutos',
@@ -106,7 +278,7 @@ window.PROTOCOLS = [
             (num(v.fc) ? ' FC ' + v.fc + ' lpm.' : '') + '<br>Buscar el <b>desencadenante</b> (ver «Desencadenantes» abajo): una taquicardia compensadora no se frena, se trata la causa.',
           q: '¿Hay signos de preexcitación?',
           help: 'FA preexcitada: QRS ancho y de morfología cambiante, muy irregular, a menudo con FC &gt;250 lpm; onda delta en ECG previos.',
-          opts: [{ l: 'Sí, sospecha de FA preexcitada', go: 'preex' }, { l: 'No', go: 'inest' }]
+          opts: [{ l: 'Sí, sospecha de FA preexcitada', go: 'preex', sug: v => v.preex === true }, { l: 'No', go: 'inest' }]
         },
         preex: {
           farmacos: SED.concat(['Procainamida', 'Flecainida']),
@@ -118,7 +290,7 @@ window.PROTOCOLS = [
         inest: {
           q: '¿Hay inestabilidad hemodinámica ATRIBUIBLE a la FA?',
           help: 'Shock o hipotensión mantenida, edema agudo de pulmón, isquemia miocárdica en curso, síncope o alteración de la consciencia por la taquicardia.',
-          opts: [{ l: 'Sí', go: 'cve', sug: v => num(v.tas) && v.tas < 90 }, { l: 'No', go: 'fevi' }]
+          opts: [{ l: 'Sí', go: 'cve', sug: v => v.inest === true || (num(v.tas) && v.tas < 90) }, { l: 'No', go: 'fevi' }]
         },
         cve: {
           farmacos: SED.concat(['Amiodarona'], ANTICO),
@@ -131,8 +303,8 @@ window.PROTOCOLS = [
           q: '¿Cómo está la función ventricular?',
           help: 'Si no hay ecocardiograma previo, trata como FEVI reducida a quien tenga signos de insuficiencia cardiaca. Ecografía a pie de cama si está disponible.',
           opts: [
-            { l: 'FEVI >40 % (o desconocida sin signos de insuficiencia cardiaca)', go: 'frec' },
-            { l: 'FEVI ≤40 %, insuficiencia cardiaca o TAS límite', go: 'frec_ic', sug: v => num(v.tas) && v.tas < 100 }
+            { l: 'FEVI >40 % (o desconocida sin signos de insuficiencia cardiaca)', go: 'frec', sug: v => v.fevi === 1 && !(num(v.tas) && v.tas < 100) },
+            { l: 'FEVI ≤40 %, insuficiencia cardiaca o TAS límite', go: 'frec_ic', sug: v => v.fevi === 2 || (num(v.tas) && v.tas < 100) }
           ]
         },
         frec: {
@@ -168,15 +340,14 @@ window.PROTOCOLS = [
           q: '¿Desde cuándo está en FA?',
           help: '<b>ESC 2024</b>: no cardiovertir sin anticoagulación previa si la FA dura <b>&gt;24 h</b> (antes, 48 h). La <b>ACC/AHA 2023</b> mantiene 48 h. La duración que refiere el paciente puede ser falsa si hubo FA asintomática.',
           opts: [
-            { l: 'Inicio seguro hace &lt;24 h, o anticoagulado eficazmente ≥3 semanas', go: 'ritmo' },
-            { l: '&gt;24 h o inicio incierto, sin anticoagulación previa', go: 'espera' }
+            { l: 'Inicio seguro hace &lt;24 h, o anticoagulado eficazmente ≥3 semanas', go: 'ritmo', sug: v => v.durac === 1 || v.acoPrev === true },
+            { l: '&gt;24 h o inicio incierto, sin anticoagulación previa', go: 'espera', sug: v => v.durac === 2 && !v.acoPrev }
           ]
         },
         ritmo: {
-          escalas: ['ehra'],
           q: '¿Hay cardiopatía estructural significativa?',
           help: 'Puede cardiovertirse ya o esperar: en la FA estable de &lt;36 h, la cardioversión diferida («esperar y ver») no fue inferior a la precoz y el 69 % revirtió solo en ≤48 h (RACE 7 ACWAS). Cardiopatía estructural: FEVI reducida, cardiopatía isquémica, hipertrofia importante o valvulopatía significativa.',
-          opts: [{ l: 'No', go: 'flec' }, { l: 'Sí', go: 'amio_cv' }]
+          opts: [{ l: 'No', go: 'flec', sug: v => v.estruct === 1 && v.fevi !== 2 }, { l: 'Sí', go: 'amio_cv', sug: v => v.estruct === 2 || v.fevi === 2 }]
         },
         flec: {
           farmacos: ['Flecainida', 'Vernakalant'].concat(SED, ANTICO),
@@ -193,7 +364,7 @@ window.PROTOCOLS = [
             'No usar flecainida. Heparina o anticoagulante oral antes de cardiovertir. ' + POSTCV + '<br><span class="pe-nota">ESC 2024, tabla 13.</span>'
         },
         espera: {
-          escalas: ['chadsva', 'hasbled'], farmacos: ANTICO,
+          farmacos: ANTICO,
           t: 'FA &gt;24 h o de inicio incierto: no cardiovertir', c: 'mid',
           show: 'Control de frecuencia y <b>anticoagulación</b>. Cardioversión diferida tras <b>≥3 semanas de anticoagulación eficaz</b>, o antes si una <b>ecocardiografía transesofágica</b> descarta trombo.<br>Evitar los fármacos que pueden revertir la FA (amiodarona, flecainida) salvo que no haya alternativa.<br><span class="pe-nota">ESC 2024.</span>'
         }
@@ -305,16 +476,105 @@ window.PROTOCOLS = [
 },
 
 {id:'hiperkalemia', title:'Manejo de hiperkalemia', sub:'Estabilización de membrana → redistribución → eliminación', badge:'amber', tag:'Urgente', rank:11,
+  /* Evaluador: potasio, ECG, glucemia y función renal una sola vez. Gravedad, umbrales y dosis salen de los
+     nodos del flujograma y los pasos de este protocolo (ERC 2025, KDIGO 2019, UK Kidney Association 2023);
+     KDIGO-AKI reproduce SCALES 'kdigo' (data/scales.js). El flujograma de abajo sugiere con estos datos. */
+  eval:{
+    items:[
+      {t:'h', l:'Potasio y ECG'},
+      {k:'k', t:'num', l:'Potasio', u:'mmol/L'},
+      {k:'ecg', t:'chk', l:'Cambios en el ECG: T picudas, PR &gt;0,2 s, P aplanada o ausente, QRS &gt;0,12 s, onda sinusoidal, bradicardia o arritmia'},
+      {k:'pcr', t:'chk', l:'Parada cardiaca'},
+      {k:'central', t:'chk', l:'Tiene vía venosa central'},
+      {k:'digi', t:'chk', l:'Sospecha de intoxicación digitálica'},
+      {t:'h', l:'Glucemia (insulina-glucosa)'},
+      {k:'glu', t:'num', l:'Glucemia previa', u:'mg/dL'},
+      {k:'riesgoHipo', t:'chk', l:'Más riesgo de hipoglucemia: insuficiencia renal, sin diabetes, bajo peso o edad avanzada'},
+      {t:'h', l:'Función renal y causa'},
+      {k:'kdCr', t:'sel', l:'KDIGO-AKI, criterio creatinina', o:[['Sin criterio (0)',0],['×1,5–1,9 basal o ↑≥0,3 mg/dL en 48 h (1)',1],['×2,0–2,9 basal (2)',2],['×3 basal, Cr ≥4 mg/dL o inicio de TRS (3)',3]]},
+      {k:'kdDiu', t:'sel', l:'KDIGO-AKI, criterio diuresis', o:[['Sin criterio (0)',0],['&lt;0,5 mL/kg/h durante 6–12 h (1)',1],['&lt;0,5 mL/kg/h ≥12 h (2)',2],['&lt;0,3 mL/kg/h ≥24 h o anuria ≥12 h (3)',3]]},
+      {k:'anuria', t:'chk', l:'Anuria, ERC avanzada o liberación continua de potasio (rabdomiólisis, lisis tumoral)'},
+      {k:'acid', t:'chk', l:'Acidosis metabólica'},
+      {k:'sobrecarga', t:'chk', l:'Sobrecarga de volumen'},
+      {t:'h', l:'Control'},
+      {k:'k2', t:'num', l:'Potasio de control (1–2 h)', u:'mmol/L'}
+    ],
+    calc:function(v){
+      const has = x => !isNaN(x) && x > 0;
+      const f = x => String(x).replace('.', ',');
+      if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && !isNaN(v[k]) && v[k] !== 0)))
+        return [{t:'Introduce los datos del paciente', c:'', h:'Potasio, ECG y glucemia: la gravedad, el tratamiento con sus dosis y la necesidad de diálisis se calculan al momento.'}];
+      const out = [];
+      const kOk = has(v.k);
+
+      /* 1. Gravedad (nodo «grav»): leve 5,5–5,9 · moderada 6,0–6,4 · grave ≥6,5; cualquier cambio del ECG = grave */
+      const grav = v.pcr ? 'pcr' : v.ecg || (kOk && v.k >= 6.5) ? 'grave' : kOk && v.k >= 6 ? 'moderada' : kOk && v.k >= 5.5 ? 'leve' : kOk ? 'no' : null;
+      const kTx = kOk ? 'K⁺ ' + f(v.k) + ' mmol/L' : 'falta el K⁺';
+      const gT = {
+        pcr: ['Parada por hiperpotasemia (' + kTx + ')', 'high'],
+        grave: ['Hiperpotasemia GRAVE: ' + kTx + (v.ecg ? ' con cambios en el ECG' : ''), 'high'],
+        moderada: ['Hiperpotasemia moderada: ' + kTx + ' sin cambios en el ECG', 'mid'],
+        leve: ['Hiperpotasemia leve: ' + kTx + ' sin cambios en el ECG', 'low'],
+        no: [kTx + ': por debajo de 5,5, fuera de los rangos del protocolo', 'low']
+      }[grav] || ['Gravedad: falta el potasio', ''];
+      out.push({t:gT[0], c:gT[1], h:'Leve 5,5–5,9 · moderada 6,0–6,4 · grave ≥6,5 mmol/L. <b>Cualquier cambio en el ECG la convierte en grave</b>; un ECG normal no la descarta. Si el valor sorprende y el ECG es normal, repetir el potasio (descartar pseudohiperpotasemia).'});
+
+      /* 2. Función renal: KDIGO-AKI (SCALES 'kdigo': estadio = criterio más alto) */
+      const kd = Math.max(v.kdCr || 0, v.kdDiu || 0);
+      if (kd > 0) out.push({t:'KDIGO-AKI estadio ' + kd, c:kd === 1 ? 'mid' : 'high',
+        h:['', 'Retirar nefrotóxicos · optimizar volemia · control de creatinina y diuresis.', 'Revisar dosis por FG · descartar obstrucción (eco) · valorar nefrología.', 'Valorar TRS: hiperpotasemia refractaria, acidosis, sobrecarga, uremia.'][kd]});
+
+      /* 3. Tratamiento con las dosis del protocolo */
+      const tx = [];
+      const glu = has(v.glu) ? (v.glu < 126
+        ? 'Glucemia previa <b>' + v.glu + ' mg/dL (&lt;126)</b>: añadir <b>glucosa 10 % a 50 mL/h durante 5 h</b> para evitar la hipoglucemia.'
+        : 'Glucemia previa ' + v.glu + ' mg/dL: no hace falta la perfusión de glucosa, pero sí vigilar la glucemia.')
+        : 'Si la glucemia previa es &lt;126 mg/dL (7 mmol/L): añadir <b>glucosa 10 % a 50 mL/h durante 5 h</b>. <b>Falta la glucemia.</b>';
+      if (grav === 'pcr') {
+        tx.push('SVA estándar y, además: <b>cloruro cálcico 10 % 10 mL IV</b> + <b>bicarbonato sódico 50 mmol IV</b>, por vías distintas o lavando entre ambos (precipitan).');
+        tx.push('<b>Insulina rápida 10 U + glucosa 25 g IV</b>.');
+        tx.push('Valorar diálisis durante la RCP y ECPR si la RCP inicial no funciona y el sistema lo permite.');
+      } else if (grav === 'grave' || grav === 'moderada') {
+        if (grav === 'grave') tx.push('<b>Calcio IV</b> con monitorización ECG (protege el miocardio 30–60 min, no baja el K⁺): ' +
+          (v.central ? '<b>cloruro cálcico 10 % 10 mL IV</b> en 2–5 min (vía central); alternativa gluconato cálcico 10 % 30 mL IV en 5–10 min.' : '<b>gluconato cálcico 10 % 30 mL IV en 5–10 min</b> (de elección por vía periférica); el cloruro cálcico 10 % 10 mL IV, solo por vía central o en parada (vesicante).') +
+          ' No son intercambiables mL a mL. <b>Repetir a los 5 min</b> si persisten o reaparecen los cambios del ECG.' +
+          (v.digi ? ' <b>Sospecha de intoxicación digitálica: calcio lento y con precaución.</b>' : ''));
+        tx.push('<b>Insulina rápida 10 U IV + glucosa 25 g IV</b> (glucosa 10 % 250 mL en 15–30 min, o glucosa 50 % 50 mL).' +
+          (v.riesgoHipo ? ' Con más riesgo de hipoglucemia, algunos protocolos usan <b>5 U</b> (evidencia limitada).' : ''));
+        tx.push(glu + ' Glucemia capilar a los 30 y 60 min y después cada hora hasta 6 h.');
+        tx.push('<b>Salbutamol 10–20 mg nebulizado</b> como complemento, nunca solo.');
+        tx.push('<b>Ciclosilicato de sodio y zirconio 10 g VO</b> desde el principio; después 10 g cada 8 h durante 24–48 h.');
+        tx.push(v.acid ? '<b>Bicarbonato sódico IV</b>: hay acidosis metabólica (el protocolo no da la dosis fuera de la parada).' : 'Bicarbonato sódico solo si hay acidosis metabólica; no de rutina.');
+        if (v.sobrecarga) tx.push('Sobrecarga de volumen: <b>diurético de asa</b> si la función renal lo permite.');
+        tx.push('Potasio de control a la 1–2 h y a las 4–6 h (rebote). Monitorización ECG continua e ingreso.');
+      } else if (grav === 'leve') {
+        tx.push('No necesita calcio ni insulina-glucosa. Revisar y ajustar los fármacos que suben el potasio; tratar la causa; repetir el potasio y la función renal; valorar un quelante oral si persiste.');
+        if (v.sobrecarga) tx.push('Sobrecarga de volumen: diurético de asa si la función renal lo permite.');
+      }
+      if (tx.length) out.push({t:'Tratamiento', c:'', h:tx.map(x => '• ' + x).join('<br>') + '<br><span class="pe-nota">ERC 2025 (PMID 41117569); KDIGO 2019; UK Kidney Association 2023.</span>'});
+
+      /* 4. Diálisis (nodos «shift» y «dial») */
+      const dial = [has(v.k2) && v.k2 >= 6.5 ? 'K⁺ de control ' + f(v.k2) + ' (sigue ≥6,5)' : has(v.k2) && v.k2 > 6 ? 'K⁺ de control ' + f(v.k2) + ' (&gt;6 pese al tratamiento, KDIGO)' : '',
+        v.anuria ? 'anuria, ERC avanzada o liberación continua' : ''].filter(Boolean);
+      if (dial.length) out.push({t:'Diálisis urgente: contactar con nefrología', c:'high', h:'<b>Motivo:</b> ' + dial.join(' · ') + '.<br>Mientras tanto: monitorización continua, repetir el calcio si vuelven los cambios del ECG, repetir insulina-glucosa según el control y vigilar la glucemia. Si el hospital no tiene diálisis: traslado con monitorización y el tratamiento en marcha.'});
+      else if (has(v.k2)) out.push({t:'K⁺ de control ' + f(v.k2) + ' mmol/L', c:'mid', h:'Si baja y el ECG se normaliza: eliminar potasio (ciclosilicato de sodio y zirconio 10 g cada 8 h 24–48 h) y repetir a las 4–6 h y a las 24 h.'});
+
+      /* Resumen de puntuaciones para la historia clínica */
+      out.resumen = [gT[0], kd > 0 ? 'KDIGO-AKI estadio ' + kd : '',
+        has(v.glu) ? 'Glucemia previa ' + v.glu + ' mg/dL' + (v.glu < 126 ? ' (&lt;126: glucosa 10 % 50 mL/h 5 h)' : '') : '',
+        has(v.k2) ? 'K⁺ de control ' + f(v.k2) + ' mmol/L' : '',
+        dial.length ? 'Diálisis urgente: ' + dial.join(', ') : ''].filter(Boolean);
+      return out;
+    }
+  },
   flow:(() => {
     const num = x => !isNaN(x) && x > 0;
     const CALCIO = ['Gluconato de calcio'];
     const SHIFT = [{ n: 'Insulina', inf: false }, { n: 'Glucosa', inf: false }, 'Salbutamol'];
     const kTxt = v => num(v.k) ? ' K⁺ ' + String(v.k).replace('.', ',') + ' mmol/L.' : '';
     return {
-      inputs: [{ k: 'k', l: 'Potasio', u: 'mmol/L' }, { k: 'glu', l: 'Glucemia', u: 'mg/dL' }],
       start: 'inicio',
       escalas: [
-        { id: 'kdigo', para: 'lesión renal aguda' },
         { id: 'news2', para: 'deterioro clínico' }
       ],
       nodes: {
@@ -324,7 +584,7 @@ window.PROTOCOLS = [
             'Si el valor sorprende y el ECG es normal, <b>repetir el potasio</b> (gasometría venosa para tenerlo rápido): descartar hemólisis de la muestra, torniquete prolongado, trombocitosis o leucocitosis intensas.<br>' +
             'Buscar la causa a la vez (ver «Causas» abajo): insuficiencia renal, fármacos, acidosis, rabdomiólisis, lisis tumoral.',
           q: '¿Está en parada cardiaca?',
-          opts: [{ l: 'Sí', go: 'pcr' }, { l: 'No', go: 'grav' }]
+          opts: [{ l: 'Sí', go: 'pcr', sug: v => v.pcr === true }, { l: 'No', go: 'grav', sug: v => !v.pcr && (num(v.k) || v.ecg === true) }]
         },
         pcr: {
           farmacos: ['Bicarbonato sódico'].concat(CALCIO, SHIFT.slice(0, 2)),
@@ -339,9 +599,9 @@ window.PROTOCOLS = [
           q: '¿Qué gravedad tiene?',
           help: 'Leve 5,5–5,9 · moderada 6,0–6,4 · grave ≥6,5 mmol/L. <b>Cualquier cambio en el ECG la convierte en grave</b>: T picudas, PR &gt;0,2 s, P aplanada o ausente, QRS &gt;0,12 s, onda sinusoidal, bradicardia o arritmia. Un ECG normal no la descarta.',
           opts: [
-            { l: 'Grave: K⁺ ≥6,5 o cambios en el ECG', go: 'calcio', sug: v => num(v.k) && v.k >= 6.5 },
-            { l: 'Moderada: K⁺ 6,0–6,4 sin cambios en el ECG', go: 'shift', sug: v => num(v.k) && v.k >= 6 && v.k < 6.5 },
-            { l: 'Leve: K⁺ 5,5–5,9 sin cambios en el ECG', go: 'leve', sug: v => num(v.k) && v.k >= 5.5 && v.k < 6 }
+            { l: 'Grave: K⁺ ≥6,5 o cambios en el ECG', go: 'calcio', sug: v => v.ecg === true || (num(v.k) && v.k >= 6.5) },
+            { l: 'Moderada: K⁺ 6,0–6,4 sin cambios en el ECG', go: 'shift', sug: v => !v.ecg && num(v.k) && v.k >= 6 && v.k < 6.5 },
+            { l: 'Leve: K⁺ 5,5–5,9 sin cambios en el ECG', go: 'leve', sug: v => !v.ecg && num(v.k) && v.k >= 5.5 && v.k < 6 }
           ]
         },
         calcio: {
@@ -374,7 +634,7 @@ window.PROTOCOLS = [
           q: '¿Cómo va el potasio de control (1–2 h)?',
           opts: [
             { l: 'Baja y el ECG se normaliza', go: 'elim' },
-            { l: 'Sigue ≥6,5 o con cambios en el ECG, o hay anuria, ERC avanzada o liberación continua (rabdomiólisis, lisis)', go: 'dial', sug: v => num(v.k) && v.k >= 6.5 }
+            { l: 'Sigue ≥6,5 o con cambios en el ECG, o hay anuria, ERC avanzada o liberación continua (rabdomiólisis, lisis)', go: 'dial', sug: v => (num(v.k2) && v.k2 >= 6.5) || v.anuria === true }
           ]
         },
         leve: {
@@ -455,21 +715,208 @@ window.PROTOCOLS = [
 },
 
 {id:'dolor-toracico', title:'Manejo del dolor torácico', sub:'ECG precoz, troponina seriada y estratificación de riesgo', badge:'amber', tag:'Urgente', rank:12,
+  /* Evaluador: los datos se meten una sola vez. Calcula HEART, GRACE 1.0, Killip-Kimball y ADD-RS (ítems, puntos y
+     cortes copiados de data/scales.js: ids 'heart', 'grace', 'killip' y 'addrs'), el algoritmo de troponina ESC 0 h/1 h
+     (y 0 h/2 h) con los umbrales del nodo «trop» del flujograma, la decisión de los nodos del flujograma y la dosis de
+     enoxaparina por peso real del apartado «Antiagregación y anticoagulación». Wells, PERC y YEARS se hacen al lado
+     (protocolo TEP agudo). El flujograma sugiere sus opciones con estas mismas funciones. */
+  eval:{
+    escalas:[{id:'wells', para:'probabilidad de TEP'}, {id:'perc', para:'excluir TEP sin dímero D'}, {id:'years', para:'umbral de dímero D en el TEP'}],
+    items:[
+      {t:'h', l:'Constantes y datos generales'},
+      {k:'edad', t:'num', l:'Edad', u:'años'},
+      {k:'mujer', t:'chk', l:'Mujer (p99 de la troponina I: 15,6 ng/l en mujeres)'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'tas', t:'num', l:'TAS', u:'mmHg'},
+      {k:'fc', t:'num', l:'FC', u:'lpm'},
+      {k:'spo2', t:'num', l:'SpO₂', u:'%'},
+      {k:'cr', t:'num', l:'Creatinina (GRACE)', u:'mg/dL'},
+      {k:'clcr', t:'num', l:'ClCr (dosis de enoxaparina)', u:'ml/min'},
+      {t:'h', l:'ECG'},
+      {k:'ecg', t:'sel', l:'ECG de 12 derivaciones (E del HEART)', o:[['Sin valorar',-1],['Normal (HEART 0)',0],['Repolarización inespecífica, BRI, HVI o digoxina (HEART 1)',1],['Desviación del ST significativa no atribuible a BRI, HVI ni digoxina (HEART 2; desviación del ST del GRACE)',2],['Elevación del ST, BRIHH o marcapasos con sospecha de isquemia, o patrón de oclusión (OMI): SCACEST',3]]},
+      {t:'h', l:'Muy alto riesgo y Killip'},
+      {k:'killip', t:'sel', l:'Killip-Kimball', o:[['Sin valorar',0],['I — Sin signos de insuficiencia cardiaca',1],['II — Estertores &lt;50 % de campos, S3, ingurgitación yugular',2],['III — Edema agudo de pulmón',3],['IV — Shock cardiogénico',4]]},
+      {k:'pcr', t:'chk', l:'Parada cardiaca en la presentación (recuperada)'},
+      {k:'muyAlto', t:'chk', l:'Otro criterio de muy alto riesgo: dolor recurrente o refractario al tratamiento médico, arritmia con riesgo vital, complicación mecánica o cambios dinámicos recurrentes del ST/T (sobre todo elevación intermitente del ST)'},
+      {t:'h', l:'Síndrome aórtico agudo (ADD-RS)'},
+      {k:'adCond', t:'chk', l:'Condición de alto riesgo: síndrome de Marfan, antecedente familiar de enfermedad aórtica, valvulopatía aórtica conocida, manipulación aórtica reciente, aneurisma de aorta torácica conocido'},
+      {k:'adDolor', t:'chk', l:'Dolor de alto riesgo (torácico, dorsal o abdominal): inicio brusco, intensidad grave o carácter desgarrante — basta uno'},
+      {k:'adExpl', t:'chk', l:'Exploración de alto riesgo: déficit de pulso o diferencia de PAS entre brazos, déficit neurológico focal con dolor, soplo nuevo de insuficiencia aórtica con dolor, hipotensión o shock'},
+      {k:'ddAo', t:'num', l:'Dímero D (sin ajuste por edad)', u:'ng/mL FEU'},
+      {t:'h', l:'HEART (la E sale del ECG, la A de la edad y la T de la troponina)'},
+      {k:'hist', t:'sel', l:'H — Historia', o:[['Sin valorar',-1],['Poco sospechosa (0)',0],['Moderadamente sospechosa (1)',1],['Muy sospechosa (2)',2]]},
+      {k:'frcv', t:'sel', l:'R — Factores de riesgo CV (DM, tabaquismo, HTA, dislipemia, AF de cardiopatía isquémica, obesidad)', o:[['Sin valorar',-1],['Ninguno (0)',0],['1–2 FR (1)',1],['≥3 FR o aterosclerosis conocida: IAM, revascularización, ictus, EAP (2)',2]]},
+      {t:'h', l:'Troponina de alta sensibilidad (algoritmo ESC 0 h/1 h)'},
+      {k:'ensayo', t:'sel', l:'Ensayo del laboratorio', o:[['Troponina T · Elecsys hs-cTnT (Roche)',0],['Troponina I · Architect hs-cTnI (Abbott)',1]]},
+      {k:'tn0', t:'num', l:'Troponina 0 h', u:'ng/l'},
+      {k:'tn1', t:'num', l:'Troponina 1 h', u:'ng/l'},
+      {k:'tn2', t:'num', l:'Troponina 2 h (alternativa 0 h/2 h, si no hay de 1 h)', u:'ng/l'},
+      {k:'mas3h', t:'chk', l:'El dolor empezó hace más de 3 h'}
+    ],
+    /* Algoritmo ESC 0 h/1 h y 0 h/2 h con los umbrales propios de cada ensayo del nodo «trop» (ESC 2023). Δ = cambio absoluto. */
+    trop:function(v){
+      const has = x => !isNaN(x);
+      if (!has(v.tn0)) return null;
+      const t0 = v.tn0, I = v.ensayo === 1;
+      const U = I ? {n:'Architect hs-cTnI', mb:4, b:5, db:2, a:64, da:6, b2:6, db2:2, da2:15} : {n:'Elecsys hs-cTnT', mb:5, b:12, db:3, a:52, da:5, b2:14, db2:4, da2:10};
+      const fx = x => String(Math.round(x * 10) / 10).replace('.', ',');
+      let r = null, alg, datos, cortes;
+      if (has(v.tn1)) {
+        const d = Math.abs(v.tn1 - t0);
+        alg = '0 h/1 h'; datos = '0 h ' + fx(t0) + ' · 1 h ' + fx(v.tn1) + ' · Δ1 h ' + fx(d);
+        r = t0 >= U.a || d >= U.da ? 'Confirmado' : (v.mas3h && t0 < U.mb) || (t0 < U.b && d < U.db) ? 'Descartado' : 'Zona de observación';
+        cortes = 'descartado: 0 h &lt;' + U.mb + ' (dolor &gt;3 h) o 0 h &lt;' + U.b + ' y Δ1 h &lt;' + U.db + ' · confirmado: 0 h ≥' + U.a + ' o Δ1 h ≥' + U.da;
+      } else if (has(v.tn2)) {
+        const d = Math.abs(v.tn2 - t0);
+        alg = '0 h/2 h'; datos = '0 h ' + fx(t0) + ' · 2 h ' + fx(v.tn2) + ' · Δ2 h ' + fx(d);
+        r = t0 >= U.a || d >= U.da2 ? 'Confirmado' : t0 < U.b2 && d < U.db2 ? 'Descartado' : 'Zona de observación';
+        cortes = 'descartado: 0 h &lt;' + U.b2 + ' y Δ2 h &lt;' + U.db2 + ' · confirmado: Δ2 h ≥' + U.da2 + ' (o 0 h ≥' + U.a + ')';
+      } else {
+        alg = '0 h'; datos = '0 h ' + fx(t0);
+        r = t0 >= U.a ? 'Confirmado' : v.mas3h && t0 < U.mb ? 'Descartado' : null;
+        cortes = 'con la de 0 h sola: descartado si &lt;' + U.mb + ' y el dolor empezó hace &gt;3 h · confirmado si ≥' + U.a;
+      }
+      return {r:r, alg:alg, datos:datos, cortes:cortes, n:U.n};
+    },
+    /* HEART (scales.js 'heart'): H, E, A (&lt;45 = 0 · 45–64 = 1 · ≥65 = 2), R, T (≤LSN = 0 · 1–3× = 1 · &gt;3× = 2).
+       LSN del laboratorio: T 14 ng/l (Elecsys) · I 34,2 ng/l en hombres y 15,6 en mujeres (Architect). */
+    heart:function(v){
+      const has = x => !isNaN(x);
+      const lsn = v.ensayo === 1 ? (v.mujer ? 15.6 : 34.2) : 14;
+      const tn = [v.tn0, v.tn1, v.tn2].filter(has);
+      const mx = tn.length ? Math.max.apply(null, tn) : NaN;
+      const p = {H:v.hist >= 0 ? v.hist : null, E:v.ecg >= 0 && v.ecg <= 2 ? v.ecg : null, A:has(v.edad) ? (v.edad < 45 ? 0 : v.edad < 65 ? 1 : 2) : null,
+        R:v.frcv >= 0 ? v.frcv : null, T:tn.length ? (mx <= lsn ? 0 : mx <= 3 * lsn ? 1 : 2) : null};
+      const falta = Object.keys(p).filter(k => p[k] === null);
+      const s = Object.keys(p).reduce((a, k) => a + (p[k] || 0), 0);
+      return {s:s, p:p, falta:falta, lsn:lsn, tropAlta:tn.length ? mx > lsn : null};
+    },
+    /* ADD-RS (scales.js 'addrs'): un punto por categoría; ≥2 → angio-TC; 0–1 → dímero D (&lt;500 ng/mL FEU). */
+    addrs:function(v){
+      const has = x => !isNaN(x);
+      if (!v.adCond && !v.adDolor && !v.adExpl && !has(v.ddAo)) return null;
+      const n = (v.adCond ? 1 : 0) + (v.adDolor ? 1 : 0) + (v.adExpl ? 1 : 0), dd = has(v.ddAo) ? v.ddAo : null;
+      if (n >= 2) return {n:n, c:'high', t:'ADD-RS ' + n, h:'Imagen urgente (angio-TC) sin esperar al dímero D', tc:true};
+      if (dd === null) return {n:n, c:'mid', t:'ADD-RS ' + n, h:'Pedir dímero D: &lt;500 ng/mL FEU permite considerar la exclusión sin imagen', tc:false};
+      return dd < 500 ? {n:n, c:'low', t:'ADD-RS ' + n + ' + DD &lt;500', h:'Permite considerar la exclusión de síndrome aórtico agudo sin imagen en pacientes seleccionados (fallo 0,3 % en ADvISED); no es certeza absoluta', tc:false} :
+        {n:n, c:'high', t:'ADD-RS ' + n + ' + DD ' + dd + ' ≥500', h:'Angio-TC: ADD-RS ' + n + ' con dímero D ' + dd + ' ≥500 ng/mL FEU — imagen', tc:true};
+    },
+    /* Criterios de muy alto riesgo del nodo «muyalto» que salen de los datos. */
+    muyAltoCrit:function(v){
+      const has = x => !isNaN(x);
+      return [has(v.tas) && v.tas < 90 ? 'TAS ' + v.tas + ' &lt;90 mmHg (inestabilidad hemodinámica)' : '', v.killip === 4 ? 'shock cardiogénico (Killip IV)' : '',
+        v.killip === 2 || v.killip === 3 ? 'insuficiencia cardiaca (Killip ' + (v.killip === 2 ? 'II' : 'III') + '), si es por isquemia' : '',
+        v.pcr ? 'parada cardiaca recuperada' : '', v.muyAlto ? 'otro criterio clínico de muy alto riesgo' : ''].filter(Boolean);
+    },
+    calc:function(v){
+      const has = x => !isNaN(x);
+      const D = {ecg:-1, hist:-1, frcv:-1, killip:0, ensayo:0};
+      const any = Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !(k in D && v[k] === D[k])));
+      if (!any) return [{t:'Introduce los datos del paciente', c:'', h:'ECG, constantes, Killip, ítems del HEART y del ADD-RS y troponinas: HEART, GRACE, Killip, ADD-RS, el algoritmo de troponina 0 h/1 h, la conducta del flujograma y la dosis de enoxaparina se calculan al momento.'}];
+      const out = [], res = [];
+      const fx = x => String(Math.round(x * 10) / 10).replace('.', ',');
+      const st = v.ecg === 3;
+
+      /* 1. SCACEST (nodo «stemi») */
+      if (st) {
+        out.push({t:'SCACEST o equivalente: ACTIVAR CODI IAM', c:'high', h:'Seguir el protocolo <b>Codi IAM</b> (reperfusión: ICP primaria, o fibrinólisis si la ICP se retrasa &gt;120 min). No esperar a la troponina. HEART y GRACE no aplican.'});
+        res.push('ECG: SCACEST o equivalente → Codi IAM');
+      }
+
+      /* 2. Muy alto riesgo (nodo «muyalto» → «inmediata») */
+      const ma = this.muyAltoCrit(v), ad = this.addrs(v);
+      if (!st && ma.length) {
+        out.push({t:'Muy alto riesgo: coronariografía inmediata (&lt;2 h)', c:'high', h:'<b>Criterios:</b> ' + ma.join(' · ') + '.<br>' +
+          (ad && ad.tc ? '<b>' + ad.t + ': antes descartar el síndrome aórtico agudo (angio-TC); no dar antiagregantes ni anticoagulantes hasta descartarlo.</b><br>' : '') + 'Avisar a cardiología o hemodinámica para la <b>estrategia invasiva inmediata</b>, aunque la troponina aún sea normal. AAS y anticoagulación parenteral; el inhibidor P2Y12, según indique hemodinámica.<br><span class="pe-nota">ESC 2023 (clase I); ACC/AHA 2025.</span>'});
+        res.push('Muy alto riesgo: ' + ma.join(', '));
+      }
+
+      /* 3. Killip (scales.js 'killip') */
+      if (v.killip > 0) {
+        const K = {1:['low','Killip I','Sin insuficiencia cardiaca — mortalidad hospitalaria ~6 %'], 2:['mid','Killip II','IC leve-moderada — mortalidad ~17 %'], 3:['high','Killip III','Edema agudo de pulmón — mortalidad ~38 %'], 4:['high','Killip IV','Shock cardiogénico — mortalidad ~81 %']}[v.killip];
+        out.push({t:K[1], c:K[0], h:K[2] + '.' + (v.killip >= 2 ? ' Sin betabloqueante con Killip ≥II ni con signos de bajo gasto.' : '')});
+        res.push(K[1]);
+      }
+
+      /* 4. ADD-RS (nodo «aorta») */
+      if (ad) {
+        out.push({t:ad.t, c:ad.c, h:ad.h + '.' + (ad.tc ? '<br><b>No dar antiagregantes ni anticoagulantes hasta descartarlo.</b>' : '') +
+          '<br>Si se confirma: analgesia IV y control de la <b>FC (&lt;60 lpm)</b> y la <b>TAS (100–120 mmHg)</b> con betabloqueante IV; cirugía cardiaca urgente si es tipo A.<br><span class="pe-nota">Un punto por categoría (0–3); dímero D en FEU sin ajuste por edad. La inestabilidad o una sospecha clínica alta mandan sobre un resultado bajo. ESC 2024; ADvISED.</span>'});
+        res.push(ad.t + (ad.tc ? ' → angio-TC' : ''));
+      }
+
+      /* 5. Troponina (nodo «trop») y destino (nodos «bajo», «obs», «scasest») */
+      const hr = this.heart(v), tr = this.trop(v);
+      if (tr) {
+        const cc = tr.r === 'Descartado' ? 'low' : tr.r === 'Confirmado' ? 'high' : 'mid';
+        out.push({t:'Troponina ' + tr.n + ' (' + tr.alg + '): ' + (tr.r ? tr.r.toUpperCase() : 'falta la de 1 h'), c:tr.r ? cc : '',
+          h:tr.datos + ' ng/l.<br><span class="pe-nota">Umbrales del ensayo: ' + tr.cortes + '. El resto es la zona de observación. ESC 2023.</span>'});
+        res.push('Troponina ' + tr.n + ' (' + tr.alg + '): ' + tr.datos + ' ng/l → ' + (tr.r || 'pendiente'));
+      }
+
+      /* 6. HEART (scales.js 'heart') */
+      if (!st && (hr.falta.length < 5)) {
+        const comp = !hr.falta.length;
+        const it = comp ? (hr.s <= 3 ? ['low','riesgo bajo','MACE 6 sem 1,7 % — considerar alta precoz'] : hr.s <= 6 ? ['mid','riesgo moderado','MACE 6 sem 16,6 % — observación/ingreso y pruebas no invasivas'] : ['high','riesgo alto','MACE 6 sem 50,1 % — estrategia invasiva precoz']) : null;
+        const fl = {H:'historia', E:'ECG', A:'edad', R:'factores de riesgo', T:'troponina'};
+        out.push({t:'HEART ' + hr.s + (comp ? ' (' + it[1] + ')' : ' (incompleto: falta ' + hr.falta.map(k => fl[k]).join(', ') + ')'), c:comp ? it[0] : '',
+          h:(comp ? it[2] + '.<br>' : '') + 'H ' + (hr.p.H === null ? '—' : hr.p.H) + ' · E ' + (hr.p.E === null ? '—' : hr.p.E) + ' · A ' + (hr.p.A === null ? '—' : hr.p.A) + ' · R ' + (hr.p.R === null ? '—' : hr.p.R) + ' · T ' + (hr.p.T === null ? '—' : hr.p.T) +
+            ' <span class="pe-nota">(T con la troponina más alta frente al p99 del laboratorio: ' + fx(hr.lsn) + ' ng/l)</span>'});
+        res.push('HEART ' + hr.s + (comp ? ' (' + it[1] + ')' : ' (incompleto)'));
+      }
+
+      /* 7. GRACE 1.0 (scales.js 'grace'): SCASEST */
+      const gIn = has(v.edad) || has(v.fc) || has(v.tas) || has(v.cr) || v.killip > 0;
+      if (!st && gIn) {
+        const ge = !has(v.edad) ? null : v.edad < 30 ? 0 : v.edad < 40 ? 8 : v.edad < 50 ? 25 : v.edad < 60 ? 41 : v.edad < 70 ? 58 : v.edad < 80 ? 75 : v.edad < 90 ? 91 : 100;
+        const gf = !has(v.fc) ? null : v.fc < 50 ? 0 : v.fc < 70 ? 3 : v.fc < 90 ? 9 : v.fc < 110 ? 15 : v.fc < 150 ? 24 : v.fc < 200 ? 38 : 46;
+        const gt = !has(v.tas) ? null : v.tas >= 200 ? 0 : v.tas >= 160 ? 10 : v.tas >= 140 ? 24 : v.tas >= 120 ? 34 : v.tas >= 100 ? 43 : v.tas >= 80 ? 53 : 58;
+        const gc = !has(v.cr) ? null : v.cr < 0.4 ? 1 : v.cr < 0.8 ? 4 : v.cr < 1.2 ? 7 : v.cr < 1.6 ? 10 : v.cr < 2 ? 13 : v.cr < 4 ? 21 : 28;
+        const gk = v.killip > 0 ? [0, 20, 39, 59][v.killip - 1] : null;
+        const gst = v.ecg === 2 ? 28 : 0, gm = hr.tropAlta ? 14 : 0, gp = v.pcr ? 39 : 0;
+        const falta = [ge === null ? 'edad' : '', gf === null ? 'FC' : '', gt === null ? 'TAS' : '', gc === null ? 'creatinina' : '', gk === null ? 'Killip' : '', hr.tropAlta === null ? 'troponina' : '', v.ecg < 0 ? 'ECG' : ''].filter(Boolean);
+        const g = [ge, gf, gt, gc, gk].reduce((a, x) => a + (x || 0), 0) + gst + gm + gp;
+        const it = falta.length ? null : g <= 108 ? ['low','riesgo bajo','Mortalidad hospitalaria &lt;1 %'] : g <= 140 ? ['mid','riesgo intermedio','Mortalidad hospitalaria 1–3 %'] : ['high','riesgo alto','Mortalidad hospitalaria &gt;3 % — ESC 2023: considerar estrategia invasiva precoz (&lt;24 h) (clase IIa)'];
+        out.push({t:'GRACE 1.0 ' + g + (it ? ' (' + it[1] + ')' : ' (incompleto: falta ' + falta.join(', ') + ')'), c:it ? it[0] : '',
+          h:(it ? it[2] + '.<br>' : '') + 'Edad ' + (ge === null ? '—' : ge) + ' · FC ' + (gf === null ? '—' : gf) + ' · TAS ' + (gt === null ? '—' : gt) + ' · creatinina ' + (gc === null ? '—' : gc) + ' · Killip ' + (gk === null ? '—' : gk) +
+            ' · parada ' + gp + ' · desviación del ST ' + gst + ' · troponina elevada ' + gm + '.<br><span class="pe-nota">GRACE 1.0 intrahospitalario, cortes ≤108 / 109–140 / &gt;140 válidos en el SCASEST. Desviación del ST = opción HEART 2 del ECG; marcadores elevados = troponina &gt; p99.</span>'});
+        res.push('GRACE 1.0 ' + g + (it ? ' (' + it[1] + ')' : ' (incompleto)'));
+      }
+
+      /* 8. Destino según el flujograma (sin SCACEST ni muy alto riesgo) */
+      if (!st && !ma.length && tr && tr.r) {
+        let d;
+        if (tr.r === 'Descartado') {
+          const alta = !hr.falta.length && hr.s <= 3 && v.ecg <= 1;
+          d = {t:'Destino: infarto descartado por la troponina', c:'low', h:(alta ? '<b>HEART ' + hr.s + ' (≤3) con ECG no isquémico:</b> si la sospecha clínica no es alta y no hay otra causa grave, cumple los criterios de alta segura con seguimiento; valorar prueba de imagen (TC coronario o prueba de estrés) ambulatoria.' :
+            hr.falta.length ? 'Completa el HEART: alta con seguimiento si es ≤3, el ECG no es isquémico y la sospecha clínica no es alta.' : '<b>HEART ' + hr.s + (hr.s > 3 ? ' (&gt;3)' : '') + (v.ecg > 1 ? ' con ECG alterado' : '') + ':</b> no cumple los criterios de alta segura del protocolo.') +
+            ' Si la sospecha clínica sigue siendo alta, repetir la troponina a las 3 h.<br><span class="pe-nota">ESC 2023; guía AHA/ACC 2021 del dolor torácico; consenso ACC 2022.</span>'};
+        } else if (tr.r === 'Zona de observación') d = {t:'Destino: zona de observación', c:'mid', h:'Troponina a las <b>3 h</b> y ECG seriado. Ecocardiografía; valorar el GRACE. Si no cambia: probable daño miocárdico crónico u otra causa; individualizar (TC coronario o prueba de isquemia; ingreso si la sospecha clínica es alta).'};
+        else d = {t:'Destino: IAMSEST de alto riesgo', c:'high', h:'Ingreso con monitorización. <b>Coronariografía precoz (&lt;24 h)</b>. AAS y anticoagulación parenteral; <b>sin pretratamiento rutinario con inhibidor P2Y12</b> si la coronariografía será en &lt;24 h.'};
+        out.push(d);
+      }
+
+      /* 9. Dosis por peso real (extras «Antiagregación y anticoagulación (SCASEST)») */
+      if (!st && has(v.peso) && v.peso > 0) {
+        const kg = Math.round(v.peso);
+        const enox = has(v.clcr) && v.clcr < 15 ? '<b>ClCr &lt;15: heparina sódica</b> en lugar de enoxaparina.' :
+          has(v.clcr) && v.clcr <= 30 ? '<b>Enoxaparina ' + kg + ' mg SC cada 24 h</b> (1 mg/kg/24 h por ClCr 15–30).' :
+          '<b>Enoxaparina ' + kg + ' mg SC cada 12 h</b> (1 mg/kg/12 h, peso real ' + fx(v.peso) + ' kg).' + (has(v.clcr) ? '' : ' Con ClCr 15–30: cada 24 h; &lt;15: heparina sódica.');
+        out.push({t:'Tratamiento: dosis por peso real', c:'', h:(ad && ad.tc ? '<b>Antes, descartar el síndrome aórtico: no dar antiagregantes ni anticoagulantes.</b><br>' : '') +
+          '<b>AAS</b> carga 150–300 mg VO y después 75–100 mg/24 h (o acetilsalicilato de lisina IV: 450 mg ≈ 250 mg de AAS).<br>' + enox +
+          '<br><b>Heparina sódica</b> si se va a hacer coronariografía inmediata o hay insuficiencia renal grave. Fondaparinux 2,5 mg/24 h SC (no con FG &lt;20 ml/min).' +
+          (has(v.spo2) && v.spo2 < 90 ? '<br><b>SpO₂ ' + v.spo2 + ' %: oxígeno.</b>' : '') + '<br><span class="pe-nota">ESC 2023.</span>'});
+      }
+      out.resumen = res;
+      return out;
+    }
+  },
   flow:(() => {
     const num = x => !isNaN(x) && x >= 0;
     const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', 'Heparina sódica'];
+    const E = () => PROTOCOLS.find(x => x.id === 'dolor-toracico').eval; // sugerencias con las mismas funciones del evaluador
     return {
-      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }, { k: 'spo2', l: 'SpO₂', u: '%' }],
       start: 'ecg',
-      escalas: [
-        { id: 'heart', para: 'riesgo del dolor torácico y alta precoz' },
-        { id: 'grace', para: 'riesgo del SCASEST (>140 = alto)' },
-        { id: 'killip', para: 'insuficiencia cardiaca en el SCA' },
-        { id: 'addrs', para: 'síndrome aórtico agudo' },
-        { id: 'wells', para: 'probabilidad de TEP' },
-        { id: 'perc', para: 'excluir TEP sin dímero D' },
-        { id: 'years', para: 'umbral de dímero D en el TEP' }
-      ],
       nodes: {
         ecg: {
           t: 'Primeros 10 minutos',
@@ -477,8 +924,8 @@ window.PROTOCOLS = [
             (num(v.spo2) && v.spo2 < 90 ? '<br><b>SpO₂ ' + v.spo2 + ' %: oxígeno</b> (indicado solo si SpO₂ &lt;90 %).' : ' Oxígeno solo si SpO₂ &lt;90 %.'),
           q: '¿Qué muestra el ECG?',
           opts: [
-            { l: 'Elevación del ST, BRIHH o marcapasos con sospecha de isquemia, o patrón de oclusión (OMI)', go: 'stemi' },
-            { l: 'Sin elevación del ST (descenso del ST, T negativas o normal)', go: 'muyalto' }
+            { l: 'Elevación del ST, BRIHH o marcapasos con sospecha de isquemia, o patrón de oclusión (OMI)', go: 'stemi', sug: v => v.ecg === 3 },
+            { l: 'Sin elevación del ST (descenso del ST, T negativas o normal)', go: 'muyalto', sug: v => v.ecg >= 0 && v.ecg <= 2 }
           ]
         },
         stemi: {
@@ -486,9 +933,9 @@ window.PROTOCOLS = [
           show: 'Seguir el protocolo <b>Codi IAM</b> (reperfusión: ICP primaria, o fibrinólisis si la ICP se retrasa >120 min). No esperar a la troponina.'
         },
         muyalto: {
-          escalas: ['killip'], q: '¿Tiene algún criterio de MUY ALTO riesgo?',
+          q: '¿Tiene algún criterio de MUY ALTO riesgo?',
           help: 'Inestabilidad hemodinámica o shock cardiogénico · dolor recurrente o refractario al tratamiento médico · arritmias con riesgo vital o parada cardiaca recuperada · complicación mecánica · insuficiencia cardiaca aguda por isquemia · cambios dinámicos recurrentes del ST/T, sobre todo elevación intermitente del ST.',
-          opts: [{ l: 'Sí, alguno', go: 'inmediata', sug: v => num(v.tas) && v.tas < 90 }, { l: 'No', go: 'alt' }]
+          opts: [{ l: 'Sí, alguno', go: 'inmediata', sug: v => E().muyAltoCrit(v).length > 0 }, { l: 'No', go: 'alt' }]
         },
         inmediata: {
           farmacos: ANTI.concat(['Nitroglicerina', { n: 'Fentanilo', inf: false }]),
@@ -499,14 +946,14 @@ window.PROTOCOLS = [
           q: '¿Sospechas otra causa grave de dolor torácico?',
           help: '<b>Síndrome aórtico</b>: dolor brusco, desgarrador o que irradia a la espalda, déficit de pulso o neurológico, soplo de insuficiencia aórtica nuevo · <b>TEP</b>: disnea, taquicardia, factores de riesgo de trombosis · <b>neumotórax</b>, <b>taponamiento</b> o <b>rotura esofágica</b> (dolor tras vómitos).',
           opts: [
-            { l: 'Síndrome aórtico agudo', go: 'aorta' },
+            { l: 'Síndrome aórtico agudo', go: 'aorta', sug: v => { const a = E().addrs(v); return !!a && a.tc; } },
             { l: 'Tromboembolismo pulmonar', go: 'tep' },
             { l: 'Neumotórax, taponamiento o rotura esofágica', go: 'otras' },
             { l: 'No, sospecha de síndrome coronario', go: 'trop' }
           ]
         },
         aorta: {
-          escalas: ['addrs'], farmacos: ['Labetalol'],
+          farmacos: ['Labetalol'],
           t: 'Sospecha de síndrome aórtico agudo', c: 'high',
           show: '<b>No dar antiagregantes ni anticoagulantes hasta descartarlo.</b><br>ADD-RS ≥2 → <b>angio-TC de aorta</b> urgente. ADD-RS 0–1 → dímero D: &lt;500 ng/ml lo hace improbable; ≥500 → angio-TC.<br>Si se confirma: analgesia IV y control de la <b>FC (&lt;60 lpm)</b> y la <b>TAS (100–120 mmHg)</b> con betabloqueante IV; cirugía cardiaca urgente si es tipo A.<br><span class="pe-nota">ESC 2024 de enfermedad aórtica y arterial periférica; estudio ADvISED.</span>'
         },
@@ -520,22 +967,20 @@ window.PROTOCOLS = [
           show: '<b>Neumotórax a tensión</b>: descompresión inmediata, sin esperar a la radiografía. <b>Taponamiento</b>: ecografía a pie de cama y pericardiocentesis si hay compromiso hemodinámico. <b>Rotura esofágica</b>: TC con contraste, dieta absoluta, antibiótico de amplio espectro y cirugía.'
         },
         trop: {
-          escalas: ['heart'], q: 'Resultado del algoritmo de troponina ESC 0 h/1 h',
+          q: 'Resultado del algoritmo de troponina ESC 0 h/1 h',
           help: '<b>Laboratorio del hospital</b> (pg/ml = ng/l): <b>troponina T</b> normal 0–14 (p99 del Elecsys hs-cTnT) · <b>troponina I</b> normal ≤34,2 (p99 del Architect hs-cTnI en hombres; en mujeres el p99 del Architect es 15,6).<br>' +
             'Umbrales <b>propios de cada ensayo</b> (ng/l):<br>' +
             '<b>Elecsys hs-cTnT (Roche)</b> · descartado: 0 h &lt;5 (si el dolor empezó hace >3 h) o 0 h &lt;12 y Δ1 h &lt;3 · confirmado: 0 h ≥52 o Δ1 h ≥5.<br>' +
             '<b>Architect hs-cTnI (Abbott)</b> · descartado: 0 h &lt;4 (si el dolor empezó hace >3 h) o 0 h &lt;5 y Δ1 h &lt;2 · confirmado: 0 h ≥64 o Δ1 h ≥6.<br>' +
             'Alternativa 0 h/2 h · Elecsys: descartado 0 h &lt;14 y Δ2 h &lt;4, confirmado Δ2 h ≥10 · Architect: descartado 0 h &lt;6 y Δ2 h &lt;2, confirmado Δ2 h ≥15.<br>' +
             'El resto de combinaciones es la <b>zona de observación</b>.<br><span class="pe-nota">ESC 2023 (tabla de los algoritmos rápidos, sin cambios desde ESC 2020).</span>',
-          opts: [{ l: 'Descartado', go: 'bajo' }, { l: 'Zona de observación', go: 'obs' }, { l: 'Confirmado', go: 'scasest' }]
+          opts: [{ l: 'Descartado', go: 'bajo', sug: v => (E().trop(v) || {}).r === 'Descartado' }, { l: 'Zona de observación', go: 'obs', sug: v => (E().trop(v) || {}).r === 'Zona de observación' }, { l: 'Confirmado', go: 'scasest', sug: v => (E().trop(v) || {}).r === 'Confirmado' }]
         },
         bajo: {
           t: 'Infarto descartado por la troponina', c: 'low',
-          show: 'Si la sospecha clínica no es alta y el <b>HEART es ≤3</b>, con ECG no isquémico: alta con seguimiento; valorar prueba de imagen (TC coronario o prueba de estrés) ambulatoria. Si la sospecha clínica sigue siendo alta, repetir la troponina a las 3 h.<br><span class="pe-nota">ESC 2023; guía AHA/ACC 2021 del dolor torácico; consenso ACC 2022.</span>',
-          escalas: ['heart']
+          show: 'Si la sospecha clínica no es alta y el <b>HEART es ≤3</b>, con ECG no isquémico: alta con seguimiento; valorar prueba de imagen (TC coronario o prueba de estrés) ambulatoria. Si la sospecha clínica sigue siendo alta, repetir la troponina a las 3 h.<br><span class="pe-nota">ESC 2023; guía AHA/ACC 2021 del dolor torácico; consenso ACC 2022.</span>'
         },
         obs: {
-          escalas: ['grace'],
           t: 'Zona de observación', c: 'mid',
           show: 'Troponina a las <b>3 h</b> y ECG seriado. Ecocardiografía; valorar el GRACE.',
           q: '¿Cómo es la troponina de las 3 h?',
@@ -546,7 +991,6 @@ window.PROTOCOLS = [
           show: 'Probable daño miocárdico crónico u otra causa. Individualizar: TC coronario o prueba de isquemia; ingreso si la sospecha clínica es alta.'
         },
         scasest: {
-          escalas: ['grace', 'killip'],
           farmacos: ANTI.concat(['Nitroglicerina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Ticagrelor', 'Clopidogrel']),
           t: 'IAMSEST: alto riesgo', c: 'high',
           show: 'Ingreso con monitorización. <b>Coronariografía precoz (&lt;24 h)</b>: el IAMSEST, los cambios dinámicos del ST/T, la elevación transitoria del ST o un GRACE >140 son criterios de alto riesgo.<br>' +
@@ -595,6 +1039,177 @@ window.PROTOCOLS = [
 
 {id:'codi-iam', title:'Codi IAM', sub:'Activación de código SCA — criterios ECG y estrategia de reperfusión', badge:'red', tag:'Crítico', rank:1, codigo:true,
   folleto:"codigos/C01._Codi_infart_agut_de_miocardi_(IAM).pdf",
+  /* Evaluador: los datos se meten una sola vez. Criterios ECG de activación (cortes del ST en V2–V3 por sexo y edad,
+     Sgarbossa-Smith), SCASEST de muy alto riesgo, Killip-Kimball, tiempo de traslado → estrategia de reperfusión,
+     contraindicaciones de la fibrinólisis, segundo antiagregante y dosis por peso real: todo de la ficha del Codi IAM
+     (SEM v.03, abril 2023) y del flujograma de abajo. Killip con la mortalidad de data/scales.js ('killip'). Las dosis
+     salen de las mismas funciones que el flujograma (flow.dosis), para que no discrepen. */
+  eval:{
+    items:[
+      {t:'h', l:'Datos del paciente'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'edad', t:'num', l:'Edad', u:'años'},
+      {k:'mujer', t:'chk', l:'Mujer (corte del ST en V2–V3)'},
+      {k:'clcr', t:'num', l:'ClCr (opcional)', u:'ml/min'},
+      {t:'h', l:'Criterios ECG de activación del Codi IAM'},
+      {k:'st', t:'num', l:'Elevación nueva del ST en el punto J, en 2 derivaciones contiguas', u:'mm'},
+      {k:'stV23', t:'chk', l:'Esa elevación es en V2–V3 (corte ≥2 mm en hombres &gt;40 años, ≥2,5 mm en hombres &lt;40 años, ≥1,5 mm en mujeres; en el resto de derivaciones ≥1 mm)'},
+      {k:'avr', t:'chk', l:'Depresión del ST ≥1 mm en ≥8 derivaciones + elevación del ST en aVR (sospecha de tronco común o multivaso)'},
+      {k:'post', t:'chk', l:'Elevación persistente del ST &gt;0,5 mm en V7–V9 con descenso especular en V1–V3 (IAM posterior)'},
+      {k:'vd', t:'chk', l:'Elevación del ST en derivaciones derechas (IAM de VD)'},
+      {k:'brihh', t:'chk', l:'BRIHH de nueva aparición'},
+      {k:'brdhh', t:'chk', l:'BRDHH de nueva aparición'},
+      {k:'winter', t:'chk', l:'Patrón de Winter'},
+      {k:'mcp', t:'chk', l:'Ritmo de marcapasos con imagen de BRIHH'},
+      {t:'h', l:'Sgarbossa-Smith (con BRIHH o marcapasos)'},
+      {k:'sg5', t:'chk', l:'Elevación del ST concordante con el QRS &gt;1 mm en cualquier derivación (5)'},
+      {k:'sg3', t:'chk', l:'Descenso del ST concordante con el QRS &gt;1 mm en V1, V2 o V3 (3)'},
+      {k:'sg2', t:'chk', l:'Elevación o descenso del ST discordante con el QRS, &gt;25 % (2)'},
+      {t:'h', l:'Sin criterios ECG: SCASEST de muy alto riesgo'},
+      {k:'inest', t:'chk', l:'Inestabilidad hemodinámica o shock cardiogénico'},
+      {k:'refr', t:'chk', l:'Dolor torácico recurrente o refractario pese al tratamiento'},
+      {k:'arrit', t:'chk', l:'Arritmias potencialmente mortales'},
+      {k:'mec', t:'chk', l:'Complicaciones mecánicas del IAM'},
+      {k:'icr', t:'chk', l:'Insuficiencia cardiaca relacionada con el SCASEST'},
+      {k:'sttr', t:'chk', l:'Elevación transitoria del ST'},
+      {t:'h', l:'Killip-Kimball'},
+      {k:'killip', t:'sel', l:'Clase Killip', o:[['Sin valorar',0],['I — Auscultación normal',1],['II — Estertores crepitantes y/o 3.er ruido',2],['III — Edema agudo de pulmón',3],['IV — Shock cardiogénico',4]]},
+      {t:'h', l:'Reperfusión'},
+      {k:'tras', t:'num', l:'Tiempo estimado desde el ECG hasta la llegada al hospital con ICP', u:'min'},
+      {k:'ciAbs', t:'chk', l:'Contraindicación ABSOLUTA de fibrinólisis: hemorragia cerebral previa o ictus de causa desconocida · ictus isquémico &lt;6 meses · neoplasia o traumatismo del SNC, malformación vascular intracraneal · traumatismo, cirugía o lesión en el último mes · sospecha de disección aórtica · traumatismo o cirugía importante o craneofacial &lt;3 meses · sangrado activo (salvo menstruación) · sangrado digestivo en el último mes · punciones no compresibles recientes'},
+      {k:'ciRel', t:'chk', l:'Contraindicación relativa de fibrinólisis: AIT &lt;6 meses · anticoagulante oral · gestación o primera semana posparto · HTA refractaria (TAS &gt;180 y/o TAD &gt;110) · hepatopatía avanzada · endocarditis infecciosa · úlcera péptica activa · RCP prolongada o traumática'},
+      {k:'lisis', t:'sel', l:'A los 60–90 min de la fibrinólisis', o:[['Sin valorar o sin fibrinólisis',0],['El ST baja ≥50 %, cede el dolor y está estable',1],['No, o inestabilidad hemodinámica o eléctrica',2]]},
+      {t:'h', l:'Segundo antiagregante (angioplastia primaria)'},
+      {k:'dudas', t:'chk', l:'Dudas diagnósticas (ECG dudoso, parada sin ECG claro, sospecha de elevación del ST por trastorno neurológico o síndrome aórtico agudo), hemorragia activa grave, imposibilidad de VO o doble antiagregación previa'},
+      {k:'hemr', t:'chk', l:'No se puede obtener información del paciente o alto riesgo hemorrágico: anticoagulación oral, hemorragia intracraneal previa, hemorragia grave (ingreso o transfusión) &lt;6 meses, neoplasia activa, cirugía mayor o traumatismo grave &lt;1 mes, insuficiencia hepática grave (Child-Pugh C), enfermedad terminal o fragilidad manifiesta'},
+      {k:'ictus', t:'chk', l:'Ictus isquémico o AIT previo'}
+    ],
+    /* Criterios ECG de activación (ficha SEM). Devuelve {c: cumplidos, dud: dudosos, no: texto si el ST no llega al corte}. */
+    crit:function(v){
+      const has = x => !isNaN(x), fx = x => String(x).replace('.', ',');
+      const c = [], dud = [];
+      let no = '';
+      if (has(v.st) && v.st >= 0) {
+        const donde = v.stV23 ? ' en V2–V3' : '';
+        const u = !v.stV23 ? 1 : v.mujer ? 1.5 : has(v.edad) && v.edad > 40 ? 2 : has(v.edad) && v.edad < 40 ? 2.5 : null;
+        if (u !== null) { if (v.st >= u) c.push('elevación del ST ' + fx(v.st) + ' mm' + donde + ' (corte ≥' + fx(u) + ' mm)'); else no = 'elevación del ST ' + fx(v.st) + ' mm' + donde + ' por debajo del corte (≥' + fx(u) + ' mm)'; }
+        else if (v.st >= 2.5) c.push('elevación del ST ' + fx(v.st) + ' mm en V2–V3 (≥2,5 mm: supera los dos cortes del hombre)');
+        else if (v.st < 2) no = 'elevación del ST ' + fx(v.st) + ' mm en V2–V3 por debajo del corte (≥2 mm)';
+        else dud.push('elevación del ST ' + fx(v.st) + ' mm en V2–V3 en un hombre: ' + (has(v.edad) ? 'con 40 años la ficha no fija el corte' : 'falta la edad') + ' (≥2 mm con &gt;40 años, ≥2,5 mm con &lt;40 años)');
+      }
+      if (v.avr) c.push('descenso del ST en ≥8 derivaciones + elevación en aVR');
+      if (v.post) c.push('elevación del ST en V7–V9 con descenso especular en V1–V3');
+      if (v.vd) c.push('elevación del ST en derivaciones derechas');
+      if (v.brihh) c.push('BRIHH nuevo');
+      if (v.brdhh) c.push('BRDHH nuevo');
+      if (v.winter) c.push('patrón de Winter');
+      if (v.mcp) c.push('marcapasos con BRIHH');
+      return {c:c, dud:dud, no:!c.length && !dud.length ? no : ''};
+    },
+    /* SCASEST de muy alto riesgo (ficha SEM, criterio 1). Killip IV = shock; Killip II–III = insuficiencia cardiaca. */
+    muyAlto:function(v){
+      return [v.inest ? 'inestabilidad hemodinámica o shock' : v.killip === 4 ? 'shock cardiogénico (Killip IV)' : '', v.refr ? 'dolor recurrente o refractario' : '', v.arrit ? 'arritmias potencialmente mortales' : '',
+        v.mec ? 'complicación mecánica' : '', v.icr ? 'insuficiencia cardiaca relacionada' : v.killip === 2 || v.killip === 3 ? 'insuficiencia cardiaca (Killip ' + (v.killip === 2 ? 'II' : 'III') + '), si es por el SCA' : '',
+        v.sttr ? 'elevación transitoria del ST' : ''].filter(Boolean);
+    },
+    /* Estrategia por el tiempo ECG → llegada al hospital con ICP: &lt;90 ICP · 90–120 individualizar · &gt;120 fibrinólisis. */
+    estr:function(v){
+      if (isNaN(v.tras)) return null;
+      return v.tras < 90 ? 'icp' : v.tras <= 120 ? 'ventana' : v.ciAbs ? 'fibno' : 'fib';
+    },
+    /* Algoritmo del segundo antiagregante con angioplastia primaria (ficha SEM): se sigue en orden. */
+    sa:function(v){
+      const has = x => !isNaN(x);
+      if (v.dudas) return {go:'sa_no', t:'ninguno de momento', por:'dudas diagnósticas, hemorragia activa grave, sin VO o doble antiagregación previa'};
+      if (v.hemr) return {go:'sa_clopi', t:'clopidogrel 600 mg VO', por:'sin información o alto riesgo hemorrágico'};
+      const r = [v.ictus ? 'ictus o AIT previo' : '', has(v.edad) && v.edad > 75 ? 'edad &gt;75 años' : '', has(v.peso) && v.peso < 60 ? 'peso &lt;60 kg' : ''].filter(Boolean);
+      if (r.length) return {go:'sa_tica', t:'ticagrelor 180 mg VO', por:r.join(', ')};
+      if (has(v.edad) && has(v.peso)) return {go:'sa_pras', t:'prasugrel 60 mg VO', por:'ninguno de los criterios anteriores'};
+      return null;
+    },
+    calc:function(v){
+      const has = x => !isNaN(x);
+      const any = Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !((k === 'killip' || k === 'lisis') && v[k] === 0)));
+      if (!any) return [{t:'Introduce los datos del paciente', c:'', h:'Peso, edad y criterios ECG; después Killip, tiempo de traslado y contraindicaciones. La activación, la estrategia de reperfusión, el segundo antiagregante y las dosis por peso real se calculan al momento.'}];
+      const out = [], res = [];
+      const D = PROTOCOLS.find(x => x.id === 'codi-iam').flow.dosis;
+      const cr = this.crit(v), act = cr.c.length > 0;
+      const sg = (v.sg5 ? 5 : 0) + (v.sg3 ? 3 : 0) + (v.sg2 ? 2 : 0);
+
+      /* 1. Activación */
+      if (act) {
+        out.push({t:'CUMPLE criterios ECG: ACTIVAR CODI IAM', c:'high', h:'<b>Criterios:</b> ' + cr.c.join(' · ') + '.<br>Notificar y anotar la hora del ECG (ECG hecho y valorado en &lt;10 min).' + (cr.dud.length ? '<br>' + cr.dud.join('<br>') : '')});
+        res.push('Codi IAM activado: ' + cr.c.join(', '));
+      } else if (cr.dud.length) {
+        out.push({t:'Criterio ECG dudoso', c:'mid', h:cr.dud.join('<br>')});
+        res.push('Criterio ECG dudoso: ' + cr.dud.join(', '));
+      }
+      if (v.brihh || v.mcp || sg) {
+        out.push({t:'Sgarbossa-Smith ' + sg + (sg >= 3 ? ' (≥3)' : ''), c:sg >= 3 ? 'high' : '', h:(sg >= 3 ? 'Puntuación ≥3: alta sensibilidad para el diagnóstico de IAM.' : 'Puntuación &lt;3.') + (v.mcp ? ' Con estimulación del VD los criterios son aplicables pero menos específicos.' : '') + '<br><span class="pe-nota">Concordante ↑ST &gt;1 mm (5) · concordante ↓ST &gt;1 mm en V1–V3 (3) · discordante &gt;25 % (2).</span>'});
+        res.push('Sgarbossa-Smith ' + sg);
+      }
+
+      /* 2. Sin criterios ECG: SCASEST */
+      const ma = this.muyAlto(v);
+      if (!act) {
+        if (ma.length) {
+          out.push({t:'SCASEST de muy alto riesgo (sin Codi IAM)', c:'high', h:'<b>Criterios:</b> ' + ma.join(' · ') + '.<br>Tratar como muy alto riesgo <b>SIN activar el Codi IAM</b>: estrategia invasiva inmediata (&lt;2 h, ESC 2023).'});
+          res.push('SCASEST de muy alto riesgo: ' + ma.join(', '));
+        } else if (cr.no) {
+          out.push({t:'Sin criterios de Codi IAM', c:'mid', h:cr.no + '.<br>Sin criterios de muy alto riesgo marcados: seguir el protocolo de SCASEST específico.'});
+          res.push('Sin criterios ECG de Codi IAM (' + cr.no + ')');
+        }
+      }
+
+      /* 3. Killip (ficha SEM; mortalidad de scales.js 'killip') */
+      if (v.killip > 0) {
+        const K = {1:['low','Killip I','Auscultación normal — mortalidad hospitalaria ~6 %'], 2:['mid','Killip II','Estertores crepitantes y/o 3.er ruido — mortalidad ~17 %'], 3:['high','Killip III','Edema agudo de pulmón — mortalidad ~38 %'], 4:['high','Killip IV','Shock cardiogénico — mortalidad ~81 %']}[v.killip];
+        out.push({t:K[1], c:K[0], h:K[2] + '.' + (v.killip === 3 ? ' Ver «Edema agudo de pulmón (Killip III)» abajo.' : v.killip === 4 ? ' Ver «Shock cardiogénico (Killip IV)» abajo.' : '')});
+        res.push(K[1]);
+      }
+
+      /* 4. Estrategia de reperfusión y tiempos */
+      const e = act ? this.estr(v) : null;
+      if (act) {
+        const T = {
+          icp:['ANGIOPLASTIA PRIMARIA', 'high', 'Traslado directo a la sala de hemodinámica (centro con angioplastia primaria 24 h).'],
+          ventana:['Ventana de 90–120 min: individualizar', 'mid', 'Angioplastia primaria o fibrinólisis prehospitalaria según el caso.'],
+          fib:['FIBRINÓLISIS PREHOSPITALARIA', 'high', 'Tenecteplasa en &lt;10 min desde el ECG diagnóstico, en bolo rápido. Después, traslado inmediato a un centro con ICP.'],
+          fibno:['Fibrinólisis contraindicada: ANGIOPLASTIA PRIMARIA', 'high', 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).']
+        };
+        if (e) {
+          const x = T[e];
+          out.push({t:'Reperfusión: ' + x[0], c:x[1], h:'Traslado estimado ECG → hospital con ICP: <b>' + v.tras + ' min</b> (&lt;90 → angioplastia · 90–120 → individualizar · &gt;120 → fibrinólisis). ' + x[2] +
+            (v.ciAbs && e !== 'fibno' ? '<br><b>Contraindicación absoluta de fibrinólisis:</b> si se valora la lisis, no está indicada.' : '') +
+            (v.ciRel && e !== 'icp' && e !== 'fibno' ? '<br><b>Contraindicación relativa de fibrinólisis</b> presente (la ficha solo la enumera).' : '')});
+          res.push('Traslado ECG → hospital ' + v.tras + ' min → ' + x[0].toLowerCase());
+        } else out.push({t:'Reperfusión: falta el tiempo de traslado', c:'', h:'Introduce el tiempo estimado desde el ECG hasta la llegada al hospital con ICP: &lt;90 min → angioplastia primaria · 90–120 → individualizar · &gt;120 → fibrinólisis prehospitalaria (tenecteplasa en &lt;10 min desde el ECG).'});
+        if (v.lisis > 0) {
+          out.push(v.lisis === 1 ? {t:'Lisis eficaz', c:'low', h:'Coronariografía en <b>2–24 h</b> (ACC/AHA 2025, ESC 2023).'} : {t:'Lisis fallida', c:'high', h:'<b>Coronariografía inmediata e ICP DE RESCATE</b> (ACC/AHA 2025, ESC 2023).'});
+          res.push(v.lisis === 1 ? 'Lisis eficaz → coronariografía 2–24 h' : 'Lisis fallida → ICP de rescate');
+        }
+      }
+
+      /* 5. Segundo antiagregante */
+      if (act && e !== 'fib') {
+        const a = this.sa(v);
+        out.push(a ? {t:'Segundo antiagregante (angioplastia primaria): ' + a.t, c:'', h:'Por: ' + a.por + '.<br><span class="pe-nota">Algoritmo de la ficha, en orden: dudas o hemorragia → ninguno · sin información o alto riesgo hemorrágico → clopidogrel 600 mg · ictus/AIT previo, &gt;75 años o &lt;60 kg → ticagrelor 180 mg · resto → prasugrel 60 mg. Con fibrinólisis: clopidogrel, NO prasugrel ni ticagrelor.</span>'} :
+          {t:'Segundo antiagregante: faltan la edad o el peso', c:'', h:'Con &gt;75 años o &lt;60 kg → ticagrelor 180 mg VO; si no → prasugrel 60 mg VO (salvo dudas, hemorragia o alto riesgo hemorrágico).'});
+        if (a) res.push('Segundo antiagregante (ICP primaria): ' + a.t);
+      }
+
+      /* 6. Dosis por peso real (mismas funciones que el flujograma) */
+      if (act) {
+        const hp = has(v.peso) && v.peso > 0;
+        const icp = '<b>Angioplastia primaria:</b> heparina sódica 70 UI/kg IV en bolo' + (hp ? ' = <b>' + Math.round(70 * v.peso).toLocaleString('es-ES') + ' UI</b>' : '') + '.';
+        const fib = '<b>Fibrinólisis:</b> tenecteplasa ' + D.tnk(v) + '<br>AAS 150–300 mg VO (o 450 mg IV) + ' + D.clopi(v) + '. NO prasugrel ni ticagrelor.<br>' + D.enox(v) + '<br>' + D.hnf(v);
+        const ini = '<b>Inicial:</b> AAS 150–300 mg VO masticada (450 mg IV de acetilsalicilato de lisina si no puede VO) · O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg).';
+        out.push({t:'Tratamiento: dosis por peso real', c:'', h:ini + '<br>' + (e === 'icp' || e === 'fibno' ? icp : e === 'fib' ? fib : icp + '<br>' + fib) + (hp ? '' : '<br><span class="pe-nota">Introduce el peso para calcular la dosis.</span>')});
+      }
+      out.resumen = res;
+      return out;
+    }
+  },
   galeria:{
     titulo:'Patrones ECG de oclusión coronaria (OMI)',
     nota:'Equivalentes de infarto con oclusión coronaria aguda que no cumplen los criterios clásicos de elevación del ST — no descartan activación del Codi IAM.',
@@ -605,6 +1220,7 @@ window.PROTOCOLS = [
     const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
     const hay = x => !isNaN(x) && x > 0;
     const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular la dosis.</span>';
+    const E = () => PROTOCOLS.find(x => x.id === 'codi-iam').eval; // sugerencias con las mismas funciones del evaluador
     const tnk = v => {
       if (!hay(v.peso)) return 'Tabla por peso: &lt;60 kg 30 mg (6 ml) · 60–69 kg 35 mg (7 ml) · 70–79 kg 40 mg (8 ml) · 80–89 kg 45 mg (9 ml) · ≥90 kg 50 mg (10 ml); con ≥75 años, media dosis. ' + faltaPeso;
       const llena = v.peso < 60 ? 30 : v.peso < 70 ? 35 : v.peso < 80 ? 40 : v.peso < 90 ? 45 : 50;
@@ -625,7 +1241,7 @@ window.PROTOCOLS = [
       'Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa.';
     const TQ = {
       q: 'Tiempo estimado desde el ECG hasta la llegada al hospital con ICP',
-      opts: [{ l: '&lt;90 min', go: 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana' }, { l: '>120 min', go: 'fibci' }]
+      opts: [{ l: '&lt;90 min', go: 'icp', sug: v => E().estr(v) === 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana', sug: v => E().estr(v) === 'ventana' }, { l: '>120 min', go: 'fibci', sug: v => /^fib/.test(E().estr(v) || '') }]
     };
     /* Patrón OMI → nodo: imagen, criterios y conducta según el tipo de patrón. */
     const OMI_EQUIV = ['OMI inferobasal - posterior.jpg', 'criterios Sgarbossa.jpg'];
@@ -654,24 +1270,24 @@ window.PROTOCOLS = [
     };
     const mlh = (dosis, peso, conc) => f(Math.round(dosis * peso * 60 / conc * 10) / 10);
     return {
-      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'clcr', l: 'ClCr (opcional)', u: 'ml/min' }],
+      dosis: { tnk, clopi, enox, hnf }, // también las usa el evaluador de arriba
       start: 'ecg',
       nodes: {
         ecg: {
           t: 'Primer contacto', show: 'Dolor torácico sugestivo de SCA (valorar SCA sin dolor en mujeres, diabéticos y ancianos): <b>ECG de 12 derivaciones en &lt;10 min</b>.',
           q: '¿Cumple criterios ECG de activación del Codi IAM?',
           help: 'Elevación nueva del ST en el punto J en 2 derivaciones contiguas (≥1 mm; en V2–V3 ≥2 mm hombres >40 a, ≥2,5 mm hombres &lt;40 a, ≥1,5 mm mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación en aVR · elevación >0,5 mm en V7–V9 con descenso en V1–V3 · elevación en derivaciones derechas · BRIHH o BRDHH nuevo (Sgarbossa-Smith), patrón de Winter o marcapasos con BRIHH. Equivalentes OMI: botón «Ver patrones IAM nuevos».',
-          opts: [{ l: 'Sí, cumple criterios', go: 'activar' }, { l: 'No', go: 'scasest' }]
+          opts: [{ l: 'Sí, cumple criterios', go: 'activar', sug: v => E().crit(v).c.length > 0 }, { l: 'No', go: 'scasest', sug: v => !!E().crit(v).no }]
         },
         scasest: {
           q: '¿SCASEST de muy alto riesgo?',
           help: 'Inestabilidad hemodinámica o shock cardiogénico · dolor recurrente o refractario · arritmias potencialmente mortales · complicaciones mecánicas del IAM · insuficiencia cardiaca relacionada · elevación transitoria del ST.',
-          opts: [{ l: 'Sí, algún criterio', go: 'muyalto' }, { l: 'No', go: 'nosca' }]
+          opts: [{ l: 'Sí, algún criterio', go: 'muyalto', sug: v => E().muyAlto(v).length > 0 }, { l: 'No', go: 'nosca' }]
         },
         muyalto: { t: 'SCASEST de muy alto riesgo', c: 'high', show: 'Tratar como muy alto riesgo <b>SIN activar el Codi IAM</b>: estrategia invasiva inmediata (&lt;2 h, ESC 2023).' },
         nosca: { t: 'Sin criterios de Codi IAM', c: 'mid', show: 'Seguir el protocolo de SCASEST específico.' },
         activar: { farmacos: ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', { n: 'Fentanilo', inf: false }, 'Cloruro mórfico', 'Nitroglicerina'],
-          t: 'ACTIVAR CODI IAM', c: 'high', escalas: ['killip'],
+          t: 'ACTIVAR CODI IAM', c: 'high',
           show: 'Notificar y anotar la hora del ECG.<br><b>Tratamiento inicial:</b> O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg) · <b>AAS 150–300 mg VO masticada</b> (450 mg IV de acetilsalicilato de lisina si no puede VO).<br>Nitroglicerina (SL 0,4 mg o IV): NO si TAS &lt;90, FC &lt;50, sospecha de IAM de VD o inhibidores de la PDE-5 en 24 h, ni como prueba diagnóstica.<br>Killip: I normal · II crepitantes o 3.er ruido · III edema agudo de pulmón · IV shock cardiogénico.',
           galeria: true,
           q: 'Localización del infarto en el ECG',
@@ -680,9 +1296,9 @@ window.PROTOCOLS = [
             { l: 'Anterior o anteroseptal (V1–V4) o anterior extenso (V1–V6, I, aVL)', go: 'loc_ant' },
             { l: 'Inferior (II, III, aVF)', go: 'loc_infq' },
             { l: 'Lateral (I, aVL, V5–V6)', go: 'loc_lat' },
-            { l: 'Posterior (descenso del ST en V1–V3, elevación en V7–V9)', go: 'loc_post' },
-            { l: 'Descenso del ST en ≥8 derivaciones + elevación en aVR', go: 'loc_tronco' },
-            { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro' },
+            { l: 'Posterior (descenso del ST en V1–V3, elevación en V7–V9)', go: 'loc_post', sug: v => v.post },
+            { l: 'Descenso del ST en ≥8 derivaciones + elevación en aVR', go: 'loc_tronco', sug: v => v.avr },
+            { l: 'BRIHH, marcapasos u otro equivalente sin localización clara', go: 'loc_otro', sug: v => v.brihh || v.mcp },
             { l: 'Otros: nuevos patrones de IAM (OMI)', go: 'loc_omi' }
           ]
         },
@@ -693,7 +1309,7 @@ window.PROTOCOLS = [
         },
         loc_infq: {
           q: '¿Elevación del ST en V3R–V4R? (≥0,5 mm; ≥1 mm en hombres &lt;30 años)',
-          opts: [{ l: 'Sí: afecta al ventrículo derecho', go: 'loc_vd' }, { l: 'No', go: 'loc_inf' }]
+          opts: [{ l: 'Sí: afecta al ventrículo derecho', go: 'loc_vd', sug: v => v.vd }, { l: 'No', go: 'loc_inf' }]
         },
         loc_inf: { farmacos: ['Atropina'],
           t: 'IAM INFERIOR — coronaria derecha o circunfleja', c: 'mid',
@@ -746,10 +1362,10 @@ window.PROTOCOLS = [
           show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + ' UI</b>' : '. ' + faltaPeso),
           q: 'Segundo antiagregante: ¿qué situación aplica?',
           opts: [
-            { l: 'Dudas diagnósticas, hemorragia activa grave, no puede tomar VO o ya con doble antiagregación', go: 'sa_no' },
-            { l: 'No se puede obtener información o alto riesgo hemorrágico', go: 'sa_clopi' },
-            { l: 'Ictus o AIT previo, >75 años o &lt;60 kg', go: 'sa_tica', sug: v => (hay(v.edad) && v.edad > 75) || (hay(v.peso) && v.peso < 60) },
-            { l: 'Ninguna de las anteriores', go: 'sa_pras' }
+            { l: 'Dudas diagnósticas, hemorragia activa grave, no puede tomar VO o ya con doble antiagregación', go: 'sa_no', sug: v => (E().sa(v) || {}).go === 'sa_no' },
+            { l: 'No se puede obtener información o alto riesgo hemorrágico', go: 'sa_clopi', sug: v => (E().sa(v) || {}).go === 'sa_clopi' },
+            { l: 'Ictus o AIT previo, >75 años o &lt;60 kg', go: 'sa_tica', sug: v => (E().sa(v) || {}).go === 'sa_tica' },
+            { l: 'Ninguna de las anteriores', go: 'sa_pras', sug: v => (E().sa(v) || {}).go === 'sa_pras' }
           ]
         },
         sa_no: { t: 'Segundo antiagregante', show: '<b>Ninguno</b> de momento.' },
@@ -759,7 +1375,7 @@ window.PROTOCOLS = [
         fibci: {
           q: '¿Alguna contraindicación absoluta para la fibrinólisis?',
           help: 'Hemorragia cerebral previa o ictus de causa desconocida · ictus isquémico &lt;6 meses · neoplasia o traumatismo del SNC · cirugía o traumatismo &lt;1 mes · sospecha de disección aórtica · sangrado activo o digestivo &lt;1 mes · punciones no compresibles recientes.',
-          opts: [{ l: 'Sí', go: 'fibno' }, { l: 'No', go: 'fib' }]
+          opts: [{ l: 'Sí', go: 'fibno', sug: v => v.ciAbs }, { l: 'No', go: 'fib' }]
         },
         fibno: {
           t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
@@ -772,7 +1388,7 @@ window.PROTOCOLS = [
             '<b>Anticoagulación</b> (hasta la revascularización o el alta, máx. 8 días): ' + enox(v) + '<br>' + hnf(v) + '<br>' +
             'Traslado inmediato a un centro con ICP.<br><span class="pe-nota">Fuentes de la dosis: ACC/AHA 2025 y ESC 2023 (media dosis ≥75 años, STREAM-2); SEM v.03 2023 «mitad de dosis si >75 años»: el corte correcto es ≥75.</span>',
           q: 'A los 60–90 min de la lisis: ¿el ST baja ≥50 %, cede el dolor y está estable?',
-          opts: [{ l: 'Sí: lisis eficaz', go: 'fibok' }, { l: 'No, o inestabilidad hemodinámica o eléctrica', go: 'rescate' }]
+          opts: [{ l: 'Sí: lisis eficaz', go: 'fibok', sug: v => v.lisis === 1 }, { l: 'No, o inestabilidad hemodinámica o eléctrica', go: 'rescate', sug: v => v.lisis === 2 }]
         },
         fibok: { t: 'Lisis eficaz', c: 'low', show: 'Coronariografía en <b>2–24 h</b> (ACC/AHA 2025, ESC 2023).' },
         rescate: { t: 'Lisis fallida', c: 'high', show: '<b>Coronariografía inmediata e ICP DE RESCATE</b> (ACC/AHA 2025, ESC 2023).' }
@@ -838,6 +1454,163 @@ window.PROTOCOLS = [
 
 {id:'codi-ictus', title:'Codi Ictus', sub:'Test RAPID/RANCOM, escala RACE y activación', badge:'red', tag:'Crítico', rank:2, codigo:true,
   folleto:'codigos/C02._Codi_ictus.pdf',
+  /* Evaluador: los datos se meten una vez. Activación del SEM (RAPID, RANCOM, tiempo; C02 Codi Ictus v.03),
+     RACE (ítems, puntos y corte ≥5 de data/scales.js 'race') y, en la fase hospitalaria de Campdevànol con
+     teleictus, ventana, contraindicaciones, TA y dosis de trombolítico por peso real (mismos criterios que los
+     nodos del flujograma). El flujograma usa estos mismos datos (v.peso, v.edad, v.tas, v.tad, v.gluc…). */
+  eval:{
+    escalas:[{id:'nihss', para:'gravedad del déficit (0–42)'}, {id:'mrs', para:'situación funcional previa (RANCOM)'}, {id:'gcs', para:'nivel de consciencia'}, {id:'abcd2', para:'riesgo de ictus tras un AIT'}, {id:'ich', para:'gravedad de la hemorragia intracerebral'}],
+    items:[
+      {t:'h', l:'Activación (SEM): test RAPID, RANCOM y tiempo'},
+      {k:'riu', t:'chk', l:'RAPID · ríe asimétrico'},
+      {k:'brazos', t:'chk', l:'RAPID · dificultad para levantar los brazos o mantenerlos levantados'},
+      {k:'disart', t:'chk', l:'RAPID · habla con dificultad (disartria)'},
+      {k:'posterior', t:'chk', l:'Sospecha de ictus de territorio posterior (vértigo, diplopía, ataxia)'},
+      {k:'hsa', t:'chk', l:'Sospecha de hemorragia subaracnoidea'},
+      {k:'rancom', t:'sel', l:'RANCOM · estado previo: ¿necesitaba ayuda para vestirse, moverse o ir al baño?', o:[['Sin valorar',0],['No, era independiente (RANCOM negativo)',1],['Sí, necesitaba ayuda (RANCOM positivo)',2]]},
+      {k:'edad', t:'num', l:'Edad', u:'años'},
+      {k:'horas', t:'num', l:'Horas desde la última vez que se le vio bien', u:'h'},
+      {k:'incierto', t:'chk', l:'Inicio incierto o ictus del despertar'},
+      /* RACE: ítems y puntos de scales.js 'race' (con «Sin valorar» para saber si está completa) */
+      {t:'h', l:'Escala RACE (0–9)'},
+      {k:'rFac', t:'sel', l:'Paresia facial (enseñar los dientes / sonreír)', o:[['Sin valorar',-1],['Ausente (0)',0],['Leve (1)',1],['Moderada o grave (2)',2]]},
+      {k:'rBra', t:'sel', l:'Paresia braquial', o:[['Sin valorar',-1],['Normal o leve: mantiene el brazo &gt;10 s (0)',0],['Moderada: lo mantiene &lt;10 s (1)',1],['Grave: no vence la gravedad (2)',2]]},
+      {k:'rCru', t:'sel', l:'Paresia crural', o:[['Sin valorar',-1],['Normal o leve: mantiene la pierna &gt;5 s (0)',0],['Moderada: la mantiene &lt;5 s (1)',1],['Grave: no vence la gravedad (2)',2]]},
+      {k:'rOcu', t:'sel', l:'Desviación oculocefálica', o:[['Sin valorar',-1],['Ausente (0)',0],['Presente (1)',1]]},
+      {k:'rAfa', t:'sel', l:'Hemiparesia derecha → afasia («cierre los ojos», «cierre el puño») · Hemiparesia izquierda → agnosia («¿de quién es este brazo?», «¿puede mover/aplaudir con ambos brazos?»)', o:[['Sin valorar',-1],['Afasia: hace las 2 órdenes · Agnosia: reconoce su brazo y el déficit (0)',0],['Afasia: hace 1 orden · Agnosia: no reconoce su brazo o el déficit (1)',1],['Afasia: no hace ninguna · Agnosia: no reconoce ni su brazo ni el déficit (2)',2]]},
+      {t:'h', l:'Constantes'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'tas', t:'num', l:'TAS', u:'mmHg'},
+      {k:'tad', t:'num', l:'TAD', u:'mmHg'},
+      {k:'gluc', t:'num', l:'Glucemia capilar', u:'mg/dl'},
+      {t:'h', l:'Fase hospitalaria (Campdevànol con teleictus): anticoagulación, contraindicaciones e imagen'},
+      {k:'hosp', t:'chk', l:'Está en el Hospital de Campdevànol (fase hospitalaria con teleictus)'},
+      {k:'aco', t:'sel', l:'Anticoagulante', o:[['Sin indicar',0],['No toma',1],['Acenocumarol o warfarina',2],['Anticoagulante oral directo, última toma hace &lt;48 h',3],['Anticoagulante oral directo, última toma hace ≥48 h',4],['HBPM a dosis plenas hace &lt;24 h',5]]},
+      {k:'inr', t:'num', l:'INR (con acenocumarol o warfarina, o si se sospecha coagulopatía)', u:'INR'},
+      {k:'plaq', t:'num', l:'Plaquetas (solo si se sospecha alteración)', u:'/µL'},
+      {k:'tc', t:'sel', l:'TC craneal sin contraste', o:[['Pendiente',0],['Sin hemorragia',1],['Hemorragia',2]]},
+      {k:'hicPrev', t:'chk', l:'Hemorragia intracraneal previa'},
+      {k:'cir', t:'chk', l:'Cirugía reciente: cirugía mayor &lt;14 días (AHA/ASA 2026) o cualquier cirugía en los últimos 15 días (SEM)'},
+      {k:'otrasCI', t:'chk', l:'Otra contraindicación: ictus isquémico o TCE grave &lt;3 meses · cirugía intracraneal o espinal &lt;3 meses · hemorragia digestiva &lt;21 días · disección aórtica · endocarditis'},
+      {k:'ogv', t:'sel', l:'Oclusión de gran vaso en la angio-TC', o:[['Sin angio-TC',0],['Sí',1],['No',2]]},
+      {k:'mismatch', t:'sel', l:'Imagen avanzada (si 4,5–9 h, ictus del despertar o inicio incierto)', o:[['No hecha',0],['Mismatch en TC de perfusión o difusión-FLAIR en RM',1],['Sin mismatch, o solo TC sin contraste',2]]}
+    ],
+    calc:function(v){
+      const has = x => typeof x === 'number' && !isNaN(x);
+      const out = [];
+      const SEL0 = ['rancom', 'aco', 'tc', 'ogv', 'mismatch'], RK = ['rFac', 'rBra', 'rCru', 'rOcu', 'rAfa'];
+      if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !(SEL0.includes(k) && v[k] === 0) && !(RK.includes(k) && v[k] === -1))))
+        return [{t:'Introduce los datos del paciente', c:'', h:'Test RAPID y RANCOM, horas desde la última vez visto bien, RACE, TA, glucemia, peso y anticoagulantes: la activación del Codi Ictus, la RACE, la candidatura a trombólisis o trombectomía y las dosis por peso real se calculan al momento.'}];
+      const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+      const pesoOk = has(v.peso) && v.peso > 0, edadOk = has(v.edad) && v.edad > 0;
+      const hOk = has(v.horas) && v.horas >= 0;
+      const ped = edadOk && v.edad < 15;
+      const rapidN = [v.riu, v.brazos, v.disart].filter(Boolean).length;
+      const tiempoOk = v.incierto || (hOk && v.horas < 24);
+      const SEM = '<span class="pe-nota">Codi Ictus, SEM Catalunya v.03 (abril 2023).</span>';
+
+      /* 1. Activación (C02 Codi Ictus: RAPID positivo → RANCOM negativo → &lt;24 h, inicio incierto o del despertar;
+         también territorio posterior y siempre en el pediátrico; la HSA no es Codi Ictus) */
+      let act = '', actC = '', actH = '', activar = false;
+      const falta = [];
+      if (v.hsa) { act = 'no se activa (sospecha de hemorragia subaracnoidea)'; actC = 'mid'; actH = 'La sospecha de HSA tiene circuito específico.'; }
+      else if (!rapidN && !v.posterior && !ped) { act = 'RAPID sin alteraciones marcadas'; actH = 'Sin RAPID positivo no se activa, salvo sospecha de territorio posterior (vértigo, diplopía, ataxia) o paciente pediátrico.'; }
+      else if (rapidN && v.rancom === 2) { act = 'no cumple criterios (RANCOM positivo)'; actC = 'mid'; actH = 'Dependencia previa: no cumple los criterios de activación del Codi Ictus del SEM.'; }
+      else {
+        if (rapidN && v.rancom === 0) falta.push('RANCOM');
+        if (!tiempoOk && !hOk) falta.push('tiempo de evolución');
+        if (!tiempoOk && hOk) { act = 'no cumple criterios (más de 24 h)'; actC = 'mid'; actH = 'Más de 24 h de evolución: no cumple los criterios de activación del SEM.'; }
+        else if (falta.length) { act = 'faltan datos (' + falta.join(' y ') + ')'; actH = (rapidN ? 'RAPID positivo (' + rapidN + ' de 3).' : v.posterior ? 'Sospecha de territorio posterior.' : 'Paciente pediátrico.') + ' Se activa con RANCOM negativo y &lt;24 h de evolución (incluido AIT), inicio incierto o ictus del despertar.'; }
+        else {
+          activar = true; act = 'ACTIVAR'; actC = 'high';
+          actH = (rapidN ? 'RAPID positivo (' + rapidN + ' de 3)' + (v.rancom === 1 ? ', RANCOM negativo' : '') : v.posterior ? 'Sospecha de ictus de territorio posterior' : 'Paciente pediátrico') + ', ' + (v.incierto ? 'inicio incierto o ictus del despertar' : v.horas + ' h de evolución') + '.<br>' +
+            (ped ? '<b>Pediátrico (&lt;15 años): activar SIEMPRE, con cualquier RACE → centro de referencia pediátrico más cercano.</b><br>' : 'Comunicar la puntuación RACE a CECOS, sea cual sea.<br>') +
+            'Datos para CECOS (SITREM): CIP/DNI, hora de inicio (hora de acostarse si es del despertar, o última vez visto bien), anticoagulantes, RAPID/RANCOM, RACE, glucemia capilar, TA, FC y temperatura.';
+        }
+      }
+      out.push({t:'Codi Ictus: ' + act, c:actC, h:actH + '<br>' + SEM});
+
+      /* 2. RACE (scales.js 'race'; C02: 0–4 → CRI más cercano · 5–9 → neurólogo referente y trombectomía) */
+      const rv = RK.map(k => v[k]), rFalta = rv.filter(x => x === -1 || !has(x)).length;
+      const race = rv.reduce((a, x) => a + (has(x) && x > 0 ? x : 0), 0);
+      const raceAlta = race >= 5, raceBaja = !rFalta && race < 5;
+      const raceTxt = rFalta === 5 ? 'RACE sin valorar' : 'RACE ' + race + (rFalta ? ' (incompleta: falta' + (rFalta > 1 ? 'n ' + rFalta + ' ítems)' : ' 1 ítem)') : '');
+      const aco = v.aco;
+      const tpaSem = [hOk ? (v.horas < 4 ? true : false) : null, aco === 1 ? true : aco > 1 ? false : null, !v.cir, !v.hicPrev];
+      if (!ped && (rFalta < 5 || activar)) {
+        let h;
+        if (raceAlta) {
+          const motNo = [hOk && v.horas >= 4 ? 'ya han pasado ' + f(v.horas) + ' h desde el inicio' : '', aco > 1 ? 'anticoagulado' : '', v.cir ? 'cirugía en los últimos 15 días' : '', v.hicPrev ? 'hemorragia cerebral previa' : ''].filter(Boolean);
+          const cand = motNo.length ? 'No es candidato a tPA según el SEM (' + motNo.join(' · ') + ')' : tpaSem.includes(null) ? 'Candidato a tPA según el SEM: pendiente de ' + [hOk ? '' : 'la hora de inicio', aco === 0 ? 'saber si toma anticoagulantes' : ''].filter(Boolean).join(' y ') : 'Candidato a tPA según el SEM si la llegada estimada al CRI es &lt;4 h desde el inicio (llevan ' + f(v.horas) + ' h)';
+          h = '<b>Alta probabilidad de oclusión arterial e ictus grave.</b> Llamar al neurólogo referente. Si el centro de referencia hace trombectomía → trasladar allí. Si no: candidato a tPA → CRI más cercano (CPI o C-TI); no candidato → centro de trombectomía más cercano (CTI, o CPI en horario de trombectomía).<br><b>' + cand + '.</b> Criterios del SEM: llegada estimada al CRI &lt;4 h desde el inicio, sin anticoagulación, sin cirugía en los últimos 15 días y sin hemorragia cerebral previa.<br><b>La trombólisis no debe retrasar el traslado a trombectomía.</b>';
+        } else if (raceBaja) h = 'Baja probabilidad de oclusión de gran vaso: trasladar al centro de referencia de ictus más cercano (CTI, CPI o C-TI).';
+        else h = 'Completa los ítems: ≥5 = alta probabilidad de oclusión de gran vaso.';
+        out.push({t:raceTxt + (raceAlta ? ': probable oclusión de gran vaso' : raceBaja ? ': baja probabilidad de oclusión de gran vaso' : ''), c:raceAlta ? 'high' : raceBaja ? 'low' : '', h:h + '<br>' + SEM});
+      }
+
+      /* 3. Trombólisis IV en Campdevànol (mismos criterios que los nodos hosp, ventana1/2, CI, ta y dosis del flujograma) */
+      const hospDatos = v.hosp || v.aco > 0 || has(v.inr) || has(v.plaq) || v.tc > 0 || v.hicPrev || v.cir || v.otrasCI || v.ogv > 0 || v.mismatch > 0;
+      let candidato = false, noCand = false, ventana = 0;
+      if (hospDatos) {
+        ventana = hOk ? (v.horas <= 4.5 ? 1 : v.horas <= 9 ? 2 : 3) : v.incierto ? 2 : 0;
+        const ci = [v.tc === 2 ? 'hemorragia en la TC' : '', v.hicPrev ? 'hemorragia intracraneal previa' : '', v.cir ? 'cirugía reciente' : '', v.otrasCI ? 'otra contraindicación de la lista' : '',
+          has(v.gluc) && v.gluc < 50 ? 'glucemia ' + v.gluc + ' mg/dl (&lt;50: corregir y reevaluar)' : '', has(v.plaq) && v.plaq < 100000 ? 'plaquetas &lt;100.000' : '',
+          has(v.inr) && v.inr > 1.7 ? 'INR ' + f(v.inr) + ' (&gt;1,7)' : '', aco === 5 ? 'HBPM a dosis plenas &lt;24 h' : ''].filter(Boolean);
+        const taOk = has(v.tas) && has(v.tad) && v.tas < 185 && v.tad < 110, taAlta = (has(v.tas) && v.tas >= 185) || (has(v.tad) && v.tad >= 110);
+        const pend = [ventana ? '' : 'horas desde la última vez visto bien', v.tc === 0 ? 'TC sin contraste' : '', taOk || taAlta ? '' : 'TAS y TAD', aco === 0 ? 'anticoagulantes' : '', aco === 2 && !has(v.inr) ? 'INR' : '', ventana === 2 && v.mismatch === 0 ? 'imagen avanzada (perfusión o RM)' : ''].filter(Boolean);
+        const avisoAcod = aco === 3 ? '<br><b>Anticoagulante oral directo &lt;48 h:</b> caso a caso, con niveles específicos (dabigatrán: idarucizumab 5 g IV).' : '';
+        let t, c = 'high', h;
+        if (ventana === 3) { t = 'fuera de ventana (más de 9 h)'; c = 'mid'; noCand = true; h = 'Sin trombólisis IV. Si hay oclusión de gran vaso, comentar con el neurólogo de teleictus el traslado a trombectomía.'; }
+        else if (ci.length) { t = 'contraindicada'; noCand = true; h = '<b>Contraindicación:</b> ' + ci.join(' · ') + '. Sin trombólisis IV. Si hay oclusión de gran vaso (RACE ≥5 o angio-TC), traslado a trombectomía según el neurólogo de teleictus.'; }
+        else if (ventana === 2 && v.mismatch === 2) { t = 'no indicada (4,5–9 h sin imagen avanzada)'; c = 'mid'; noCand = true; h = 'Fuera de las 4,5 h sin mismatch en perfusión o difusión-FLAIR no hay indicación de trombólisis IV. Si hay oclusión de gran vaso, comentar la trombectomía con el neurólogo de teleictus.'; }
+        else if (taAlta && !pend.filter(x => x !== 'TAS y TAD').length) { t = 'bajar antes la TA a &lt;185/110'; h = 'TA ' + (has(v.tas) ? v.tas : '?') + '/' + (has(v.tad) ? v.tad : '?') + ' mmHg. <b>Labetalol IV</b> 10 mg en 1–2 min, repetible (máx. 150 mg), o <b>urapidilo</b> si hay contraindicación a los betabloqueantes. Objetivo &lt;185/110 antes de empezar y &lt;180/105 las 24 h siguientes. Si no se consigue: TA no controlable → contraindicada.'; }
+        else if (pend.length) { t = 'faltan datos (' + pend.join(', ') + ')'; c = ''; h = 'Sin contraindicaciones marcadas por ahora.' + (taAlta ? ' TA ≥185/110: bajarla antes (labetalol o urapidilo).' : '') + ' No esperar plaquetas, INR ni TTPa salvo sospecha (anticoagulante, hepatopatía, hemopatía). Objetivo puerta-aguja &lt;60 min.'; }
+        else { candidato = true; t = 'CANDIDATO' + (ventana === 2 ? ' (4,5–9 h con mismatch: solo alteplasa)' : '') + (aco === 3 ? ' si se descarta efecto del ACOD (&lt;48 h, caso a caso)' : ''); h = 'Ventana ' + (ventana === 1 ? '0–4,5 h' : '4,5–9 h o ictus del despertar con mismatch') + ', TC sin hemorragia, TA ' + v.tas + '/' + v.tad + ' mmHg y sin contraindicaciones marcadas.'; }
+        if (!noCand && !(t.indexOf('faltan') === 0 && !ventana)) {
+          let d;
+          if (pesoOk) {
+            const tot = Math.min(0.9 * v.peso, 90), bolo = tot / 10, resto = tot - bolo;
+            d = '<b>Alteplasa</b> 0,9 mg/kg, máx. 90 mg: <b>' + f(Math.round(tot * 10) / 10) + ' mg</b> en total (1 mg/ml) → <b>bolo de ' + f(Math.round(bolo * 10) / 10) + ' mg IV en 1 min</b> + <b>' + f(Math.round(resto * 10) / 10) + ' mg con bomba en 60 min (' + f(Math.round(resto * 10) / 10) + ' ml/h)</b>.';
+            if (ventana === 2) d += ' <b>Ventana 4,5–9 h: solo alteplasa</b> (no tenecteplasa).';
+            else { const tk = v.peso < 60 ? 15 : v.peso < 70 ? 17.5 : v.peso < 80 ? 20 : v.peso < 90 ? 22.5 : 25; d += '<br><b>O tenecteplasa</b> (misma eficacia en &lt;4,5 h): <b>' + f(tk) + ' mg = ' + f(tk / 5) + ' ml</b> en bolo IV único en 5–10 s (tabla de la ficha técnica). No usar la dosis del IAM.'; }
+          } else d = 'Alteplasa 0,9 mg/kg (máx. 90 mg) o tenecteplasa por tramos de peso: <b>introduce el peso real</b> para calcular la dosis.';
+          h += '<br>' + d;
+        }
+        out.push({t:'Trombólisis IV: ' + t, c:c, h:h + avisoAcod + '<br>La decide el neurólogo de teleictus.<br><span class="pe-nota">Fase hospitalaria: AHA/ASA 2026; ESO 2021 y 2023; fichas técnicas Actilyse y Metalyse 25 mg.</span>'});
+      }
+
+      /* 4. Trombectomía: RACE ≥5 o oclusión de gran vaso en la angio-TC (C02 y nodos race_hi, fuera, contra) */
+      if (raceAlta || v.ogv === 1)
+        out.push({t:'Probable oclusión de gran vaso: valorar trombectomía', c:'high', h:(v.ogv === 1 ? 'Oclusión de gran vaso en la angio-TC' : raceTxt) + '. Comentar con el neurólogo de teleictus (o el referente) el traslado a un centro con trombectomía. <b>La trombólisis no debe retrasar el traslado.</b>'});
+
+      /* 5. TA y glucemia (C02, manejo de complicaciones agudas; AHA/ASA 2026 para el candidato) */
+      const tg = [];
+      if (has(v.tas) || has(v.tad)) {
+        const ta = (has(v.tas) ? v.tas : '?') + '/' + (has(v.tad) ? v.tad : '?');
+        if (candidato || (hospDatos && !noCand)) tg.push('<b>TA ' + ta + '</b>: ' + (candidato ? 'candidato' : 'posible candidato') + ' a trombólisis → &lt;185/110 antes y &lt;180/105 las 24 h siguientes.');
+        else if ((has(v.tas) && v.tas > 220) || (has(v.tad) && v.tad > 120)) tg.push('<b>TA ' + ta + ': emergencia hipertensiva (TAS &gt;220 y/o TAD &gt;120)</b> → labetalol IV 10 mg en 1–2 min, repetir cada 10 min hasta 150 mg, o urapidilo si hay contraindicación a los betabloqueantes; bajar la TA un 10 % inicial, evitar descensos &gt;15 % y los hipotensores sublinguales.');
+        else tg.push('TA ' + ta + ': sin candidatura a trombólisis, tratar solo si TAS &gt;220 y/o TAD &gt;120.');
+      }
+      if (has(v.gluc)) {
+        if (v.gluc < 60) tg.push('<b>Glucemia ' + v.gluc + ' mg/dl: hipoglucemia</b> → glucosa IV, mantener &gt;70.');
+        else if (v.gluc > 180) tg.push('<b>Glucemia ' + v.gluc + ' mg/dl</b> → insulina rápida en bolo IV según glucemia capilar: <b>' + (v.gluc <= 250 ? 4 : v.gluc <= 350 ? 8 : 12) + ' UI</b> (150–250 → 4 UI · 250–350 → 8 UI · &gt;350 → 12 UI); objetivo ~180, evitar hipoglucemias.');
+        else tg.push('Glucemia ' + v.gluc + ' mg/dl.');
+      }
+      if (tg.length) out.push({t:'Tratamiento: TA y glucemia', c:'', h:tg.join('<br>') + '<br>' + SEM});
+
+      /* Resumen para la historia clínica (sale al final del flujograma y entra en «Copiar resumen») */
+      const trom = out.find(s => s.t.indexOf('Trombólisis IV: ') === 0);
+      out.resumen = [
+        (rapidN || v.posterior || v.rancom > 0 ? 'RAPID ' + (rapidN ? 'positivo (' + rapidN + ' de 3)' : 'negativo') + (v.posterior ? ' · sospecha de territorio posterior' : '') + (v.rancom === 1 ? ' · RANCOM negativo' : v.rancom === 2 ? ' · RANCOM positivo' : '') : ''),
+        hOk || v.incierto ? 'Tiempo: ' + (hOk ? f(v.horas) + ' h desde la última vez visto bien' : '') + (v.incierto ? (hOk ? ' · ' : '') + 'inicio incierto o del despertar' : '') : '',
+        rFalta < 5 ? raceTxt + (raceAlta ? ' (≥5: probable oclusión de gran vaso)' : '') : '',
+        'Codi Ictus: ' + act,
+        trom ? trom.t : '',
+        has(v.tas) || has(v.tad) || has(v.gluc) ? [has(v.tas) || has(v.tad) ? 'TA ' + (has(v.tas) ? v.tas : '?') + '/' + (has(v.tad) ? v.tad : '?') + ' mmHg' : '', has(v.gluc) ? 'glucemia ' + v.gluc + ' mg/dl' : ''].filter(Boolean).join(' · ') : ''
+      ].filter(Boolean);
+      return out;
+    }
+  },
   flow:(() => {
     const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
     const hay = x => !isNaN(x) && x > 0;
@@ -848,41 +1621,38 @@ window.PROTOCOLS = [
       q: '¿Alguna contraindicación para la trombólisis?',
       help: v => 'Hemorragia en la TC · hemorragia intracraneal previa · ictus isquémico o TCE grave &lt;3 meses · cirugía intracraneal o espinal &lt;3 meses · cirugía mayor &lt;14 días · hemorragia digestiva &lt;21 días · glucemia &lt;50 mg/dl (corregir y reevaluar) · plaquetas &lt;100.000 · INR >1,7 · HBPM a dosis plenas &lt;24 h · anticoagulante oral directo &lt;48 h (caso a caso; dabigatrán: idarucizumab 5 g IV) · disección aórtica · endocarditis (AHA/ASA 2026). La TA no controlable se valora en el paso siguiente.' +
         (hay(v.gluc) && v.gluc < 50 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: corregir y reevaluar antes de decidir.</b>' : ''),
-      opts: [{ l: 'Sí, alguna', go: 'contra', sug: v => hay(v.gluc) && v.gluc < 50 }, { l: 'No', go: 'ta' }]
+      opts: [{ l: 'Sí, alguna', go: 'contra', sug: v => (hay(v.gluc) && v.gluc < 50) || ciSi(v) }, { l: 'No', go: 'ta' }]
     };
     const ext = v => v.ruta.includes('ventana2');
+    const hOk = v => typeof v.horas === 'number' && !isNaN(v.horas) && v.horas >= 0;
+    const rapidPos = v => !!(v.riu || v.brazos || v.disart);
+    const RK = ['rFac', 'rBra', 'rCru', 'rOcu', 'rAfa'];
+    const raceSum = v => RK.reduce((a, k) => a + (v[k] > 0 ? v[k] : 0), 0);
+    const raceCompleta = v => RK.every(k => typeof v[k] === 'number' && v[k] >= 0);
+    const ciSi = v => v.tc === 2 || v.hicPrev === true || v.cir === true || v.otrasCI === true || (hay(v.plaq) && v.plaq < 100000) || (hay(v.inr) && v.inr > 1.7) || v.aco === 5;
     return {
-      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'edad', l: 'Edad', u: 'años' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'tad', l: 'TAD', u: 'mmHg' }, { k: 'gluc', l: 'Glucemia', u: 'mg/dl' }],
       start: 'rapid',
-      escalas: [
-        { id: 'race', para: 'sospecha de oclusión de gran vaso (≥5)' },
-        { id: 'nihss', para: 'gravedad del déficit (0–42)' },
-        { id: 'mrs', para: 'situación funcional previa (RANCOM)' },
-        { id: 'gcs', para: 'nivel de consciencia' },
-        { id: 'abcd2', para: 'riesgo de ictus tras un AIT' },
-        { id: 'ich', para: 'gravedad de la hemorragia intracerebral' }
-      ],
       nodes: {
         rapid: {
           t: 'Test RAPID — estado clínico actual',
           show: '¿Ríe asimétrico? · ¿Dificultad para levantar o mantener los brazos? · ¿Disartria?',
           q: '¿RAPID positivo (algún ítem alterado)?',
-          opts: [{ l: 'Sí', go: 'rancom' }, { l: 'No', go: 'atipico' }]
+          opts: [{ l: 'Sí', go: 'rancom', sug: rapidPos }, { l: 'No', go: 'atipico' }]
         },
         atipico: {
           q: '¿Sospecha de ictus de territorio posterior (vértigo, diplopía, ataxia) o paciente pediátrico?',
-          opts: [{ l: 'Sí', go: 'tiempo', sug: v => hay(v.edad) && v.edad < 15 }, { l: 'No', go: 'nocodi' }]
+          opts: [{ l: 'Sí', go: 'tiempo', sug: v => v.posterior === true || (hay(v.edad) && v.edad < 15) }, { l: 'No', go: 'nocodi' }]
         },
         nocodi: { t: 'No cumple criterios de Codi Ictus', c: 'mid', show: 'Valoración habitual. La sospecha de hemorragia subaracnoidea NO es Codi Ictus: tiene circuito específico.' },
         rancom: {
           t: 'Test RANCOM — estado clínico previo', escalas: ['mrs'], show: '¿Necesitaba ayuda para vestirse, moverse o ir al baño?',
           q: '¿Era independiente antes del ictus (RANCOM negativo)?',
-          opts: [{ l: 'Sí, independiente', go: 'tiempo' }, { l: 'No, necesitaba ayuda', go: 'nodep' }]
+          opts: [{ l: 'Sí, independiente', go: 'tiempo', sug: v => v.rancom === 1 }, { l: 'No, necesitaba ayuda', go: 'nodep', sug: v => v.rancom === 2 }]
         },
         nodep: { t: 'RANCOM positivo', c: 'mid', show: 'Dependencia previa: no cumple los criterios de activación del Codi Ictus del SEM.' },
         tiempo: {
           q: '¿Síntomas de menos de 24 h (incluido AIT), inicio incierto o ictus del despertar?',
-          opts: [{ l: 'Sí', go: 'activar' }, { l: 'No, más de 24 h', go: 'notiempo' }]
+          opts: [{ l: 'Sí', go: 'activar', sug: v => v.incierto === true || (hOk(v) && v.horas < 24) }, { l: 'No, más de 24 h', go: 'notiempo', sug: v => !v.incierto && hOk(v) && v.horas >= 24 }]
         },
         notiempo: { t: 'Más de 24 h de evolución', c: 'mid', show: 'No cumple los criterios de activación del Codi Ictus del SEM.' },
         activar: {
@@ -893,20 +1663,20 @@ window.PROTOCOLS = [
         },
         ped: { t: 'Ictus pediátrico', c: 'high', show: 'Activar SIEMPRE el Codi Ictus, con cualquier RACE → centro de referencia pediátrico más cercano.' },
         race: {
-          escalas: ['race'], q: 'Puntuación de la escala RACE (0–9)',
+          q: 'Puntuación de la escala RACE (0–9)',
           help: 'Paresia facial (0–2) · brazo (0–2) · pierna (0–2) · desviación oculocefálica (0–1) · afasia si la debilidad es derecha o agnosia si es izquierda (0–2). ≥5 = alta probabilidad de oclusión de gran vaso.',
-          opts: [{ l: 'RACE 0–4', go: 'race_lo' }, { l: 'RACE 5–9', go: 'race_hi' }]
+          opts: [{ l: 'RACE 0–4', go: 'race_lo', sug: v => raceCompleta(v) && raceSum(v) < 5 }, { l: 'RACE 5–9', go: 'race_hi', sug: v => raceSum(v) >= 5 }]
         },
         race_lo: {
           t: 'RACE 0–4', show: 'Trasladar al centro de referencia de ictus más cercano (CTI, CPI o C-TI).',
           q: '¿Está en el Hospital de Campdevànol (fase hospitalaria con teleictus)?',
-          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp' }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
+          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp', sug: v => v.hosp === true }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
         },
         race_hi: {
           t: 'RACE 5–9: probable oclusión de gran vaso', c: 'high',
           show: 'Llamar al neurólogo referente. Si el centro de referencia hace trombectomía → trasladar allí. Si no, y es candidato a trombólisis → centro de referencia; si no es candidato → centro más cercano con trombectomía.<br><b>La trombólisis no debe retrasar el traslado a trombectomía.</b>',
           q: '¿Está en el Hospital de Campdevànol (fase hospitalaria con teleictus)?',
-          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp' }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
+          opts: [{ l: 'Sí, valorar la trombólisis', go: 'hosp', sug: v => v.hosp === true }, { l: 'No, sigue el traslado prehospitalario', go: 'traslado' }]
         },
         traslado: { t: 'Traslado', show: 'Transmitir los datos a CECOS y trasladar al centro indicado. Tratar las complicaciones (panel de abajo) durante el traslado.' },
         hosp: {
@@ -915,14 +1685,14 @@ window.PROTOCOLS = [
             (hay(v.gluc) && v.gluc < 60 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: glucosa IV y mantener >70.</b>' : '') +
             (hay(v.gluc) && v.gluc > 180 ? '<br><b>Glucemia ' + v.gluc + ' mg/dl: insulina rápida IV según glucemia capilar.</b>' : ''),
           q: 'Tiempo desde la última vez que se le vio bien',
-          opts: [{ l: '0–4,5 h', go: 'ventana1' }, { l: '4,5–9 h, o ictus del despertar / inicio incierto', go: 'ventana2' }, { l: 'Más de 9 h', go: 'fuera' }]
+          opts: [{ l: '0–4,5 h', go: 'ventana1', sug: v => hOk(v) && v.horas <= 4.5 }, { l: '4,5–9 h, o ictus del despertar / inicio incierto', go: 'ventana2', sug: v => hOk(v) ? v.horas > 4.5 && v.horas <= 9 : v.incierto === true }, { l: 'Más de 9 h', go: 'fuera', sug: v => hOk(v) && v.horas > 9 }]
         },
         fuera: { t: 'Fuera de la ventana de trombólisis IV', c: 'mid', show: 'Sin trombólisis IV. Si hay oclusión de gran vaso, comentar con el neurólogo de teleictus el traslado a trombectomía.' },
         ventana1: { ...CI },
         ventana2: { farmacos: [{ n: 'Alteplasa', inf: false, esquema: 'alteplasa-ictus' }],
           q: '¿Hay mismatch en la TC de perfusión o difusión-FLAIR en la RM?',
           help: '4,5–9 h o ictus del despertar: solo con imagen avanzada y solo ALTEPLASA (EXTEND, WAKE-UP). No tenecteplasa si solo hay TC sin contraste (TWIST).',
-          opts: [{ l: 'Sí, hay mismatch', go: 'ventana2ci' }, { l: 'No, o solo hay TC sin contraste', go: 'sinimagen' }]
+          opts: [{ l: 'Sí, hay mismatch', go: 'ventana2ci', sug: v => v.mismatch === 1 }, { l: 'No, o solo hay TC sin contraste', go: 'sinimagen', sug: v => v.mismatch === 2 }]
         },
         sinimagen: { t: 'Sin trombólisis IV', c: 'mid', show: 'Fuera de las 4,5 h sin imagen avanzada no hay indicación de trombólisis IV. Si hay oclusión de gran vaso, comentar la trombectomía con el neurólogo de teleictus.' },
         ventana2ci: { ...CI },
@@ -1016,16 +1786,190 @@ window.PROTOCOLS = [
 
 {id:'codi-ppt', title:'Codi PPT', sub:'Paciente traumático — criterios fisiológicos, anatómicos y mecanismo lesional', badge:'red', tag:'Crítico', rank:3, codigo:true,
   folleto:"codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf",
+  /* Evaluador: los datos del paciente se introducen una sola vez; el flujograma de abajo usa estas
+     mismas claves (v.edad, v.fr, v.tas, v.gcs y los criterios) para sugerir las opciones y para el
+     mensaje al hospital. Criterios, prioridades, destino, inmovilización, Glasgow, RTS e ITP: folleto
+     Codi PPT (SEM, Grup de Treball de Trauma, revisión diciembre 2017). Sin índice de shock: no está en el folleto. */
+  eval:(() => {
+    const num = x => !isNaN(x) && x >= 0;
+    const edadTxt = e => e < 1 ? Math.round(e * 12) + ' meses' : Math.floor(e) + ' años';
+    /* [clave, texto del folleto, forma corta para el resumen] */
+    const ANAT = [
+      ['aPen', 'Herida penetrante en cabeza, cuello, tórax o extremidades (proximal a rodilla o codo)', 'herida penetrante'],
+      ['aCra', 'Fractura craneal abierta o con hundimiento', 'fractura craneal abierta o con hundimiento'],
+      ['aVol', 'Tórax inestable (volet)', 'tórax inestable'],
+      ['aPel', 'Fractura de pelvis', 'fractura de pelvis'],
+      ['aHue', '≥2 fracturas de huesos largos proximales (húmero o fémur); en &lt;1 año, ≥1', 'fracturas de huesos largos proximales'],
+      ['aAmp', 'Amputación proximal a tobillo o muñeca', 'amputación proximal'],
+      ['aExt', 'Extremidad aplastada, desguantada o destrozada (extremidad catastrófica)', 'extremidad catastrófica'],
+      ['aPar', 'Parálisis de una extremidad, déficit motor o sensitivo (sospecha de lesión medular)', 'déficit motor o sensitivo de una extremidad'],
+      ['aCara', 'Quemadura completa de cara o cuello', 'quemadura completa de cara o cuello']
+    ];
+    const MEC = [
+      ['mCai', 'Caída: adultos >6 m, niños >2–3 veces su altura (en general >3 m)', 'caída'],
+      ['mVeh', 'Colisión de vehículo: intrusión >30 cm en el lugar del acompañante o >45 cm en cualquier otro, eyección parcial o completa, muerte de un ocupante o telemetría de alto riesgo (en general >60 km/h)', 'colisión de vehículo de riesgo'],
+      ['mAtr', 'Atropello de peatón o ciclista con desplazamiento o impacto significativo (>30 km/h)', 'atropello'],
+      ['mMoto', 'Accidente de moto, bicicleta u otro dispositivo móvil (p. ej., esquí) a velocidad significativa', 'moto, bicicleta o esquí a velocidad significativa'],
+      ['mMal', 'Sospecha de maltrato en &lt;3 años', 'sospecha de maltrato en &lt;3 años'],
+      ['mObj', 'Objeto que cae desde altura sobre el afectado (valorar peso y altura)', 'objeto que cae desde altura'],
+      ['mArm', 'Arma blanca o de fuego', 'arma blanca o de fuego']
+    ];
+    const ESP = [
+      ['eAco', 'Anticoagulación o alteración de la coagulación', 'anticoagulación o coagulopatía'],
+      ['eDia', 'Diálisis o múltiples patologías', 'diálisis o multipatología'],
+      ['ePro', 'Criterio del profesional', 'criterio del profesional']
+    ];
+    /* Criterios del folleto. Si cumple varias prioridades, prevalece la más grave. */
+    const crit = v => {
+      const lact = num(v.edad) && v.edad < 1;
+      const fisio = [];
+      if (num(v.fr) && (v.fr > 29 || v.fr < (lact ? 20 : 10))) fisio.push('FR ' + v.fr + ' rpm');
+      if (num(v.tas) && v.tas < (lact ? 70 : 90)) fisio.push('TAS ' + v.tas + ' mmHg');
+      if (v.pulsos) fisio.push('sin pulsos periféricos');
+      if (num(v.gcs) && v.gcs <= 13) fisio.push('Glasgow ' + v.gcs);
+      if (v.ptc) fisio.push('pérdida transitoria de consciencia (&lt;1 año)');
+      const anat = ANAT.filter(a => v[a[0]]).map(a => a[2]);
+      const qLim = (num(v.edad) && (v.edad < 10 || v.edad > 50)) || v.emb > 0 ? 10 : 15;
+      if (num(v.q2) && v.q2 >= qLim) anat.push('quemadura de grado >II del ' + v.q2 + ' % (≥' + qLim + ' %)');
+      if (num(v.q3) && v.q3 > 5) anat.push('quemadura de grado III del ' + v.q3 + ' % (>5 %)');
+      const mec = MEC.filter(a => v[a[0]]).map(a => a[2]);
+      const esp = [v.emb === 2 ? 'embarazo >20 semanas' : ''].concat(ESP.filter(a => v[a[0]]).map(a => a[2]),
+        num(v.edad) && (v.edad < 3 || v.edad > 65) ? 'edad ' + edadTxt(v.edad) + ' (&lt;3 o >65 años, orientativo)' : '').filter(Boolean);
+      const prio = fisio.length ? 0 : anat.length ? 1 : mec.length ? 2 : esp.length ? 3 : null;
+      /* Inmovilización completa de la columna (trauma cerrado / penetrante) */
+      const inmC = [num(v.gcs) && v.gcs < 15 ? 'Glasgow ' + v.gcs + ' (&lt;15)' : '',
+        v.raquis ? 'dolor, déficit neurológico o motor, o deformidad del raquis' : ''];
+      if (mec.length) inmC.push(v.iIntox ? 'mecanismo de riesgo + intoxicación' : '', v.iDist ? 'mecanismo de riesgo + dolor intenso o lesión distractora' : '',
+        v.iCom ? 'mecanismo de riesgo + incapacidad para comunicarse' : '', num(v.edad) && v.edad < 3 ? 'mecanismo de riesgo en &lt;3 años' : '',
+        v.iHipo ? 'mecanismo de riesgo + hipotensión mantenida' : '');
+      return { fisio, anat, mec, esp, prio, inmC: inmC.filter(Boolean), inmP: v.raquis ? ['sospecha de déficit o molestias neurológicas'] : [] };
+    };
+    /* RTS: mismos códigos que «Revised Trauma Score» de data/scales.js (id rts) y que el folleto;
+       el folleto usa la suma simple de los códigos (0–12): RTS <12 → centro de trauma especializado. */
+    const rts = v => {
+      if (!num(v.fr) || !num(v.tas) || !num(v.gcs)) return null;
+      const fr = v.fr > 29 ? 3 : v.fr >= 10 ? 4 : v.fr >= 6 ? 2 : v.fr >= 1 ? 1 : 0;
+      const ta = v.tas > 89 ? 4 : v.tas >= 76 ? 3 : v.tas >= 50 ? 2 : v.tas >= 1 ? 1 : 0;
+      const gc = v.gcs >= 13 ? 4 : v.gcs >= 9 ? 3 : v.gcs >= 6 ? 2 : v.gcs >= 4 ? 1 : 0;
+      return { fr, ta, gc, total: fr + ta + gc };
+    };
+    const P = ['fisiológico', 'anatómico', 'mecanismo lesional', 'consideración especial'];
+    const DEST = [
+      'Criterio fisiológico: <b>box de críticos</b>. Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.',
+      'Criterio anatómico: <b>box de críticos</b>. Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.',
+      'Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
+      'Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.'
+    ];
+    const DEST01 = '<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 min: CAT 3 (considerar CAT 3e) · isócrona CAT 3 >30 min: CAT 3 (considerar CAT 3e) / CAT 2b · Pediátrico: CAT P3 (considerar CAT P3e) / CAT P2b.';
+    const SEL0 = ['emb', 'tipo'];
+    return {
+      crit,
+      items: [
+        {t:'h', l:'Constantes (primera valoración)'},
+        {k:'edad', t:'num', l:'Edad', u:'años'},
+        {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
+        {k:'tas', t:'num', l:'TAS', u:'mmHg'},
+        {k:'gcs', t:'num', l:'Glasgow', u:'3–15'},
+        {t:'h', l:'Criterios FISIOLÓGICOS (Prioridad 0): la FR, la TAS y el Glasgow salen de arriba'},
+        {k:'pulsos', t:'chk', l:'Ausencia de pulsos periféricos'},
+        {k:'ptc', t:'chk', l:'Pérdida transitoria de consciencia en &lt;1 año'},
+        {t:'h', l:'Criterios ANATÓMICOS (Prioridad 1)'},
+        ...ANAT.map(a => ({k:a[0], t:'chk', l:a[1]})),
+        {k:'q2', t:'num', l:'Quemaduras de grado >II (dérmicas o de espesor total): extensión (criterio ≥15 %; ≥10 % en &lt;10 años, >50 años o embarazadas)', u:'% SCQ'},
+        {k:'q3', t:'num', l:'Quemaduras de grado III: extensión (criterio >5 %)', u:'% SCQ'},
+        {t:'h', l:'MECANISMO LESIONAL de riesgo (Prioridad 2)'},
+        ...MEC.map(a => ({k:a[0], t:'chk', l:a[1]})),
+        {t:'h', l:'CONSIDERACIONES ESPECIALES (Prioridad 3): la edad &lt;3 o >65 años (orientativo) sale de arriba'},
+        {k:'emb', t:'sel', l:'Embarazo', o:[['No',0],['Sí, ≤20 semanas',1],['Sí, >20 semanas',2]]},
+        ...ESP.map(a => ({k:a[0], t:'chk', l:a[1]})),
+        {t:'h', l:'Inmovilización de la columna'},
+        {k:'tipo', t:'sel', l:'Tipo de traumatismo', o:[['Sin especificar',0],['Cerrado',1],['Penetrante',2]]},
+        {k:'raquis', t:'chk', l:'Dolor, déficit neurológico o motor, o deformidad del raquis (en el penetrante: sospecha de déficit o molestias neurológicas)'},
+        {k:'iIntox', t:'chk', l:'Intoxicación: alcohol, drogas o fármacos (cuenta si hay mecanismo de riesgo)'},
+        {k:'iDist', t:'chk', l:'Dolor intenso en otro lugar o lesión distractora (cuenta si hay mecanismo de riesgo)'},
+        {k:'iCom', t:'chk', l:'Incapacidad para comunicarse: idioma, &lt;3 años, enfermedad (cuenta si hay mecanismo de riesgo)'},
+        {k:'iHipo', t:'chk', l:'Hipotensión mantenida (cuenta si hay mecanismo de riesgo)'},
+        {t:'h', l:'Índice de Trauma Pediátrico (ITP): la TAS sale de arriba'},
+        {k:'peso', t:'num', l:'Peso', u:'kg'},
+        {k:'itpVia', t:'sel', l:'Vía aérea', o:[['—',''],['Normal (+2)',2],['Sostenible (+1)',1],['Insostenible (−1)',-1]]},
+        {k:'itpCons', t:'sel', l:'Nivel de consciencia', o:[['—',''],['Consciente (+2)',2],['Obnubilado (+1)',1],['Coma (−1)',-1]]},
+        {k:'itpHer', t:'sel', l:'Heridas', o:[['—',''],['No (+2)',2],['Menores (+1)',1],['Mayores o penetrantes (−1)',-1]]},
+        {k:'itpFrac', t:'sel', l:'Fracturas', o:[['—',''],['No (+2)',2],['Cerrada (+1)',1],['Abiertas o múltiples (−1)',-1]]}
+      ],
+      calc:function(v){
+        const has = x => !isNaN(x);
+        if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && has(v[k]) && !(SEL0.includes(k) && v[k] === 0))))
+          return [{t:'Introduce los datos del paciente', c:'', h:'Constantes y criterios: la prioridad del Codi PPT, el destino, el Glasgow, el RTS, el ITP y la inmovilización se calculan solos, y el flujograma de abajo sugiere las respuestas.'}];
+        const k = crit(v);
+        const out = [];
+
+        /* 1. Activación y prioridad */
+        const faltan = [num(v.fr) ? '' : 'FR', num(v.tas) ? '' : 'TAS', num(v.gcs) ? '' : 'Glasgow'].filter(Boolean);
+        const lista = [['Fisiológicos (P0)', k.fisio], ['Anatómicos (P1)', k.anat], ['Mecanismo lesional (P2)', k.mec], ['Consideraciones especiales (P3)', k.esp]]
+          .filter(x => x[1].length).map(x => '<b>' + x[0] + ':</b> ' + x[1].join(' · '));
+        out.push(k.prio === null ?
+          {t:'Sin criterios de Codi PPT' + (faltan.length ? ' (faltan ' + faltan.join(', ') + ')' : ''), c:'low',
+            h:'No se activa el código. Valoración y traslado habituales; reevaluar si cambian las constantes.' +
+              (faltan.length ? '<br><b>Faltan ' + faltan.join(', ') + ':</b> sin ellos no se pueden descartar los criterios fisiológicos.' : '')} :
+          {t:'ACTIVAR CODI PPT — PRIORIDAD ' + k.prio + ' (' + P[k.prio] + ')', c:k.prio <= 1 ? 'high' : 'mid',
+            h:lista.join('<br>') + '<br>Si cumple varias prioridades, prevalece la más grave. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», en el flujograma).' +
+              (k.prio > 0 && faltan.length ? '<br><b>Faltan ' + faltan.join(', ') + ':</b> podrían cumplir un criterio fisiológico (Prioridad 0).' : '')});
+
+        /* 2. Destino y traslado (folleto); RTS e ITP como criterio de centro de trauma */
+        const r = rts(v);
+        const itpV = [v.itpVia, v.itpCons, v.itpHer, v.itpFrac];
+        const itpDatos = num(v.peso) || itpV.some(has);
+        const itpOk = num(v.peso) && num(v.tas) && itpV.every(has);
+        const itp = itpOk ? (v.peso > 20 ? 2 : v.peso >= 10 ? 1 : -1) + (v.tas > 90 ? 2 : v.tas >= 50 ? 1 : -1) + itpV.reduce((a, x) => a + x, 0) : null;
+        const centro = [r && r.total < 12 ? 'RTS ' + r.total + ' (&lt;12)' : '', itp !== null && itp < 8 ? 'ITP ' + itp + ' (&lt;8)' : ''].filter(Boolean);
+        out.push({t:'Destino y traslado', c:k.prio === null ? (centro.length ? 'mid' : 'low') : k.prio <= 1 ? 'high' : 'mid',
+          h:(k.prio === null ? 'Sin activación: hospital según la valoración habitual.' : DEST[k.prio] + (k.prio <= 1 ? DEST01 : '')) +
+            (centro.length ? '<br><b>' + centro.join(' · ') + ' → traslado a un centro de trauma especializado.</b>' : '')});
+
+        /* 3. Glasgow (folleto: leve 14–15 · moderado 9–13 · grave <8) */
+        if (num(v.gcs) && v.gcs >= 3 && v.gcs <= 15) {
+          const g = v.gcs;
+          out.push({t:'Glasgow ' + g + ': ' + (g >= 14 ? 'leve' : g >= 9 ? 'moderado' : 'grave'), c:g >= 14 ? 'low' : g >= 9 ? 'mid' : 'high',
+            h:'Leve 14–15 · moderado 9–13 · grave ≤8 (el folleto escribe «&lt;8»).' + (g <= 13 ? ' <b>Glasgow ≤13: criterio fisiológico (Prioridad 0).</b>' : '') +
+              (g <= 8 ? ' TCE grave: ver «TCE grave (Glasgow ≤8)» en el flujograma.' : '')});
+        } else if (num(v.gcs)) out.push({t:'Glasgow fuera de rango', c:'', h:'El Glasgow va de 3 a 15.'});
+
+        /* 4. RTS (adulto) */
+        if (r) out.push({t:'RTS (adulto): ' + r.total + '/12' + (r.total < 12 ? ' → centro de trauma especializado' : ''), c:r.total < 12 ? 'high' : 'low',
+          h:'FR ' + v.fr + ' → ' + r.fr + ' · TAS ' + v.tas + ' → ' + r.ta + ' · Glasgow ' + v.gcs + ' → ' + r.gc + '.<br>' +
+            'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0. <b>RTS &lt;12 requiere traslado a un centro de trauma especializado</b> (folleto).'});
+
+        /* 5. ITP (pediátrico) */
+        if (itpDatos) {
+          const falta = [num(v.peso) ? '' : 'peso', num(v.tas) ? '' : 'TAS', has(v.itpVia) ? '' : 'vía aérea', has(v.itpCons) ? '' : 'consciencia', has(v.itpHer) ? '' : 'heridas', has(v.itpFrac) ? '' : 'fracturas'].filter(Boolean);
+          out.push(itp === null ? {t:'ITP (pediátrico) incompleto', c:'', h:'Faltan: ' + falta.join(', ') + '.'} :
+            {t:'ITP (pediátrico): ' + itp + (itp < 8 ? ' → centro de trauma especializado' : ''), c:itp < 8 ? 'high' : 'low',
+              h:'Peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples (+2 / +1 / −1). <b>ITP &lt;8 requiere traslado a un centro de trauma especializado</b> (folleto).'});
+        }
+
+        /* 6. Inmovilización completa de la columna */
+        const inm = v.tipo === 1 ? k.inmC : v.tipo === 2 ? k.inmP : null;
+        const INM = ' Traslado con <b>collarín cervical y colchón de vacío</b> hasta la transferencia. En caso de duda, inmovilizar.';
+        if (inm) out.push(inm.length ?
+          {t:'Inmovilización completa de la columna: indicada', c:'mid', h:'Trauma ' + (v.tipo === 1 ? 'cerrado' : 'penetrante') + ': ' + inm.join(' · ') + '.' + INM} :
+          {t:'Sin criterios de inmovilización completa', c:'low', h:'Trauma ' + (v.tipo === 1 ? 'cerrado' : 'penetrante') + ' sin criterios marcados. En caso de duda, inmovilizar.'});
+        else if (k.inmC.length) out.push({t:'Inmovilización de la columna: indica si el traumatismo es cerrado o penetrante', c:'',
+          h:'Criterios de trauma cerrado presentes: ' + k.inmC.join(' · ') + '.' + INM});
+
+        /* Resumen para la historia clínica: sale al final del flujograma y entra en «Copiar resumen» */
+        out.resumen = [
+          k.prio === null ? 'Codi PPT: sin criterios de activación' + (faltan.length ? ' (faltan ' + faltan.join(', ') + ')' : '') :
+            'Codi PPT: Prioridad ' + k.prio + ' (' + P[k.prio] + ': ' + [k.fisio, k.anat, k.mec, k.esp][k.prio].join(', ') + ')'
+        ].concat(out.filter(s => /^(Glasgow \d|RTS|ITP \(pediátrico\): |Inmovilización completa|Sin criterios de inmovilización)/.test(s.t)).map(s => s.t));
+        return out;
+      }
+    };
+  })(),
   flow:(() => {
     const num = x => !isNaN(x) && x >= 0;
-    const lact = v => num(v.edad) && v.edad < 1;
-    const fisio = v => {
-      const r = [];
-      if (num(v.fr) && (v.fr > 29 || v.fr < (lact(v) ? 20 : 10))) r.push('FR ' + v.fr + ' rpm');
-      if (num(v.tas) && v.tas < (lact(v) ? 70 : 90)) r.push('TAS ' + v.tas + ' mmHg');
-      if (num(v.gcs) && v.gcs <= 13) r.push('Glasgow ' + v.gcs);
-      return r;
-    };
+    /* Criterios del evaluador de arriba (una sola fuente para las sugerencias del flujograma) */
+    const ppt = v => PROTOCOLS.find(x => x.id === 'codi-ppt').eval.crit(v);
+    const fisio = v => ppt(v).fisio;
     const rts = v => {
       if (!num(v.fr) || !num(v.tas) || !num(v.gcs)) return null;
       const fr = v.fr > 29 ? 3 : v.fr >= 10 ? 4 : v.fr >= 6 ? 2 : v.fr >= 1 ? 1 : 0;
@@ -1070,10 +2014,9 @@ window.PROTOCOLS = [
     const TIPO = {
       q: '¿Traumatismo cerrado o penetrante?',
       help: 'Para decidir la inmovilización de la columna.',
-      opts: [{ l: 'Cerrado', go: 'inm_c' }, { l: 'Penetrante', go: 'inm_p' }]
+      opts: [{ l: 'Cerrado', go: 'inm_c', sug: v => v.tipo === 1 }, { l: 'Penetrante', go: 'inm_p', sug: v => v.tipo === 2 }]
     };
     return {
-      inputs: [{ k: 'edad', l: 'Edad', u: 'años' }, { k: 'fr', l: 'FR', u: 'rpm' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'gcs', l: 'Glasgow', u: 'puntos' }],
       start: 'fisio',
       nodes: {
         fisio: {
@@ -1093,7 +2036,7 @@ window.PROTOCOLS = [
         anat: {
           q: '¿Tiene algún criterio ANATÓMICO?',
           help: 'Herida penetrante en cabeza, cuello, tórax o extremidades (proximal a rodilla o codo) · fractura craneal abierta o hundimiento · tórax inestable (volet) · fractura de pelvis · ≥2 fracturas de huesos largos proximales (húmero o fémur; en &lt;1 año, ≥1) · amputación proximal a tobillo o muñeca · extremidad aplastada, desguantada o destrozada · parálisis o déficit motor o sensitivo de una extremidad (sospecha de lesión medular) · quemaduras de grado >II con extensión ≥15 % (≥10 % en &lt;10 años, >50 años o embarazadas) · quemaduras de grado III >5 % · quemadura completa de cara o cuello.',
-          opts: [{ l: 'Sí, algún criterio', go: 'p1' }, { l: 'No', go: 'mec' }]
+          opts: [{ l: 'Sí, algún criterio', go: 'p1', sug: v => ppt(v).anat.length > 0 }, { l: 'No', go: 'mec' }]
         },
         p1: {
           t: '🟠 ACTIVAR CODI PPT — PRIORIDAD 1', c: 'high',
@@ -1103,7 +2046,7 @@ window.PROTOCOLS = [
         mec: {
           q: '¿Tiene un MECANISMO LESIONAL de riesgo?',
           help: 'Caída: adultos >6 m, niños >2–3 veces su altura (en general >3 m) · colisión de vehículo con intrusión >30 cm en el lugar del acompañante o >45 cm en cualquier otro, eyección parcial o completa, muerte de un ocupante o telemetría de alto riesgo (en general >60 km/h) · atropello de peatón o ciclista con desplazamiento o impacto significativo (>30 km/h) · moto, bicicleta u otro dispositivo (p. ej., esquí) a velocidad significativa · sospecha de maltrato en &lt;3 años · objeto que cae desde altura (valorar peso y altura) · arma blanca o de fuego.',
-          opts: [{ l: 'Sí', go: 'p2' }, { l: 'No', go: 'ant' }]
+          opts: [{ l: 'Sí', go: 'p2', sug: v => ppt(v).mec.length > 0 }, { l: 'No', go: 'ant' }]
         },
         p2: {
           t: '🟡 ACTIVAR CODI PPT — PRIORIDAD 2', c: 'mid',
@@ -1113,7 +2056,7 @@ window.PROTOCOLS = [
         ant: {
           q: '¿Tiene algún antecedente o consideración especial?',
           help: 'Embarazo avanzado (>20 semanas) · anticoagulación o alteración de la coagulación · diálisis o múltiples patologías · niños pequeños o edad avanzada (orientativo &lt;3 y >65 años) · criterio del profesional.',
-          opts: [{ l: 'Sí', go: 'p3', sug: v => num(v.edad) && (v.edad < 3 || v.edad > 65) }, { l: 'No', go: 'noact' }]
+          opts: [{ l: 'Sí', go: 'p3', sug: v => ppt(v).esp.length > 0 }, { l: 'No', go: 'noact' }]
         },
         p3: {
           t: '🟢 ACTIVAR CODI PPT — PRIORIDAD 3', c: 'mid',
@@ -1128,11 +2071,11 @@ window.PROTOCOLS = [
         inm_c: {
           escalas: ['gcs'], q: '¿Cumple algún criterio de inmovilización completa de la columna?',
           help: 'Alteración de la consciencia (Glasgow &lt;15) · dolor, déficit neurológico o motor, o deformidad del raquis · mecanismo lesional de riesgo junto con: intoxicación (alcohol, drogas, fármacos), dolor intenso en otro lugar o lesión distractora, incapacidad para comunicarse (idioma, &lt;3 años, enfermedad) o &lt;3 años con mecanismo de riesgo (incluida sospecha de maltrato) y/o hipotensión mantenida.',
-          opts: [{ l: 'Sí', go: 'inmov', sug: v => num(v.gcs) && v.gcs < 15 }, { l: 'No', go: 'noinmov' }]
+          opts: [{ l: 'Sí', go: 'inmov', sug: v => ppt(v).inmC.length > 0 }, { l: 'No', go: 'noinmov' }]
         },
         inm_p: {
           q: '¿Sospecha de déficit o molestias neurológicas?',
-          opts: [{ l: 'Sí', go: 'inmov' }, { l: 'No', go: 'noinmov' }]
+          opts: [{ l: 'Sí', go: 'inmov', sug: v => ppt(v).inmP.length > 0 }, { l: 'No', go: 'noinmov' }]
         },
         inmov: {
           t: 'Inmovilización completa de la columna', c: 'mid',
@@ -1221,23 +2164,36 @@ window.PROTOCOLS = [
 
 {id:'codi-sepsia', title:'Codi Sèpsia', sub:'NEWS ≥7 + sospecha de infección — activación y objetivos de la 1ª hora', badge:'red', tag:'Crítico', rank:4, codigo:true,
   folleto:'codigos/C04._Codi_sèpsia.pdf',
-  flow:(() => {
-    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+  /* Evaluador: los datos del paciente se introducen una sola vez (también el peso y las constantes que antes
+     estaban en el flujograma). Todo sale del folleto C04 (GdT Sèpsia, Junta Clínica SEM, enero 2021) y de los
+     nodos del flujograma de abajo, que usan estas mismas funciones para sugerir las opciones. Sin qSOFA, SOFA,
+     lactato ni antibiótico concreto: el folleto no los usa. */
+  eval:(() => {
     const hay = x => !isNaN(x) && x > 0;
-    const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular volúmenes y ml/h.</span>';
+    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    // Folleto: TAM = TAD + (TAS − TAD) / 3; índice de shock = FC/TAS
     const tam = v => hay(v.tas) && hay(v.tad) ? Math.round(v.tad + (v.tas - v.tad) / 3) : null;
     const ishock = v => hay(v.fc) && hay(v.tas) ? Math.round(v.fc / v.tas * 100) / 100 : null;
+    /* Criterios de riesgo vital del folleto (basta uno): A vía aérea · B FR >30 o <8, Patrick >3, cianosis ·
+       C TAS <90 (o caída >40 % de la basal) o >220, FC <40 o >131 · D somnolencia, estupor, coma, convulsiones */
     const vital = v => {
       const r = [];
+      if (v.va) r.push('vía aérea comprometida');
       if (hay(v.fr) && (v.fr > 30 || v.fr < 8)) r.push('FR ' + v.fr);
+      if (v.patrick) r.push('escala de Patrick >3');
+      if (v.cianosis) r.push('cianosis o livideces');
       if (hay(v.tas) && (v.tas < 90 || v.tas > 220)) r.push('TAS ' + v.tas);
+      if (v.caidaTas) r.push('caída de la TAS >40 % de la basal');
       if (hay(v.fc) && (v.fc < 40 || v.fc > 131)) r.push('FC ' + v.fc);
+      if (v.neuro) r.push('somnolencia, estupor, coma o convulsiones');
       return r;
     };
-    // NEWS2 (RCP 2017, tabla del folleto). cons: 0 alerta, 1 confusión nueva/voz/dolor/inconsciente.
-    // oxi: 0 aire (escala 1), 1 O2 (escala 1), 2 aire (escala 2), 3 O2 (escala 2).
+    /* NEWS2: mismos ítems, puntos y cortes que SCALES 'news2' (data/scales.js) y que la tabla del folleto
+       (RCP), más la escala 2 de SpO₂ del folleto (CPAP, BiPAP u O₂ domiciliario).
+       cons: 0 alerta, 1 confusión nueva/voz/dolor/inconsciente. oxi: 0 aire (escala 1), 1 O₂ (escala 1),
+       2 aire (escala 2), 3 O₂ (escala 2). */
     const news = v => {
-      const cons = v.resp.cons, oxi = v.resp.oxi;
+      const cons = v.cons, oxi = v.oxi;
       const p = [], falta = [];
       const add = (l, x, fn) => { if (hay(x)) p.push([l, fn(x)]); else falta.push(l); };
       add('FR', v.fr, x => x <= 8 ? 3 : x <= 11 ? 1 : x <= 20 ? 0 : x <= 24 ? 2 : 3);
@@ -1252,15 +2208,123 @@ window.PROTOCOLS = [
       add('Temperatura', v.temp, x => x <= 35 ? 3 : x <= 36 ? 1 : x <= 38 ? 0 : x <= 39 ? 1 : 2);
       return { total: p.reduce((a, x) => a + x[1], 0), p, falta };
     };
+    /* Hipoperfusión (folleto, indicación de fluidos): EtCO₂ <25 mmHg, índice de perfusión <1,4,
+       índice de shock >0,8 o mala perfusión periférica; TAM <65 (objetivo TAM 65–70 del folleto). */
+    const hipo = v => {
+      const r = [], t = tam(v), is = ishock(v);
+      if (hay(v.etco2) && v.etco2 < 25) r.push('EtCO₂ ' + v.etco2 + ' mmHg (&lt;25)');
+      if (hay(v.ip) && v.ip < 1.4) r.push('índice de perfusión ' + f(v.ip) + ' (&lt;1,4)');
+      if (is !== null && is > 0.8) r.push('índice de shock ' + f(is) + ' (>0,8)');
+      if (t !== null && t < 65) r.push('TAM ' + t + ' mmHg (&lt;65)');
+      if (v.perif) r.push('mala perfusión periférica');
+      return r;
+    };
+    const ml = (dosis, peso) => f(Math.round(dosis * peso * 60 / 160 * 10) / 10);
+    const items = [
+      {t:'h', l:'Constantes (NEWS2 y riesgo vital)'},
+      {k:'peso', t:'num', l:'Peso real', u:'kg'},
+      {k:'fr', t:'num', l:'Frecuencia respiratoria (contada durante 1 min)', u:'rpm'},
+      {k:'spo2', t:'num', l:'SpO₂', u:'%'},
+      {k:'oxi', t:'sel', l:'Aire u oxígeno (escala 2 de SpO₂ solo con CPAP, BiPAP u O₂ crónico domiciliario, objetivo 88–92 %)', o:[['Aire ambiente (escala 1)',0],['Oxígeno (escala 1)',1],['Aire ambiente, con CPAP, BiPAP u O₂ domiciliario (escala 2)',2],['Oxígeno, con CPAP, BiPAP u O₂ domiciliario (escala 2)',3]]},
+      {k:'tas', t:'num', l:'TAS', u:'mmHg'},
+      {k:'tad', t:'num', l:'TAD', u:'mmHg'},
+      {k:'fc', t:'num', l:'Frecuencia cardiaca', u:'lpm'},
+      {k:'temp', t:'num', l:'Temperatura', u:'°C'},
+      {k:'cons', t:'sel', l:'Nivel de consciencia', o:[['Alerta',0],['Confusión o desorientación nueva, responde solo a la voz o al dolor, o inconsciente',1]]},
+      {t:'h', l:'Otros criterios de riesgo vital'},
+      {k:'va', t:'chk', l:'A: vía aérea comprometida'},
+      {k:'patrick', t:'chk', l:'B: trabajo respiratorio, escala de Patrick &gt;3 (ver «Escala de Patrick» en el flujograma)'},
+      {k:'cianosis', t:'chk', l:'B: cianosis o livideces'},
+      {k:'caidaTas', t:'chk', l:'C: caída de la TAS &gt;40 % de la basal'},
+      {k:'neuro', t:'chk', l:'D: somnolencia, estupor, coma o convulsiones'},
+      {t:'h', l:'Infección'},
+      {k:'infec', t:'chk', l:'Sospecha de infección: fiebre (o sensación de haberla tenido), hipotermia no accidental o temperatura normal + ≥1 síntoma de foco (respiratorio, urinario, abdominal, cefalea o alteración mental, extremidad, piel o catéter/sonda), o deterioro general sin otra causa'},
+      {k:'frInf', t:'chk', l:'Factores de riesgo de infección: diabetes, corticoides o inmunosupresores, inmunosupresión, neoplasia activa o quimioterapia, infección reciente o con antibiótico, cirugía o endoscopia &lt;1 mes, heridas, úlceras, catéter central o sonda vesical, &gt;70 años con dependencia o en residencia'},
+      {t:'h', l:'Perfusión, dolor y glucemia'},
+      {k:'etco2', t:'num', l:'EtCO₂', u:'mmHg'},
+      {k:'ip', t:'num', l:'Índice de perfusión', u:'IP'},
+      {k:'perif', t:'chk', l:'Mala perfusión periférica (relleno capilar lento, piel moteada)'},
+      {k:'eva', t:'num', l:'Dolor EVA (0–10)', u:'0–10'},
+      {k:'glu', t:'num', l:'Glucemia capilar', u:'mg/dl'}
+    ];
+    const calc = function (v) {
+      const SEL = ['cons', 'oxi'];
+      if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && !isNaN(v[k]) && !(SEL.includes(k) && v[k] === 0))))
+        return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, consciencia, oxígeno y sospecha de infección: el NEWS2, el riesgo vital, la activación del Codi Sèpsia, la hipoperfusión y los volúmenes se calculan al momento.'}];
+      const out = [];
+      const n = news(v), rv = vital(v), hp = hipo(v), t = tam(v), is = ishock(v);
+      const completo = !n.falta.length, n7 = n.total >= 7;
+      const pesoOk = hay(v.peso);
+      const faltaPeso = '<span class="pe-nota">Introduce el peso real para calcular volúmenes y ml/h.</span>';
+
+      /* 1. NEWS2 (cortes de respuesta de SCALES news2: 0–4 bajo · 5–6 medio · ≥7 alto; folleto: ≥7 potencialmente crítico) */
+      const nTit = 'NEWS2 ' + n.total + (completo ? '' : ' (incompleto)');
+      out.push({t:nTit + (n7 ? ': ≥7, paciente potencialmente crítico' : completo ? ': &lt;7' : ''), c:n7 ? 'high' : n.total >= 5 ? 'mid' : 'low',
+        h:n.p.map(x => x[0] + ' ' + x[1]).join(' · ') +
+          (n.falta.length ? '<br><b>Faltan:</b> ' + n.falta.join(', ') + '.' : '') +
+          (n.p.some(x => x[1] === 3) ? '<br>Algún parámetro puntúa 3: valoración urgente aunque el total sea bajo (NEWS2).' : '') +
+          '<br><span class="pe-nota">Se puntúa la primera valoración o la peor durante la asistencia.</span>'});
+
+      /* 2. Riesgo vital */
+      out.push(rv.length
+        ? {t:'Riesgo vital: SÍ', c:'high', h:'<b>Criterios:</b> ' + rv.join(' · ') + '.<br>Actuación inicial (ABCDE) y traslado con <b>ALERTA DE PACIENTE CRÍTICO</b>. Un valor alterado aislado se interpreta según el estado general.'}
+        : {t:'Riesgo vital: no con los datos introducidos', c:'low', h:'Ningún criterio A–D del folleto con los datos y casillas marcados.'});
+
+      /* 3. Activación (folleto): (riesgo vital o NEWS ≥7) + sospecha o factores de riesgo de infección */
+      const grave = rv.length > 0 || n7, inf = v.infec || v.frInf;
+      const porque = [rv.length ? 'riesgo vital' : '', n7 ? 'NEWS2 ≥7' : ''].filter(Boolean).join(' y ');
+      if (grave && inf) out.push({t:'ACTIVAR CODI SÈPSIA', c:'high', h:porque + ' + ' + [v.infec ? 'sospecha de infección' : '', v.frInf ? 'factores de riesgo de infección' : ''].filter(Boolean).join(' y ') + '. Comunicar a CECOS (IDEAS).'});
+      else if (grave) out.push({t:'Alerta de paciente crítico, sin Codi Sèpsia (no hay sospecha de infección marcada)', c:'high', h:porque + ' sin sospecha ni factores de riesgo de infección: traslado a urgencias con <b>alerta de paciente crítico</b>. Si hay sospecha o factores de riesgo de infección, márcalos: se activa el Codi Sèpsia.'});
+      else if (!completo) out.push({t:'Codi Sèpsia: faltan datos del NEWS2', c:'', h:'Por ahora no hay riesgo vital ni NEWS2 ≥7, pero faltan ' + n.falta.join(', ') + '.'});
+      else out.push({t:'Sin criterios de activación: NEWS2 &lt;7 y sin riesgo vital', c:'low', h:'Comunicar a CECOS (IDEAS) y <b>valorar el traslado</b>. Repetir el NEWS2 si cambia la situación.'});
+
+      /* 4. Hemodinámica */
+      const hemo = [t !== null ? 'TAM ' + t + ' mmHg' : '', is !== null ? 'índice de shock ' + f(is) : ''].filter(Boolean).join(' · ');
+      const perfDatos = t !== null || is !== null || hay(v.etco2) || hay(v.ip) || v.perif;
+      out.push({t:hp.length ? 'Hipoperfusión: SÍ' : perfDatos ? 'Sin criterios de hipoperfusión con los datos' : 'Hipoperfusión: faltan datos', c:hp.length ? 'high' : perfDatos ? 'low' : '',
+        h:(hemo ? '<b>' + hemo + '.</b> ' : '') + (hp.length ? '<b>Criterios:</b> ' + hp.join(' · ') + '.' : '') +
+          '<br><span class="pe-nota">Criterios del folleto: EtCO₂ &lt;25 mmHg · índice de perfusión &lt;1,4 · índice de shock (FC/TAS) >0,8 · mala perfusión periférica; objetivo TAM 65–70 mmHg.</span>'});
+
+      /* 5. Tratamiento (folleto) */
+      const tx = [];
+      if (grave && inf) tx.push('<b>Primera hora:</b> hemocultivos y <b>antibiótico en &lt;1 h</b> · control del foco (drenaje precoz, &lt;12 h) · monitorización de FR, FC, TAM, relleno capilar, EtCO₂, índice de perfusión e índice de shock.');
+      if (hp.length && grave) tx.push('<b>Fluidos indicados</b> (' + porque + ' + hipoperfusión): cristaloide balanceado (p. ej., Plasmalyte) en bolos de <b>500 ml</b>, reevaluando la tolerancia tras cada uno; evitar coloides. Volumen orientativo 20–30 ml/kg' + (pesoOk ? ' = <b>' + f(Math.round(20 * v.peso / 10) * 10) + '–' + f(Math.round(30 * v.peso / 10) * 10) + ' ml</b>.' : '. ' + faltaPeso));
+      else if (hp.length) tx.push('<b>Hipoperfusión sin NEWS2 ≥7 ni riesgo vital</b>: el folleto indica los bolos de 500 ml en pacientes con NEWS ≥7 e hipoperfusión.');
+      else tx.push('<b>Fluidos:</b> sin hipoperfusión, sin bolos de rutina; repetir la valoración.');
+      if (hp.length) tx.push('<b>Si no responde a los fluidos</b> (TAM &lt;65): <b>noradrenalina</b> 8 mg en 50 ml de SG 5 % (160 µg/ml), empezar a 3 ml/h y subir de 3 en 3 ml/h hasta TAM 65–70 mmHg; máximo 1 µg/kg/min' + (pesoOk ? ' = <b>' + ml(1, v.peso) + ' ml/h</b> con ' + f(v.peso) + ' kg.' : ' (con 80 kg, 30 ml/h). ' + faltaPeso));
+      if (hay(v.eva) && v.eva >= 5) tx.push('<b>Analgesia</b> (EVA ' + v.eva + '/10): fentanilo 50 µg + paracetamol 1 g IV, orientada al foco.');
+      if (hay(v.glu)) tx.push(v.glu >= 180 ? '<b>Glucemia ' + v.glu + ' mg/dl</b> (objetivo &lt;180): insulina rápida 10 UI SC; mantener alrededor de 180 y evitar la hipoglucemia.' : 'Glucemia ' + v.glu + ' mg/dl: en objetivo (&lt;180); evitar la hipoglucemia.');
+      const fuera = [t !== null && t < 65 ? 'TAM ' + t : '', hay(v.etco2) && v.etco2 <= 25 ? 'EtCO₂ ' + v.etco2 : '', hay(v.spo2) && v.spo2 <= 90 ? 'SpO₂ ' + v.spo2 + ' %' : ''].filter(Boolean);
+      tx.push('<b>Objetivos:</b> TAM 65–70 mmHg · EtCO₂ >25 (35–45) mmHg · SpO₂ >90 % · glucemia &lt;180 mg/dl.' + (fuera.length ? ' <b>Fuera de objetivo:</b> ' + fuera.join(' · ') + '.' : ''));
+      out.push({t:'Tratamiento (folleto Codi Sèpsia)', c:'', h:tx.map(x => '• ' + x).join('<br>') +
+        '<br><span class="pe-nota">El folleto no da antibiótico concreto ni dosis: según la guía local del foco.</span>'});
+
+      /* Resumen de puntuaciones para la historia clínica (final del flujograma y «Copiar resumen») */
+      out.resumen = [
+        nTit + ' (' + n.p.map(x => x[0] + ' ' + x[1]).join(', ') + ')',
+        rv.length ? 'Riesgo vital: ' + rv.join(', ') : 'Riesgo vital: no',
+        out[2].t,
+        hemo || hp.length ? (hp.length ? 'Hipoperfusión: ' + hp.join(', ') : 'Sin hipoperfusión' + (hemo ? ': ' + hemo : '')) : ''
+      ].filter(Boolean);
+      return out;
+    };
+    return { items, calc, news, vital, hipo, tam, ishock };
+  })(),
+  flow:(() => {
+    const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    const hay = x => !isNaN(x) && x > 0;
+    const faltaPeso = '<span class="pe-nota">Introduce el peso para calcular volúmenes y ml/h.</span>';
+    /* Los cálculos son los del evaluador de arriba (una sola fuente): mismas cifras y sugerencias. */
+    const E = () => PROTOCOLS.find(x => x.id === 'codi-sepsia').eval;
+    const tam = v => E().tam(v), ishock = v => E().ishock(v), vital = v => E().vital(v), news = v => E().news(v);
     const ml = (dosis, peso) => f(Math.round(dosis * peso * 60 / 160 * 10) / 10);
     const INFEC = {
       q: '¿Sospecha de infección o factores de riesgo de infección?',
       help: '<b>Sospecha:</b> fiebre (o sensación de haberla tenido), hipotermia no accidental o temperatura normal + ≥1 de: tos o expectoración · molestias urinarias, orina turbia o maloliente · dolor abdominal, diarrea o vómitos · cefalea o alteración del estado mental · dolor, inflamación o enrojecimiento de una extremidad · úlceras o heridas con supuración, catéter central con el punto de entrada enrojecido o sonda vesical permanente. O deterioro general sin otra causa que lo explique.<br>' +
         '<b>Factores de riesgo:</b> diabetes · corticoides o inmunosupresores crónicos · inmunosupresión (esplenectomía, VIH, hemodiálisis) · neoplasia activa o quimioterapia · infección reciente o en tratamiento antibiótico · cirugía o endoscopia (urinaria, biliar) en el último mes · heridas quirúrgicas, úlceras, catéter venoso central (diálisis, port-a-cath) o sonda vesical · >70 años con dependencia o en residencia (valorar antes su estado basal).',
-      opts: [{ l: 'Sí', go: 'activar' }, { l: 'No', go: 'critico' }]
+      opts: [{ l: 'Sí', go: 'activar', sug: v => v.infec === true || v.frInf === true }, { l: 'No', go: 'critico' }]
     };
     return {
-      inputs: [{ k: 'peso', l: 'Peso real', u: 'kg' }, { k: 'fr', l: 'FR', u: 'rpm' }, { k: 'spo2', l: 'SpO₂', u: '%' }, { k: 'tas', l: 'TAS', u: 'mmHg' }, { k: 'tad', l: 'TAD', u: 'mmHg' }, { k: 'fc', l: 'FC', u: 'lpm' }, { k: 'temp', l: 'Temperatura', u: '°C' }],
       start: 'vital',
       nodes: {
         vital: {
@@ -1270,26 +2334,12 @@ window.PROTOCOLS = [
             return 'Al menos uno de: <b>A</b> vía aérea comprometida · <b>B</b> FR >30 o &lt;8 rpm (contada durante 1 min), trabajo respiratorio (escala de Patrick >3), cianosis · <b>C</b> TAS &lt;90 mmHg (o caída >40 % de la basal) o >220 mmHg, FC &lt;40 o >131 lpm · <b>D</b> somnolencia, estupor, coma o convulsiones. Un valor alterado aislado se interpreta según el estado general.' +
               (r.length ? '<br><b>Con los datos introducidos: ' + r.join(' · ') + '.</b>' : '');
           },
-          opts: [{ l: 'Sí', go: 'rv', sug: v => vital(v).length > 0 }, { l: 'No', go: 'cons' }]
+          opts: [{ l: 'Sí', go: 'rv', sug: v => vital(v).length > 0 }, { l: 'No', go: 'news', sug: v => hay(v.fr) && hay(v.tas) && hay(v.fc) && !vital(v).length }]
         },
         rv: {
           t: 'RIESGO VITAL', c: 'high',
           show: 'Actuación inicial (ABCDE) y traslado con <b>ALERTA DE PACIENTE CRÍTICO</b>.',
           ...INFEC
-        },
-        cons: {
-          q: 'Nivel de consciencia (para el NEWS)',
-          opts: [{ l: 'Alerta', go: 'oxi' }, { l: 'Confusión o desorientación nueva, responde solo a la voz o al dolor, o inconsciente', go: 'oxi' }]
-        },
-        oxi: {
-          q: '¿Respira aire ambiente u oxígeno? (para el NEWS)',
-          help: 'La escala 2 de SpO₂ es solo para pacientes con CPAP, BiPAP u oxígeno crónico domiciliario (objetivo de SpO₂ 88–92 %). Los demás, escala 1.',
-          opts: [
-            { l: 'Aire ambiente', go: 'news' },
-            { l: 'Oxígeno', go: 'news' },
-            { l: 'Aire ambiente, con CPAP, BiPAP u O₂ domiciliario (escala 2)', go: 'news' },
-            { l: 'Oxígeno, con CPAP, BiPAP u O₂ domiciliario (escala 2)', go: 'news' }
-          ]
         },
         news: {
           t: 'Escala NEWS2',
@@ -1297,10 +2347,10 @@ window.PROTOCOLS = [
             const n = news(v);
             return '<b>NEWS = ' + n.total + (n.falta.length ? ' (incompleto)' : '') + '</b>' + (n.total >= 7 ? ' → <b>≥7: paciente potencialmente crítico</b>' : '') + '<br>' +
               n.p.map(x => x[0] + ' ' + x[1]).join(' · ') +
-              (n.falta.length ? '<br>Faltan: ' + n.falta.join(', ') + ' (introdúcelos arriba).' : '') +
+              (n.falta.length ? '<br>Faltan: ' + n.falta.join(', ') + ' (introdúcelos en el evaluador).' : '') +
               '<br><span class="pe-nota">Se puntúa la primera valoración o la peor durante la asistencia.</span>';
           },
-          escalas: ['news2'], q: '¿Resultado del NEWS?',
+          q: '¿Resultado del NEWS?',
           opts: [{ l: 'NEWS ≥7', go: 'news7', sug: v => news(v).total >= 7 }, { l: 'NEWS &lt;7', go: 'bajo', sug: v => !news(v).falta.length && news(v).total < 7 }]
         },
         news7: {
@@ -1326,10 +2376,9 @@ window.PROTOCOLS = [
             '<br><span class="pe-nota">SSC 2026: antibiótico inmediato, idealmente &lt;1 h, si el shock es posible, probable o seguro; en la sepsis posible sin shock, estudio rápido y antibiótico en &lt;3 h si persiste la sospecha.</span>',
           q: '¿Hay hipoperfusión o shock?',
           help: v => 'EtCO₂ &lt;25 mmHg · índice de perfusión &lt;1,4 · índice de shock (FC/TAS) >0,8 · TAM &lt;65 mmHg · mala perfusión periférica (relleno capilar lento, piel moteada).' +
-            (ishock(v) !== null && ishock(v) > 0.8 ? '<br><b>Índice de shock ' + f(ishock(v)) + ' (>0,8).</b>' : '') +
-            (tam(v) !== null && tam(v) < 65 ? '<br><b>TAM ' + tam(v) + ' mmHg (&lt;65).</b>' : ''),
+            (E().hipo(v).length ? '<br><b>Con los datos: ' + E().hipo(v).join(' · ') + '.</b>' : ''),
           opts: [
-            { l: 'Sí', go: 'fluidos', sug: v => (ishock(v) !== null && ishock(v) > 0.8) || (tam(v) !== null && tam(v) < 65) || (hay(v.tas) && v.tas < 90) },
+            { l: 'Sí', go: 'fluidos', sug: v => E().hipo(v).length > 0 },
             { l: 'No', go: 'nohipo' }
           ]
         },
@@ -1398,19 +2447,97 @@ window.PROTOCOLS = [
 
 {id:'codi-risc-suicidi', title:'Codi Risc Suïcidi', sub:'Cribado MINI y estratificación del riesgo suicida', badge:'amber', tag:'Urgente', rank:5, codigo:true,
   folleto:'codigos/C05.Codi_risc_suïcidi.pdf',
-  /* Flujograma paso a paso del algoritmo genérico del folleto SEM (v.01, junio 2024).
-     El MINI se contesta pregunta a pregunta (v.resp[m1..m6] = 0 si «Sí») y el resultado
-     sugiere el nivel de riesgo. Sin contenido clínico propio fuera del folleto. */
-  flow:(() => {
+  /* Evaluador: la tentativa, las respuestas del MINI y los factores de riesgo se marcan una sola vez;
+     el flujograma de abajo usa estos mismos datos (v.tent, v.m1..v.m6) para sugerir las opciones.
+     Preguntas, puntos, cortes, actuación y factores: folleto Codi Risc Suïcidi (SEM, Grup de Treball
+     en malalties mentals, v.01 junio 2024). Sin contenido clínico propio fuera del folleto. */
+  eval:(() => {
     const MINI = [
-      ['m1', 'Durante el último mes, ¿ha pensado que estaría mejor muerto/a?', 1],
-      ['m2', 'Durante el último mes, ¿ha querido hacerse daño?', 2],
-      ['m3', 'Durante el último mes, ¿ha pensado en el suicidio?', 6],
-      ['m4', 'Durante el último mes, ¿ha planeado cómo hacerlo?', 10],
-      ['m5', 'Durante el último mes, ¿lo ha intentado recientemente?', 10],
+      ['m1', '¿Ha pensado que estaría mejor muerto/a?', 1],
+      ['m2', '¿Ha querido hacerse daño?', 2],
+      ['m3', '¿Ha pensado en el suicidio?', 6],
+      ['m4', '¿Ha planeado cómo hacerlo?', 10],
+      ['m5', '¿Lo ha intentado recientemente?', 10],
       ['m6', '¿Lo ha intentado alguna vez en la vida?', 4]
     ];
-    const pts = v => MINI.reduce((a, m) => a + (v.resp[m[0]] === 0 ? m[2] : 0), 0);
+    /* [clave, texto del folleto, forma corta para el resumen] */
+    const FR = [
+      ['fDep', 'Depresión mayor', 'depresión mayor'],
+      ['fPsiq', 'Diagnóstico psiquiátrico: trastorno depresivo, psicótico, bipolar, límite de la personalidad o de la conducta alimentaria', 'diagnóstico psiquiátrico'],
+      ['fImp', 'Impulsividad, agresividad, agitación o nivel de consciencia alterado', 'impulsividad, agresividad, agitación o consciencia alterada'],
+      ['fAlc', 'Consumo excesivo o dependencia del alcohol; consumo o adicción a otras sustancias', 'alcohol u otras sustancias'],
+      ['fOrg', 'Enfermedades orgánicas graves', 'enfermedad orgánica grave'],
+      ['fHom', 'Género hombre', 'género hombre'],
+      ['fEdad', '>65 años o adolescente', '>65 años o adolescente'],
+      ['fSoc', 'Problemas sociales', 'problemas sociales'],
+      ['fEstr', 'Acontecimientos vitales estresantes en los últimos 3 meses (laborales, de pareja, económicos, familiares)', 'acontecimiento vital estresante &lt;3 meses'],
+      ['fArm', 'Acceso a armas, tóxicos u otros medios letales, o situaciones de violencia', 'acceso a medios letales o violencia'],
+      ['fFam', 'Antecedentes familiares de 1.er grado de suicidio consumado', 'antecedente familiar de 1.er grado de suicidio consumado']
+    ];
+    const pts = v => MINI.reduce((a, m) => a + (v[m[0]] === true ? m[2] : 0), 0);
+    const ACTIVAR = '• <b>Alerta</b> a la Central de Coordinación Sanitaria del SEM (CECOS) · 061/Salut Respon · 112.<br>' +
+      '• Activación de recursos y acompañamiento telefónico continuado.<br>' +
+      '• Valoración del estado del paciente y <b>contención</b>.<br>' +
+      '• <b>Traslado al hospital de referencia CRS.</b><br>' +
+      '• Seguimiento posterior al alta hospitalaria (061/Salut Respon, a los 30 días).';
+    const CONSEJO = '• Consejo telefónico con acompañamiento telefónico continuado.<br>' +
+      '• Información de los dispositivos de la red disponibles: Atención Primaria y Salud Mental.<br>' +
+      '• Seguimiento proactivo del 061/Salut Respon.';
+    return {
+      MINI, pts,
+      items: [
+        {t:'h', l:'Tentativa'},
+        {k:'tent', t:'chk', l:'Tentativa de suicidio (se activa el código directamente, sin el MINI)'},
+        {t:'h', l:'MINI (mini-entrevista neuropsiquiátrica internacional) · durante el último mes… marcar las respuestas «Sí»'},
+        ...MINI.map(m => ({k:m[0], t:'chk', l:m[1] + ' (' + m[2] + (m[2] === 1 ? ' punto)' : ' puntos)')})),
+        {t:'h', l:'Factores de riesgo (para la valoración clínica del riesgo MEDIO)'},
+        ...FR.map(f => ({k:f[0], t:'chk', l:f[1]}))
+      ],
+      calc:function(v){
+        const n = pts(v);
+        const si = MINI.filter(m => v[m[0]] === true);
+        const fr = FR.filter(f => v[f[0]] === true);
+        if (!v.tent && !si.length && !fr.length)
+          return [{t:'Introduce los datos del paciente', c:'', h:'Marca si hay tentativa de suicidio y las respuestas «Sí» del MINI: la puntuación, el nivel de riesgo y la actuación del folleto salen solos. Si todas las respuestas del MINI son «No», suma 0 puntos: el folleto no lo clasifica; decide la valoración clínica.'}];
+        const out = [];
+        const nivel = n >= 10 ? 'ALTO' : n >= 6 ? 'MEDIO' : n >= 1 ? 'BAJO' : '';
+        const pTxt = n + (n === 1 ? ' punto' : ' puntos');
+
+        /* 1. MINI: 1–5 puntos riesgo BAJO · 6–9 MEDIO · ≥10 ALTO (folleto) */
+        if (si.length || !v.tent) out.push({t:'MINI ' + pTxt + (nivel ? ': riesgo ' + nivel : ''), c:n >= 10 ? 'high' : n >= 6 ? 'mid' : n >= 1 ? 'low' : '',
+          h:(si.length ? '<b>«Sí» en:</b> ' + si.map(m => m[1] + ' (' + m[2] + ')').join(' · ') + '<br>' : 'Ninguna respuesta «Sí» marcada.<br>') +
+            '1–5 puntos = riesgo BAJO · 6–9 = riesgo MEDIO · ≥10 = riesgo ALTO.' +
+            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '')});
+
+        /* 2. Actuación según el folleto */
+        if (v.tent || n >= 10) out.push({t:'ACTIVAR CODI RISC SUÏCIDI', c:'high',
+          h:'Motivo: <b>' + [v.tent ? 'tentativa de suicidio' : '', n >= 10 ? 'MINI ' + pTxt + ' (riesgo ALTO)' : ''].filter(Boolean).join(' y ') + '</b>.<br>' + ACTIVAR});
+        else if (n >= 6) out.push({t:'Riesgo MEDIO: consejo telefónico', c:'mid',
+          h:CONSEJO + '<br><b>Excepcionalmente</b>, la valoración clínica de la comorbilidad y de los factores de riesgo puede aconsejar subir el nivel de sospecha a riesgo ALTO y activar el código (pregunta del flujograma).' +
+            (fr.length ? '<br><b>Factores de riesgo marcados:</b> ' + fr.map(f => f[2]).join(' · ') + '.' : '')});
+        else if (n >= 1) out.push({t:'Riesgo BAJO: consejo telefónico', c:'low', h:CONSEJO});
+
+        /* 3. Factores de riesgo marcados (el folleto los lista para la valoración clínica; no puntúan en el MINI) */
+        if (fr.length) out.push({t:'Factores de riesgo marcados: ' + fr.length, c:'',
+          h:'• ' + fr.map(f => f[1]).join('<br>• ') + '<br><span class="pe-nota">El folleto los recoge para la valoración clínica; no forman parte de la puntuación del MINI.</span>'});
+
+        /* Resumen para la historia clínica: sale al final del flujograma y entra en «Copiar resumen».
+           La decisión de subir un riesgo MEDIO a ALTO se toma en el flujograma y queda en su recorrido. */
+        out.resumen = [
+          v.tent ? 'Tentativa de suicidio' : '',
+          si.length || !v.tent ? 'MINI ' + pTxt + (nivel ? ' (riesgo ' + nivel + ')' : ' (sin clasificar en el folleto)') : '',
+          fr.length ? 'Factores de riesgo: ' + fr.map(f => f[2]).join(', ') : ''
+        ].filter(Boolean);
+        return out;
+      }
+    };
+  })(),
+  /* Flujograma paso a paso del algoritmo genérico del folleto SEM (v.01, junio 2024).
+     El MINI se marca en el evaluador de arriba (v.m1..v.m6) y el resultado sugiere el nivel
+     de riesgo. Sin contenido clínico propio fuera del folleto. */
+  flow:(() => {
+    const ev = () => PROTOCOLS.find(x => x.id === 'codi-risc-suicidi').eval;
+    const pts = v => ev().pts(v);
     const FACTORES = '• Depresión mayor.<br>' +
       '• Diagnóstico psiquiátrico: trastorno depresivo, psicótico, bipolar, límite de la personalidad o de la conducta alimentaria.<br>' +
       '• Impulsividad, agresividad, agitación o nivel de consciencia alterado.<br>' +
@@ -1424,17 +2551,17 @@ window.PROTOCOLS = [
       sospecha: {
         t: 'Sospecha de riesgo de suicidio',
         q: '¿Hay una tentativa de suicidio?',
-        help: 'Ante una tentativa se activa el código directamente, sin el MINI.',
-        opts: [{ l: 'Sí, tentativa de suicidio', go: 'activar' }, { l: 'No', go: 'm1' }]
+        help: 'Ante una tentativa se activa el código directamente, sin el MINI. Si no la hay, el MINI se marca en el evaluador de arriba.',
+        opts: [{ l: 'Sí, tentativa de suicidio', go: 'activar', sug: v => v.tent === true }, { l: 'No', go: 'resultado', sug: v => !v.tent && pts(v) > 0 }]
       },
       resultado: {
         t: 'Resultado del MINI',
         show: v => {
           const n = pts(v);
-          const si = MINI.filter(m => v.resp[m[0]] === 0);
+          const si = ev().MINI.filter(m => v[m[0]] === true);
           return '<b>MINI = ' + n + ' puntos</b>' + (si.length ? ' (sí en: ' + si.map(m => m[2] + ' p').join(' + ') + ')' : '') + '<br>' +
             '1–5 puntos = riesgo BAJO · 6–9 = riesgo MEDIO · ≥10 = riesgo ALTO.' +
-            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '');
+            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica. Las respuestas «Sí» del MINI se marcan en el evaluador de arriba.</span>' : '');
         },
         q: 'Nivel de riesgo de suicidio',
         opts: [
@@ -1452,7 +2579,7 @@ window.PROTOCOLS = [
       activar: {
         t: 'ACTIVAR CODI RISC SUÏCIDI', c: 'high',
         show: v => {
-          const por = v.ruta.indexOf('m1') < 0 ? 'tentativa de suicidio' : v.ruta.indexOf('medio') >= 0 ? 'riesgo medio subido a alto por la valoración clínica' : 'MINI ' + pts(v) + ' puntos (riesgo ALTO)';
+          const por = v.ruta.indexOf('resultado') < 0 ? 'tentativa de suicidio' : v.ruta.indexOf('medio') >= 0 ? 'riesgo medio subido a alto por la valoración clínica' : 'MINI ' + pts(v) + ' puntos (riesgo ALTO)';
           return 'Motivo: <b>' + por + '</b>.<br>' +
             '• <b>Alerta</b> a la Central de Coordinación Sanitaria del SEM (CECOS) · 061/Salut Respon · 112.<br>' +
             '• Activación de recursos y acompañamiento telefónico continuado.<br>' +
@@ -1469,14 +2596,6 @@ window.PROTOCOLS = [
           '• Seguimiento proactivo del 061/Salut Respon.'
       }
     };
-    MINI.forEach((m, i) => {
-      nodes[m[0]] = {
-        t: i === 0 ? 'MINI (mini-entrevista neuropsiquiátrica internacional)' : undefined,
-        q: m[1],
-        help: '«Sí» = ' + m[2] + (m[2] === 1 ? ' punto.' : ' puntos.'),
-        opts: [{ l: 'Sí', go: i < 5 ? MINI[i + 1][0] : 'resultado' }, { l: 'No', go: i < 5 ? MINI[i + 1][0] : 'resultado' }]
-      };
-    });
     return {
       start: 'sospecha',
       nodes,
