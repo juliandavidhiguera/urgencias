@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 26 | **Rama:** main | **HEAD:** `97b7a56` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 26 | **Rama:** main | **HEAD:** `f38b461` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -62,6 +62,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
 ### Sesion 26 - 2026-11-11
+- Anadido (`f38b461`): recuadro «📊 Puntuaciones del caso» al final del flujograma (`_flowPunt` en index.html: `eval.calc(...).resumen` o titulos del evaluador salvo Tratamiento/Destino/Respuesta y destino/Introduce + primera linea de las escalas abiertas al lado `_escRes`); entra en «Copiar resumen» (bloque «Puntuaciones:»). `_escPintar` re-renderiza el flujo. TEP: Wells/Ginebra/PERC calculados siempre y `out.resumen` (probabilidad con todas las escalas + conclusion, gravedad, categoria). Verificado headless (TEP 5650 caminos, EPOC 11, asma 32, 0 errores; copia correcta).
+- En curso: evaluadores (`eval`) para dolor-toracico, codi-sepsia, fa-rapida, codi-ictus, codi-ppt, codi-iam, hiperkalemia y codi-risc-suicidi (pedido del usuario); al anadir `eval` hay que quitar `flow.inputs` (sobrescriben las claves del evaluador en `_flowVals`).
 - Modificado (`40c10f7`): `tep-agudo` segun **Protocolo TEP v3.0 clinica** (`Downloads/TEP_Campdevanol_v3.0_clinica_vista_previa.pdf`, reorganiza v2.1 sin cambio de criterio). Tenecteplasa = fibrinolitico disponible hoy (alteplasa de eleccion pendiente de stock): primero en `LISIS`, evaluador calcula mg por peso real (misma dosis en PCR), con TNK suspender perfusion de HNF; `pautas-protocolo.js` y `FARM_ESQUEMAS['tnk-tep']` (index.html) actualizados. HUV → CHV/Vic en todo el TEP. Criterios ya cerrados: parar HNF con alteplasa = criterio CHV; lisis local D2 sin nota; C3 estable = discrepancia abierta. Nuevos nodos del flujograma 4: `trasCrit` (desde planta), `pertD` (llamada PERT ≤30 min), `optim` (A-B-C + pregunta PERT catéter/ECMO → `clinic`/`vic`), `SALIR` (SBAR + durante el traslado + plan de desvio). Extra nuevo «Red flags y No hacer»; recursos, R y checklist actualizados.
 - Anadido: `protocolos/Flujograma4_TEP_Traslado_Campdevanol.jpg` (imagen del anexo I pag. 9 del PDF v3.0, = PNG del usuario) y `.pdf` (generado con pymupdf; el `Flujograma4_...pdf` de Descargas era una version anterior con TNK «util si el traslado no admite perfusion»), `Protocolo_TEP_Campdevanol_v3.pdf` (boton docs). Eliminado `Protocolo_TEP_Campdevanol_v2.pdf`. `sw.js` `urg-v78`.
 - Verificado: Chrome headless 5650 caminos, 0 errores JS, E1 72 kg → TNK 40 mg, PDFs/JPG 200; Chrome del usuario (nodo optim).
