@@ -824,6 +824,12 @@ label.fl-ask-hint { display: block; }
 .protocol-card[open] > summary::after, .scale-card[open] > summary::after, .databox[open] > summary::after, .card[open] > summary::after { content: '▴'; }
 .protocol-card > summary:hover, .scale-card > summary:hover, .databox > summary:hover, .card > summary:hover { background: var(--bg3); }
 .pe-box { padding: 6px 14px 14px; border-bottom: 2px solid var(--border); margin-bottom: 4px; }
+.fg-calc { margin: 2px 0 8px; font-size: var(--fs-sm); }
+.fg-calc summary { cursor: pointer; color: var(--text2); }
+.fg-calc-in { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 6px 0; }
+.fg-calc-in label { display: flex; align-items: center; gap: 4px; }
+.fg-calc-in .num-in { width: 80px; }
+.fg-calc-res { color: var(--text2); }
 .pe-title { font-size: var(--fs-base); font-weight: 600; padding: 6px 0; }
 .pe-h { font-size: var(--fs-xs); font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; padding: 12px 0 2px; }
 .pe-out { margin-top: 10px; }
@@ -2559,12 +2565,50 @@ function _protoEvalHtml(p) {
       const ctrl = it.t === 'num' ? '<input type="number" step="any" class="num-in" id="' + id + '" oninput="' + on + '" placeholder="' + (it.u || '') + '">' :
         it.t === 'sel' ? '<select id="' + id + '" onchange="' + on + '">' + it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>' :
         '<input type="checkbox" id="' + id + '" onchange="' + on + '">';
-      return '<div class="scale-item"><label class="scale-label" for="' + id + '">' + it.l + '</label><div class="scale-input">' + ctrl + '</div></div>';
+      return '<div class="scale-item"><label class="scale-label" for="' + id + '">' + it.l + '</label><div class="scale-input">' + ctrl + '</div></div>' +
+        (it.k === 'fg' || it.k === 'clcr' ? _fgCalcHtml(p, it) : '');
     }).join('') +
     '<div id="' + pid + '-out" class="pe-out" aria-live="polite"></div>' +
     '<button class="reset-btn" onclick="resetProtoEval(\'' + p.id + '\')">↺ Reset</button>' +
     '<button class="btn btn-copy" onclick="copyProtoEval(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
     '</div>';
+}
+
+/* Filtrado glomerular a partir de la creatinina, para los campos fg/clcr de los evaluadores (se puede
+   seguir escribiendo a mano). Cockcroft-Gault con peso real, como la tarjeta del SCA (Cockcroft 1976,
+   PMID 1244564); CKD-EPI 2021 sin raza (Inker 2021, N Engl J Med, PMID 34554658). La fórmula sale de la
+   etiqueta del campo: «CKD-EPI» → CKD-EPI; el resto (ClCr, Cockcroft-Gault) → Cockcroft-Gault. */
+function _fgFormula(it) { return /CKD/i.test(it.l) ? 'ckd' : 'cg'; }
+function _fgCalcHtml(p, it) {
+  const b = 'pe-' + p.id + '-' + it.k + '-fgc', f = _fgFormula(it);
+  const on = ' oninput="_fgCalc(\'' + p.id + '\',\'' + it.k + '\')"';
+  const num = (k, l, u) => '<label>' + l + ' <input type="number" step="any" class="num-in" id="' + b + '-' + k + '" placeholder="' + u + '"' + on + '></label>';
+  return '<details class="fg-calc" id="' + b + '" ontoggle="if(this.open)_fgPrefill(\'' + p.id + '\',\'' + it.k + '\')">' +
+    '<summary>🧮 Calcular a partir de la creatinina (' + (f === 'ckd' ? 'CKD-EPI 2021' : 'Cockcroft-Gault') + ')</summary><div class="fg-calc-in">' +
+    num('cr', 'Creatinina', 'mg/dL') + num('edad', 'Edad', 'años') + (f === 'cg' ? num('peso', 'Peso real', 'kg') : '') +
+    '<label>Sexo <select id="' + b + '-sexo" onchange="_fgCalc(\'' + p.id + '\',\'' + it.k + '\')"><option value="">—</option><option value="h">Hombre</option><option value="m">Mujer</option></select></label>' +
+    '</div><div class="fg-calc-res" id="' + b + '-res">Rellena los datos: el resultado se copia en el campo de arriba.</div></details>';
+}
+function _fgPrefill(pid, k) {
+  const g = x => document.getElementById('pe-' + pid + '-' + x), b = 'pe-' + pid + '-' + k + '-fgc-';
+  ['cr', 'edad', 'peso'].forEach(x => { const src = g(x), dst = document.getElementById(b + x); if (src && dst && src.type === 'number' && src.value !== '' && dst.value === '') dst.value = src.value; });
+  const sx = document.getElementById(b + 'sexo');
+  if (sx && !sx.value) { if (g('mujer')) sx.value = g('mujer').checked ? 'm' : ''; else if (g('varon')) sx.value = g('varon').checked ? 'h' : ''; }
+  _fgCalc(pid, k);
+}
+function _fgCalc(pid, k) {
+  const p = PROTOCOLS.find(x => x.id === pid), it = p.eval.items.find(x => x.k === k), f = _fgFormula(it);
+  const b = 'pe-' + pid + '-' + k + '-fgc-', n = x => { const el = document.getElementById(b + x); return el ? parseFloat(String(el.value).replace(',', '.')) : NaN; };
+  const cr = n('cr'), edad = n('edad'), peso = n('peso'), sexo = document.getElementById(b + 'sexo').value, res = document.getElementById(b + 'res');
+  const falta = [!(cr > 0) ? 'creatinina' : '', !(edad > 0) ? 'edad' : '', f === 'cg' && !(peso > 0) ? 'peso' : '', !sexo ? 'sexo' : ''].filter(Boolean);
+  if (falta.length) { res.textContent = 'Falta: ' + falta.join(', ') + '.'; return; }
+  const m = sexo === 'm';
+  const fg = f === 'cg' ? (140 - edad) * peso / (72 * cr) * (m ? 0.85 : 1) :
+    142 * Math.pow(Math.min(cr / (m ? 0.7 : 0.9), 1), m ? -0.241 : -0.302) * Math.pow(Math.max(cr / (m ? 0.7 : 0.9), 1), -1.2) * Math.pow(0.9938, edad) * (m ? 1.012 : 1);
+  const val = Math.round(fg);
+  document.getElementById('pe-' + pid + '-' + k).value = val;
+  res.innerHTML = '<b>' + (f === 'cg' ? 'ClCr (Cockcroft-Gault)' : 'FGe (CKD-EPI 2021)') + ': ' + val + ' mL/min' + (f === 'ckd' ? '/1,73 m²' : '') + '</b> → copiado en el campo de arriba.';
+  calcProtoEval(pid);
 }
 
 function _evalVals(p) {
@@ -2592,6 +2636,11 @@ function resetProtoEval(pid) {
     if (it.t === 'h') return;
     const el = document.getElementById('pe-' + pid + '-' + it.k);
     if (it.t === 'chk') el.checked = false; else if (it.t === 'sel') el.selectedIndex = 0; else el.value = '';
+  });
+  document.querySelectorAll('.pe-box[data-pid="' + pid + '"] .fg-calc').forEach(d => {
+    d.querySelectorAll('input').forEach(i => { i.value = ''; });
+    d.querySelectorAll('select').forEach(s => { s.selectedIndex = 0; });
+    d.open = false;
   });
   farmBorrarCaso(pid);
   calcProtoEval(pid);

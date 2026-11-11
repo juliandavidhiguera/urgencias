@@ -491,6 +491,7 @@ window.PROTOCOLS = [
       {k:'glu', t:'num', l:'Glucemia previa', u:'mg/dL'},
       {k:'riesgoHipo', t:'chk', l:'Más riesgo de hipoglucemia: insuficiencia renal, sin diabetes, bajo peso o edad avanzada'},
       {t:'h', l:'Función renal y causa'},
+      {k:'fg', t:'num', l:'Filtrado glomerular, CKD-EPI (opcional)', u:'mL/min'},
       {k:'kdCr', t:'sel', l:'KDIGO-AKI, criterio creatinina', o:[['Sin criterio (0)',0],['×1,5–1,9 basal o ↑≥0,3 mg/dL en 48 h (1)',1],['×2,0–2,9 basal (2)',2],['×3 basal, Cr ≥4 mg/dL o inicio de TRS (3)',3]]},
       {k:'kdDiu', t:'sel', l:'KDIGO-AKI, criterio diuresis', o:[['Sin criterio (0)',0],['&lt;0,5 mL/kg/h durante 6–12 h (1)',1],['&lt;0,5 mL/kg/h ≥12 h (2)',2],['&lt;0,3 mL/kg/h ≥24 h o anuria ≥12 h (3)',3]]},
       {k:'anuria', t:'chk', l:'Anuria, ERC avanzada o liberación continua de potasio (rabdomiólisis, lisis tumoral)'},
@@ -521,7 +522,8 @@ window.PROTOCOLS = [
 
       /* 2. Función renal: KDIGO-AKI (SCALES 'kdigo': estadio = criterio más alto) */
       const kd = Math.max(v.kdCr || 0, v.kdDiu || 0);
-      if (kd > 0) out.push({t:'KDIGO-AKI estadio ' + kd, c:kd === 1 ? 'mid' : 'high',
+      if (has(v.fg) && kd === 0) out.push({t:'FGe ' + v.fg + ' mL/min/1,73 m² (CKD-EPI)', c:'', h:'Sin criterios KDIGO-AKI marcados. Ajustar al FG los fármacos de eliminación renal.'});
+      if (kd > 0) out.push({t:'KDIGO-AKI estadio ' + kd + (has(v.fg) ? ' · FGe ' + v.fg + ' mL/min/1,73 m²' : ''), c:kd === 1 ? 'mid' : 'high',
         h:['', 'Retirar nefrotóxicos · optimizar volemia · control de creatinina y diuresis.', 'Revisar dosis por FG · descartar obstrucción (eco) · valorar nefrología.', 'Valorar TRS: hiperpotasemia refractaria, acidosis, sobrecarga, uremia.'][kd]});
 
       /* 3. Tratamiento con las dosis del protocolo */
@@ -1053,7 +1055,7 @@ window.PROTOCOLS = [
       {k:'clcr', t:'num', l:'ClCr (opcional)', u:'ml/min'},
       {t:'h', l:'Criterios ECG de activación del Codi IAM'},
       {k:'st', t:'num', l:'Elevación nueva del ST en el punto J, en 2 derivaciones contiguas', u:'mm'},
-      {k:'stV23', t:'chk', l:'Esa elevación es en V2–V3 (corte ≥2 mm en hombres &gt;40 años, ≥2,5 mm en hombres &lt;40 años, ≥1,5 mm en mujeres; en el resto de derivaciones ≥1 mm)'},
+      {k:'stV23', t:'chk', l:'Esa elevación es en V2–V3 (corte ≥2 mm en hombres ≥40 años, ≥2,5 mm en hombres &lt;40 años, ≥1,5 mm en mujeres; en el resto de derivaciones ≥1 mm)'},
       {k:'avr', t:'chk', l:'Depresión del ST ≥1 mm en ≥8 derivaciones + elevación del ST en aVR (sospecha de tronco común o multivaso)'},
       {k:'post', t:'chk', l:'Elevación persistente del ST &gt;0,5 mm en V7–V9 con descenso especular en V1–V3 (IAM posterior)'},
       {k:'vd', t:'chk', l:'Elevación del ST en derivaciones derechas (IAM de VD)'},
@@ -1091,11 +1093,11 @@ window.PROTOCOLS = [
       let no = '';
       if (has(v.st) && v.st >= 0) {
         const donde = v.stV23 ? ' en V2–V3' : '';
-        const u = !v.stV23 ? 1 : v.mujer ? 1.5 : has(v.edad) && v.edad > 40 ? 2 : has(v.edad) && v.edad < 40 ? 2.5 : null;
+        const u = !v.stV23 ? 1 : v.mujer ? 1.5 : has(v.edad) && v.edad >= 40 ? 2 : has(v.edad) && v.edad < 40 ? 2.5 : null; /* 40 años justos → ≥2 mm (decisión del usuario; ESC/4.ª definición universal) */
         if (u !== null) { if (v.st >= u) c.push('elevación del ST ' + fx(v.st) + ' mm' + donde + ' (corte ≥' + fx(u) + ' mm)'); else no = 'elevación del ST ' + fx(v.st) + ' mm' + donde + ' por debajo del corte (≥' + fx(u) + ' mm)'; }
         else if (v.st >= 2.5) c.push('elevación del ST ' + fx(v.st) + ' mm en V2–V3 (≥2,5 mm: supera los dos cortes del hombre)');
         else if (v.st < 2) no = 'elevación del ST ' + fx(v.st) + ' mm en V2–V3 por debajo del corte (≥2 mm)';
-        else dud.push('elevación del ST ' + fx(v.st) + ' mm en V2–V3 en un hombre: ' + (has(v.edad) ? 'con 40 años la ficha no fija el corte' : 'falta la edad') + ' (≥2 mm con &gt;40 años, ≥2,5 mm con &lt;40 años)');
+        else dud.push('elevación del ST ' + fx(v.st) + ' mm en V2–V3 en un hombre: falta la edad (≥2 mm con ≥40 años, ≥2,5 mm con &lt;40 años)');
       }
       if (v.avr) c.push('descenso del ST en ≥8 derivaciones + elevación en aVR');
       if (v.post) c.push('elevación del ST en V7–V9 con descenso especular en V1–V3');
@@ -1122,7 +1124,7 @@ window.PROTOCOLS = [
       const has = x => !isNaN(x);
       if (v.dudas) return {go:'sa_no', t:'ninguno de momento', por:'dudas diagnósticas, hemorragia activa grave, sin VO o doble antiagregación previa'};
       if (v.hemr) return {go:'sa_clopi', t:'clopidogrel 600 mg VO', por:'sin información o alto riesgo hemorrágico'};
-      const r = [v.ictus ? 'ictus o AIT previo' : '', has(v.edad) && v.edad > 75 ? 'edad &gt;75 años' : '', has(v.peso) && v.peso < 60 ? 'peso &lt;60 kg' : ''].filter(Boolean);
+      const r = [v.ictus ? 'ictus o AIT previo' : '', has(v.edad) && v.edad >= 75 ? 'edad ≥75 años' : '', has(v.peso) && v.peso < 60 ? 'peso &lt;60 kg' : ''].filter(Boolean);
       if (r.length) return {go:'sa_tica', t:'ticagrelor 180 mg VO', por:r.join(', ')};
       if (has(v.edad) && has(v.peso)) return {go:'sa_pras', t:'prasugrel 60 mg VO', por:'ninguno de los criterios anteriores'};
       return null;
@@ -1193,8 +1195,8 @@ window.PROTOCOLS = [
       /* 5. Segundo antiagregante */
       if (act && e !== 'fib') {
         const a = this.sa(v);
-        out.push(a ? {t:'Segundo antiagregante (angioplastia primaria): ' + a.t, c:'', h:'Por: ' + a.por + '.<br><span class="pe-nota">Algoritmo de la ficha, en orden: dudas o hemorragia → ninguno · sin información o alto riesgo hemorrágico → clopidogrel 600 mg · ictus/AIT previo, &gt;75 años o &lt;60 kg → ticagrelor 180 mg · resto → prasugrel 60 mg. Con fibrinólisis: clopidogrel, NO prasugrel ni ticagrelor.</span>'} :
-          {t:'Segundo antiagregante: faltan la edad o el peso', c:'', h:'Con &gt;75 años o &lt;60 kg → ticagrelor 180 mg VO; si no → prasugrel 60 mg VO (salvo dudas, hemorragia o alto riesgo hemorrágico).'});
+        out.push(a ? {t:'Segundo antiagregante (angioplastia primaria): ' + a.t, c:'', h:'Por: ' + a.por + '.<br><span class="pe-nota">Algoritmo de la ficha, en orden: dudas o hemorragia → ninguno · sin información o alto riesgo hemorrágico → clopidogrel 600 mg · ictus/AIT previo, ≥75 años o &lt;60 kg → ticagrelor 180 mg · resto → prasugrel 60 mg. Con fibrinólisis: clopidogrel, NO prasugrel ni ticagrelor.</span>'} :
+          {t:'Segundo antiagregante: faltan la edad o el peso', c:'', h:'Con ≥75 años o &lt;60 kg → ticagrelor 180 mg VO; si no → prasugrel 60 mg VO (salvo dudas, hemorragia o alto riesgo hemorrágico).'});
         if (a) res.push('Segundo antiagregante (ICP primaria): ' + a.t);
       }
 
@@ -1228,8 +1230,8 @@ window.PROTOCOLS = [
       const mg = v.edad >= 75 ? llena / 2 : llena;
       return '<b>' + f(mg) + ' mg = ' + f(mg / 5) + ' ml</b> IV en bolo único en 5–10 s' + (v.edad >= 75 ? ' (MEDIA DOSIS por ≥75 años; dosis completa ' + llena + ' mg)' : '') + '.';
     };
-    const clopi = v => !hay(v.edad) ? 'clopidogrel 300 mg VO con ≤75 años o 75 mg sin carga con >75 años' :
-      v.edad <= 75 ? '<b>clopidogrel 300 mg VO</b> (≤75 años)' : '<b>clopidogrel 75 mg VO sin dosis de carga</b> (>75 años)';
+    const clopi = v => !hay(v.edad) ? 'clopidogrel 300 mg VO con &lt;75 años o 75 mg sin carga con ≥75 años' :
+      v.edad < 75 ? '<b>clopidogrel 300 mg VO</b> (&lt;75 años)' : '<b>clopidogrel 75 mg VO sin dosis de carga</b> (≥75 años)';
     const enox = v => {
       if (!hay(v.peso) || !hay(v.edad)) return 'ENOXAPARINA: &lt;75 años 30 mg IV en bolo y a los 15 min 1 mg/kg SC cada 12 h (máx. 100 mg en las 2 primeras dosis) · ≥75 años sin bolo, 0,75 mg/kg SC cada 12 h (máx. 75 mg en las 2 primeras) · ClCr &lt;30: 1 mg/kg SC cada 24 h. ' + (hay(v.peso) ? 'Introduce la edad.' : faltaPeso);
       const r = Math.round;
@@ -1276,7 +1278,7 @@ window.PROTOCOLS = [
         ecg: {
           t: 'Primer contacto', show: 'Dolor torácico sugestivo de SCA (valorar SCA sin dolor en mujeres, diabéticos y ancianos): <b>ECG de 12 derivaciones en &lt;10 min</b>.',
           q: '¿Cumple criterios ECG de activación del Codi IAM?',
-          help: 'Elevación nueva del ST en el punto J en 2 derivaciones contiguas (≥1 mm; en V2–V3 ≥2 mm hombres >40 a, ≥2,5 mm hombres &lt;40 a, ≥1,5 mm mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación en aVR · elevación >0,5 mm en V7–V9 con descenso en V1–V3 · elevación en derivaciones derechas · BRIHH o BRDHH nuevo (Sgarbossa-Smith), patrón de Winter o marcapasos con BRIHH. Equivalentes OMI: botón «Ver patrones IAM nuevos».',
+          help: 'Elevación nueva del ST en el punto J en 2 derivaciones contiguas (≥1 mm; en V2–V3 ≥2 mm hombres ≥40 a, ≥2,5 mm hombres &lt;40 a, ≥1,5 mm mujeres) · depresión del ST ≥1 mm en ≥8 derivaciones + elevación en aVR · elevación >0,5 mm en V7–V9 con descenso en V1–V3 · elevación en derivaciones derechas · BRIHH o BRDHH nuevo (Sgarbossa-Smith), patrón de Winter o marcapasos con BRIHH. Equivalentes OMI: botón «Ver patrones IAM nuevos».',
           opts: [{ l: 'Sí, cumple criterios', go: 'activar', sug: v => E().crit(v).c.length > 0 }, { l: 'No', go: 'scasest', sug: v => !!E().crit(v).no }]
         },
         scasest: {
@@ -1364,7 +1366,7 @@ window.PROTOCOLS = [
           opts: [
             { l: 'Dudas diagnósticas, hemorragia activa grave, no puede tomar VO o ya con doble antiagregación', go: 'sa_no', sug: v => (E().sa(v) || {}).go === 'sa_no' },
             { l: 'No se puede obtener información o alto riesgo hemorrágico', go: 'sa_clopi', sug: v => (E().sa(v) || {}).go === 'sa_clopi' },
-            { l: 'Ictus o AIT previo, >75 años o &lt;60 kg', go: 'sa_tica', sug: v => (E().sa(v) || {}).go === 'sa_tica' },
+            { l: 'Ictus o AIT previo, ≥75 años o &lt;60 kg', go: 'sa_tica', sug: v => (E().sa(v) || {}).go === 'sa_tica' },
             { l: 'Ninguna de las anteriores', go: 'sa_pras', sug: v => (E().sa(v) || {}).go === 'sa_pras' }
           ]
         },
@@ -1386,7 +1388,7 @@ window.PROTOCOLS = [
           show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
             '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
             '<b>Anticoagulación</b> (hasta la revascularización o el alta, máx. 8 días): ' + enox(v) + '<br>' + hnf(v) + '<br>' +
-            'Traslado inmediato a un centro con ICP.<br><span class="pe-nota">Fuentes de la dosis: ACC/AHA 2025 y ESC 2023 (media dosis ≥75 años, STREAM-2); SEM v.03 2023 «mitad de dosis si >75 años»: el corte correcto es ≥75.</span>',
+            'Traslado inmediato a un centro con ICP.<br><span class="pe-nota">Fuentes de la dosis: ACC/AHA 2025 y ESC 2023 (media dosis ≥75 años, STREAM-2); SEM v.03 2023 «mitad de dosis si >75 años»: se usa ≥75 en todo el código (decisión del usuario).</span>',
           q: 'A los 60–90 min de la lisis: ¿el ST baja ≥50 %, cede el dolor y está estable?',
           opts: [{ l: 'Sí: lisis eficaz', go: 'fibok', sug: v => v.lisis === 1 }, { l: 'No, o inestabilidad hemodinámica o eléctrica', go: 'rescate', sug: v => v.lisis === 2 }]
         },
@@ -1442,10 +1444,10 @@ window.PROTOCOLS = [
   {type:'info', text:'Ventana individualizable entre 90 y 120 min según el caso'},
   {type:'action', text:'Tratamiento inicial: O₂ solo si SpO₂<90%. Analgesia: fentanilo 50-75 mcg IV c/5-10min o cloruro mórfico 4-8 mg IV (+2 mg c/5-15min, máx 15-20mg). AAS 150-300 mg VO masticada (450 mg IV acetilsalicilato de lisina si no puede VO). Heparina sódica 70 UI/kg IV bolus si angioplastia primaria'},
   {type:'info', text:'Nitroglicerina (SL 0,4 mg o IV 10-60 mcg/kg/h): NO administrar si TAS<90, FC<50, sospecha de IAM de VD o inhibidores de fosfodiesterasa en las 24h previas, ni como prueba diagnóstica del dolor torácico'},
-  {type:'info', text:'2º antiagregante (SCAEST con angioplastia primaria): dudas diagnósticas/hemorragia activa grave/no puede VO/doble antiagregación previa → ninguno · imposibilidad de obtener información o alto riesgo hemorrágico → clopidogrel 600 mg VO · ictus/AIT previo, >75a o <60kg → ticagrelor 180 mg VO · resto → prasugrel 60 mg VO'},
+  {type:'info', text:'2º antiagregante (SCAEST con angioplastia primaria): dudas diagnósticas/hemorragia activa grave/no puede VO/doble antiagregación previa → ninguno · imposibilidad de obtener información o alto riesgo hemorrágico → clopidogrel 600 mg VO · ictus/AIT previo, ≥75a o <60kg → ticagrelor 180 mg VO (SEM: >75; se usa ≥75) · resto → prasugrel 60 mg VO'},
   {type:'action', text:'FIBRINÓLISIS — tenecteplasa en bolo IV único en 5–10 s según el peso: <60 kg 30 mg (6 ml) · 60–69 kg 35 mg (7 ml) · 70–79 kg 40 mg (8 ml) · 80–89 kg 45 mg (9 ml) · ≥90 kg 50 mg (10 ml). Con ≥75 AÑOS, MEDIA DOSIS: 15 · 17,5 · 20 · 22,5 · 25 mg. Es el doble que la dosis del ictus: no confundirlas. Incompatible con glucosa (vía con SF 0,9 %). Ver Fichas → Tenecteplasa'},
   {type:'info', text:'Dosis de tenecteplasa según la fuente — ACC/AHA 2025: tabla por peso 30–50 mg; media dosis con ≥75 años (STREAM-2) · ESC 2023: misma tabla; media dosis con ≥75 años (IIa B, desde la ESC 2017) · SEM Codi IAM v.03 (2023): «ajustada al peso, mitad de dosis si >75 años». El corte correcto es ≥75: con 75 años cumplidos ya va media dosis'},
-  {type:'action', text:'Antiagregación con la fibrinólisis: AAS 150–300 mg VO (o 450 mg IV de acetilsalicilato de lisina) + clopidogrel 300 mg VO con ≤75 años o 75 mg sin carga con >75 años — NO prasugrel ni ticagrelor (ACC/AHA 2025, ESC 2023; SEM: 300 mg si <75 a, 75 mg si >75 a)'},
+  {type:'action', text:'Antiagregación con la fibrinólisis: AAS 150–300 mg VO (o 450 mg IV de acetilsalicilato de lisina) + clopidogrel 300 mg VO con <75 años o 75 mg sin carga con ≥75 años — NO prasugrel ni ticagrelor (ACC/AHA 2025, ESC 2023; SEM: 300 mg si <75 a, 75 mg si >75 a; se usa ≥75 en todo el código)'},
   {type:'action', text:'Anticoagulación con la fibrinólisis — ENOXAPARINA: <75 años 30 mg IV en bolo y a los 15 min 1 mg/kg SC cada 12 h (máx. 100 mg en las 2 primeras dosis) · ≥75 años sin bolo, 0,75 mg/kg SC cada 12 h (máx. 75 mg en las 2 primeras) · ClCr <30: 1 mg/kg SC cada 24 h. Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa. Hasta la revascularización o el alta (máx. 8 días) (ACC/AHA 2025, ESC 2023; el SEM no la detalla)'},
   {type:'info', text:'Después de la lisis: traslado inmediato a un centro con ICP. A los 60–90 min, si el ST no baja ≥50 %, persiste el dolor o hay inestabilidad hemodinámica o eléctrica → coronariografía inmediata e ICP DE RESCATE. Si la lisis es eficaz → coronariografía en 2–24 h (ACC/AHA 2025, ESC 2023)'},
   {type:'info', text:'Fibrinólisis — Contraindicaciones absolutas: hemorragia cerebral previa o AVC de causa desconocida, AVC isquémico <6 meses, neoplasia/traumatismo del SNC, cirugía o trauma <1 mes, sospecha de disección aórtica, sangrado activo o gastrointestinal <1 mes, punciones no compresibles recientes'},
@@ -2166,8 +2168,15 @@ window.PROTOCOLS = [
   folleto:'codigos/C04._Codi_sèpsia.pdf',
   /* Evaluador: los datos del paciente se introducen una sola vez (también el peso y las constantes que antes
      estaban en el flujograma). Todo sale del folleto C04 (GdT Sèpsia, Junta Clínica SEM, enero 2021) y de los
-     nodos del flujograma de abajo, que usan estas mismas funciones para sugerir las opciones. Sin qSOFA, SOFA,
-     lactato ni antibiótico concreto: el folleto no los usa. */
+     nodos del flujograma de abajo, que usan estas mismas funciones para sugerir las opciones.
+     Bloque hospitalario (decisión del usuario, nov 2026; el folleto prehospitalario no lo trae):
+     SOFA (mismos ítems y cortes que SCALES 'sofa': Vincent 1996, PMID 8844239; Sepsis-3, Singer 2016,
+     PMID 26903338), lactato y shock séptico (Sepsis-3; SSC 2026, doi 10.1007/s00134-026-08361-1) y
+     antibiótico empírico por foco, cada pauta con su guía (informe verificado en scratchpad sepsis_atb.md):
+     IDSA/ATS 2019 (PMID 31573350) y ERS 2023 (PMID 37012484) neumonía · EAU 2026 urinaria · IDSA/SIS 2010
+     (PMID 20034345) y WSES 2017 (PMID 28702076) abdominal · IDSA 2014 (PMID 24973422) y WSES 2018
+     (PMID 30564282) piel · ESCMID 2016 (PMID 27062097) meningitis · IDSA 2009 (PMID 19489710) catéter ·
+     SSC 2021 (PMID 34599691) y Código Sepsis 2016 (Ministerio de Sanidad). Sin pauta verificada → se dice. */
   eval:(() => {
     const hay = x => !isNaN(x) && x > 0;
     const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
@@ -2220,6 +2229,89 @@ window.PROTOCOLS = [
       return r;
     };
     const ml = (dosis, peso) => f(Math.round(dosis * peso * 60 / 160 * 10) / 10);
+    const sofa = v => {
+      const p = [], falta = [];
+      const fio = hay(v.fio2) ? (v.fio2 > 1 ? v.fio2 / 100 : v.fio2) : NaN;
+      if (hay(v.pao2) && hay(fio)) {
+        const pf = v.pao2 / fio;
+        let r = pf < 100 ? 4 : pf < 200 ? 3 : pf < 300 ? 2 : pf < 400 ? 1 : 0;
+        if (r > 2 && !v.vm) r = 2;
+        p.push(['Respiratorio (PaO₂/FiO₂ ' + Math.round(pf) + ')', r]);
+      } else { p.push(['Respiratorio', 0]); falta.push('PaO₂/FiO₂'); }
+      if (hay(v.plaq)) p.push(['Plaquetas ' + v.plaq, v.plaq < 20 ? 4 : v.plaq < 50 ? 3 : v.plaq < 100 ? 2 : v.plaq < 150 ? 1 : 0]); else { p.push(['Plaquetas', 0]); falta.push('plaquetas'); }
+      if (hay(v.bili)) p.push(['Bilirrubina ' + f(v.bili), v.bili >= 12 ? 4 : v.bili >= 6 ? 3 : v.bili >= 2 ? 2 : v.bili >= 1.2 ? 1 : 0]); else { p.push(['Bilirrubina', 0]); falta.push('bilirrubina'); }
+      const t = tam(v);
+      if (v.vaso > 0) p.push(['Cardiovascular (vasoactivos)', v.vaso]);
+      else if (t !== null) p.push(['Cardiovascular (TAM ' + t + ')', t < 70 ? 1 : 0]);
+      else { p.push(['Cardiovascular', 0]); falta.push('TAS/TAD'); }
+      if (hay(v.gcs) && v.gcs <= 15) p.push(['Glasgow ' + v.gcs, v.gcs < 6 ? 4 : v.gcs <= 9 ? 3 : v.gcs <= 12 ? 2 : v.gcs <= 14 ? 1 : 0]); else { p.push(['Glasgow', 0]); falta.push('Glasgow'); }
+      if (hay(v.cr) || hay(v.diur)) {
+        const rc = hay(v.cr) ? (v.cr >= 5 ? 4 : v.cr >= 3.5 ? 3 : v.cr >= 2 ? 2 : v.cr >= 1.2 ? 1 : 0) : 0;
+        const rd = hay(v.diur) ? (v.diur < 200 ? 4 : v.diur < 500 ? 3 : 0) : 0;
+        p.push(['Renal (' + [hay(v.cr) ? 'creatinina ' + f(v.cr) : '', hay(v.diur) ? 'diuresis ' + v.diur + ' mL/24 h' : ''].filter(Boolean).join(', ') + ')', Math.max(rc, rd)]);
+      } else { p.push(['Renal', 0]); falta.push('creatinina o diuresis'); }
+      return { total: p.reduce((a, x) => a + x[1], 0), p, falta, datos: falta.length < 6 };
+    };
+    /* Antibiótico empírico por foco. Solo pautas verificadas en las guías de la cabecera; donde no hay
+       pauta verificada (foco desconocido, alergia grave en varios focos) se dice y se remite a PROA/infecciosas. */
+    const atb = (v, pesoOk, shock) => {
+      const kg = (mgkg, max) => pesoOk ? ' (<b>' + Math.round(Math.min(mgkg * v.peso, max || Infinity)) + ' mg</b>)' : '';
+      const vanco = 'vancomicina 15 mg/kg/12 h IV' + kg(15) + ', ajustar por niveles';
+      const sinAlerg = '<b>Alergia grave a betalactámicos:</b> las guías revisadas no dan pauta para este foco → consultar con infecciosas/PROA.';
+      const L = [];
+      const F = ['', 'neumonía comunitaria grave', 'urinario', 'intraabdominal', 'piel y partes blandas', 'meningitis bacteriana', 'catéter vascular', 'desconocido'][v.foco];
+      if (v.foco === 1) {
+        L.push(v.rPseu ? '<b>Piperacilina-tazobactam 4,5 g/6 h IV</b> (alternativas: cefepima 2 g/8 h o meropenem 1 g/8 h) <b>+ azitromicina 500 mg/24 h IV</b> (riesgo de <i>Pseudomonas</i>; IDSA/ATS 2019).'
+          : '<b>Ceftriaxona 1–2 g/24 h IV + azitromicina 500 mg/24 h IV</b> (IDSA/ATS 2019; la ERS 2023 prefiere el macrólido a la quinolona). Alternativa al macrólido: levofloxacino 750 mg/24 h.');
+        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> o linezolid 600 mg/12 h (riesgo de SARM; IDSA/ATS 2019). Cultivo o PCR nasal para desescalar.');
+        if (v.rBlee) L.push('Riesgo de BLEE: las guías de neumonía no lo tratan; SSC 2026: cubrir un multirresistente solo si el riesgo de ese germen es alto (Rec 25).');
+        if (shock) L.push('<b>Shock:</b> la ERS 2023 indica corticoide: metilprednisolona 0,5 mg/kg/12 h × 5 días' + kg(0.5) + ' (no en neumonía viral, diabetes mal controlada ni corticoterapia previa). La IDSA/ATS 2019 no lo recomienda de rutina.');
+        if (v.alerg) L.push(sinAlerg);
+        L.push('<span class="pe-nota">NAC grave (IDSA/ATS): 1 criterio mayor (shock con vasopresor o ventilación mecánica) o ≥3 menores (FR ≥30, PaO₂/FiO₂ ≤250, multilobar, confusión, BUN ≥20, leucocitos &lt;4.000, plaquetas &lt;100.000, T &lt;36 °C, hipotensión que requiere fluidos agresivos).</span>');
+      } else if (v.foco === 2) {
+        L.push(v.rBlee || shock || v.rPseu ? '<b>Meropenem 1 g/8 h IV</b> (' + [v.rBlee ? 'riesgo de BLEE' : '', v.rPseu ? 'riesgo de <i>Pseudomonas</i>' : '', shock ? 'paciente crítico' : ''].filter(Boolean).join(', ') + '; EAU 2026: en la infección urinaria sistémica del crítico u obstruido, carbapenémico para cubrir BLEE y <i>Pseudomonas</i>).'
+          : '<b>Ceftriaxona 2 g/24 h IV</b> o cefotaxima 2 g/8 h IV (EAU 2026, 1.ª línea). <span class="pe-nota">Discrepancia: la EAU 2026 justifica cubrir BLEE ante signos de urosepsis (→ meropenem 1 g/8 h); la SSC 2026 sugiere cubrir multirresistentes solo con riesgo alto. Decidir según la prevalencia local de BLEE.</span>');
+        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> si se sospecha SARM (EAU 2026, sin dosis; dosis del Código Sepsis 2016: 15–20 mg/kg/8–12 h).');
+        L.push('<b>Control del foco:</b> descartar obstrucción (ecografía) y drenarla precozmente, idealmente ≤6 h (SSC 2026 Rec 24).');
+        if (v.alerg) L.push('<b>Alergia grave a betalactámicos:</b> no hay pauta de alergia verificada. La EAU 2026 incluye aminoglucósidos en 2.ª línea: amikacina 15–20 mg/kg/24 h' + kg(20) + ' (Código Sepsis 2016; la EAU da 25–30) o gentamicina 5–7 mg/kg/24 h. Consultar con infecciosas/PROA.');
+      } else if (v.foco === 3) {
+        L.push(v.alerg ? '<b>Alergia grave:</b> aztreonam 1–2 g/6–8 h IV + metronidazol 500 mg/8 h IV + un fármaco activo frente a grampositivos (' + vanco + ') (IDSA/SIS 2010).'
+          : v.rBlee ? '<b>Meropenem 1 g/8 h IV</b> (riesgo de BLEE: carbapenémico; IDSA/SIS 2010, WSES 2017).'
+          : '<b>Piperacilina-tazobactam 4,5 g/6 h IV</b> o <b>meropenem 1 g/8 h IV</b>, o cefepima 2 g/8 h + metronidazol 500 mg/8 h IV (gravedad alta, IDSA/SIS 2010). No ampicilina-sulbactam ni aminoglucósidos de rutina.');
+        if (v.rSarm) L.push('SARM solo con colonización conocida o fracaso con exposición antibiótica intensa: <b>+ vancomicina 15–20 mg/kg/8–12 h</b>' + kg(15) + ' (IDSA/SIS 2010).');
+        if (v.nosoc) L.push('Asociada a cuidados sanitarios: cubrir <i>Pseudomonas</i> (piperacilina-tazobactam o meropenem) y enterococo, sobre todo posoperatoria (IDSA/SIS 2010; WSES 2017). Antifúngico empírico solo en la nosocomial con cirugía reciente o fuga anastomótica (WSES 2017).');
+        L.push('<b>Control del foco</b> quirúrgico o percutáneo, idealmente ≤6 h (SSC 2026 Rec 24). Con control del foco, 4–7 días (Código Sepsis 2016).');
+      } else if (v.foco === 4) {
+        if (v.necro) {
+          L.push('<b>Cirugía urgente</b> (desbridamiento). <b>' + vanco + '</b> o linezolid 600 mg/12 h <b>+ piperacilina-tazobactam 4,5 g/6 h IV</b> o meropenem 1 g/8 h IV <b>+ clindamicina 600–900 mg/8 h IV</b> (IDSA 2014; la WSES 2018 añade siempre clindamicina o linezolid por el efecto antitoxina y prefiere linezolid o daptomicina a la vancomicina si hay insuficiencia renal).');
+          L.push('Estreptococo del grupo A o <i>Clostridium</i> documentado: <b>penicilina 2–4 MU/4–6 h IV + clindamicina 600–900 mg/8 h IV</b> (IDSA 2014).');
+          if (v.alerg) L.push('<b>Alergia grave:</b> clindamicina o metronidazol + aminoglucósido o quinolona, más vancomicina si se sospecha SARM (IDSA 2014, Tabla 4; sin dosis del aminoglucósido ni de la quinolona en la guía).');
+        } else {
+          L.push('Celulitis grave con SIRS o hipotensión: <b>' + vanco + ' + piperacilina-tazobactam 4,5 g/6 h IV</b> o meropenem 1 g/8 h IV (IDSA 2014).');
+          if (v.alerg) L.push('<b>Alergia grave:</b> estreptocócica → vancomicina, linezolid o daptomicina; mixta → clindamicina o metronidazol + aminoglucósido o quinolona + vancomicina si hay SARM (IDSA 2014).');
+          L.push('<span class="pe-nota">Descartar infección necrosante: dolor desproporcionado, crepitación, ampollas, necrosis, progresión rápida → marcar «infección necrosante».</span>');
+        }
+      } else if (v.foco === 5) {
+        L.push('<b>Antibiótico ≤1 h</b>, con hemocultivos; si la punción lumbar se retrasa (p. ej., por TC), dar el empírico antes (ESCMID 2016).');
+        L.push('<b>Dexametasona 10 mg/6 h IV × 4 días</b>, con la primera dosis de antibiótico (o hasta 4 h después); suspender si no es neumococo ni <i>H. influenzae</i> (ESCMID 2016).');
+        L.push('<b>Ceftriaxona 2 g/12 h IV</b>' + (v.menRisk ? ' <b>+ ampicilina 2 g/4 h IV</b> (&gt;50 años o riesgo de <i>Listeria</i>)' : '') + ' (ESCMID 2016). <b>+ vancomicina 10–20 mg/kg/8–12 h IV</b>' + (pesoOk ? ' (<b>' + Math.round(10 * v.peso) + '–' + Math.round(20 * v.peso) + ' mg</b>)' : '') + ' (valle 15–20) <b>o rifampicina 300 mg/12 h</b> si hay riesgo de neumococo con sensibilidad reducida: la ESCMID cita un 20–50 % en España. <span class="pe-nota">La IDSA 2004 pone la vancomicina de rutina.</span>');
+        L.push('TC antes de la punción lumbar si hay focalidad (salvo pares craneales), crisis de inicio reciente, Glasgow &lt;10 o inmunodepresión grave (ESCMID 2016).');
+        if (v.alerg) L.push(sinAlerg);
+      } else if (v.foco === 6) {
+        L.push('<b>' + vanco + '</b> (prevalencia de SARM elevada; daptomicina 6–8 mg/kg/día si la mayoría de los SARM tienen CMI &gt;2; no linezolid empírico) (IDSA 2009).');
+        L.push('<b>+ cobertura de gramnegativos</b> (indicada en sepsis, neutropenia o catéter femoral): <b>cefepima 2 g/8 h IV</b>, meropenem 1 g/8 h IV o piperacilina-tazobactam 4,5 g/6 h IV según la epidemiología local' + (v.rPseu ? '; con colonización o infección reciente por gramnegativo multirresistente, <b>2 fármacos de clases distintas</b> (p. ej., + amikacina 15 mg/kg/24 h' + kg(15) + ')' : '') + ' (IDSA 2009).');
+        L.push('<i>Candida</i> (nutrición parenteral, antibióticos de amplio espectro prolongados, neoplasia hematológica, trasplante, catéter femoral o colonización en varios sitios): equinocandina, p. ej., caspofungina 70 mg de carga y 50 mg/día (IDSA 2009).');
+        L.push('<b>Retirar el catéter</b>: en los de larga duración, si hay sepsis grave, tromboflebitis supurada, endocarditis o bacteriemia &gt;72 h con tratamiento adecuado (IDSA 2009).');
+        if (v.alerg) L.push(sinAlerg);
+      } else if (v.foco === 7) {
+        L.push('<b>No hay pauta concreta verificada</b> para el foco desconocido: la SSC 2026 deja la elección fuera de su alcance y el Código Sepsis 2016 no trae tablas por foco. Decidir con la guía local/PROA.');
+        L.push('Principios (SSC 2026): buscar rápido un foco que requiera control urgente (Rec 23); cubrir multirresistentes solo con riesgo alto de ese germen (Rec 25–26); anaerobios solo si el foco puede ser abdominal, ginecológico profundo, necrosante, de cabeza y cuello o del SNC (Rec 28–29); no dar antifúngico empírico de rutina (Rec 27).' +
+          (v.rPseu ? ' Con riesgo alto de gramnegativo multirresistente, la SSC 2021 sugiere 2 fármacos frente a gramnegativos (Rec 19), y el Código Sepsis 2016 la combinación betalactámico + aminoglucósido o quinolona para <i>Pseudomonas</i>/<i>Acinetobacter</i>.' : '') +
+          (v.rSarm ? ' Con riesgo alto de SARM, cubrirlo (SSC 2021 Rec 17): ' + vanco + '.' : ''));
+      }
+      L.push('<b>Siempre:</b> hemocultivos antes; antibiótico ' + (shock ? '<b>≤1 h</b> (shock)' : '≤1 h si la sepsis es probable o hay shock; ≤3 h si solo es posible y persiste la sospecha') + ' (SSC 2026 Rec 16–18). Betalactámicos en <b>infusión prolongada tras una dosis de carga</b> (Rec 33). Desescalar con los cultivos, también si son negativos (Rec 36–37). <span class="pe-nota">Dosis de adulto con función renal normal: ajustar al FG.</span>' + (hay(v.clcr) ? ' <b>ClCr ' + v.clcr + ' mL/min: comprobar el ajuste renal de cada antibiótico.</b>' : ''));
+      return {t:'Tratamiento antibiótico empírico: ' + F, c:'', h:L.map(x => '• ' + x).join('<br>')};
+    };
     const items = [
       {t:'h', l:'Constantes (NEWS2 y riesgo vital)'},
       {k:'peso', t:'num', l:'Peso real', u:'kg'},
@@ -2245,12 +2337,36 @@ window.PROTOCOLS = [
       {k:'ip', t:'num', l:'Índice de perfusión', u:'IP'},
       {k:'perif', t:'chk', l:'Mala perfusión periférica (relleno capilar lento, piel moteada)'},
       {k:'eva', t:'num', l:'Dolor EVA (0–10)', u:'0–10'},
-      {k:'glu', t:'num', l:'Glucemia capilar', u:'mg/dl'}
+      {k:'glu', t:'num', l:'Glucemia capilar', u:'mg/dl'},
+      {t:'h', l:'Hospital · SOFA (Sepsis-3): peor valor de las últimas 24 h; lo que falte cuenta 0'},
+      {k:'pao2', t:'num', l:'PaO₂', u:'mmHg'},
+      {k:'fio2', t:'num', l:'FiO₂ (aire = 21)', u:'%'},
+      {k:'vm', t:'chk', l:'Con soporte ventilatorio (VMNI o ventilación mecánica): necesario para 3–4 puntos respiratorios'},
+      {k:'plaq', t:'num', l:'Plaquetas', u:'×10³/µL'},
+      {k:'bili', t:'num', l:'Bilirrubina', u:'mg/dL'},
+      {k:'gcs', t:'num', l:'Glasgow', u:'3–15'},
+      {k:'cr', t:'num', l:'Creatinina', u:'mg/dL'},
+      {k:'clcr', t:'num', l:'ClCr por Cockcroft-Gault (ajuste de antibióticos)', u:'mL/min'},
+      {k:'diur', t:'num', l:'Diuresis (si se conoce)', u:'mL/24 h'},
+      {k:'vaso', t:'sel', l:'Fármacos vasoactivos (µg/kg/min)', o:[['Ninguno',0],['Dopamina ≤5 o dobutamina (cualquier dosis)',2],['Dopamina &gt;5 o noradrenalina/adrenalina ≤0,1',3],['Dopamina &gt;15 o noradrenalina/adrenalina &gt;0,1',4]]},
+      {k:'sofaBase', t:'num', l:'SOFA basal (solo si hay disfunción orgánica crónica conocida; vacío = 0)', u:'puntos'},
+      {t:'h', l:'Hospital · lactato y shock'},
+      {k:'lact', t:'num', l:'Lactato', u:'mmol/L'},
+      {k:'vasoNec', t:'chk', l:'Necesita vasopresor para mantener TAM ≥65 mmHg pese a una reanimación con fluidos adecuada'},
+      {t:'h', l:'Hospital · antibiótico empírico'},
+      {k:'foco', t:'sel', l:'Foco sospechado', o:[['Sin indicar',0],['Respiratorio: neumonía comunitaria grave',1],['Urinario',2],['Intraabdominal',3],['Piel y partes blandas',4],['Meningitis bacteriana',5],['Catéter vascular',6],['Desconocido',7]]},
+      {k:'necro', t:'chk', l:'Piel: infección necrosante (fascitis) sospechada'},
+      {k:'menRisk', t:'chk', l:'Meningitis: &gt;50 años o riesgo de <i>Listeria</i> (diabetes, inmunosupresores, cáncer, inmunodepresión)'},
+      {k:'alerg', t:'chk', l:'Alergia grave a betalactámicos (anafilaxia o reacción cutánea grave)'},
+      {k:'rPseu', t:'chk', l:'Riesgo de <i>Pseudomonas</i>/gramnegativo MDR: aislamiento o colonización previa (último año), antibiótico de amplio espectro o IV con ingreso en los últimos 90 días'},
+      {k:'rBlee', t:'chk', l:'Riesgo de BLEE: antibióticos en los últimos 90 días (sobre todo cefalosporinas de 3.ª o quinolonas) o colonización por BLEE'},
+      {k:'rSarm', t:'chk', l:'Riesgo de SARM: SARM o colonización previa, antibiótico IV reciente, infecciones cutáneas recurrentes, dispositivos invasivos, hemodiálisis o ingresos recientes'},
+      {k:'nosoc', t:'chk', l:'Infección nosocomial o asociada a cuidados sanitarios'}
     ];
     const calc = function (v) {
-      const SEL = ['cons', 'oxi'];
+      const SEL = ['cons', 'oxi', 'vaso', 'foco'];
       if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && !isNaN(v[k]) && !(SEL.includes(k) && v[k] === 0))))
-        return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, consciencia, oxígeno y sospecha de infección: el NEWS2, el riesgo vital, la activación del Codi Sèpsia, la hipoperfusión y los volúmenes se calculan al momento.'}];
+        return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, consciencia, oxígeno y sospecha de infección: el NEWS2, el riesgo vital, la activación del Codi Sèpsia, la hipoperfusión y los volúmenes se calculan al momento. En el hospital, además, el SOFA, el lactato y el antibiótico empírico según el foco.'}];
       const out = [];
       const n = news(v), rv = vital(v), hp = hipo(v), t = tam(v), is = ishock(v);
       const completo = !n.falta.length, n7 = n.total >= 7;
@@ -2285,6 +2401,40 @@ window.PROTOCOLS = [
         h:(hemo ? '<b>' + hemo + '.</b> ' : '') + (hp.length ? '<b>Criterios:</b> ' + hp.join(' · ') + '.' : '') +
           '<br><span class="pe-nota">Criterios del folleto: EtCO₂ &lt;25 mmHg · índice de perfusión &lt;1,4 · índice de shock (FC/TAS) >0,8 · mala perfusión periférica; objetivo TAM 65–70 mmHg.</span>'});
 
+      /* 4b. SOFA (SCALES 'sofa', Vincent 1996): respiratorio PaO₂/FiO₂ ≥400 0 · &lt;400 1 · &lt;300 2 ·
+         &lt;200 con soporte 3 · &lt;100 con soporte 4 (sin soporte, máximo 2) · plaquetas ≥150 0 · &lt;150 1 ·
+         &lt;100 2 · &lt;50 3 · &lt;20 4 · bilirrubina &lt;1,2 0 · 1,2–1,9 1 · 2,0–5,9 2 · 6,0–11,9 3 · ≥12 4 ·
+         cardiovascular PAM ≥70 0 · &lt;70 1 · vasoactivos 2–4 · Glasgow 15 0 · 13–14 1 · 10–12 2 · 6–9 3 · &lt;6 4 ·
+         renal creatinina &lt;1,2 0 · 1,2–1,9 1 · 2,0–3,4 2 · 3,5–4,9 o diuresis &lt;500 3 · ≥5 o diuresis &lt;200 4.
+         Sepsis-3: infección + aumento del SOFA ≥2 sobre el basal (0 si no hay disfunción previa conocida). */
+      const so = sofa(v);
+      if (so.datos) {
+        const delta = so.total - (hay(v.sofaBase) ? v.sofaBase : 0);
+        const sep = (v.infec || v.frInf) && delta >= 2;
+        out.push({t:'SOFA ' + so.total + (so.falta.length ? ' (incompleto)' : '') + (sep ? ': SEPSIS (Sepsis-3)' : delta >= 2 ? ': disfunción orgánica (ΔSOFA ≥2)' : ''),
+          c:so.total > 11 ? 'high' : delta >= 2 ? 'mid' : 'low',
+          h:so.p.map(x => x[0] + ' ' + x[1]).join(' · ') +
+            (so.falta.length ? '<br><b>Faltan (cuentan 0):</b> ' + so.falta.join(', ') + '.' : '') +
+            '<br>ΔSOFA ' + delta + (hay(v.sofaBase) ? ' (basal ' + v.sofaBase + ')' : ' (basal 0)') + '. ' +
+            (sep ? 'Infección + ΔSOFA ≥2 = <b>sepsis</b> (mortalidad hospitalaria &gt;10 %, Sepsis-3).' : delta >= 2 ? 'ΔSOFA ≥2: con infección sería sepsis (marca la sospecha de infección arriba).' : 'ΔSOFA &lt;2: sin disfunción orgánica por SOFA con estos datos.') +
+            (so.total > 11 ? ' SOFA &gt;11: mortalidad &gt;80–90 % (Ferreira 2001).' : '') +
+            '<br><span class="pe-nota">SOFA original (el de Sepsis-3 y de la escala de la app). El SOFA-2 (JAMA 2025, PMID 41159833) cambia variables y cortes; no se usa aquí.</span>'});
+      }
+      /* 4c. Lactato y shock séptico: Sepsis-3 = vasopresor para TAM ≥65 + lactato &gt;2 mmol/L tras fluidos
+         adecuados. SSC 2026: medir lactato (Rec 8), seriado para guiar la reanimación sin perseguir su
+         normalización (Rec 51); ≥4 «umbral histórico» para fluidos, &gt;2 a &lt;4 considerarlos; ≥30 mL/kg de
+         cristaloide en 3 h si hay hipoperfusión o shock (Rec 10); TAM 65 (Rec 13), 60–65 en ≥65 años (Rec 14). */
+      if (hay(v.lact) || v.vasoNec) {
+        const shock = v.vasoNec && hay(v.lact) && v.lact > 2;
+        const l = hay(v.lact) ? v.lact : NaN;
+        out.push({t:shock ? 'SHOCK SÉPTICO (Sepsis-3): lactato ' + f(l) + ' mmol/L con vasopresor' : hay(l) ? 'Lactato ' + f(l) + ' mmol/L' + (l >= 4 ? ': ≥4' : l > 2 ? ': &gt;2' : '') : 'Vasopresor necesario: falta el lactato',
+          c:shock || l >= 4 ? 'high' : l > 2 ? 'mid' : v.vasoNec ? 'high' : 'low',
+          h:(shock ? '<b>Vasopresor para TAM ≥65 + lactato &gt;2 mmol/L tras fluidos adecuados = shock séptico</b> (mortalidad hospitalaria &gt;40 %, Sepsis-3). Antibiótico ≤1 h (SSC 2026 Rec 16).<br>' :
+              v.vasoNec ? 'Con vasopresor y lactato ' + (hay(l) ? '≤2 mmol/L no cumple la definición Sepsis-3 de shock séptico (requiere lactato &gt;2), pero es una sepsis con hipotensión que requiere vasopresor.' : 'sin medir: <b>medir lactato</b> (definición Sepsis-3: lactato &gt;2).') + '<br>' : '') +
+            (hay(l) ? (l >= 4 ? 'Lactato ≥4: umbral histórico para la reanimación con fluidos (SSC 2026).' : l > 2 ? 'Lactato &gt;2 a &lt;4: considerar fluidos (SSC 2026).' : 'Lactato ≤2.') + ' Repetirlo para guiar la reanimación, sin perseguir su normalización (SSC 2026 Rec 51); añadir el relleno capilar (Rec 52).<br>' : '') +
+            ((hay(l) && l > 2) || v.vasoNec || hp.length ? 'Si hay hipoperfusión o shock: <b>cristaloide ≥30 mL/kg en las primeras 3 h</b>' + (pesoOk ? ' (<b>' + Math.round(v.peso * 30) + ' mL</b> con ' + f(v.peso) + ' kg)' : '') + ', reevaluando tras cada bolo (SSC 2026 Rec 10, condicional). Objetivo TAM 65 mmHg (60–65 en ≥65 años; Rec 13–14).' : '')});
+      }
+
       /* 5. Tratamiento (folleto) */
       const tx = [];
       if (grave && inf) tx.push('<b>Primera hora:</b> hemocultivos y <b>antibiótico en &lt;1 h</b> · control del foco (drenaje precoz, &lt;12 h) · monitorización de FR, FC, TAM, relleno capilar, EtCO₂, índice de perfusión e índice de shock.');
@@ -2297,18 +2447,24 @@ window.PROTOCOLS = [
       const fuera = [t !== null && t < 65 ? 'TAM ' + t : '', hay(v.etco2) && v.etco2 <= 25 ? 'EtCO₂ ' + v.etco2 : '', hay(v.spo2) && v.spo2 <= 90 ? 'SpO₂ ' + v.spo2 + ' %' : ''].filter(Boolean);
       tx.push('<b>Objetivos:</b> TAM 65–70 mmHg · EtCO₂ >25 (35–45) mmHg · SpO₂ >90 % · glucemia &lt;180 mg/dl.' + (fuera.length ? ' <b>Fuera de objetivo:</b> ' + fuera.join(' · ') + '.' : ''));
       out.push({t:'Tratamiento (folleto Codi Sèpsia)', c:'', h:tx.map(x => '• ' + x).join('<br>') +
-        '<br><span class="pe-nota">El folleto no da antibiótico concreto ni dosis: según la guía local del foco.</span>'});
+        '<br><span class="pe-nota">El folleto no da antibiótico concreto ni dosis: el apartado siguiente lo sugiere por foco con las guías.</span>'});
+
+      /* 6. Antibiótico empírico por foco (guías de la cabecera). Dosis de adulto con función renal normal. */
+      if (v.foco > 0) out.push(atb(v, pesoOk, v.vasoNec === true));
 
       /* Resumen de puntuaciones para la historia clínica (final del flujograma y «Copiar resumen») */
       out.resumen = [
         nTit + ' (' + n.p.map(x => x[0] + ' ' + x[1]).join(', ') + ')',
         rv.length ? 'Riesgo vital: ' + rv.join(', ') : 'Riesgo vital: no',
         out[2].t,
-        hemo || hp.length ? (hp.length ? 'Hipoperfusión: ' + hp.join(', ') : 'Sin hipoperfusión' + (hemo ? ': ' + hemo : '')) : ''
+        hemo || hp.length ? (hp.length ? 'Hipoperfusión: ' + hp.join(', ') : 'Sin hipoperfusión' + (hemo ? ': ' + hemo : '')) : '',
+        so.datos ? 'SOFA ' + so.total + (so.falta.length ? ' (incompleto: faltan ' + so.falta.join(', ') + ')' : '') + ' · ΔSOFA ' + (so.total - (hay(v.sofaBase) ? v.sofaBase : 0)) + ((v.infec || v.frInf) && so.total - (hay(v.sofaBase) ? v.sofaBase : 0) >= 2 ? ' → sepsis (Sepsis-3)' : '') : '',
+        hay(v.lact) ? 'Lactato ' + f(v.lact) + ' mmol/L' + (v.vasoNec && v.lact > 2 ? ' · shock séptico (Sepsis-3)' : '') : v.vasoNec ? 'Vasopresor necesario; lactato sin medir' : '',
+        v.foco > 0 ? 'Foco sospechado: ' + ['', 'respiratorio (NAC grave)', 'urinario', 'intraabdominal', 'piel y partes blandas' + (v.necro ? ' (necrosante)' : ''), 'meningitis', 'catéter vascular', 'desconocido'][v.foco] : ''
       ].filter(Boolean);
       return out;
     };
-    return { items, calc, news, vital, hipo, tam, ishock };
+    return { items, calc, news, vital, hipo, tam, ishock, sofa };
   })(),
   flow:(() => {
     const f = n => n.toLocaleString('es-ES', { maximumFractionDigits: 1 });
@@ -2443,12 +2599,12 @@ window.PROTOCOLS = [
   {type:'info', text:'Objetivos: TA media 65-70 mmHg · EtCO₂ >25 (35-45) · SpO₂ >90% · glucemia <180 mg/dl'},
   {type:'action', text:'Fluidos: descargas de 500 ml de cristaloides balanceados si NEWS≥7 y EtCO₂<25/shock index>0,8 (evitar coloides). Noradrenalina en perfusión continua (máx 1 mcg/kg/min) si no responde a fluidos, objetivo TA media ≥65-70. Analgesia: fentanilo 50 mcg + paracetamol 1g IV si dolor. Insulina rápida 10 UI SC si hiperglucemia, mantener ~180 mg/dl evitando hipoglucemia'},
   {type:'info', text:'Comunicación a CECOS — metodología IDEAS: Identificación del paciente, sospecha Diagnóstica, Estado (escala NEWS), Actuación realizada, alerta/activación del Codi Sèpsia'}
-], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021'},
+], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021 · Hospital: SOFA (Vincent 1996, PMID 8844239) y Sepsis-3 (Singer 2016, PMID 26903338) · SSC 2026 (Intensive Care Med 2026, doi 10.1007/s00134-026-08361-1) y SSC 2021 (PMID 34599691) · antibiótico por foco: IDSA/ATS 2019 (PMID 31573350), ERS/ESICM 2023 (PMID 37012484), EAU 2026, IDSA/SIS 2010 (PMID 20034345), WSES 2017 (PMID 28702076), IDSA 2014 (PMID 24973422), WSES 2018 (PMID 30564282), ESCMID 2016 (PMID 27062097), IDSA 2009 (PMID 19489710), Código Sepsis 2016 (Ministerio de Sanidad)'},
 
 {id:'codi-risc-suicidi', title:'Codi Risc Suïcidi', sub:'Cribado MINI y estratificación del riesgo suicida', badge:'amber', tag:'Urgente', rank:5, codigo:true,
   folleto:'codigos/C05.Codi_risc_suïcidi.pdf',
   /* Evaluador: la tentativa, las respuestas del MINI y los factores de riesgo se marcan una sola vez;
-     el flujograma de abajo usa estos mismos datos (v.tent, v.m1..v.m6) para sugerir las opciones.
+     el flujograma de abajo usa estos mismos datos (v.tent, v.m1..v.m6: 0 sin valorar · 1 sí · 2 no) para sugerir las opciones.
      Preguntas, puntos, cortes, actuación y factores: folleto Codi Risc Suïcidi (SEM, Grup de Treball
      en malalties mentals, v.01 junio 2024). Sin contenido clínico propio fuera del folleto. */
   eval:(() => {
@@ -2474,7 +2630,9 @@ window.PROTOCOLS = [
       ['fArm', 'Acceso a armas, tóxicos u otros medios letales, o situaciones de violencia', 'acceso a medios letales o violencia'],
       ['fFam', 'Antecedentes familiares de 1.er grado de suicidio consumado', 'antecedente familiar de 1.er grado de suicidio consumado']
     ];
-    const pts = v => MINI.reduce((a, m) => a + (v[m[0]] === true ? m[2] : 0), 0);
+    /* Cada pregunta: Sin valorar (0) · Sí (1) · No (2), para no confundir una casilla sin marcar con un «No» (decisión del usuario). */
+    const SNV = [['Sin valorar', 0], ['Sí', 1], ['No', 2]];
+    const pts = v => MINI.reduce((a, m) => a + (v[m[0]] === 1 ? m[2] : 0), 0);
     const ACTIVAR = '• <b>Alerta</b> a la Central de Coordinación Sanitaria del SEM (CECOS) · 061/Salut Respon · 112.<br>' +
       '• Activación de recursos y acompañamiento telefónico continuado.<br>' +
       '• Valoración del estado del paciente y <b>contención</b>.<br>' +
@@ -2484,49 +2642,61 @@ window.PROTOCOLS = [
       '• Información de los dispositivos de la red disponibles: Atención Primaria y Salud Mental.<br>' +
       '• Seguimiento proactivo del 061/Salut Respon.';
     return {
-      MINI, pts,
+      MINI, FR, pts,
       items: [
         {t:'h', l:'Tentativa'},
-        {k:'tent', t:'chk', l:'Tentativa de suicidio (se activa el código directamente, sin el MINI)'},
-        {t:'h', l:'MINI (mini-entrevista neuropsiquiátrica internacional) · durante el último mes… marcar las respuestas «Sí»'},
-        ...MINI.map(m => ({k:m[0], t:'chk', l:m[1] + ' (' + m[2] + (m[2] === 1 ? ' punto)' : ' puntos)')})),
+        {k:'tent', t:'sel', l:'Tentativa de suicidio (se activa el código directamente, sin el MINI)', o:SNV},
+        {t:'h', l:'MINI (mini-entrevista neuropsiquiátrica internacional) · durante el último mes…'},
+        ...MINI.map(m => ({k:m[0], t:'sel', l:m[1] + ' (' + m[2] + (m[2] === 1 ? ' punto)' : ' puntos)'), o:SNV})),
         {t:'h', l:'Factores de riesgo (para la valoración clínica del riesgo MEDIO)'},
-        ...FR.map(f => ({k:f[0], t:'chk', l:f[1]}))
+        ...FR.map(f => ({k:f[0], t:'sel', l:f[1], o:SNV}))
       ],
       calc:function(v){
         const n = pts(v);
-        const si = MINI.filter(m => v[m[0]] === true);
-        const fr = FR.filter(f => v[f[0]] === true);
-        if (!v.tent && !si.length && !fr.length)
-          return [{t:'Introduce los datos del paciente', c:'', h:'Marca si hay tentativa de suicidio y las respuestas «Sí» del MINI: la puntuación, el nivel de riesgo y la actuación del folleto salen solos. Si todas las respuestas del MINI son «No», suma 0 puntos: el folleto no lo clasifica; decide la valoración clínica.'}];
+        const si = MINI.filter(m => v[m[0]] === 1);
+        const fr = FR.filter(f => v[f[0]] === 1);
+        const nv = MINI.filter(m => v[m[0]] !== 1 && v[m[0]] !== 2), frNv = FR.filter(f => v[f[0]] !== 1 && v[f[0]] !== 2);
+        const tent = v.tent === 1;
+        if (v.tent !== 1 && v.tent !== 2 && nv.length === MINI.length && frNv.length === FR.length)
+          return [{t:'Introduce los datos del paciente', c:'', h:'Responde Sí / No a la tentativa y a cada pregunta del MINI (lo que no se pregunte queda «Sin valorar»): la puntuación, el nivel de riesgo y la actuación del folleto salen solos. Si todas las respuestas del MINI son «No», suma 0 puntos: el folleto no lo clasifica; decide la valoración clínica.'}];
         const out = [];
         const nivel = n >= 10 ? 'ALTO' : n >= 6 ? 'MEDIO' : n >= 1 ? 'BAJO' : '';
         const pTxt = n + (n === 1 ? ' punto' : ' puntos');
+        /* Preguntas del MINI sin valorar: la puntuación es un mínimo; con ellas podría llegar a nMax. */
+        const nMax = n + nv.reduce((a, m) => a + m[2], 0);
+        const nivMax = nMax >= 10 ? 'ALTO' : nMax >= 6 ? 'MEDIO' : nMax >= 1 ? 'BAJO' : '';
+        const incompleto = nv.length ? nv.length + (nv.length === 1 ? ' pregunta sin valorar' : ' preguntas sin valorar') : '';
 
         /* 1. MINI: 1–5 puntos riesgo BAJO · 6–9 MEDIO · ≥10 ALTO (folleto) */
-        if (si.length || !v.tent) out.push({t:'MINI ' + pTxt + (nivel ? ': riesgo ' + nivel : ''), c:n >= 10 ? 'high' : n >= 6 ? 'mid' : n >= 1 ? 'low' : '',
-          h:(si.length ? '<b>«Sí» en:</b> ' + si.map(m => m[1] + ' (' + m[2] + ')').join(' · ') + '<br>' : 'Ninguna respuesta «Sí» marcada.<br>') +
+        if (si.length || !tent) out.push({t:'MINI ' + pTxt + (nivel ? ': riesgo ' + nivel : '') + (incompleto ? ' · INCOMPLETO (' + incompleto + ')' : ''), c:n >= 10 ? 'high' : n >= 6 ? 'mid' : n >= 1 ? 'low' : '',
+          h:(si.length ? '<b>«Sí» en:</b> ' + si.map(m => m[1] + ' (' + m[2] + ')').join(' · ') + '<br>' : 'Ninguna respuesta «Sí».<br>') +
+            (incompleto ? '<b>Sin valorar:</b> ' + nv.map(m => m[1] + ' (' + m[2] + ')').join(' · ') + '. La puntuación es un mínimo: con ellas podría llegar a <b>' + nMax + ' puntos' + (nivMax && nivMax !== nivel ? ' (riesgo ' + nivMax + ')' : '') + '</b>.<br>' : '') +
             '1–5 puntos = riesgo BAJO · 6–9 = riesgo MEDIO · ≥10 = riesgo ALTO.' +
-            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '')});
+            (n === 0 && !incompleto ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '')});
 
         /* 2. Actuación según el folleto */
-        if (v.tent || n >= 10) out.push({t:'ACTIVAR CODI RISC SUÏCIDI', c:'high',
-          h:'Motivo: <b>' + [v.tent ? 'tentativa de suicidio' : '', n >= 10 ? 'MINI ' + pTxt + ' (riesgo ALTO)' : ''].filter(Boolean).join(' y ') + '</b>.<br>' + ACTIVAR});
+        if (tent || n >= 10) out.push({t:'ACTIVAR CODI RISC SUÏCIDI', c:'high',
+          h:'Motivo: <b>' + [tent ? 'tentativa de suicidio' : '', n >= 10 ? 'MINI ' + pTxt + ' (riesgo ALTO)' : ''].filter(Boolean).join(' y ') + '</b>.<br>' + ACTIVAR});
         else if (n >= 6) out.push({t:'Riesgo MEDIO: consejo telefónico', c:'mid',
           h:CONSEJO + '<br><b>Excepcionalmente</b>, la valoración clínica de la comorbilidad y de los factores de riesgo puede aconsejar subir el nivel de sospecha a riesgo ALTO y activar el código (pregunta del flujograma).' +
             (fr.length ? '<br><b>Factores de riesgo marcados:</b> ' + fr.map(f => f[2]).join(' · ') + '.' : '')});
         else if (n >= 1) out.push({t:'Riesgo BAJO: consejo telefónico', c:'low', h:CONSEJO});
+        if (!tent && n < 10 && incompleto && nivMax !== nivel) out.push({t:'Completar el MINI antes de decidir', c:'mid',
+          h:'Con las ' + incompleto + ' el riesgo podría llegar a <b>' + nivMax + '</b> (máximo ' + nMax + ' puntos). Pregúntalas antes de cerrar la actuación.'});
 
         /* 3. Factores de riesgo marcados (el folleto los lista para la valoración clínica; no puntúan en el MINI) */
-        if (fr.length) out.push({t:'Factores de riesgo marcados: ' + fr.length, c:'',
-          h:'• ' + fr.map(f => f[1]).join('<br>• ') + '<br><span class="pe-nota">El folleto los recoge para la valoración clínica; no forman parte de la puntuación del MINI.</span>'});
+        if (fr.length || frNv.length < FR.length) out.push({t:'Factores de riesgo presentes: ' + fr.length + (frNv.length ? ' · ' + frNv.length + ' sin valorar' : ''), c:'',
+          h:(fr.length ? '• ' + fr.map(f => f[1]).join('<br>• ') : 'Ningún factor presente entre los valorados.') +
+            (frNv.length ? '<br><b>Sin valorar:</b> ' + frNv.map(f => f[2]).join(' · ') + '.' : '') +
+            '<br><span class="pe-nota">El folleto los recoge para la valoración clínica; no forman parte de la puntuación del MINI.</span>'});
 
         /* Resumen para la historia clínica: sale al final del flujograma y entra en «Copiar resumen».
            La decisión de subir un riesgo MEDIO a ALTO se toma en el flujograma y queda en su recorrido. */
         out.resumen = [
-          v.tent ? 'Tentativa de suicidio' : '',
-          si.length || !v.tent ? 'MINI ' + pTxt + (nivel ? ' (riesgo ' + nivel + ')' : ' (sin clasificar en el folleto)') : '',
-          fr.length ? 'Factores de riesgo: ' + fr.map(f => f[2]).join(', ') : ''
+          tent ? 'Tentativa de suicidio' : v.tent === 2 ? 'Sin tentativa de suicidio' : 'Tentativa de suicidio: sin valorar',
+          si.length || !tent ? 'MINI ' + pTxt + (nivel ? ' (riesgo ' + nivel + ')' : incompleto ? '' : ' (sin clasificar en el folleto)') + (incompleto ? ' · incompleto: ' + incompleto + ', máximo posible ' + nMax : '') : '',
+          fr.length ? 'Factores de riesgo: ' + fr.map(f => f[2]).join(', ') : frNv.length < FR.length ? 'Factores de riesgo: ninguno de los valorados' : '',
+          frNv.length && frNv.length < FR.length ? 'Factores de riesgo sin valorar: ' + frNv.length + ' de ' + FR.length : frNv.length ? 'Factores de riesgo: sin valorar' : ''
         ].filter(Boolean);
         return out;
       }
@@ -2552,16 +2722,18 @@ window.PROTOCOLS = [
         t: 'Sospecha de riesgo de suicidio',
         q: '¿Hay una tentativa de suicidio?',
         help: 'Ante una tentativa se activa el código directamente, sin el MINI. Si no la hay, el MINI se marca en el evaluador de arriba.',
-        opts: [{ l: 'Sí, tentativa de suicidio', go: 'activar', sug: v => v.tent === true }, { l: 'No', go: 'resultado', sug: v => !v.tent && pts(v) > 0 }]
+        opts: [{ l: 'Sí, tentativa de suicidio', go: 'activar', sug: v => v.tent === 1 }, { l: 'No', go: 'resultado', sug: v => v.tent === 2 }]
       },
       resultado: {
         t: 'Resultado del MINI',
         show: v => {
           const n = pts(v);
-          const si = ev().MINI.filter(m => v[m[0]] === true);
+          const si = ev().MINI.filter(m => v[m[0]] === 1), nv = ev().MINI.filter(m => v[m[0]] !== 1 && v[m[0]] !== 2);
           return '<b>MINI = ' + n + ' puntos</b>' + (si.length ? ' (sí en: ' + si.map(m => m[2] + ' p').join(' + ') + ')' : '') + '<br>' +
+            (nv.length ? '<b>Incompleto: ' + nv.length + ' sin valorar</b> (' + nv.map(m => m[2] + ' p').join(', ') + '); la puntuación es un mínimo.<br>' : '') +
             '1–5 puntos = riesgo BAJO · 6–9 = riesgo MEDIO · ≥10 = riesgo ALTO.' +
-            (n === 0 ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica. Las respuestas «Sí» del MINI se marcan en el evaluador de arriba.</span>' : '');
+            (n === 0 && !nv.length ? '<br><span class="pe-nota">0 puntos: el folleto no lo clasifica; decide la valoración clínica.</span>' : '') +
+            (nv.length === ev().MINI.length ? '<br><span class="pe-nota">Las respuestas del MINI se marcan en el evaluador de arriba.</span>' : '');
         },
         q: 'Nivel de riesgo de suicidio',
         opts: [
@@ -2986,6 +3158,7 @@ window.PROTOCOLS = [
       {k:'anafil', t:'chk', l:'Sospecha de anafilaxia (urticaria, angioedema, hipotensión, desencadenante alérgico)'},
       {k:'emb', t:'chk', l:'Embarazo'},
       {k:'peso', t:'num', l:'Peso real (salbutamol IV, ketamina y rocuronio)', u:'kg'},
+      {k:'fg', t:'num', l:'Filtrado glomerular, CKD-EPI (opcional: magnesio y enoxaparina)', u:'mL/min'},
       {t:'h', l:'Gravedad a la llegada (antes de tratar)'},
       {k:'habla', t:'sel', l:'Disnea y habla', o:[['Leve: habla en párrafos',0],['Moderada: habla en frases',1],['Intensa: habla en palabras',2],['Agónica: no puede hablar',3]]},
       {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
@@ -3106,7 +3279,7 @@ window.PROTOCOLS = [
       t.push(nivel === 3 ? '<b>Hidrocortisona 250 mg IV</b> (SEMES).' :
         nivel === 2 ? '<b>Corticoide sistémico en la 1.ª hora: ' + pd + '</b>, dosis matutina; metilprednisolona 40 mg IV si no tolera la VO (la VO es tan eficaz como la IV).' :
         '<b>Corticoide sistémico</b> si no hay respuesta rápida o lleva días empeorando: ' + pd + '.');
-      if (nivel >= 2) t.push((nivel === 3 ? '<b>Ya, sin esperar:</b> ' : '<b>Si no mejora en 1 h</b> (hipoxemia persistente o PEF &lt;60 %): ') + '<b>sulfato de magnesio 2 g IV</b> en 50–100 mL de SSF en 20 min, dosis única (vigilar PA, FR y reflejos; antídoto: gluconato cálcico; evitar o reducir si FG &lt;30). Mg²⁺ nebulizado no recomendado de rutina.');
+      if (nivel >= 2) t.push((nivel === 3 ? '<b>Ya, sin esperar:</b> ' : '<b>Si no mejora en 1 h</b> (hipoxemia persistente o PEF &lt;60 %): ') + '<b>sulfato de magnesio 2 g IV</b> en 50–100 mL de SSF en 20 min, dosis única (vigilar PA, FR y reflejos; antídoto: gluconato cálcico; evitar o reducir si FG &lt;30)' + (has(v.fg) && v.fg > 0 && v.fg < 30 ? ' <b>FG ' + v.fg + ': evitar o reducir el magnesio</b>' : '') + '. Mg²⁺ nebulizado no recomendado de rutina.');
       if (nivel >= 2) t.push('<b>Salbutamol IV solo como rescate en la crisis refractaria</b>, con monitorización y de acuerdo con la UCI de HUV (GINA y ERS no lo recomiendan de rutina; GEMA 5.5 lo reserva a este caso): 200 µg en 30 min → 0,1–0,2 µg/kg/min' + (pesoOk ? ' (' + (v.peso * 0.1).toFixed(0) + '–' + (v.peso * 0.2).toFixed(0) + ' µg/min)' : '') + ', con ECG, K⁺ y lactato.');
       if (nivel === 3) t.push('<b>Preparar la IOT</b> y avisar a la UCI de HUV: operador más experto, tubo ≥8 mm, ketamina 1–2 mg/kg + rocuronio 1–1,2 mg/kg IV' + (pesoOk ? ' (' + Math.round(v.peso) + '–' + Math.round(v.peso * 2) + ' mg y ' + Math.round(v.peso) + '–' + Math.round(v.peso * 1.2) + ' mg con el peso real)' : '') + '; fluidos y vasopresor preparados. VMI: Vt 6–8 mL/kg de peso ideal, FR 10–12, I:E 1:3–1:5, PEEP 0, Pplat &lt;30; hipercapnia permisiva con pH &gt;7,20.');
       else if (nivel === 2) t.push('<b>Soporte:</b> VMNI solo como puente en el box (pauta SEMES: IPAP 8 subiendo, EPAP 4–6, I:E 1:4–1:5; evidencia débil en asma) si persisten FR &gt;25, FC &gt;110, musculatura accesoria o PEF &lt;50 % con PaO₂/FiO₂ &gt;200 y PaCO₂ &lt;60. OAF: sin evidencia sólida, solo puente ante hipoxemia. Nunca retrasar la IOT.');
