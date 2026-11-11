@@ -2172,7 +2172,8 @@ window.PROTOCOLS = [
      Bloque hospitalario (decisión del usuario, nov 2026; el folleto prehospitalario no lo trae):
      SOFA (mismos ítems y cortes que SCALES 'sofa': Vincent 1996, PMID 8844239; Sepsis-3, Singer 2016,
      PMID 26903338), lactato y shock séptico (Sepsis-3; SSC 2026, doi 10.1007/s00134-026-08361-1) y
-     antibiótico empírico por foco, cada pauta con su guía (informe verificado en scratchpad sepsis_atb.md):
+     antibiótico empírico por foco: fuente principal el documento «ab en sepsis» aportado por el usuario (nov 2026:
+     pautas, dosis, ajuste renal y reglas del crítico); lo que no cubre, de estas guías:
      IDSA/ATS 2019 (PMID 31573350) y ERS 2023 (PMID 37012484) neumonía · EAU 2026 urinaria · IDSA/SIS 2010
      (PMID 20034345) y WSES 2017 (PMID 28702076) abdominal · IDSA 2014 (PMID 24973422) y WSES 2018
      (PMID 30564282) piel · ESCMID 2016 (PMID 27062097) meningitis · IDSA 2009 (PMID 19489710) catéter ·
@@ -2252,42 +2253,59 @@ window.PROTOCOLS = [
       } else { p.push(['Renal', 0]); falta.push('creatinina o diuresis'); }
       return { total: p.reduce((a, x) => a + x[1], 0), p, falta, datos: falta.length < 6 };
     };
-    /* Antibiótico empírico por foco. Solo pautas verificadas en las guías de la cabecera; donde no hay
-       pauta verificada (foco desconocido, alergia grave en varios focos) se dice y se remite a PROA/infecciosas. */
+    /* Antibiótico empírico por foco. Fuente principal (decisión del usuario, nov 2026): documento «ab en sepsis»
+       aportado por el usuario (pautas por foco, dosis de adulto con función renal normal, ajuste renal y reglas del
+       crítico). Lo que ese documento no cubre se conserva de las guías de la cabecera: meningitis (ESCMID 2016),
+       alergia grave a betalactámicos, corticoide en NAC con shock (ERS 2023), Candida y retirada del catéter
+       (IDSA 2009), clindamicina en la infección necrosante (IDSA 2014, WSES 2018), principios SSC del foco desconocido.
+       Contrastado con Vera/Perplexity (nov 2026), cambios sobre el documento: BLEE → meropenem en abdominal y desconocido
+       (IDSA AMR Guidance 2024), 2.º antipseudomónico en NAV quinolona antes que amikacina (ATS/IDSA 2016, PMID 27418577),
+       infusión prolongada recomendada (SSC 2026; BLING III, PMID 38864155; consenso 2026, PMID 42598847). */
     const atb = (v, pesoOk, shock) => {
       const kg = (mgkg, max) => pesoOk ? ' (<b>' + Math.round(Math.min(mgkg * v.peso, max || Infinity)) + ' mg</b>)' : '';
-      const vanco = 'vancomicina 15 mg/kg/12 h IV' + kg(15) + ', ajustar por niveles';
+      const kgR = (a, b, max) => pesoOk ? ' (<b>' + Math.round(Math.min(a * v.peso, max || Infinity)) + '–' + Math.round(Math.min(b * v.peso, max || Infinity)) + ' mg</b>)' : '';
+      const vanco = 'vancomicina IV: carga 25–30 mg/kg con peso real, máx. 3 g' + kgR(25, 30, 3000) + ', después 15–20 mg/kg/8–12 h' + kgR(15, 20) + ' ajustada por niveles (AUC/CMI 400–600)';
       const sinAlerg = '<b>Alergia grave a betalactámicos:</b> las guías revisadas no dan pauta para este foco → consultar con infecciosas/PROA.';
+      const mdr = v.rPseu || v.rBlee;
+      const por = a => a.filter(Boolean).join(', ');
       const L = [];
-      const F = ['', 'neumonía comunitaria grave', 'urinario', 'intraabdominal', 'piel y partes blandas', 'meningitis bacteriana', 'catéter vascular', 'desconocido'][v.foco];
+      const F = ['', 'neumonía comunitaria grave', 'urinario', 'intraabdominal o biliar', 'piel y partes blandas', 'meningitis bacteriana', 'catéter vascular o bacteriemia asociada a cuidados sanitarios', 'desconocido', 'neumonía nosocomial o asociada a ventilación'][v.foco];
       if (v.foco === 1) {
-        L.push(v.rPseu ? '<b>Piperacilina-tazobactam 4,5 g/6 h IV</b> (alternativas: cefepima 2 g/8 h o meropenem 1 g/8 h) <b>+ azitromicina 500 mg/24 h IV</b> (riesgo de <i>Pseudomonas</i>; IDSA/ATS 2019).'
-          : '<b>Ceftriaxona 1–2 g/24 h IV + azitromicina 500 mg/24 h IV</b> (IDSA/ATS 2019; la ERS 2023 prefiere el macrólido a la quinolona). Alternativa al macrólido: levofloxacino 750 mg/24 h.');
-        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> o linezolid 600 mg/12 h (riesgo de SARM; IDSA/ATS 2019). Cultivo o PCR nasal para desescalar.');
+        L.push(v.rPseu ? '<b>Cefepima 2 g/8 h IV o piperacilina-tazobactam 4,5 g/6 h IV + azitromicina 500 mg/24 h IV</b> (riesgo de <i>Pseudomonas</i>).'
+          : '<b>Ceftriaxona 2 g/24 h IV</b> o cefotaxima 2 g/6–8 h IV <b>+ azitromicina 500 mg/24 h IV</b>.');
+        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> o linezolid 600 mg/12 h IV (solo con riesgo de SARM). Cultivo o PCR nasal para desescalar.');
         if (v.rBlee) L.push('Riesgo de BLEE: las guías de neumonía no lo tratan; SSC 2026: cubrir un multirresistente solo si el riesgo de ese germen es alto (Rec 25).');
         if (shock) L.push('<b>Shock:</b> la ERS 2023 indica corticoide: metilprednisolona 0,5 mg/kg/12 h × 5 días' + kg(0.5) + ' (no en neumonía viral, diabetes mal controlada ni corticoterapia previa). La IDSA/ATS 2019 no lo recomienda de rutina.');
         if (v.alerg) L.push(sinAlerg);
         L.push('<span class="pe-nota">NAC grave (IDSA/ATS): 1 criterio mayor (shock con vasopresor o ventilación mecánica) o ≥3 menores (FR ≥30, PaO₂/FiO₂ ≤250, multilobar, confusión, BUN ≥20, leucocitos &lt;4.000, plaquetas &lt;100.000, T &lt;36 °C, hipotensión que requiere fluidos agresivos).</span>');
+      } else if (v.foco === 8) {
+        L.push('<b>Cefepima 2 g/8 h IV, piperacilina-tazobactam 4,5 g/6 h IV o meropenem 1 g/8 h IV</b>.');
+        if (shock || mdr) L.push('<b>+ un segundo antipseudomónico</b> (' + por([shock ? 'shock' : '', mdr ? 'alto riesgo de multirresistencia' : '']) + '): <b>ciprofloxacino 400 mg/8–12 h IV o levofloxacino 750 mg/24 h IV</b>; alternativa, amikacina 15–20 mg/kg/24 h IV' + kgR(15, 20) + ' con niveles (la ATS/IDSA 2016 prefiere evitar los aminoglucósidos si hay alternativa).');
+        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> o linezolid 600 mg/12 h IV (riesgo de SARM).');
+        if (v.alerg) L.push(sinAlerg);
       } else if (v.foco === 2) {
-        L.push(v.rBlee || shock || v.rPseu ? '<b>Meropenem 1 g/8 h IV</b> (' + [v.rBlee ? 'riesgo de BLEE' : '', v.rPseu ? 'riesgo de <i>Pseudomonas</i>' : '', shock ? 'paciente crítico' : ''].filter(Boolean).join(', ') + '; EAU 2026: en la infección urinaria sistémica del crítico u obstruido, carbapenémico para cubrir BLEE y <i>Pseudomonas</i>).'
-          : '<b>Ceftriaxona 2 g/24 h IV</b> o cefotaxima 2 g/8 h IV (EAU 2026, 1.ª línea). <span class="pe-nota">Discrepancia: la EAU 2026 justifica cubrir BLEE ante signos de urosepsis (→ meropenem 1 g/8 h); la SSC 2026 sugiere cubrir multirresistentes solo con riesgo alto. Decidir según la prevalencia local de BLEE.</span>');
-        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> si se sospecha SARM (EAU 2026, sin dosis; dosis del Código Sepsis 2016: 15–20 mg/kg/8–12 h).');
+        L.push(v.rBlee ? '<b>Meropenem 1 g/8 h IV</b> (infección o colonización previa por BLEE, exposición antibiótica reciente o resistencia local relevante).'
+          : shock || v.rPseu ? '<b>Cefepima 2 g/8 h IV o piperacilina-tazobactam 4,5 g/6 h IV</b> (' + por([shock ? 'shock' : '', v.rPseu ? 'riesgo de <i>Pseudomonas</i>' : '']) + ').'
+          : '<b>Ceftriaxona 2 g/24 h IV</b> (adquisición comunitaria y bajo riesgo de resistencia).');
+        L.push('El urocultivo dirige el tratamiento definitivo.');
+        if (v.rSarm) L.push('<b>+ ' + vanco + '</b> si se sospecha SARM (EAU 2026).');
         L.push('<b>Control del foco:</b> descartar obstrucción (ecografía) y drenarla precozmente, idealmente ≤6 h (SSC 2026 Rec 24).');
-        if (v.alerg) L.push('<b>Alergia grave a betalactámicos:</b> no hay pauta de alergia verificada. La EAU 2026 incluye aminoglucósidos en 2.ª línea: amikacina 15–20 mg/kg/24 h' + kg(20) + ' (Código Sepsis 2016; la EAU da 25–30) o gentamicina 5–7 mg/kg/24 h. Consultar con infecciosas/PROA.');
+        if (v.alerg) L.push('<b>Alergia grave a betalactámicos:</b> no hay pauta de alergia verificada. La EAU 2026 incluye aminoglucósidos en 2.ª línea: amikacina 15–20 mg/kg/24 h' + kgR(15, 20) + ' con niveles o gentamicina 5–7 mg/kg/24 h. Consultar con infecciosas/PROA.');
       } else if (v.foco === 3) {
         L.push(v.alerg ? '<b>Alergia grave:</b> aztreonam 1–2 g/6–8 h IV + metronidazol 500 mg/8 h IV + un fármaco activo frente a grampositivos (' + vanco + ') (IDSA/SIS 2010).'
-          : v.rBlee ? '<b>Meropenem 1 g/8 h IV</b> (riesgo de BLEE: carbapenémico; IDSA/SIS 2010, WSES 2017).'
-          : '<b>Piperacilina-tazobactam 4,5 g/6 h IV</b> o <b>meropenem 1 g/8 h IV</b>, o cefepima 2 g/8 h + metronidazol 500 mg/8 h IV (gravedad alta, IDSA/SIS 2010). No ampicilina-sulbactam ni aminoglucósidos de rutina.');
-        if (v.rSarm) L.push('SARM solo con colonización conocida o fracaso con exposición antibiótica intensa: <b>+ vancomicina 15–20 mg/kg/8–12 h</b>' + kg(15) + ' (IDSA/SIS 2010).');
-        if (v.nosoc) L.push('Asociada a cuidados sanitarios: cubrir <i>Pseudomonas</i> (piperacilina-tazobactam o meropenem) y enterococo, sobre todo posoperatoria (IDSA/SIS 2010; WSES 2017). Antifúngico empírico solo en la nosocomial con cirugía reciente o fuga anastomótica (WSES 2017).');
-        L.push('<b>Control del foco</b> quirúrgico o percutáneo, idealmente ≤6 h (SSC 2026 Rec 24). Con control del foco, 4–7 días (Código Sepsis 2016).');
+          : v.rBlee ? '<b>Meropenem 1 g/8 h IV</b> (riesgo de BLEE). <span class="pe-nota">La IDSA 2024 no recomienda piperacilina-tazobactam ni cefepima en la infección por BLEE fuera de la vía urinaria.</span>'
+          : shock || v.nosoc ? '<b>Piperacilina-tazobactam 4,5 g/6 h IV o meropenem 1 g/8 h IV</b> (' + por([shock ? 'shock' : '', v.nosoc ? 'infección hospitalaria' : '']) + ').'
+          : '<b>Ceftriaxona 2 g/24 h IV + metronidazol 500 mg/8 h IV</b>, o piperacilina-tazobactam 4,5 g/6 h IV.');
+        if (v.rSarm) L.push('SARM solo con colonización conocida o fracaso con exposición antibiótica intensa: <b>+ ' + vanco + '</b> (IDSA/SIS 2010).');
+        if (v.nosoc) L.push('Asociada a cuidados sanitarios: cubrir también enterococo, sobre todo posoperatoria (IDSA/SIS 2010). Antifúngico empírico solo en la nosocomial con cirugía reciente o fuga anastomótica (WSES 2017).');
+        L.push('<b>Drenaje, cirugía o desobstrucción biliar: esenciales</b>, idealmente ≤6 h (SSC 2026 Rec 24). Con control del foco, 4–7 días (Código Sepsis 2016).');
       } else if (v.foco === 4) {
         if (v.necro) {
-          L.push('<b>Cirugía urgente</b> (desbridamiento). <b>' + vanco + '</b> o linezolid 600 mg/12 h <b>+ piperacilina-tazobactam 4,5 g/6 h IV</b> o meropenem 1 g/8 h IV <b>+ clindamicina 600–900 mg/8 h IV</b> (IDSA 2014; la WSES 2018 añade siempre clindamicina o linezolid por el efecto antitoxina y prefiere linezolid o daptomicina a la vancomicina si hay insuficiencia renal).');
+          L.push('<b>Desbridamiento quirúrgico sin demora.</b> <b>Vancomicina + piperacilina-tazobactam 4,5 g/6 h IV</b> (' + vanco + ') <b>+ clindamicina 600–900 mg/8 h IV</b> por el efecto antitoxina (IDSA 2014; la WSES 2018 añade siempre clindamicina o linezolid y prefiere linezolid o daptomicina a la vancomicina si hay insuficiencia renal).');
           L.push('Estreptococo del grupo A o <i>Clostridium</i> documentado: <b>penicilina 2–4 MU/4–6 h IV + clindamicina 600–900 mg/8 h IV</b> (IDSA 2014).');
           if (v.alerg) L.push('<b>Alergia grave:</b> clindamicina o metronidazol + aminoglucósido o quinolona, más vancomicina si se sospecha SARM (IDSA 2014, Tabla 4; sin dosis del aminoglucósido ni de la quinolona en la guía).');
         } else {
-          L.push('Celulitis grave con SIRS o hipotensión: <b>' + vanco + ' + piperacilina-tazobactam 4,5 g/6 h IV</b> o meropenem 1 g/8 h IV (IDSA 2014).');
+          L.push('Celulitis grave: <b>vancomicina + piperacilina-tazobactam 4,5 g/6 h IV</b> (' + vanco + ').');
           if (v.alerg) L.push('<b>Alergia grave:</b> estreptocócica → vancomicina, linezolid o daptomicina; mixta → clindamicina o metronidazol + aminoglucósido o quinolona + vancomicina si hay SARM (IDSA 2014).');
           L.push('<span class="pe-nota">Descartar infección necrosante: dolor desproporcionado, crepitación, ampollas, necrosis, progresión rápida → marcar «infección necrosante».</span>');
         }
@@ -2298,19 +2316,49 @@ window.PROTOCOLS = [
         L.push('TC antes de la punción lumbar si hay focalidad (salvo pares craneales), crisis de inicio reciente, Glasgow &lt;10 o inmunodepresión grave (ESCMID 2016).');
         if (v.alerg) L.push(sinAlerg);
       } else if (v.foco === 6) {
-        L.push('<b>' + vanco + '</b> (prevalencia de SARM elevada; daptomicina 6–8 mg/kg/día si la mayoría de los SARM tienen CMI &gt;2; no linezolid empírico) (IDSA 2009).');
-        L.push('<b>+ cobertura de gramnegativos</b> (indicada en sepsis, neutropenia o catéter femoral): <b>cefepima 2 g/8 h IV</b>, meropenem 1 g/8 h IV o piperacilina-tazobactam 4,5 g/6 h IV según la epidemiología local' + (v.rPseu ? '; con colonización o infección reciente por gramnegativo multirresistente, <b>2 fármacos de clases distintas</b> (p. ej., + amikacina 15 mg/kg/24 h' + kg(15) + ')' : '') + ' (IDSA 2009).');
+        L.push('Si hay riesgo de SARM o de gramnegativos resistentes: <b>vancomicina + betalactámico antipseudomónico</b> (cefepima 2 g/8 h IV, piperacilina-tazobactam 4,5 g/6 h IV o meropenem 1 g/8 h IV); ' + vanco + '.' + (v.rPseu ? ' Con colonización o infección reciente por gramnegativo multirresistente, <b>2 fármacos de clases distintas</b> (p. ej., + amikacina 15 mg/kg/24 h' + kg(15) + '; IDSA 2009).' : ''));
+        L.push('<span class="pe-nota">Daptomicina 6–8 mg/kg/día si la mayoría de los SARM locales tienen CMI de vancomicina &gt;2; no linezolid empírico (IDSA 2009).</span>');
         L.push('<i>Candida</i> (nutrición parenteral, antibióticos de amplio espectro prolongados, neoplasia hematológica, trasplante, catéter femoral o colonización en varios sitios): equinocandina, p. ej., caspofungina 70 mg de carga y 50 mg/día (IDSA 2009).');
-        L.push('<b>Retirar el catéter</b>: en los de larga duración, si hay sepsis grave, tromboflebitis supurada, endocarditis o bacteriemia &gt;72 h con tratamiento adecuado (IDSA 2009).');
+        L.push('<b>Retirar el catéter sospechoso y cultivarlo</b> cuando corresponda; en los de larga duración, si hay sepsis grave, tromboflebitis supurada, endocarditis o bacteriemia &gt;72 h con tratamiento adecuado (IDSA 2009).');
         if (v.alerg) L.push(sinAlerg);
       } else if (v.foco === 7) {
-        L.push('<b>No hay pauta concreta verificada</b> para el foco desconocido: la SSC 2026 deja la elección fuera de su alcance y el Código Sepsis 2016 no trae tablas por foco. Decidir con la guía local/PROA.');
-        L.push('Principios (SSC 2026): buscar rápido un foco que requiera control urgente (Rec 23); cubrir multirresistentes solo con riesgo alto de ese germen (Rec 25–26); anaerobios solo si el foco puede ser abdominal, ginecológico profundo, necrosante, de cabeza y cuello o del SNC (Rec 28–29); no dar antifúngico empírico de rutina (Rec 27).' +
-          (v.rPseu ? ' Con riesgo alto de gramnegativo multirresistente, la SSC 2021 sugiere 2 fármacos frente a gramnegativos (Rec 19), y el Código Sepsis 2016 la combinación betalactámico + aminoglucósido o quinolona para <i>Pseudomonas</i>/<i>Acinetobacter</i>.' : '') +
-          (v.rSarm ? ' Con riesgo alto de SARM, cubrirlo (SSC 2021 Rec 17): ' + vanco + '.' : ''));
+        L.push(v.rBlee ? '<b>Meropenem 1 g/8 h IV</b> (riesgo de BLEE). <span class="pe-nota">La IDSA 2024 no recomienda piperacilina-tazobactam ni cefepima en la infección por BLEE fuera de la vía urinaria.</span>'
+          : shock || v.nosoc || v.rPseu ? '<b>Piperacilina-tazobactam 4,5 g/6 h IV o meropenem 1 g/8 h IV</b> (' + por([shock ? 'shock' : '', v.nosoc ? 'infección nosocomial' : '', v.rPseu ? 'alto riesgo de multirresistencia' : '']) + ').'
+          : '<b>Ceftriaxona 2 g/24 h IV</b> (paciente estable y bajo riesgo de resistencia).');
+        L.push(v.rSarm ? '<b>+ ' + vanco + '</b> (indicación concreta de SARM o grampositivo resistente).' : 'Sin riesgo de SARM: no añadir cobertura de grampositivos resistentes.');
+        L.push('Principios (SSC 2026): buscar rápido un foco que requiera control urgente (Rec 23); anaerobios solo si el foco puede ser abdominal, ginecológico profundo, necrosante, de cabeza y cuello o del SNC (Rec 28–29); no dar antifúngico empírico de rutina (Rec 27).' +
+          (v.rPseu ? ' Con riesgo alto de gramnegativo multirresistente, la SSC 2021 sugiere 2 fármacos frente a gramnegativos (Rec 19).' : ''));
+        if (v.alerg) L.push(sinAlerg);
       }
-      L.push('<b>Siempre:</b> hemocultivos antes; antibiótico ' + (shock ? '<b>≤1 h</b> (shock)' : '≤1 h si la sepsis es probable o hay shock; ≤3 h si solo es posible y persiste la sospecha') + ' (SSC 2026 Rec 16–18). Betalactámicos en <b>infusión prolongada tras una dosis de carga</b> (Rec 33). Desescalar con los cultivos, también si son negativos (Rec 36–37). <span class="pe-nota">Dosis de adulto con función renal normal: ajustar al FG.</span>' + (hay(v.clcr) ? ' <b>ClCr ' + v.clcr + ' mL/min: comprobar el ajuste renal de cada antibiótico.</b>' : ''));
-      return {t:'Tratamiento antibiótico empírico: ' + F, c:'', h:L.map(x => '• ' + x).join('<br>')};
+      const pauta = L.join(' ').replace(/<span class="pe-nota">.*?<\/span>/g, '');
+      L.push('<b>Siempre:</b> hemocultivos antes; antibiótico ' + (shock ? '<b>≤1 h</b> (shock)' : '≤1 h si la sepsis es probable o hay shock; ≤3 h si solo es posible y persiste la sospecha') + ' (SSC 2026 Rec 16–18). <b>Dosis iniciales plenas, también la de carga</b> (dosis de adulto con función renal normal). Cefepima, piperacilina-tazobactam y meropenem en <b>infusión prolongada (extendida o continua) tras la dosis de carga</b>: recomendación fuerte de la SSC 2026, sobre todo con shock, CMI alta, aclaramiento renal aumentado o multirresistente. <b>Desescalar a las 24–48 h</b> con cultivos, sensibilidad y evolución, retirando la cobertura de SARM, <i>Pseudomonas</i>, anaerobios o <i>Candida</i> que no haga falta (también con cultivos negativos). Vigilar creatinina y diuresis a diario, niveles de vancomicina y aminoglucósidos, estado neurológico con cefepima, hemograma con linezolid y función hepática con metronidazol y macrólidos.');
+      return [{t:'Tratamiento antibiótico empírico: ' + F, c:'', h:L.map(x => '• ' + x).join('<br>')}, renal(pauta, v)];
+    };
+    /* Ajuste renal del mantenimiento (documento «ab en sepsis»): solo de los fármacos que aparecen en la pauta.
+       La carga no se reduce. Donde la fuente no da corte o pauta, se dice y se remite a farmacia. */
+    const renal = (txt, v) => {
+      const trr = v.trr || 0, hd = trr === 1, c = hay(v.clcr) ? v.clcr : null;
+      const has = re => re.test(txt);
+      const base = 'Dosis de carga completa: no se reduce por la función renal; se ajusta el mantenimiento. Recalcular el ClCr cada día si hay lesión renal aguda. Orientativo: prevalece el protocolo de farmacia local.';
+      if (trr === 2) return {t:'Ajuste renal: terapia renal continua (TRRC)', c:'mid', h:'Las dosis de ajuste renal <b>no son aplicables</b>: ajustar al tipo de técnica, flujo de efluente, diuresis residual y niveles (farmacia/protocolo local). ' + base};
+      if (c === null && !hd) return {t:'Ajuste renal: falta el ClCr', c:'', h:'Introduce el ClCr (Cockcroft-Gault) o la terapia renal sustitutiva para ver el mantenimiento ajustado de cada antibiótico de la pauta. ' + base};
+      const R = [];
+      const farm = 'la fuente no da pauta: ficha técnica/farmacia';
+      if (has(/ceftriaxona/i)) R.push('<b>Ceftriaxona:</b> sin ajuste' + (hd ? '; sin dosis suplementaria tras la hemodiálisis' : '') + '. Si coinciden insuficiencia renal y hepática importantes, máx. 2 g/día.');
+      if (has(/cefotaxima/i)) R.push('<b>Cefotaxima:</b> ' + (hd ? '0,5–2 g/24 h; considerar una dosis tras la sesión.' : c < 20 ? '≈50 % de la dosis habitual (ClCr &lt;20).' : 'dosis habitual.'));
+      if (has(/cefepima/i)) R.push('<b>Cefepima:</b> ' + (hd ? '1 g el 1.er día y después 500 mg/24 h, tras la diálisis.' : 'con insuficiencia renal, reducir la dosis o alargar el intervalo (sin cortes en la fuente: ficha técnica/farmacia).') + ' Encefalopatía, mioclonías o convulsiones → reevaluar la dosis de inmediato.');
+      if (has(/piperacilina/i)) R.push('<b>Piperacilina-tazobactam:</b> ' + (v.foco === 8 ? 'en la neumonía nosocomial la pauta renal es distinta y más intensiva: farmacia.' : hd ? '2,25 g/12 h + 0,75 g tras cada sesión.' : c < 20 ? '2,25 g/8 h.' : c <= 40 ? '2,25 g/6 h.' : 'dosis habitual (4,5 g/6 h).'));
+      if (has(/meropenem/i)) R.push('<b>Meropenem:</b> ' + (hd ? 'hemodiálisis: ' + farm + '.' : c > 50 ? '1 g/8 h (habitual).' : c >= 26 ? '1 g/12 h.' : c >= 10 ? '500 mg/12 h (50 % de la dosis).' : '500 mg/24 h (50 % de la dosis).'));
+      if (has(/metronidazol/i)) R.push('<b>Metronidazol:</b> sin reducción por insuficiencia renal aislada; insuficiencia hepática grave → ≈50 %' + (hd ? '; separar la administración de la sesión o dar una dosis suplementaria.' : '.'));
+      if (has(/azitromicina/i)) R.push('<b>Azitromicina:</b> sin ajuste' + (hd || c < 10 ? '; con cautela (ClCr &lt;10).' : '.'));
+      if (has(/linezolid/i)) R.push('<b>Linezolid:</b> sin ajuste renal' + (hd ? '; administrar tras la sesión' : '') + '. Vigilar plaquetas, sobre todo con insuficiencia renal grave.');
+      if (has(/levofloxacino/i)) R.push('<b>Levofloxacino (pauta de 750 mg):</b> ' + (hd || (c >= 10 && c < 20) ? '750 mg de carga y después 500 mg/48 h.' : c >= 20 && c < 50 ? '750 mg/48 h.' : c >= 50 ? '750 mg/24 h (habitual).' : 'ClCr &lt;10 sin diálisis: ' + farm + '.'));
+      if (has(/ciprofloxacino/i)) R.push('<b>Ciprofloxacino:</b> ' + farm + '.');
+      if (has(/vancomicina/i)) R.push('<b>Vancomicina:</b> carga por peso, sin reducir; mantenimiento según función renal y niveles (preferible AUC/CMI). En insuficiencia renal avanzada el intervalo puede ir de 24 a 96 h.');
+      if (has(/amikacina/i)) R.push('<b>Amikacina:</b> carga por peso (peso ajustado en obesidad) y después según niveles: ' + (hd ? 'tras la diálisis.' : c >= 25 ? '≈ cada 24 h.' : c >= 10 ? '≈ cada 48 h.' : 'ClCr &lt;10 sin diálisis: ' + farm + '.') + ' Vigilar creatinina, niveles y audición.');
+      const otros = ['ampicilina', 'aztreonam', 'clindamicina', 'daptomicina', 'gentamicina', 'penicilina', 'rifampicina', 'caspofungina'].filter(x => new RegExp(x, 'i').test(txt));
+      if (otros.length) R.push('<span class="pe-nota">Otros fármacos de la pauta (' + otros.join(', ') + '): la fuente no da ajuste renal; ficha técnica/farmacia.</span>');
+      return {t:'Ajuste renal del mantenimiento (' + (hd ? 'hemodiálisis' : 'ClCr ' + f(c) + ' mL/min') + ')', c:hd || c < 50 ? 'mid' : '', h:R.map(x => '• ' + x).join('<br>') + '<br><span class="pe-nota">' + base + '</span>'};
     };
     const items = [
       {t:'h', l:'Constantes (NEWS2 y riesgo vital)'},
@@ -2347,6 +2395,7 @@ window.PROTOCOLS = [
       {k:'gcs', t:'num', l:'Glasgow', u:'3–15'},
       {k:'cr', t:'num', l:'Creatinina', u:'mg/dL'},
       {k:'clcr', t:'num', l:'ClCr por Cockcroft-Gault (ajuste de antibióticos)', u:'mL/min'},
+      {k:'trr', t:'sel', l:'Terapia renal sustitutiva (ajuste de antibióticos)', o:[['Ninguna',0],['Hemodiálisis intermitente',1],['Terapia renal continua (TRRC)',2]]},
       {k:'diur', t:'num', l:'Diuresis (si se conoce)', u:'mL/24 h'},
       {k:'vaso', t:'sel', l:'Fármacos vasoactivos (µg/kg/min)', o:[['Ninguno',0],['Dopamina ≤5 o dobutamina (cualquier dosis)',2],['Dopamina &gt;5 o noradrenalina/adrenalina ≤0,1',3],['Dopamina &gt;15 o noradrenalina/adrenalina &gt;0,1',4]]},
       {k:'sofaBase', t:'num', l:'SOFA basal (solo si hay disfunción orgánica crónica conocida; vacío = 0)', u:'puntos'},
@@ -2354,7 +2403,7 @@ window.PROTOCOLS = [
       {k:'lact', t:'num', l:'Lactato', u:'mmol/L'},
       {k:'vasoNec', t:'chk', l:'Necesita vasopresor para mantener TAM ≥65 mmHg pese a una reanimación con fluidos adecuada'},
       {t:'h', l:'Hospital · antibiótico empírico'},
-      {k:'foco', t:'sel', l:'Foco sospechado', o:[['Sin indicar',0],['Respiratorio: neumonía comunitaria grave',1],['Urinario',2],['Intraabdominal',3],['Piel y partes blandas',4],['Meningitis bacteriana',5],['Catéter vascular',6],['Desconocido',7]]},
+      {k:'foco', t:'sel', l:'Foco sospechado', o:[['Sin indicar',0],['Respiratorio: neumonía comunitaria grave',1],['Respiratorio: neumonía nosocomial o asociada a ventilación',8],['Urinario',2],['Intraabdominal o biliar',3],['Piel y partes blandas',4],['Meningitis bacteriana',5],['Catéter vascular o bacteriemia asociada a cuidados sanitarios',6],['Desconocido',7]]},
       {k:'necro', t:'chk', l:'Piel: infección necrosante (fascitis) sospechada'},
       {k:'menRisk', t:'chk', l:'Meningitis: &gt;50 años o riesgo de <i>Listeria</i> (diabetes, inmunosupresores, cáncer, inmunodepresión)'},
       {k:'alerg', t:'chk', l:'Alergia grave a betalactámicos (anafilaxia o reacción cutánea grave)'},
@@ -2364,7 +2413,7 @@ window.PROTOCOLS = [
       {k:'nosoc', t:'chk', l:'Infección nosocomial o asociada a cuidados sanitarios'}
     ];
     const calc = function (v) {
-      const SEL = ['cons', 'oxi', 'vaso', 'foco'];
+      const SEL = ['cons', 'oxi', 'vaso', 'foco', 'trr'];
       if (!Object.keys(v).some(k => v[k] === true || (typeof v[k] === 'number' && !isNaN(v[k]) && !(SEL.includes(k) && v[k] === 0))))
         return [{t:'Introduce los datos del paciente', c:'', h:'Constantes, consciencia, oxígeno y sospecha de infección: el NEWS2, el riesgo vital, la activación del Codi Sèpsia, la hipoperfusión y los volúmenes se calculan al momento. En el hospital, además, el SOFA, el lactato y el antibiótico empírico según el foco.'}];
       const out = [];
@@ -2450,7 +2499,7 @@ window.PROTOCOLS = [
         '<br><span class="pe-nota">El folleto no da antibiótico concreto ni dosis: el apartado siguiente lo sugiere por foco con las guías.</span>'});
 
       /* 6. Antibiótico empírico por foco (guías de la cabecera). Dosis de adulto con función renal normal. */
-      if (v.foco > 0) out.push(atb(v, pesoOk, v.vasoNec === true));
+      if (v.foco > 0) out.push(...atb(v, pesoOk, v.vasoNec === true));
 
       /* Resumen de puntuaciones para la historia clínica (final del flujograma y «Copiar resumen») */
       out.resumen = [
@@ -2460,7 +2509,7 @@ window.PROTOCOLS = [
         hemo || hp.length ? (hp.length ? 'Hipoperfusión: ' + hp.join(', ') : 'Sin hipoperfusión' + (hemo ? ': ' + hemo : '')) : '',
         so.datos ? 'SOFA ' + so.total + (so.falta.length ? ' (incompleto: faltan ' + so.falta.join(', ') + ')' : '') + ' · ΔSOFA ' + (so.total - (hay(v.sofaBase) ? v.sofaBase : 0)) + ((v.infec || v.frInf) && so.total - (hay(v.sofaBase) ? v.sofaBase : 0) >= 2 ? ' → sepsis (Sepsis-3)' : '') : '',
         hay(v.lact) ? 'Lactato ' + f(v.lact) + ' mmol/L' + (v.vasoNec && v.lact > 2 ? ' · shock séptico (Sepsis-3)' : '') : v.vasoNec ? 'Vasopresor necesario; lactato sin medir' : '',
-        v.foco > 0 ? 'Foco sospechado: ' + ['', 'respiratorio (NAC grave)', 'urinario', 'intraabdominal', 'piel y partes blandas' + (v.necro ? ' (necrosante)' : ''), 'meningitis', 'catéter vascular', 'desconocido'][v.foco] : ''
+        v.foco > 0 ? 'Foco sospechado: ' + ['', 'respiratorio (NAC grave)', 'urinario', 'intraabdominal o biliar', 'piel y partes blandas' + (v.necro ? ' (necrosante)' : ''), 'meningitis', 'catéter vascular', 'desconocido', 'neumonía nosocomial o asociada a ventilación'][v.foco] : ''
       ].filter(Boolean);
       return out;
     };
@@ -2599,7 +2648,7 @@ window.PROTOCOLS = [
   {type:'info', text:'Objetivos: TA media 65-70 mmHg · EtCO₂ >25 (35-45) · SpO₂ >90% · glucemia <180 mg/dl'},
   {type:'action', text:'Fluidos: descargas de 500 ml de cristaloides balanceados si NEWS≥7 y EtCO₂<25/shock index>0,8 (evitar coloides). Noradrenalina en perfusión continua (máx 1 mcg/kg/min) si no responde a fluidos, objetivo TA media ≥65-70. Analgesia: fentanilo 50 mcg + paracetamol 1g IV si dolor. Insulina rápida 10 UI SC si hiperglucemia, mantener ~180 mg/dl evitando hipoglucemia'},
   {type:'info', text:'Comunicación a CECOS — metodología IDEAS: Identificación del paciente, sospecha Diagnóstica, Estado (escala NEWS), Actuación realizada, alerta/activación del Codi Sèpsia'}
-], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021 · Hospital: SOFA (Vincent 1996, PMID 8844239) y Sepsis-3 (Singer 2016, PMID 26903338) · SSC 2026 (Intensive Care Med 2026, doi 10.1007/s00134-026-08361-1) y SSC 2021 (PMID 34599691) · antibiótico por foco: IDSA/ATS 2019 (PMID 31573350), ERS/ESICM 2023 (PMID 37012484), EAU 2026, IDSA/SIS 2010 (PMID 20034345), WSES 2017 (PMID 28702076), IDSA 2014 (PMID 24973422), WSES 2018 (PMID 30564282), ESCMID 2016 (PMID 27062097), IDSA 2009 (PMID 19489710), Código Sepsis 2016 (Ministerio de Sanidad)'},
+], src:'Codi Sèpsia — SEM Catalunya, Junta Clínica, enero 2021 · Hospital: SOFA (Vincent 1996, PMID 8844239) y Sepsis-3 (Singer 2016, PMID 26903338) · SSC 2026 (Intensive Care Med 2026, doi 10.1007/s00134-026-08361-1) y SSC 2021 (PMID 34599691) · antibiótico por foco y ajuste renal: documento «ab en sepsis» aportado por el usuario (nov 2026); contrastado (nov 2026) con IDSA AMR Guidance 2024 (BLEE), ATS/IDSA 2016 NAH/NAV (PMID 27418577) y SSC 2026 (infusión prolongada); meningitis, alergia, corticoide en NAC, Candida y casos no cubiertos: IDSA/ATS 2019 (PMID 31573350), ERS/ESICM 2023 (PMID 37012484), EAU 2026, IDSA/SIS 2010 (PMID 20034345), WSES 2017 (PMID 28702076), IDSA 2014 (PMID 24973422), WSES 2018 (PMID 30564282), ESCMID 2016 (PMID 27062097), IDSA 2009 (PMID 19489710), Código Sepsis 2016 (Ministerio de Sanidad)'},
 
 {id:'codi-risc-suicidi', title:'Codi Risc Suïcidi', sub:'Cribado MINI y estratificación del riesgo suicida', badge:'amber', tag:'Urgente', rank:5, codigo:true,
   folleto:'codigos/C05.Codi_risc_suïcidi.pdf',
