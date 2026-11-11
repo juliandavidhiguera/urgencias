@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 26 | **Rama:** main | **HEAD:** `26bf190` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 27 | **Rama:** main | **HEAD:** `dc136c5` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -60,6 +60,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 27 - 2026-11-11
+- Modificado (`dc136c5`): `codi-sepsia` `atb` segun el documento del usuario «ab en sepsis» (`C:/Users/julia/Downloads/ab en sepsis.txt`, sin citas exactas): pautas y dosis por foco; nuevo foco 8 NAH/NAV (valor 8, listado tras NAC); se conservan de las guias previas meningitis, alergia, corticoide NAC con shock, Candida/retirada de cateter y clindamicina en necrosante. `atb` devuelve [antibiotico, ajuste renal] (`out.push(...atb())`).
+- Anadido: `renal()` ajuste del mantenimiento por ClCr, item `trr` (0 ninguna, 1 HD, 2 TRRC → tabla no aplicable); solo farmacos presentes en la pauta (regex sobre el texto sin `pe-nota`); sin corte en la fuente → «ficha tecnica/farmacia» (cefepima, meropenem en HD, cipro, ClCr <10 sin dialisis, pip-tazo en NAH). `sw.js` `urg-v80`.
+- Contraste `/md-urg-hosp` (Vera + Perplexity): dosis y ajustes renales coinciden con ASHP; cambios aplicados: BLEE → meropenem en abdominal y desconocido (IDSA AMR Guidance 2024), 2.o antipseudomonico en NAV quinolona antes que amikacina (ATS/IDSA 2016, PMID 27418577), infusion prolongada «recomendada» (SSC 2026; BLING III PMID 38864155; consenso 2026 PMID 42598847).
+- Verificado: node 12 casos (todos los focos, ClCr 90/35/20/15/8/25,5, HD, TRRC) + 5 casos de los cambios finales; Chrome headless sin errores JS (antes de los 3 cambios finales, que son solo texto/condiciones). Produccion no comprobada con curl.
+- Decisiones: «archivo manda + conservar lo no cubierto»; ajuste renal automatico (no tabla fija); ceftriaxona NAC 2 g (ATS/IDSA da 1–2 g).
 
 ### Sesion 26 - 2026-11-11
 - Anadido (`26bf190`): calculadora de FG desde la creatinina (`_fgCalcHtml/_fgPrefill/_fgCalc` en index.html, `<details class="fg-calc">` bajo todo item `fg`/`clcr` del evaluador; prellena cr/edad/peso/sexo; formula CKD-EPI 2021 si la etiqueta dice CKD, si no Cockcroft-Gault con peso real). Presente en 8 protocolos: CG en codi-iam, codi-sepsia, tep-agudo, dolor-toracico, fa-rapida; CKD-EPI en hiperkalemia, epoc-agudizado, asma-crisis. Nuevos campos FG: asma (aviso magnesio si FG<30), hiperK (FGe junto a KDIGO), sepsis ClCr (recordar ajuste renal, sin umbral inventado).
@@ -148,8 +155,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 16 | Probar el evaluador EPOC en movil real y en modo oscuro (layout 390px y oscuro ya verificados en escritorio, sesion 13) | `index.html` (`.pe-*`) | P3 | Usuario (movil) | Campos legibles a ancho de movil y colores de gravedad con contraste en oscuro |
 | ~~17~~ | ~~Verificar con Vera + Perplexity las dosis de asma y TEP~~ — HECHO sesion 14 (`c70f885`) | `data/protocols.js` | - | - | Resuelto |
 | 19 | (NO hacer todavia, decision del usuario 2026-11-07) Activar la optimizacion con IA: proteger `/api/ideas` (Cloudflare Access sobre la ruta, o codigo + regla de rate limiting), crear el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages, fusionar `ideas-ia` en `main` y comprobar que el build instala el SDK | rama `ideas-ia` | P2 | Decision del usuario (app publica) | `/api/ideas` responde 200 solo a usuarios autorizados y la funcion aparece en el despliegue |
-| 21 | Contrastar con los PDF originales las dosis de antibiotico de sepsis para neumonia, urinario, abdominal y piel (se leyeron via resumen WebFetch) | `data/protocols.js` (`codi-sepsia` `atb`) | P1 | - | Cada dosis cotejada con el PDF de la guia citada |
-| 22 | Decisiones del usuario en sepsis: vancomicina rutinaria en meningitis (hoy opcional por riesgo); discrepancia BLEE en urosepsis (EAU vs SSC) | `data/protocols.js` | P2 | Usuario | Criterio elegido y reflejado en `atb` |
+| ~~21~~ | ~~Contrastar dosis de antibiotico de sepsis~~ — SUPERADO sesion 27 (`dc136c5`): pautas del documento del usuario, dosis cotejadas con ASHP via Vera | - | - | - | Resuelto |
+| 24 | Verificar con fuente las dosis de metronidazol (500 mg/8–12 h, sin ajuste renal) y linezolid (600 mg/12 h, sin ajuste) y los cortes renales de cefepima (la app remite a farmacia) | `data/protocols.js` (`codi-sepsia` `renal`) | P2 | - | Cada dato con ficha tecnica/ASHP citada o cortes de cefepima anadidos |
+| 22 | Decision del usuario en sepsis: vancomicina rutinaria en meningitis (hoy opcional por riesgo). (BLEE en urosepsis resuelto sesion 27: meropenem solo con riesgo de BLEE) | `data/protocols.js` | P2 | Usuario | Criterio elegido y reflejado en `atb` |
 | 23 | «Copiar resumen» del flujo sin linea «Datos:» en protocolos con evaluador: decidir si se anade; comentario obsoleto «Killip II–III» en `muyAlto` de codi-iam | `index.html`, `data/protocols.js` | P3 | Usuario | Decision aplicada |
 | 20 | Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3 | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
 
@@ -236,4 +244,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Cotejar las dosis de antibiotico de sepsis (backlog #21) y preguntar al usuario los puntos #22.
+Comprobar en produccion (curl) que `data/protocols.js` trae `trr` y `renal`, y preguntar al usuario el punto #22 (vancomicina rutinaria en meningitis).
