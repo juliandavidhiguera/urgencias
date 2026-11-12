@@ -906,7 +906,7 @@ window.PROTOCOLS = [
           '<b>Enoxaparina ' + kg + ' mg SC cada 12 h</b> (1 mg/kg/12 h, peso real ' + fx(v.peso) + ' kg).' + (has(v.clcr) ? '' : ' Con ClCr 15–30: cada 24 h; &lt;15: heparina sódica.');
         out.push({t:'Tratamiento: dosis por peso real', c:'', h:(ad && ad.tc ? '<b>Antes, descartar el síndrome aórtico: no dar antiagregantes ni anticoagulantes.</b><br>' : '') +
           '<b>AAS</b> carga 150–300 mg VO y después 75–100 mg/24 h (o acetilsalicilato de lisina IV: 450 mg ≈ 250 mg de AAS).<br>' + enox +
-          '<br><b>Heparina sódica</b> si se va a hacer coronariografía inmediata o hay insuficiencia renal grave. Fondaparinux 2,5 mg/24 h SC (no con FG &lt;20 ml/min).' +
+          '<br><b>Heparina sódica</b> si se va a hacer coronariografía inmediata o hay insuficiencia renal grave: sin coronariografía inmediata, <b>' + Math.min(Math.round(60 * v.peso), 4000) + ' UI IV</b> (60 UI/kg, máx. 4.000) + <b>' + Math.min(Math.round(12 * v.peso), 1000) + ' UI/h</b> (12 UI/kg/h, máx. 1.000) según TTPa (objetivo 50–70 s; ACC/AHA 2025). Fondaparinux 2,5 mg/24 h SC (no con FG &lt;20 ml/min).' +
           (has(v.spo2) && v.spo2 < 90 ? '<br><b>SpO₂ ' + v.spo2 + ' %: oxígeno.</b>' : '') + '<br><span class="pe-nota">ESC 2023.</span>'});
       }
       out.resumen = res;
@@ -915,7 +915,7 @@ window.PROTOCOLS = [
   },
   flow:(() => {
     const num = x => !isNaN(x) && x >= 0;
-    const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', { n: 'Heparina sódica', inf: false }];
+    const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', { n: 'Heparina sódica', dosis: 12, min: 12, topeH: 1000, rango: 'SCASEST sin coronariografía inmediata: 12 UI/kg/h, máx. 1.000 UI/h, TTPa 50–70 s' }];
     const E = () => PROTOCOLS.find(x => x.id === 'dolor-toracico').eval; // sugerencias con las mismas funciones del evaluador
     return {
       start: 'ecg',
@@ -1015,7 +1015,7 @@ window.PROTOCOLS = [
             show: '<b>AAS</b> (oral): carga de 150–300 mg VO y después 75–100 mg/24 h. Si no puede tomar VO: <b>acetilsalicilato de lisina IV</b>, dosis equivalente a 75–250 mg de AAS (450 mg de acetilsalicilato de lisina ≈ 250 mg de AAS).<br>' +
               '<b>Enoxaparina</b>: 1 mg/kg/12 h SC con el peso real; con ClCr 15–30 ml/min, 1 mg/kg/24 h; con ClCr &lt;15, heparina sódica.<br>' +
               '<b>Fondaparinux</b>: 2,5 mg/24 h SC (no con FG &lt;20 ml/min según la ESC; la ficha técnica es más restrictiva). No sirve como único anticoagulante durante la ICP.<br>' +
-              '<b>Heparina sódica</b>: si se va a hacer coronariografía inmediata o hay insuficiencia renal grave.<br><span class="pe-nota">ESC 2023.</span>'
+              '<b>Heparina sódica</b>: si se va a hacer coronariografía inmediata o hay insuficiencia renal grave. Sin coronariografía inmediata: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa (objetivo 50–70 s); en la sala de hemodinámica, bolo ajustado por ACT. Sangrado mayor con HNF: <b>protamina</b> 1 mg por cada 100 UI recibidas en las últimas 2–3 h (máx. 50 mg), IV lenta.<br><span class="pe-nota">ESC 2023; dosis de HNF: ACC/AHA 2025 (Rao, JACC, doi 10.1016/j.jacc.2024.11.009).</span>'
           },
           {
             l: 'Criterios de alta segura', t: 'Criterios de alta segura',
@@ -1203,7 +1203,7 @@ window.PROTOCOLS = [
       /* 6. Dosis por peso real (mismas funciones que el flujograma) */
       if (act) {
         const hp = has(v.peso) && v.peso > 0;
-        const icp = '<b>Angioplastia primaria:</b> heparina sódica 70 UI/kg IV en bolo' + (hp ? ' = <b>' + Math.round(70 * v.peso).toLocaleString('es-ES') + ' UI</b>' : '') + '.';
+        const icp = '<b>Angioplastia primaria:</b> heparina sódica 70–100 UI/kg IV en bolo' + (hp ? ' = <b>' + Math.round(70 * v.peso).toLocaleString('es-ES') + '–' + Math.round(100 * v.peso).toLocaleString('es-ES') + ' UI</b>' : '') + ', ajustada a un ACT de 250–300 s en la sala de hemodinámica (ACC/AHA 2025).';
         const fib = '<b>Fibrinólisis:</b> tenecteplasa ' + D.tnk(v) + '<br>AAS 150–300 mg VO (o 450 mg IV) + ' + D.clopi(v) + '. NO prasugrel ni ticagrelor.<br>' + D.enox(v) + '<br>' + D.hnf(v);
         const ini = '<b>Inicial:</b> AAS 150–300 mg VO masticada (450 mg IV de acetilsalicilato de lisina si no puede VO) · O₂ solo si SpO₂ &lt;90 % · fentanilo 50–75 µg IV cada 5–10 min o cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg).';
         out.push({t:'Tratamiento: dosis por peso real', c:'', h:ini + '<br>' + (e === 'icp' || e === 'fibno' ? icp : e === 'fib' ? fib : icp + '<br>' + fib) + (hp ? '' : '<br><span class="pe-nota">Introduce el peso para calcular la dosis.</span>')});
@@ -1239,8 +1239,8 @@ window.PROTOCOLS = [
       if (v.edad < 75) return 'ENOXAPARINA: <b>30 mg IV en bolo</b> y a los 15 min <b>' + r(Math.min(v.peso, 100)) + ' mg SC cada 12 h</b> (1 mg/kg; máx. 100 mg en las 2 primeras dosis' + (v.peso > 100 ? ', después ' + r(v.peso) + ' mg' : '') + ').' + (hay(v.clcr) ? '' : ' Si ClCr &lt;30, cada 24 h.');
       return 'ENOXAPARINA (≥75 años): sin bolo, <b>' + r(Math.min(0.75 * v.peso, 75)) + ' mg SC cada 12 h</b> (0,75 mg/kg; máx. 75 mg en las 2 primeras dosis' + (0.75 * v.peso > 75 ? ', después ' + r(0.75 * v.peso) + ' mg' : '') + ').' + (hay(v.clcr) ? '' : ' Si ClCr &lt;30: 1 mg/kg cada 24 h.');
     };
-    const hnf = v => hay(v.peso) ? 'Alternativa, HEPARINA SÓDICA: <b>' + f(Math.min(60 * v.peso, 4000)) + ' UI IV</b> en bolo (60 UI/kg, máx. 4.000) + <b>' + f(Math.min(12 * v.peso, 1000)) + ' UI/h</b> (12 UI/kg/h, máx. 1.000) según TTPa.' :
-      'Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa.';
+    const hnf = v => hay(v.peso) ? 'Alternativa, HEPARINA SÓDICA: <b>' + f(Math.min(60 * v.peso, 4000)) + ' UI IV</b> en bolo (60 UI/kg, máx. 4.000) + <b>' + f(Math.min(12 * v.peso, 1000)) + ' UI/h</b> (12 UI/kg/h, máx. 1.000) según TTPa (objetivo 50–70 s).' :
+      'Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa (objetivo 50–70 s).';
     const TQ = {
       q: 'Tiempo estimado desde el ECG hasta la llegada al hospital con ICP',
       opts: [{ l: '&lt;90 min', go: 'icp', sug: v => E().estr(v) === 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana', sug: v => E().estr(v) === 'ventana' }, { l: '>120 min', go: 'fibci', sug: v => /^fib/.test(E().estr(v) || '') }]
@@ -1361,7 +1361,7 @@ window.PROTOCOLS = [
         },
         icp: { farmacos: [{ n: 'Heparina sódica', inf: false }],
           t: 'ANGIOPLASTIA PRIMARIA', c: 'high',
-          show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + ' UI</b>' : '. ' + faltaPeso),
+          show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70–100 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + '–' + f(Math.round(100 * v.peso)) + ' UI</b>' : '. ' + faltaPeso) + ', ajustada a un ACT de 250–300 s en la sala (ACC/AHA 2025). <span class="pe-nota">Sin perfusión sistemática tras el procedimiento.</span>',
           q: 'Segundo antiagregante: ¿qué situación aplica?',
           opts: [
             { l: 'Dudas diagnósticas, hemorragia activa grave, no puede tomar VO o ya con doble antiagregación', go: 'sa_no', sug: v => (E().sa(v) || {}).go === 'sa_no' },
@@ -1383,7 +1383,7 @@ window.PROTOCOLS = [
           t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
           q: 'Continuar', opts: [{ l: 'Pautar la angioplastia primaria', go: 'icp' }]
         },
-        fib: { farmacos: [{ n: 'Tenecteplasa', esquema: 'tnk-iam' }, 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', { n: 'Heparina sódica', inf: false }],
+        fib: { farmacos: [{ n: 'Tenecteplasa', esquema: 'tnk-iam' }, 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', { n: 'Heparina sódica', dosis: 12, min: 12, topeH: 1000, rango: 'IAM con fibrinólisis: 12 UI/kg/h, máx. 1.000 UI/h, TTPa 50–70 s' }],
           t: 'FIBRINÓLISIS CON TENECTEPLASA', c: 'high',
           show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
             '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
@@ -1442,13 +1442,13 @@ window.PROTOCOLS = [
   {type:'info', branch:'no', text:'Si SÍ: tratar como muy alto riesgo SIN activar Codi IAM. Si NO: protocolo SCASEST específico'},
   {type:'decision', text:'Estrategia de reperfusión — tiempo estimado de traslado (ECG a llegada al hospital)', yes:'<90 min → angioplastia primaria', no:'>90 min → fibrinólisis prehospitalaria'},
   {type:'info', text:'Ventana individualizable entre 90 y 120 min según el caso'},
-  {type:'action', text:'Tratamiento inicial: O₂ solo si SpO₂<90%. Analgesia: fentanilo 50-75 mcg IV c/5-10min o cloruro mórfico 4-8 mg IV (+2 mg c/5-15min, máx 15-20mg). AAS 150-300 mg VO masticada (450 mg IV acetilsalicilato de lisina si no puede VO). Heparina sódica 70 UI/kg IV bolus si angioplastia primaria'},
+  {type:'action', text:'Tratamiento inicial: O₂ solo si SpO₂<90%. Analgesia: fentanilo 50-75 mcg IV c/5-10min o cloruro mórfico 4-8 mg IV (+2 mg c/5-15min, máx 15-20mg). AAS 150-300 mg VO masticada (450 mg IV acetilsalicilato de lisina si no puede VO). Heparina sódica 70–100 UI/kg IV en bolo si angioplastia primaria (ACT 250–300 s en la sala)'},
   {type:'info', text:'Nitroglicerina (SL 0,4 mg o IV 10-60 mcg/kg/h): NO administrar si TAS<90, FC<50, sospecha de IAM de VD o inhibidores de fosfodiesterasa en las 24h previas, ni como prueba diagnóstica del dolor torácico'},
   {type:'info', text:'2º antiagregante (SCAEST con angioplastia primaria): dudas diagnósticas/hemorragia activa grave/no puede VO/doble antiagregación previa → ninguno · imposibilidad de obtener información o alto riesgo hemorrágico → clopidogrel 600 mg VO · ictus/AIT previo, ≥75a o <60kg → ticagrelor 180 mg VO (SEM: >75; se usa ≥75) · resto → prasugrel 60 mg VO'},
   {type:'action', text:'FIBRINÓLISIS — tenecteplasa en bolo IV único en 5–10 s según el peso: <60 kg 30 mg (6 ml) · 60–69 kg 35 mg (7 ml) · 70–79 kg 40 mg (8 ml) · 80–89 kg 45 mg (9 ml) · ≥90 kg 50 mg (10 ml). Con ≥75 AÑOS, MEDIA DOSIS: 15 · 17,5 · 20 · 22,5 · 25 mg. Es el doble que la dosis del ictus: no confundirlas. Incompatible con glucosa (vía con SF 0,9 %). Ver Fichas → Tenecteplasa'},
   {type:'info', text:'Dosis de tenecteplasa según la fuente — ACC/AHA 2025: tabla por peso 30–50 mg; media dosis con ≥75 años (STREAM-2) · ESC 2023: misma tabla; media dosis con ≥75 años (IIa B, desde la ESC 2017) · SEM Codi IAM v.03 (2023): «ajustada al peso, mitad de dosis si >75 años». El corte correcto es ≥75: con 75 años cumplidos ya va media dosis'},
   {type:'action', text:'Antiagregación con la fibrinólisis: AAS 150–300 mg VO (o 450 mg IV de acetilsalicilato de lisina) + clopidogrel 300 mg VO con <75 años o 75 mg sin carga con ≥75 años — NO prasugrel ni ticagrelor (ACC/AHA 2025, ESC 2023; SEM: 300 mg si <75 a, 75 mg si >75 a; se usa ≥75 en todo el código)'},
-  {type:'action', text:'Anticoagulación con la fibrinólisis — ENOXAPARINA: <75 años 30 mg IV en bolo y a los 15 min 1 mg/kg SC cada 12 h (máx. 100 mg en las 2 primeras dosis) · ≥75 años sin bolo, 0,75 mg/kg SC cada 12 h (máx. 75 mg en las 2 primeras) · ClCr <30: 1 mg/kg SC cada 24 h. Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa. Hasta la revascularización o el alta (máx. 8 días) (ACC/AHA 2025, ESC 2023; el SEM no la detalla)'},
+  {type:'action', text:'Anticoagulación con la fibrinólisis — ENOXAPARINA: <75 años 30 mg IV en bolo y a los 15 min 1 mg/kg SC cada 12 h (máx. 100 mg en las 2 primeras dosis) · ≥75 años sin bolo, 0,75 mg/kg SC cada 12 h (máx. 75 mg en las 2 primeras) · ClCr <30: 1 mg/kg SC cada 24 h. Alternativa, HEPARINA SÓDICA: 60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa (objetivo 50–70 s). Sangrado mayor con HNF: protamina 1 mg por cada 100 UI recibidas en las últimas 2–3 h (máx. 50 mg), IV lenta. Hasta la revascularización o el alta (máx. 8 días) (ACC/AHA 2025, ESC 2023; el SEM no la detalla)'},
   {type:'info', text:'Después de la lisis: traslado inmediato a un centro con ICP. A los 60–90 min, si el ST no baja ≥50 %, persiste el dolor o hay inestabilidad hemodinámica o eléctrica → coronariografía inmediata e ICP DE RESCATE. Si la lisis es eficaz → coronariografía en 2–24 h (ACC/AHA 2025, ESC 2023)'},
   {type:'info', text:'Fibrinólisis — Contraindicaciones absolutas: hemorragia cerebral previa o AVC de causa desconocida, AVC isquémico <6 meses, neoplasia/traumatismo del SNC, cirugía o trauma <1 mes, sospecha de disección aórtica, sangrado activo o gastrointestinal <1 mes, punciones no compresibles recientes'},
   {type:'info', text:'Clasificación Killip/Kimball: I auscultación normal · II estertores crepitantes y/o 3er ruido · III edema agudo de pulmón · IV shock cardiogénico'}
@@ -3723,7 +3723,7 @@ window.PROTOCOLS = [
       const renal = has(v.clcr) ? v.clcr : NaN;
       const enox = pesoOk ? P(1) + ' mg' : '1 mg/kg';
       const enoxTxt = has(renal) && renal < 15 ? 'ClCr &lt;15: <b>HNF</b> (HBPM contraindicada)' : has(renal) && renal < 30 ? '<b>Enoxaparina ' + enox + ' SC cada 24 h</b> (ClCr 15–30)' : '<b>Enoxaparina ' + enox + ' SC cada 12 h</b> (peso real, sin tope fijo)';
-      const hnf = '<b>HNF</b> bolo 80 U/kg' + (pesoOk ? ' (' + P(80) + ' U)' : '') + ' IV + perfusión 18 U/kg/h' + (pesoOk ? ' (' + P(18) + ' U/h = ' + (v.peso * 0.18).toFixed(1).replace('.', ',') + ' mL/h con 25.000 U en 250 mL SF, 100 U/mL)' : ' (25.000 U en 250 mL SF = 100 U/mL; 70 kg → 12,6 mL/h)') + ', peso real; topes solo si los fija el nomograma local; TTPa a las 6 h y tras cada cambio (rango del laboratorio, ≈1,5–2,5 × control); Hb y plaquetas diarias';
+      const hnf = '<b>HNF</b> bolo 80 UI/kg' + (pesoOk ? ' (' + P(80) + ' UI)' : '') + ' IV + perfusión 18 UI/kg/h' + (pesoOk ? ' (' + P(18) + ' UI/h = ' + (v.peso * 0.18).toFixed(1).replace('.', ',') + ' mL/h con 25.000 UI en 250 mL SF, 100 UI/mL)' : ' (25.000 UI en 250 mL SF = 100 UI/mL; 70 kg → 12,6 mL/h)') + ', peso real; topes solo si los fija el nomograma local; TTPa a las 6 h y tras cada cambio (rango del laboratorio, ≈1,5–2,5 × control); Hb y plaquetas diarias';
       const tnkMg = pesoOk ? [30, 35, 40, 45, 50][v.peso < 60 ? 0 : v.peso < 70 ? 1 : v.peso < 80 ? 2 : v.peso < 90 ? 3 : 4] : null;
       const tnkTxt = '<b>tenecteplasa</b> (disponible actualmente; fuera de ficha) bolo IV único en 5–10 s por peso real' + (pesoOk ? ': <b>' + tnkMg + ' mg</b>' : ' (&lt;60 kg 30 mg · 60–69 kg 35 · 70–79 kg 40 · 80–89 kg 45 · ≥90 kg 50 mg)');
       const altStd = pesoOk && v.peso < 65 ? 'total máx. ' + Math.round(v.peso * 1.5) + ' mg (1,5 mg/kg, bolo incluido): 10 mg en bolo + ' + (Math.round(v.peso * 1.5) - 10) + ' mg en 2 h' : '100 mg IV en 2 h: 10 mg en bolo (1–2 min) + 90 mg en 2 h' + (pesoOk ? '' : ' (&lt;65 kg: máx. 1,5 mg/kg total, bolo incluido)');
@@ -3833,9 +3833,9 @@ window.PROTOCOLS = [
           ]
         },
         shock: {
-          farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Noradrenalina' }],
+          farmacos: [{ n: 'Heparina sódica' }, { n: 'Noradrenalina' }],
           t: 'Shock', c: 'high',
-          show: '<b>HNF bolo 80 U/kg</b> (peso real) ya. <b>Llamada simultánea: PERT Clínic + UCI de Vic.</b> Trasladable = PAS sostenida con fluidos/noradrenalina → angio-TC inmediato, monitorizado y acompañado por médico.<br>' + SOPORTE + DOSIS,
+          show: '<b>HNF bolo 80 UI/kg</b> (peso real) ya. <b>Llamada simultánea: PERT Clínic + UCI de Vic.</b> Trasladable = PAS sostenida con fluidos/noradrenalina → angio-TC inmediato, monitorizado y acompañado por médico.<br>' + SOPORTE + DOSIS,
           q: '¿Trasladable a la sala de TC?',
           opts: [{ l: 'Sí: angio-TC inmediato', go: 'angioTCi' }, { l: 'No: POCUS a pie de cama', go: 'pocus' }]
         },
@@ -3937,7 +3937,7 @@ window.PROTOCOLS = [
         ttoAlta: {
           farmacos: HEP,
           t: '4 · Tratamiento inicial', c: 'mid',
-          show: '<b>Anticoagular ya</b> (peso real): enoxaparina 1 mg/kg/12 h SC por defecto (ClCr 15–30 → cada 24 h; &lt;15 → HNF). <b>HNF</b> bolo 80 U/kg + 18 U/kg/h si FG &lt;30 o reperfusión o procedimiento previstos; TTPa a las 6 h. <b>PERT en C–E</b> (AHA 2026, I, B-NR).' + DOSIS,
+          show: '<b>Anticoagular ya</b> (peso real): enoxaparina 1 mg/kg/12 h SC por defecto (ClCr 15–30 → cada 24 h; &lt;15 → HNF). <b>HNF</b> bolo 80 UI/kg + 18 UI/kg/h si FG &lt;30 o reperfusión o procedimiento previstos; TTPa a las 6 h. <b>PERT en C–E</b> (AHA 2026, I, B-NR).' + DOSIS,
           q: '5 · Clasificar: ¿VD (TC/POCUS), troponina y NT-proBNP?',
           opts: [
             { l: 'VD y biomarcadores normales: C1', go: 'planta', sug: () => cat() === 'C1' },
@@ -4027,7 +4027,7 @@ window.PROTOCOLS = [
         catE: {
           farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'Categoría E: fibrinólisis local', c: 'high',
-          show: 'E1 hipotensión persistente con shock (SCAI C) · E2 shock refractario (SCAI D–E) o PCR.<br><b>HNF bolo 80 U/kg IV</b> (si no se ha puesto) · <b>PERT Clínic + UCI de Vic</b> (no retrasa la lisis).',
+          show: 'E1 hipotensión persistente con shock (SCAI C) · E2 shock refractario (SCAI D–E) o PCR.<br><b>HNF bolo 80 UI/kg IV</b> (si no se ha puesto) · <b>PERT Clínic + UCI de Vic</b> (no retrasa la lisis).',
           q: '¿Contraindicación absoluta a la fibrinólisis?',
           help: '<b>Absolutas:</b> ictus hemorrágico o de origen desconocido previo · ictus isquémico &lt;6 meses · neoplasia o malformación del SNC · trauma mayor, cirugía o TCE &lt;3 semanas · diátesis hemorrágica · sangrado activo · sospecha de disección aórtica.<br><b>Relativas</b> (en E se individualizan): AIT &lt;6 meses · anticoagulación oral · embarazo o primera semana posparto · punción en lugar no compresible · RCP traumática · PAS &gt;180 refractaria · hepatopatía avanzada, endocarditis infecciosa, úlcera péptica activa (ESC 2019, tabla 10).',
           opts: [
@@ -4048,7 +4048,7 @@ window.PROTOCOLS = [
               '• <b>Dosis reducida</b> (IIb C-LD, para disminuir el sangrado): 25–50 mg, p. ej. 50 mg = 10 mg en bolo + 40 mg en 2 h (20 mL/h). No convierte una contraindicación en indicación.<br>' +
               '• Acelerada solo en inestabilidad extrema (fuera de ficha, ESC 2019): 0,6 mg/kg en 15 min, máx. 50 mg.<br>' +
               '• <b>Parar la HNF durante la alteplasa</b> (criterio CHV; ESC permite mantenerla); <b>con tenecteplasa, suspender la perfusión</b>. Al terminar, TTPa cada 2–4 h → reiniciar sin bolo si TTPa ≤2 × normal (criterio tras tenecteplasa pendiente de acordar con el CHV).<br>' +
-              '<b>Vigilar:</b> cefalea intensa, déficit neurológico o sangrado mayor → parar alteplasa/HNF y TC craneal urgente.';
+              '<b>Vigilar:</b> cefalea intensa, déficit neurológico o sangrado mayor → parar alteplasa/HNF y TC craneal urgente. Sangrado mayor con HNF: <b>protamina</b> 1 mg por cada 100 UI recibidas en las últimas 2–3 h (máx. 50 mg), IV lenta.';
           },
           q: '¿Estabilizado tras la lisis?',
           nota: 'Anota hora de inicio y fin de la lisis y la evolución…',
@@ -4062,7 +4062,7 @@ window.PROTOCOLS = [
           farmacos: LISIS,
           t: 'PCR + TEP: RCP y fibrinólisis (ERC 2025)', c: 'high', pcr: true,
           show: v => '<b>SVA en curso</b> (botón «Abrir el protocolo de PCR»: cronómetro, ritmos, adrenalina) y aquí la fibrinólisis del TEP.<br>Mientras no haya alteplasa: <b>tenecteplasa en bolo por peso</b> (abajo). <b>Alteplasa 50 mg (50 mL a 1 mg/mL) en bolo IV</b>, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg)' + (v.peso > 0 ? ' = ' + fx(Math.min(0.6 * v.peso, 100)) + '–' + fx(Math.min(v.peso, 100)) + ' mg' : '') + '. <b>RCP ≥60–90 min tras la lisis.</b> Las contraindicaciones se ponderan frente a la muerte segura; ningún régimen ha demostrado superioridad.<br>' +
-            '• ' + TNK(v) + '<br>HNF bolo 80 U/kg · PERT + UCI de Vic sin retrasar la lisis.' + DOSIS,
+            '• ' + TNK(v) + '<br>HNF bolo 80 UI/kg · PERT + UCI de Vic sin retrasar la lisis.' + DOSIS,
           q: '¿Recupera la circulación (RCE)?',
           opts: [
             { l: 'Sí: estabilizar', go: 'postLisis' },
@@ -4090,7 +4090,7 @@ window.PROTOCOLS = [
         },
         postLisis: {
           t: 'Estabilizado tras la lisis', c: 'high',
-          show: 'Control neurológico y de sangrado estrecho las primeras 24 h; hemograma, coagulación y pruebas cruzadas. Cefalea intensa, déficit o sangrado mayor → parar alteplasa/HNF y TC craneal urgente. Ningún E sale sin lisis previa salvo contraindicación absoluta.',
+          show: 'Control neurológico y de sangrado estrecho las primeras 24 h; hemograma, coagulación y pruebas cruzadas. Cefalea intensa, déficit o sangrado mayor → parar alteplasa/HNF y TC craneal urgente. Sangrado mayor con HNF: <b>protamina</b> 1 mg por cada 100 UI recibidas en las últimas 2–3 h (máx. 50 mg), IV lenta. Ningún E sale sin lisis previa salvo contraindicación absoluta.',
           q: '¿Continuar?',
           opts: [{ l: 'Optimización A-B-C antes del traslado', go: 'optim' }]
         },
@@ -4142,7 +4142,7 @@ window.PROTOCOLS = [
           },
           {
             l: 'Peso de dosificación', t: 'Peso de dosificación',
-            show: 'Pesar o registrar peso declarado y talla. <b>Peso real</b> para HNF (bolo 80 U/kg, perfusión 18 U/kg/h; sin tope en las guías, solo si lo fija el nomograma institucional), enoxaparina (1 mg/kg/12 h, sin tope fijo; obesidad clase III: reducir puede ser razonable, IIb; anti-Xa no rutinario), tenecteplasa (tramos de peso) y alteplasa (&lt;65 kg: máx. 1,5 mg/kg total). Noradrenalina y dobutamina en µg/kg/min. Inductor sin dosis específica en guías de TEP: reducir en shock (ketamina no garantiza estabilidad). <b>Peso ideal solo para el Vt</b> (6 mL/kg): ♂ 50 + 0,91 × (talla − 152,4) · ♀ 45,5 + 0,91 × (talla − 152,4). ACOD a dosis fija; IMC &gt;40 o &gt;120 kg: apixabán o rivaroxabán (evitar dabigatrán/edoxabán).'
+            show: 'Pesar o registrar peso declarado y talla. <b>Peso real</b> para HNF (bolo 80 UI/kg, perfusión 18 UI/kg/h; sin tope en las guías, solo si lo fija el nomograma institucional), enoxaparina (1 mg/kg/12 h, sin tope fijo; obesidad clase III: reducir puede ser razonable, IIb; anti-Xa no rutinario), tenecteplasa (tramos de peso) y alteplasa (&lt;65 kg: máx. 1,5 mg/kg total). Noradrenalina y dobutamina en µg/kg/min. Inductor sin dosis específica en guías de TEP: reducir en shock (ketamina no garantiza estabilidad). <b>Peso ideal solo para el Vt</b> (6 mL/kg): ♂ 50 + 0,91 × (talla − 152,4) · ♀ 45,5 + 0,91 × (talla − 152,4). ACOD a dosis fija; IMC &gt;40 o &gt;120 kg: apixabán o rivaroxabán (evitar dabigatrán/edoxabán).'
           },
           {
             l: 'POCUS: criterios de VD y uso', t: 'POCUS por urgenciólogo',
@@ -4179,13 +4179,13 @@ window.PROTOCOLS = [
   {type:'info', text:'Campdevànol resuelve A, B y C in situ; D se coordina con el PERT del Clínic y E se fibrinoliza localmente sin esperar traslado (hoy con tenecteplasa; alteplasa de elección pendiente de stock). Sin UCI ni ecocardiografía reglada; POCUS si hay urgenciólogo formado. Red: CHV Vic (~30 min: solo UCI y MI monitorizada) y PERT del Hospital Clínic (~90 min: catéter, embolectomía, ECMO)'},
   {type:'action', text:'ABC, constantes, ECG y monitor; peso real y talla; dos vías si hay compromiso hemodinámico. O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF); VMNI/IOT con precaución'},
   {type:'decision', text:'¿PCR, hipotensión persistente o shock?', yes:'Sí', no:'No'},
-  {type:'action', branch:'yes', text:'HNF bolo 80 U/kg. Trasladable a TC → angio-TC inmediato acompañado. No trasladable: PCR con sospecha fundada → lisis empírica sin imagen (ERC 2025); shock con pulso → POCUS: VD dilatado sin otra causa → tratar como E; VD normal → otra causa'},
+  {type:'action', branch:'yes', text:'HNF bolo 80 UI/kg. Trasladable a TC → angio-TC inmediato acompañado. No trasladable: PCR con sospecha fundada → lisis empírica sin imagen (ERC 2025); shock con pulso → POCUS: VD dilatado sin otra causa → tratar como E; VD normal → otra causa'},
   {type:'action', branch:'no', text:'Embarazo → YEARS adaptado. Gestalt <15 % → PERC (8/8 negativos descarta). Si no: una sola vía — A (Wells/Ginebra: alta → angio-TC; baja/intermedia → dímero D ajustado por edad) o B (YEARS: 0 ítems + DD <1000; ≥1 ítem + DD <500, o edad × 10 si ≥50 a con el modificado). Dímero D en FEU'},
   {type:'action', text:'Angio-TC con VD/VI. TEP confirmado: hemodinámica + PESI/sPESI/Hestia + VD (TC/POCUS) + troponina, NT-proBNP y lactato → categoría A–E (± R) en la historia. Subsegmentario aislado: revisar con Radiología y anticoagular'},
   {type:'action', text:'A–B (gravedad baja, VD y biomarcadores normales): ACOD (apixabán 10 mg/12 h × 7 d → 5 mg/12 h o rivaroxabán 15 mg/12 h × 21 d → 20 mg/24 h) y alta precoz, control 48 h–7 d. B* (VD o biomarcador alterado): no alta precoz'},
   {type:'action', text:'C1–C3 (gravedad elevada): enoxaparina 1 mg/kg/12 h SC (ClCr 15–30 → cada 24 h; <15 → HNF) → planta Campdevànol; C3 con monitor en observación. PERT en C–E (prioritario en C3)'},
   {type:'action', text:'D1 (hipotensión transitoria/relativa) / D2 (hipoperfusión: lactato >2, LRA, diuresis <0,5 mL/kg/h, alteración mental, PAM <60): HBPM en D1, HNF en D2 + PERT Clínic en ≤30 min; no candidato → CHV Vic (UCI en D2, MI en D1). D2 que empeora o traslado >60–90 min → lisis local con el PERT'},
-  {type:'action', text:'E: HNF 80 U/kg + PERT + UCI de Vic. ¿PCR? → alteplasa 50 mg en bolo ± 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg), RCP ≥60–90 min. Sin PCR y sin contraindicación absoluta → alteplasa 100 mg en 2 h (10 + 90; <65 kg máx. 1,5 mg/kg); dosis reducida 50 mg IIb. Mientras no haya alteplasa: tenecteplasa en bolo único por peso real (<60 kg 30 mg · 60–69 35 · 70–79 40 · 80–89 45 · ≥90 kg 50 mg; misma dosis en PCR). Contraindicación absoluta → PERT (catéter/ECMO)'},
+  {type:'action', text:'E: HNF 80 UI/kg + PERT + UCI de Vic. ¿PCR? → alteplasa 50 mg en bolo ± 50 mg a los 30 min, o 0,6–1 mg/kg (máx. 100 mg), RCP ≥60–90 min. Sin PCR y sin contraindicación absoluta → alteplasa 100 mg en 2 h (10 + 90; <65 kg máx. 1,5 mg/kg); dosis reducida 50 mg IIb. Mientras no haya alteplasa: tenecteplasa en bolo único por peso real (<60 kg 30 mg · 60–69 35 · 70–79 40 · 80–89 45 · ≥90 kg 50 mg; misma dosis en PCR). Contraindicación absoluta → PERT (catéter/ECMO)'},
   {type:'info', text:'Traslado (flujograma 4): optimización A-B-C → PERT decide Clínic (catéter, embolectomía, ECMO-VA) o CHV Vic (UCI/MI) → checklist SBAR y plan de desvío. Nunca trasladar un E antes de estabilizarlo (AHA 2026, clase 3) ni un D sin anticoagulación parenteral en curso. Parar la HNF durante la alteplasa (criterio CHV; con tenecteplasa, suspender la perfusión); reiniciar sin bolo cuando TTPa ≤2 × normal'},
   {type:'info', text:'Al alta: anticoagulación ≥3 meses, control a las 48 h–7 d y a los ~3 meses; signos de alarma (sangrado, disnea súbita, síncope); evitar AINE. Disnea o intolerancia persistente → estudio de HPTEC'}],
   src:'Protocolo TEP agudo Hospital de Campdevànol v3.0 clínica (nov 2026; reorganiza la v2.1/v2.2 sin cambios de criterio; tenecteplasa disponible mientras la alteplasa está pendiente de stock) y flujograma 4 de traslado interhospitalario · Rali P, Chest 2021;160:1844-52 (traslado del TEP) · 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN PE Guideline (Creager MA, Circulation 2026;153:e977; corrección Circulation 2026;154:e24) · ESC/ERS 2019: Konstantinides SV, Eur Heart J 2020;41:543-603 · ERC 2025 ALS y Special Circumstances (Lott C, PMID 41117569) · ISTH 2026 (Talerico R) e ISTH 2021 (Martin KA) · CHEST 2021: Stevens SM, Chest 2021;160:e545 · ASH 2020 · Hunsicker O, Crit Care 2026 · Barco S, Eur Heart J 2019;40:902 · HOME-PE: Roy PM 2021 · Bova C, Eur Respir J 2014;44:694-703 · PERC/PROPER (Kline 2004; Freund 2018) · ADJUST-PE (Righini 2014) · YEARS (van der Hulle 2017) y YEARS modificado (Freund, JAMA 2021) · Artemis (van der Pol, NEJM 2019) · Le Gal, Ann Intern Med 2022 · Wang C, Chest 2010 · Ficha técnica de alteplasa (CIMA) · protocolo del Consorci Hospitalari de Vic (CHV) 2026'},

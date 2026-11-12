@@ -5433,15 +5433,21 @@ function _farmCalc(key, origen) {
     return;
   }
   const u = d.unitLabel || 'mg';
+  /* topeH (cfg del nodo): tope absoluto por hora (p. ej. heparina máx. 1.000 UI/h); si la dosis por kg lo supera se recorta el ritmo. */
+  const tope = _farmCfgDeCaja(box).topeH;
+  let topado = false;
   if (origen === 'mlh') {
     const mlh = _n(key + '-mlh');
     document.getElementById(key + '-dosis').value = mlh != null ? +(mlh * conc / porUnidad).toFixed(3) : '';
   } else {
     const dosis = _n(key + '-dosis');
-    document.getElementById(key + '-mlh').value = dosis != null ? +(dosis * porUnidad / conc).toFixed(1) : '';
+    topado = tope != null && dosis != null && dosis * porUnidad > tope;
+    if (topado) document.getElementById(key + '-dosis').value = +(tope / porUnidad).toFixed(3);
+    document.getElementById(key + '-mlh').value = dosis != null ? +((topado ? tope : dosis * porUnidad) / conc).toFixed(1) : '';
   }
   const dosis = _n(key + '-dosis'), mlh = _n(key + '-mlh');
   const rg = _farmRango(_farmCfgDeCaja(box), d);
+  const sobreTope = tope != null && mlh != null && mlh * conc > tope + 1e-6;
   const sinDiluir = /no se diluye/i.test(d.diluyente || '');
   res.innerHTML = dosis != null && mlh != null
     ? '<b>' + _fmt(dosis, 3) + ' ' + d.unit + ' = ' + _fmt(mlh, 1) + ' ml/h</b><br>Concentración ' + _fmt(conc, 3) + ' ' + u + '/ml · 1 ml/h = ' + _fmt(conc / porUnidad, 3) + ' ' + d.unit +
@@ -5450,9 +5456,11 @@ function _farmCalc(key, origen) {
       '<li>Iniciar a <b>' + _fmt(mlh, 1) + ' ml/h</b> (' + _fmt(dosis, 3) + ' ' + d.unit + ').</li>' +
       '<li>Titular según la respuesta dentro de ' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + ': cambia aquí la dosis o el ritmo y se recalcula el otro.</li></ol>'
     : 'Introduce la dosis o el ritmo.';
-  const fuera = dosis != null && (dosis < rg.min || (rg.max != null && dosis > rg.max));
-  warn.hidden = !fuera;
-  warn.textContent = fuera ? '⚠ Fuera del rango terapéutico (' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + '): revisar antes de administrar.' : '';
+  if (topado && dosis != null) res.innerHTML = '<b>Tope de ' + _fmt(tope, 0) + ' ' + u + '/h aplicado</b> (la dosis por kg lo superaba).<br>' + res.innerHTML;
+  const fuera = dosis != null && !topado && (dosis < rg.min || (rg.max != null && dosis > rg.max));
+  warn.hidden = !fuera && !sobreTope;
+  warn.textContent = sobreTope ? '⚠ Supera el tope de ' + _fmt(tope, 0) + ' ' + u + '/h: revisar antes de administrar.'
+    : fuera ? '⚠ Fuera del rango terapéutico (' + rg.min + (rg.max != null ? '–' + rg.max : '') + ' ' + d.unit + rg.txt + '): revisar antes de administrar.' : '';
   if (box.dataset.pid) _farmPintar(box.dataset.pid);
 }
 

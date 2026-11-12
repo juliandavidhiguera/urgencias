@@ -6,6 +6,7 @@
    Formato: una línea por pauta («• Situación (vía): N mg/kg (máx. M mg)»), un solo «/kg» por línea. */
 window.PAUTAS_PROTOCOLO = {
 'fa-rapida': {
+  'Heparina sódica': '• Bolo inicial (IV): 60–80 UI/kg (máx. 5000 UI), después 12–18 UI/kg/h según TTPa', // evaluador: «HNF bolo 60–80 UI/kg IV (máx. 5.000) + 12–18 UI/kg/h»
   'Metoprolol': '• Control de frecuencia, FEVI >40 % (IV): 2,5–5 mg en 2 min; repetir hasta 15 mg\n• Control de frecuencia, FEVI ≤40 % sin IC descompensada ni hipotensión (IV): 2,5–5 mg', // nodo frec: «Metoprolol 2,5–5 mg IV en 2 min; repetir hasta 15 mg» · nodo frec_ic: «metoprolol 2,5–5 mg IV»
   'Esmolol': '• Control de frecuencia, bolo (IV): 500 mcg/kg en 1 min', // nodo frec: «Esmolol 500 µg/kg IV en 1 min ..., después 50–300 µg/kg/min»
   'Diltiazem': '• Control de frecuencia, bolo (IV): 0,25 mg/kg en 5 min', // nodo frec: «Diltiazem (no comercializado IV en España) 0,25 mg/kg IV en 5 min ..., después 5–15 mg/h»
@@ -31,6 +32,7 @@ window.PAUTAS_PROTOCOLO = {
   'Salbutamol': '• Redistribución, complemento (nebulizado): 10–20 mg', // nodo shift: «Salbutamol 10–20 mg nebulizado como complemento, nunca solo»
 },
 'dolor-toracico': {
+  'Heparina sódica': '• SCASEST sin coronariografía inmediata, bolo (IV): 60 UI/kg (máx. 4000 UI), después 12 UI/kg/h (máx. 1000 UI/h) según TTPa', // extra «Antiagregación y anticoagulación»: ACC/AHA 2025
   'Ácido acetilsalicílico': '• SCASEST, carga (VO): 150–300 mg\n• Mantenimiento (VO): 75–100 mg cada 24 h', // AAS solo VO; la vía IV es el acetilsalicilato de lisina (indicación del servicio, 2026-11-08). extra «Antiagregación y anticoagulación»: «AAS: carga de 150–300 mg VO (o 75–250 mg IV) y después 75–100 mg/24 h»
   'Acetilsalicilato de lisina': '• SCASEST, si no puede tomar VO (IV): dosis equivalente a 75–250 mg de AAS (450 mg de acetilsalicilato de lisina ≈ 250 mg de AAS)', // extra «Antiagregación y anticoagulación»: «(o 75–250 mg IV)»; el AAS es oral y la forma parenteral es el acetilsalicilato de lisina (servicio, 2026-11-08)
   'Enoxaparina': '• SCASEST (SC): 1 mg/kg cada 12 h, con peso real\n• SCASEST con ClCr 15–30 ml/min (SC): 1 mg/kg cada 24 h', // extra «Antiagregación y anticoagulación»: «Enoxaparina: 1 mg/kg/12 h SC con el peso real; con ClCr 15–30 ml/min, 1 mg/kg/24 h»
@@ -42,6 +44,7 @@ window.PAUTAS_PROTOCOLO = {
   'Cloruro mórfico': '• Analgesia (IV): 4–8 mg, después 2 mg cada 5–15 min (máx. 15–20 mg)', // nodo activar: «cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg)»
   'Nitroglicerina': '• Dolor isquémico (SL): 0,4 mg', // nodo activar: «Nitroglicerina (SL 0,4 mg o IV)» — la IV es perfusión (5–10 µg/min; steps: 10–60 mcg/kg/h), omitida
   'Heparina sódica': '• Angioplastia primaria, bolo (IV): 70 UI/kg\n• Con fibrinólisis, bolo (IV): 60 UI/kg (máx. 4000 UI), después perfusión según TTPa', // nodo icp: «HEPARINA SÓDICA 70 UI/kg IV en bolo» · nodo fib (hnf): «60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa»
+  'Heparina sódica@icp': '• Angioplastia primaria, bolo (IV): 70–100 UI/kg, ajustado a ACT 250–300 s', // nodo icp (ACC/AHA 2025)
   'Heparina sódica@fib': '• Con fibrinólisis, bolo (IV): 60 UI/kg (máx. 4000 UI), después perfusión según TTPa',
   'Clopidogrel': '• Angioplastia primaria, sin información o alto riesgo hemorrágico (VO): 600 mg\n• Con fibrinólisis, <75 años (VO): 300 mg\n• Con fibrinólisis, ≥75 años (VO): 75 mg sin dosis de carga', // nodo sa_clopi: «Clopidogrel 600 mg VO.» · nodo fib (clopi): «clopidogrel 300 mg VO con <75 años o 75 mg sin carga con ≥75 años»
   'Ticagrelor': '• Angioplastia primaria con ictus/AIT previo, ≥75 años o <60 kg (VO): 180 mg', // nodo sa_tica: «Ticagrelor 180 mg VO.»
