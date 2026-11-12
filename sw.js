@@ -2,7 +2,7 @@
 // (revalidando la cache HTTP) y se actualiza la copia local; la cache solo se usa
 // sin conexion. Ya no hace falta subir CACHE en cada cambio de data/*.js o
 // index.html; subirla solo si cambia la lista ASSETS o este fichero.
-const CACHE = 'urg-v81';
+const CACHE = 'urg-v82';
 const ASSETS = [
   '/',
   '/index.html',
