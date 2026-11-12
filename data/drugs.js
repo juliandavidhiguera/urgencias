@@ -10,26 +10,29 @@
    muestra un botón que abre la calculadora de Perfusión IV con ese
    fármaco ya seleccionado. Omitido si el fármaco no se da en perfusión
    o no tiene una entrada equivalente en INFUSIONS.
+   dilution de un fármaco en perfusión: copia de la de INFUSIONS (jeringa de
+   50 mL, pensada para transporte y adaptable en el menú Perfusiones), que es
+   la fuente única. Si cambia allí, cambiarla aquí.
    ================================================================== */
 window.DRUGS = [
 
 {group: 'Drogas vasoactivas', badge: 'red', tag: 'UCI', drugs: [
   {
     name: 'Noradrenalina',
-    dilution: '4 mg (4 amp) en 250 mL SG5% = 16 µg/mL',
+    dilution: 'Perfusión: 5 mg en 50 mL SG5% o SF = 100 µg/mL (jeringa de 50 mL)',
     doseRange: '0.05–1 µg/kg/min',
     alerts: ['Vía central de elección', 'Si se usa periférica de forma temporal: vena gruesa y proximal, comprobar reflujo y vigilar el punto de punción', 'Extravasación: riesgo de necrosis. Infiltrar fentolamina 5–10 mg en 10–15 mL de SSF cuanto antes', 'Monitorizar TA, preferiblemente invasiva'], src: 'ASHP Drug Compendium (Norepinephrine)',
     ficha: 'Noradrenalina.md', infusionRef: 'Noradrenalina'
   },
   {
     name: 'Dopamina',
-    dilution: '200 mg en 250 mL SG5% = 800 µg/mL',
+    dilution: 'Perfusión: 200 mg en 50 mL SG5% = 4000 µg/mL (jeringa de 50 mL)',
     doseRange: '2–20 µg/kg/min', alerts: ['Extravasación: riesgo de necrosis. Infiltrar fentolamina cuanto antes', 'Taquiarritmias, más frecuentes que con noradrenalina'],
     infusionRef: 'Dopamina'
   },
   {
     name: 'Dobutamina',
-    dilution: '250 mg en 250 mL SG5% = 1000 µg/mL',
+    dilution: 'Perfusión: 250 mg en 50 mL SG5% o SF = 5000 µg/mL (jeringa de 50 mL)',
     doseRange: '2.5–20 µg/kg/min', alerts: ['Puede bajar la TA por vasodilatación: no usar como vasopresor', 'Taquicardia y arritmias'],
     ficha: 'Dobutamina.md', infusionRef: 'Dobutamina'
   }
@@ -38,7 +41,7 @@ window.DRUGS = [
 {group: 'Sedación / Analgesia', badge: 'amber', tag: 'Urgente', drugs: [
   {
     name: 'Midazolam',
-    dilution: '15 mg en 50 mL SSF = 0.3 mg/mL',
+    dilution: 'Perfusión: 50 mg en 50 mL SF o SG5% = 1 mg/mL (jeringa de 50 mL)',
     doseRange: 'Bolo 0.02–0.1 mg/kg · Perfusión 0.02–0.1 mg/kg/h', alerts: ['Depresión respiratoria, potenciada al combinarse con opioides', 'Acumulación en ancianos, insuficiencia hepática y perfusiones prolongadas'],
     doseCalc: function(peso) {
       return {
