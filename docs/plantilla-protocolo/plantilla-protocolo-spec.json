@@ -1,0 +1,180 @@
+{
+  "slide_size": "16:9",
+  "slides": [
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.08, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.42, "width": 10, "height": 0.08, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.5, "top": 2.5, "width": 9, "height": 2.5, "fill": "162B44", "text": "TÍTULO DEL PROTOCOLO", "text_color": "FFFFFF"}
+      ],
+      "images": [
+        {"path": "C:/Users/julia/git/site/src/assets/logo/logo.png", "left": 3.75, "top": 0.4, "width": 2.5}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 0.15, "height": 7.5, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0.5, "top": 0.6, "width": 5.5, "height": 0.04, "fill": "C8A45C"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "Sección 1", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.3, "top": 1.6, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "Sección 2", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "Sección 3", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.3, "top": 4.4, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "Sección 4", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 1", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 2", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 3", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 4", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 5", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 6.1, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Punto 6", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Columna izquierda", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Columna derecha", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "Alerta / Crítico", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "Precaución", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "Estable", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "Observación", "text_color": "4D96FF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Paso 1", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Paso 2", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Paso 3", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Paso 4", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Paso 5", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Criterios", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Decisiones", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "Nivel alto", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "Nivel medio", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "Nivel bajo", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "Seguimiento", "text_color": "4D96FF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 1", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 2", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 3", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 4", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 5", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 6.1, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "Tratamiento 6", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Fármacos", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "Dosis", "text_color": "FFFFFF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "Contraindicación", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "Precaución", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "Efectivo", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "Alternativa", "text_color": "4D96FF"}
+      ]
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.5, "top": 2.5, "width": 9, "height": 2.5, "fill": "162B44", "text": "GRACIAS", "text_color": "FFFFFF"}
+      ],
+      "images": [
+        {"path": "C:/Users/julia/git/site/src/assets/logo/logo.png", "left": 3.75, "top": 0.4, "width": 2.5}
+      ]
+    }
+  ]
+}

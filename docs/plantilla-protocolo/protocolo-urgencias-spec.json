@@ -1,0 +1,226 @@
+{
+  "slide_size": "16:9",
+  "slides": [
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.08, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.42, "width": 10, "height": 0.08, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.5, "top": 1.5, "width": 9, "height": 4.5, "fill": "162B44", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [
+        {"path": "C:/Users/julia/git/site/src/assets/logo/logo.png", "left": 3.75, "top": 0.4, "width": 2.5}
+      ],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 0.15, "height": 7.5, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0.5, "top": 0.6, "width": 5.5, "height": 0.04, "fill": "C8A45C"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.3, "top": 1.6, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.3, "top": 4.4, "width": 4.3, "height": 2.5, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 6.1, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "", "text_color": "4D96FF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "", "text_color": "4D96FF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 2.5, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.4, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.3, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.2, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 6.1, "width": 9.2, "height": 0.7, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"},
+        {"type": "rounded_rectangle", "left": 5.2, "top": 1.6, "width": 4.4, "height": 5.3, "fill": "1A3352", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 1.2, "fill": "162B44"},
+        {"type": "rectangle", "left": 0, "top": 1.2, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 1.6, "width": 9.2, "height": 1.2, "fill": "2D1B1B", "text": "", "text_color": "FF6B6B"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 3.0, "width": 9.2, "height": 1.2, "fill": "2D2B1B", "text": "", "text_color": "FFD93D"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 4.4, "width": 9.2, "height": 1.2, "fill": "1B2D1B", "text": "", "text_color": "6BCB77"},
+        {"type": "rounded_rectangle", "left": 0.4, "top": 5.8, "width": 9.2, "height": 1.2, "fill": "1B1B2D", "text": "", "text_color": "4D96FF"}
+      ],
+      "images": [],
+      "tables": [],
+      "notes": ""
+    },
+    {
+      "layout": "blank",
+      "background": "0F1B2D",
+      "shapes": [
+        {"type": "rectangle", "left": 0, "top": 0, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rectangle", "left": 0, "top": 7.44, "width": 10, "height": 0.06, "fill": "C8A45C"},
+        {"type": "rounded_rectangle", "left": 0.5, "top": 1.5, "width": 9, "height": 4.5, "fill": "162B44", "text": "", "text_color": "FFFFFF"}
+      ],
+      "images": [
+        {"path": "C:/Users/julia/git/site/src/assets/logo/logo.png", "left": 3.75, "top": 0.4, "width": 2.5}
+      ],
+      "tables": [],
+      "notes": ""
+    }
+  ]
+}
