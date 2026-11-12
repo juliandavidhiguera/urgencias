@@ -69,6 +69,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - No cambiado: con ClCr >40 sin NAH la tabla da 3,375 g/6 h; el protocolo mantiene 4,5 g/6 h (documento «ab en sepsis»). Dialisis peritoneal no esta en el selector `trr`.
 - Modificado (#24): `codi-sepsia` `renal` segun fichas tecnicas CIMA. Cefepima (columna muy grave, 2 g/8 h): >50 habitual, 30–50 2 g/12 h, 11–29 2 g/24 h, ≤10 1 g/24 h, HD sin cambio (1 g dia 1 → 500 mg/24 h tras la sesion). Metronidazol: max 1.500 mg/dia, HD dosis tras la sesion; el ≈50 % hepatico es del documento (la FT no da cifra). Linezolid: HD tras la sesion (≈30 % en 3 h), aviso con ClCr <30 o dialisis. `sw.js` `urg-v83`. Verificado con node (cefepima ClCr 60/40/30/29/11/10/HD; metro y linezolid 60/20/HD).
 - Pendiente detectado: meropenem en HD sigue «farmacia» (Meronem solo dice dosis tras la sesion).
+- Modificado (#26, peticion del usuario): el boton de heparina abre la perfusion en TEP `ttoAlta`, `catC3` (via `HEP`) y `catD` (pauta 80/18) y en FA `ANTICO` (cve, flec, amio_cv, espera) con `{ min: 12, max: 18, rango: 'FA: 12–18 UI/kg/h' }`. Siguen `inf:false`: TEP `shock` y `catE` (solo bolo antes de la lisis), IAM `icp`/`fib`, SCASEST. `sw.js` `urg-v84`. Verificado headless: panel con perfusion, 70 kg → 12,6 ml/h, rango FA visible, `shock` y `fib` sin perfusion, 0 errores JS.
 - Decisiones: contenido de fichas sin fuente local → ficha tecnica CIMA (usuario). Heparina vuelve a la calculadora (usuario; memoria `perfusion_iv_scope` actualizada).
 - Descartado: Meropenem Kabi como fuente (errata renal).
 
@@ -171,7 +172,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~22~~ | ~~Decisiones sepsis~~ — RESUELTO sesion 27: BLEE en urosepsis → meropenem solo con riesgo de BLEE; vancomicina en meningitis se queda opcional por riesgo de neumococo resistente (decision del usuario 2026-11-11, ESCMID 2016) | - | - | - | Resuelto |
 | 23 | «Copiar resumen» del flujo sin linea «Datos:» en protocolos con evaluador: decidir si se anade; comentario obsoleto «Killip II–III» en `muyAlto` de codi-iam | `index.html`, `data/protocols.js` | P3 | Usuario | Decision aplicada |
 | ~~25~~ | ~~Ajuste renal de piperacilina-tazobactam~~ — RESUELTO sesion 28: el Codi Sepsia usa la tabla de la monografia (ficha de EE. UU., Zosyn) aportada por el usuario, incluida la fila de neumonia nosocomial; la ficha europea queda como nota | - | - | - | Resuelto |
-| 26 | Decidir si TEP (80/18, coincide con la perfusion) y FA (12–18 UI/kg/h) abren la perfusion de heparina desde sus botones (hoy `inf:false`) | `data/protocols.js` (`HEP`, `ANTICO`) | P3 | Usuario | Botones con perfusion o decision de dejarlos asi |
+| ~~26~~ | ~~Heparina del TEP y la FA abre la perfusion~~ — HECHO sesion 28 (peticion del usuario) | - | - | - | Resuelto |
 | 27 | La calculadora de ficha no lee la presentacion de meropenem («500 mg y de 1 g»): hay que escribirla a mano | `data/fichas.js` (`presentacion`) o `parsePresentacion` | P3 | - | Al abrir la ficha la presentacion queda preseleccionada |
 | 20 | Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3 | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
 
@@ -258,7 +259,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
 - **Fichas fuera de Guies Clíniques** (meropenem, piperacilina-tazobactam): escritas a mano al final de `data/fichas.js` con `fuenteNombre`; `scripts/merge_fichas.js` regenera solo las 75 de `medicamentos/` y las borraria. `file` es solo la clave (no hay `.md`).
-- **Heparina en INFUSIONS**: todo boton `'Heparina sódica'` como texto en un nodo abre la perfusion a 18 UI/kg/h; donde la pauta sea otra usar `{ n: 'Heparina sódica', inf: false }`.
+- **Heparina en INFUSIONS**: todo boton `'Heparina sódica'` como texto en un nodo abre la perfusion a 18 UI/kg/h; donde la pauta sea otra usar `{ n: 'Heparina sódica', inf: false }` (solo bolo) o `min/max/rango` (otro rango, como la FA).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Preguntar al usuario la pauta de meropenem en hemodialisis (hoy «farmacia» en `codi-sepsia` `renal`) o seguir con el backlog #26/#27.
+Preguntar al usuario la pauta de meropenem en hemodialisis (hoy «farmacia» en `codi-sepsia` `renal`) o seguir con el backlog #27.

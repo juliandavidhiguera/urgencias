@@ -267,7 +267,7 @@ window.PROTOCOLS = [
     const kg = (v, f, max) => num(v.peso) ? ' (' + String(Math.round(Math.min(v.peso * f, max || Infinity))).replace('.', ',') + ' mg con ' + v.peso + ' kg)' : '';
     const rg = (v, a, b, u) => num(v.peso) ? ' (<b>' + Math.round(v.peso * a) + '–' + Math.round(v.peso * b) + ' ' + (u || 'mg') + '</b> con ' + v.peso + ' kg)' : '';
     const SED = ['Etomidato', 'Propofol', 'Midazolam', { n: 'Fentanilo', inf: false }];
-    const ANTICO = ['Enoxaparina', { n: 'Heparina sódica', inf: false }];
+    const ANTICO = ['Enoxaparina', { n: 'Heparina sódica', min: 12, max: 18, rango: 'FA: 12–18 UI/kg/h' }];
     const POSTCV = 'Tras cualquier cardioversión: <b>anticoagulación ≥4 semanas</b> (opcional solo si no hay factores de riesgo y el ritmo sinusal se recuperó en &lt;24 h desde un inicio seguro); después, según el CHA₂DS₂-VA.';
     return {
       start: 'ecg',
@@ -3800,7 +3800,7 @@ window.PROTOCOLS = [
     const SOPORTE = '<b>Soporte:</b> cristaloide ≤500 mL en 15–30 min solo sin congestión · noradrenalina 0,05–0,1 µg/kg/min si PAM &lt;65 o PAS &lt;90, titular sin techo fijo (ESC: 0,2–1,0); vía periférica válida hasta tener CVC · dobutamina 2–10 µg/kg/min (ESC hasta 20) si bajo gasto con PA conservada, no en monoterapia si hay hipotensión · O₂ para SpO₂ ≥90 % (Ventimask → reservorio → OAF). Sedación profunda/IOT sin indicación: clase 3 (daño); si es imprescindible, soporte hemodinámico preparado, inductor a dosis reducida (ketamina o etomidato), Vt 6 mL/kg de peso ideal, PEEP baja y avisar a UCI.';
     const EMPEORA = '<b>Empeoramiento</b> = ↑FC progresiva · ↓PA sin hipotensión franca · ↓SpO₂ o ↑FiO₂ · oliguria · confusión · relleno capilar &gt;3 s o moteado · ↑lactato o troponina.';
     const ACOD = '<b>ACOD:</b> apixabán 10 mg/12 h VO × 7 días → 5 mg/12 h, o rivaroxabán 15 mg/12 h VO × 21 días → 20 mg/24 h con comida (ClCr &lt;15: evitar rivaroxabán). Embarazo, cáncer activo, SAF triple positivo o ERC grave → «Situaciones especiales» abajo.';
-    const HEP = [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica', inf: false }];
+    const HEP = [{ n: 'Enoxaparina', inf: false }, { n: 'Heparina sódica' }];
     const LISIS = [{ n: 'Tenecteplasa', inf: false, esquema: 'tnk-tep' }, { n: 'Alteplasa', inf: false, esquema: 'alteplasa-tep' }];
     const TNK = v => {
       const ok = v.peso > 0, mg = ok ? [30, 35, 40, 45, 50][v.peso < 60 ? 0 : v.peso < 70 ? 1 : v.peso < 80 ? 2 : v.peso < 90 ? 3 : 4] : 0;
@@ -3999,7 +3999,7 @@ window.PROTOCOLS = [
           ]
         },
         catD: {
-          farmacos: [{ n: 'Heparina sódica', inf: false }, { n: 'Enoxaparina', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
+          farmacos: [{ n: 'Heparina sódica' }, { n: 'Enoxaparina', inf: false }, { n: 'Noradrenalina' }, { n: 'Dobutamina' }],
           t: 'Categoría D1–D2: monitor + PERT', c: 'high',
           show: 'D1 hipotensión transitoria (PAS &lt;90 o caída &gt;40, &lt;15 min o responde a fluidos) sin hipoperfusión · D2 + hipoperfusión (lactato &gt;2, LRA, diuresis &lt;0,5 mL/kg/h, alteración mental, PAM &lt;60).<br>' +
             '• <b>HNF</b> (D1 sin reperfusión prevista: HBPM) · <b>PERT del Clínic en ≤30 min</b>; si no es candidato → CHV (Vic): UCI en D2, MI monitorizada en D1. Ningún D sale sin anticoagulación parenteral en curso.<br>' +
