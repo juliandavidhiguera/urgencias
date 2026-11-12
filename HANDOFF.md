@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-11 | **Sesion #:** 27 | **Rama:** main | **HEAD:** `dc136c5` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-12 | **Sesion #:** 28 | **Rama:** main | **HEAD:** `6e716fb` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -60,6 +60,13 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 28 - 2026-11-12
+- Anadido (`6e716fb`, peticion del usuario): Heparina sodica en `data/infusions.js` (grupo Anticoagulacion, 25.000 UI/250 ml = 100 UI/ml, 18 UI/kg/h, ficha `Heparina sòdica.md`); 70 kg → 12,6 ml/h = tarjeta de `drugs.js` (sin tocar). Botones de protocolo que la nombraban como texto pasan a `{ n: 'Heparina sódica', inf: false }` (FA `ANTICO`, SCASEST `ANTI`, IAM `icp` y `fib`) para no abrir 18 UI/kg/h donde la pauta es otra (IAM 12 UI/kg/h max 1.000; ICP solo bolo). TEP ya tenia `inf:false`.
+- Anadido: fichas `meropenem` (FT Meronem, CIMA 60640; la de Meropenem Kabi 72611 tiene errata: ClCr <10 «cada 12 h», Meronem «mitad cada 24 h») y `piperacilina-tazobactam` (FT Kabi, CIMA 71601) al final de `data/fichas.js`; dosis pediatricas en `data/fichas-ped.js`. Campo nuevo `fuenteNombre` (modal `_fichaHTML`: por defecto «Guies Clíniques SEM Catalunya»). Botones Ceftriaxona/Piperacilina-tazobactam/Meropenem en el nodo `activar` de `codi-sepsia`. `sw.js` `urg-v81`.
+- Verificado: node (carga de datos, resolucion de botones), Chromium headless shell con arnes temporal (heparina en el select, fichas con fuente CIMA, calculadora con pautas «Niños ·», ceftriaxona sigue con Guies); produccion con curl (`urg-v81`, Anticoagulacion, fichas). Chrome DevTools MCP no conecto.
+- Decisiones: contenido de fichas sin fuente local → ficha tecnica CIMA (usuario). Heparina vuelve a la calculadora (usuario; memoria `perfusion_iv_scope` actualizada).
+- Descartado: Meropenem Kabi como fuente (errata renal).
 
 ### Sesion 27 - 2026-11-11
 - Modificado (`dc136c5`): `codi-sepsia` `atb` segun el documento del usuario «ab en sepsis» (`C:/Users/julia/Downloads/ab en sepsis.txt`, sin citas exactas): pautas y dosis por foco; nuevo foco 8 NAH/NAV (valor 8, listado tras NAC); se conservan de las guias previas meningitis, alergia, corticoide NAC con shock, Candida/retirada de cateter y clindamicina en necrosante. `atb` devuelve [antibiotico, ajuste renal] (`out.push(...atb())`).
@@ -159,6 +166,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 24 | Verificar con fuente las dosis de metronidazol (500 mg/8–12 h, sin ajuste renal) y linezolid (600 mg/12 h, sin ajuste) y los cortes renales de cefepima (la app remite a farmacia) | `data/protocols.js` (`codi-sepsia` `renal`) | P2 | - | Cada dato con ficha tecnica/ASHP citada o cortes de cefepima anadidos |
 | ~~22~~ | ~~Decisiones sepsis~~ — RESUELTO sesion 27: BLEE en urosepsis → meropenem solo con riesgo de BLEE; vancomicina en meningitis se queda opcional por riesgo de neumococo resistente (decision del usuario 2026-11-11, ESCMID 2016) | - | - | - | Resuelto |
 | 23 | «Copiar resumen» del flujo sin linea «Datos:» en protocolos con evaluador: decidir si se anade; comentario obsoleto «Killip II–III» en `muyAlto` de codi-iam | `index.html`, `data/protocols.js` | P3 | Usuario | Decision aplicada |
+| 25 | Decidir el ajuste renal de piperacilina-tazobactam: Codi Sepsia (documento «ab en sepsis») da 2,25 g/6 h con ClCr 20–40 y 2,25 g/8 h con <20; la ficha tecnica da max 4/0,5 g c/8 h y c/12 h | `data/protocols.js` (`codi-sepsia` `renal`), `data/fichas.js` | P1 | Usuario | Pauta elegida aplicada o nota cruzada entre ficha y protocolo |
+| 26 | Decidir si TEP (80/18, coincide con la perfusion) y FA (12–18 UI/kg/h) abren la perfusion de heparina desde sus botones (hoy `inf:false`) | `data/protocols.js` (`HEP`, `ANTICO`) | P3 | Usuario | Botones con perfusion o decision de dejarlos asi |
+| 27 | La calculadora de ficha no lee la presentacion de meropenem («500 mg y de 1 g»): hay que escribirla a mano | `data/fichas.js` (`presentacion`) o `parsePresentacion` | P3 | - | Al abrir la ficha la presentacion queda preseleccionada |
 | 20 | Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3 | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -243,5 +253,8 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Pautas por protocolo** (`data/pautas-protocolo.js`): una linea por pauta, solo la primera `/kg` de cada linea se parsea y la primera linea es la preseleccionada; un tope diario o una nota con `/kg` en linea aparte crea otra opcion. Para una pauta en ml (glucosa, gluconato) poner la linea en ml primero (si no, la calculadora usa la presentacion de la ficha).
 - **Rango de perfusion por nodo**: `{n, dosis, min, max, rango}` en `farmacos` de un nodo sustituye el rango de `data/infusions.js` en el panel lateral (`_farmRango`, leido via `_farmCfgDeCaja`). Sin `min` se usa el de Perfusion IV. Titulos de escala sin entidades HTML (`&lt;`): el panel lateral los pone con `textContent`.
 
+- **Fichas fuera de Guies Clíniques** (meropenem, piperacilina-tazobactam): escritas a mano al final de `data/fichas.js` con `fuenteNombre`; `scripts/merge_fichas.js` regenera solo las 75 de `medicamentos/` y las borraria. `file` es solo la clave (no hay `.md`).
+- **Heparina en INFUSIONS**: todo boton `'Heparina sódica'` como texto en un nodo abre la perfusion a 18 UI/kg/h; donde la pauta sea otra usar `{ n: 'Heparina sódica', inf: false }`.
+
 ## 10. SIGUIENTE ACCION INMEDIATA
-Comprobar en produccion (curl) que `data/protocols.js` trae `trr` y `renal`, y abordar el backlog #24 (metronidazol, linezolid y cortes renales de cefepima).
+Pedir al usuario la decision del backlog #25 (ajuste renal de piperacilina-tazobactam: documento «ab en sepsis» vs ficha tecnica) y aplicarla en `codi-sepsia` `renal`.
