@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-12 | **Sesion #:** 28 | **Rama:** main | **HEAD:** `6e716fb` (desplegado en produccion) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-12 | **Sesion #:** 28 | **Rama:** main | **HEAD:** `c2edb32` (desplegado en produccion, `urg-v85`) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -73,6 +73,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - Modificado (#26, peticion del usuario): el boton de heparina abre la perfusion en TEP `ttoAlta`, `catC3` (via `HEP`) y `catD` (pauta 80/18) y en FA `ANTICO` (cve, flec, amio_cv, espera) con `{ min: 12, max: 18, rango: 'FA: 12–18 UI/kg/h' }`. Siguen `inf:false`: TEP `shock` y `catE` (solo bolo antes de la lisis), IAM `icp`/`fib`, SCASEST. `sw.js` `urg-v84`. Verificado headless: panel con perfusion, 70 kg → 12,6 ml/h, rango FA visible, `shock` y `fib` sin perfusion, 0 errores JS.
 - Modificado (bibliografia aportada por el usuario; DOIs en Crossref): perfusion de heparina 12 UI/kg/h con tope 1.000 UI/h en IAM `fib` y SCASEST `ANTI` (`{ dosis: 12, min: 12, topeH: 1000, rango }`); TEP `shock` tambien abre perfusion (80/18); `catE` sigue `inf:false` (HNF parada durante la lisis); ICP solo bolo. SCASEST: texto y evaluador con 60 UI/kg (max 4.000) + 12 UI/kg/h (max 1.000) segun TTPa (ACC/AHA 2025, Rao, doi 10.1016/j.jacc.2024.11.009). `index.html` `_farmCalc`: `topeH` recorta el ritmo, lo anuncia y avisa si se escribe un ritmo por encima. `sw.js` `urg-v85`. Verificado headless: IAM 70 kg 8,4 ml/h, 100 kg 10 ml/h (tope), TEP shock 12,6 ml/h, catE sin perfusion, 0 errores. DOI de Malleier 2026 (10.1007/s00392-026-02900-y) no corresponde al articulo citado: no se uso.
 - Revision de heparina en protocolos (peticion del usuario; aplicadas 1, 2+3, 4+6): `pautas-protocolo.js` con bolo propio en FA (60–80 UI/kg, max 5000) y SCASEST (60 UI/kg, max 4000) — antes la calculadora del panel ofrecia el 70 UI/kg de ICP de la ficha — y `Heparina sódica@icp` (70–100 UI/kg, ACT 250–300 s). IAM/SCASEST: TTPa objetivo 50–70 s (texto, evaluadores y `rango`). Codi IAM ICP 70–100 UI/kg ajustado por ACT (ACC/AHA 2025), sin perfusion sistematica. Protamina (1 mg/100 UI de las ultimas 2–3 h, max 50 mg) en TEP (lisis) e IAM/SCASEST. TEP «U» → «UI» (17). Verificado headless: FA 70 kg 4200–5000 UI, 100 kg 5000; SCASEST 100 kg 4000; ICP 80 kg 5600–8000; IAM fib 4000; TEP 5600; 0 errores.
+- Commits sesion 28: `6e716fb` heparina en perfusiones + fichas meropenem/pip-tazo · `9827c0e` renal pip-tazo NAH · `30a7d9c` cefepima/metronidazol/linezolid · `83c57ce` heparina TEP/FA · `c2edb32` heparina IAM/SCASEST, bolos, TTPa, protamina. Todos verificados en produccion con curl.
 - Decisiones: contenido de fichas sin fuente local → ficha tecnica CIMA (usuario). Heparina vuelve a la calculadora (usuario; memoria `perfusion_iv_scope` actualizada).
 - Descartado: Meropenem Kabi como fuente (errata renal).
 
@@ -266,4 +267,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Heparina en INFUSIONS**: todo boton `'Heparina sódica'` como texto en un nodo abre la perfusion a 18 UI/kg/h; donde la pauta sea otra usar `{ n: 'Heparina sódica', inf: false }` (solo bolo) o `min/max/rango` (otro rango, como la FA) y `topeH` (tope absoluto por hora, IAM/SCASEST 1.000 UI/h).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Preguntar al usuario la pauta de meropenem en hemodialisis (hoy «farmacia» en `codi-sepsia` `renal`) o seguir con el backlog #27.
+Hacer el backlog #27 (que la calculadora de ficha lea la presentacion de meropenem «500 mg y de 1 g»); #28 y meropenem en HD esperan datos del usuario.
