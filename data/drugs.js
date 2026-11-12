@@ -27,7 +27,7 @@ window.DRUGS = [
   {
     name: 'Dopamina',
     dilution: 'Perfusión: 200 mg en 50 mL SG5% = 4000 µg/mL (jeringa de 50 mL)',
-    doseRange: '2–20 µg/kg/min', alerts: ['Extravasación: riesgo de necrosis. Infiltrar fentolamina cuanto antes', 'Taquiarritmias, más frecuentes que con noradrenalina'],
+    doseRange: '5–20 µg/kg/min', alerts: ['Extravasación: riesgo de necrosis. Infiltrar fentolamina cuanto antes', 'Taquiarritmias, más frecuentes que con noradrenalina'],
     infusionRef: 'Dopamina'
   },
   {
