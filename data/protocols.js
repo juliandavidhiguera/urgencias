@@ -267,7 +267,7 @@ window.PROTOCOLS = [
     const kg = (v, f, max) => num(v.peso) ? ' (' + String(Math.round(Math.min(v.peso * f, max || Infinity))).replace('.', ',') + ' mg con ' + v.peso + ' kg)' : '';
     const rg = (v, a, b, u) => num(v.peso) ? ' (<b>' + Math.round(v.peso * a) + '–' + Math.round(v.peso * b) + ' ' + (u || 'mg') + '</b> con ' + v.peso + ' kg)' : '';
     const SED = ['Etomidato', 'Propofol', 'Midazolam', { n: 'Fentanilo', inf: false }];
-    const ANTICO = ['Enoxaparina', 'Heparina sódica'];
+    const ANTICO = ['Enoxaparina', { n: 'Heparina sódica', inf: false }];
     const POSTCV = 'Tras cualquier cardioversión: <b>anticoagulación ≥4 semanas</b> (opcional solo si no hay factores de riesgo y el ritmo sinusal se recuperó en &lt;24 h desde un inicio seguro); después, según el CHA₂DS₂-VA.';
     return {
       start: 'ecg',
@@ -915,7 +915,7 @@ window.PROTOCOLS = [
   },
   flow:(() => {
     const num = x => !isNaN(x) && x >= 0;
-    const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', 'Heparina sódica'];
+    const ANTI = ['Ácido acetilsalicílico', 'Acetilsalicilato de lisina', 'Enoxaparina', { n: 'Heparina sódica', inf: false }];
     const E = () => PROTOCOLS.find(x => x.id === 'dolor-toracico').eval; // sugerencias con las mismas funciones del evaluador
     return {
       start: 'ecg',
@@ -1359,7 +1359,7 @@ window.PROTOCOLS = [
           q: 'Ventana de 90–120 min: decidir según el caso. ¿Qué estrategia se elige?',
           opts: [{ l: 'Angioplastia primaria', go: 'icp' }, { l: 'Fibrinólisis prehospitalaria', go: 'fibci' }]
         },
-        icp: { farmacos: ['Heparina sódica'],
+        icp: { farmacos: [{ n: 'Heparina sódica', inf: false }],
           t: 'ANGIOPLASTIA PRIMARIA', c: 'high',
           show: v => 'Traslado directo a la sala de hemodinámica.<br>HEPARINA SÓDICA 70 UI/kg IV en bolo' + (hay(v.peso) ? ': <b>' + f(Math.round(70 * v.peso)) + ' UI</b>' : '. ' + faltaPeso),
           q: 'Segundo antiagregante: ¿qué situación aplica?',
@@ -1383,7 +1383,7 @@ window.PROTOCOLS = [
           t: 'Fibrinólisis contraindicada', c: 'high', show: 'Traslado para angioplastia primaria aunque el tiempo supere la ventana (ESC 2023).',
           q: 'Continuar', opts: [{ l: 'Pautar la angioplastia primaria', go: 'icp' }]
         },
-        fib: { farmacos: [{ n: 'Tenecteplasa', esquema: 'tnk-iam' }, 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', 'Heparina sódica'],
+        fib: { farmacos: [{ n: 'Tenecteplasa', esquema: 'tnk-iam' }, 'Ácido acetilsalicílico', 'Clopidogrel', 'Enoxaparina', { n: 'Heparina sódica', inf: false }],
           t: 'FIBRINÓLISIS CON TENECTEPLASA', c: 'high',
           show: v => '<b>Tenecteplasa:</b> ' + tnk(v) + ' Es el doble que la dosis del ictus. Incompatible con glucosa: vía con SF 0,9 %.<br>' +
             '<b>Antiagregación:</b> AAS 150–300 mg VO (o 450 mg IV) + ' + clopi(v) + '. NO prasugrel ni ticagrelor.<br>' +
@@ -2571,7 +2571,7 @@ window.PROTOCOLS = [
           t: 'Sin sospecha de infección', c: 'mid',
           show: 'No se activa el Codi Sèpsia: traslado a urgencias con <b>alerta de paciente crítico</b>.'
         },
-        activar: { farmacos: [{ n: 'Fentanilo', inf: false }, 'Paracetamol', { n: 'Insulina', inf: false }],
+        activar: { farmacos: [{ n: 'Fentanilo', inf: false }, 'Paracetamol', { n: 'Insulina', inf: false }, 'Ceftriaxona', 'Piperacilina-tazobactam', 'Meropenem'],
           t: 'ACTIVAR CODI SÈPSIA', c: 'high',
           show: v => 'Comunicar a CECOS (IDEAS).<br>' +
             '<b>Primera hora:</b> hemocultivos y <b>antibiótico en &lt;1 h</b> · control del foco (drenaje precoz, &lt;12 h) · monitorización de FR, FC, TAM, relleno capilar, EtCO₂, índice de perfusión e índice de shock.<br>' +

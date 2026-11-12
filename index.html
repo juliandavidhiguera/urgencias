@@ -5907,7 +5907,7 @@ function _fichaHTML(f) {
     if (f.lactancia) parts.push('<strong>Lactancia:</strong> ' + f.lactancia);
     html += _fichaSection('Embarazo y lactancia', parts.join('<br><br>'), 'ficha-nota');
   }
-  if (f.fuente) html += '<div class="ficha-src">Fuente: <a href="' + f.fuente + '" target="_blank" rel="noopener">Guies Clíniques SEM Catalunya ↗</a></div>';
+  if (f.fuente) html += '<div class="ficha-src">Fuente: <a href="' + f.fuente + '" target="_blank" rel="noopener">' + (f.fuenteNombre || 'Guies Clíniques SEM Catalunya') + ' ↗</a></div>';
   html += '</div>';
   return html;
 }

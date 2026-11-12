@@ -139,6 +139,11 @@ window.INFUSIONS = [
   diluyente: 'SF 0,9%', notas: 'Fase inicial 0,1 UI/kg/h en CAD (o EHH con criterios mixtos de cetosis/acidosis); 0,05 UI/kg/h si EHH puro sin cetosis significativa. Reducir a 0,05 UI/kg/h y añadir dextrosa 5-10% cuando la glucemia sea <250 mg/dl. Vigilar hipoglucemia y potasio seriados',
   ficha: 'Insulina.md'},
 
+{name: 'Heparina sódica', group: 'Anticoagulación', badge: 'blue',
+  mg: 25000, vol: 250, unit: 'UI/kg/h', doseMin: 18, doseMax: null, unitLabel: 'UI',
+  diluyente: 'SF 0,9%', notas: 'Bolo previo de 80 UI/kg IV. Inicio 18 UI/kg/h y ajuste según TTPa: control a las 6 h del inicio y tras cada cambio de ritmo. Vigilar plaquetas (trombopenia inducida por heparina)',
+  ficha: 'Heparina sòdica.md'},
+
 {name: 'Naloxona', group: 'Antídotos', badge: 'red',
   mg: 2, vol: 50, unit: 'mg/h', doseMin: 0.2, doseMax: 1.6,
   diluyente: 'SF 0,9% / SG 5%', notas: 'Resedación tras bolos eficaces (metadona, opioides de acción prolongada, fentanilo a dosis altas): iniciar a 2/3 de la dosis eficaz de reversión por hora (AHA 2025, PMID 41122889) y ajustar a ventilación eficaz, no a despertar completo. El rango 0,2-1,6 mg/h es orientativo: manda la dosis eficaz. Dilución: 2 mg (5 amp. 0,4 mg) en 50 mL (0,04 mg/mL). Vigilar abstinencia y EAP no cardiogénico',

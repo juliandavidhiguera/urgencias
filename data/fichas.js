@@ -2,6 +2,9 @@
    FICHAS — fichas técnicas de medicamentos (castellano)
    Fuente: Guies Clíniques SEM Catalunya (medicamentos/*.md), traducidas
    y limpiadas de artefactos de extracción PDF. Ver "fuente" por fármaco.
+   Excepción: meropenem y piperacilina-tazobactam no están en Guies Clíniques;
+   se redactaron a mano desde la ficha técnica de CIMA AEMPS (campo fuenteNombre).
+   Regenerar con scripts/merge_fichas.js las borraría.
    Formato: { file, id, nombre, altoRiesgo, fuente, subtitulo, alerta,
              presentacion, propiedades, indicaciones, dosis,
              contraindicaciones, efectosSecundarios, observaciones,
@@ -1528,5 +1531,45 @@ window.FICHAS = [
     "lactancia": null,
     "pediatria": null,
     "id": "acido-tranexamico"
+  },
+  {
+    "file": "Meropenem.md",
+    "nombre": "Meropenem",
+    "altoRiesgo": false,
+    "fuente": "https://cima.aemps.es/cima/dochtml/ft/60640/FT_60640.html",
+    "fuenteNombre": "Ficha técnica Meronem, CIMA AEMPS",
+    "subtitulo": null,
+    "alerta": "No asociar con ácido valproico: los carbapenémicos bajan sus niveles un 60–100 % en unos 2 días (riesgo de convulsiones).",
+    "presentacion": "Vial de polvo de 500 mg y de 1 g para solución inyectable y para perfusión. El vial de 1 g aporta unos 4 mEq (90 mg) de sodio.",
+    "propiedades": "Antibiótico betalactámico del grupo de los carbapenémicos. Bactericida: inhibe la síntesis de la pared bacteriana. Su eficacia depende del tiempo que la concentración se mantiene por encima de la CMI.",
+    "indicaciones": "Adultos y niños mayores de 3 meses: neumonía grave (incluidas la hospitalaria y la asociada a ventilación mecánica), infección broncopulmonar en la fibrosis quística, infección urinaria complicada, infección intraabdominal complicada, infección intra- y posparto, infección complicada de piel y tejidos blandos y meningitis bacteriana aguda. Bacteriemia asociada (o sospechada) a cualquiera de ellas. Neutropenia febril de probable origen bacteriano.",
+    "dosis": "• Adultos y adolescentes, cada 8 h: 500 mg o 1 g en neumonía grave, infección urinaria, intraabdominal, intra- o posparto y de piel y tejidos blandos complicadas; 1 g en neutropenia febril; 2 g en meningitis bacteriana aguda y en fibrosis quística.\n• Hasta 2 g cada 8 h en infecciones muy graves o por bacterias menos sensibles (Enterobacterales, Pseudomonas aeruginosa, Acinetobacter).\n• Administración: perfusión IV en 15–30 min, diluido en SF 0,9 % a 1–20 mg/ml (en SG 5 %, usar de inmediato). Dosis de hasta 1 g también en bolo IV de 5 min, reconstituido con agua para inyección a 50 mg/ml.\n• Insuficiencia renal (ClCr): 26–50 ml/min, dosis completa cada 12 h; 10–25 ml/min, mitad de la dosis cada 12 h; <10 ml/min, mitad de la dosis cada 24 h. Se elimina por hemodiálisis y hemofiltración: dar la dosis al acabar la sesión. Diálisis peritoneal: sin pauta establecida.\n• Insuficiencia hepática y ancianos con ClCr >50 ml/min: sin ajuste.",
+    "contraindicaciones": "Hipersensibilidad al meropenem, a otro carbapenémico o a los excipientes. Hipersensibilidad grave (anafilaxia, reacción cutánea grave) a cualquier otro betalactámico (penicilinas, cefalosporinas).",
+    "efectosSecundarios": "Frecuentes: diarrea, náuseas, vómitos, dolor abdominal, cefalea, erupción, prurito, trombocitosis, aumento de transaminasas, fosfatasa alcalina y LDH, inflamación y dolor en el punto de inyección. Poco frecuentes: candidiasis oral y vaginal, eosinofilia, trombocitopenia, leucopenia, neutropenia, parestesias, colitis por Clostridioides difficile, hipopotasemia, aumento de creatinina y urea, lesión hepática, tromboflebitis, urticaria, síndrome de Stevens-Johnson y necrólisis epidérmica tóxica. Raras: convulsiones. Frecuencia no conocida: agranulocitosis, anemia hemolítica, anafilaxia, angioedema, DRESS, pustulosis exantemática generalizada aguda, rabdomiólisis.",
+    "observaciones": "• Ácido valproico: evitar la asociación (ver alerta).\n• Probenecid: aumenta la concentración y la semivida del meropenem.\n• Anticoagulantes orales: vigilar el INR durante el tratamiento y al acabarlo.\n• Preguntar por reacciones previas a penicilinas, cefalosporinas u otros carbapenémicos.\n• Vigilar la función hepática (lesión hepática inducida). Suspender si aparecen rabdomiólisis o una reacción cutánea grave.\n• Puede positivizar la prueba de Coombs.\n• No mezclar con otros fármacos. Diluido en SF 0,9 %, estable 6 h a ≤25 ºC o 24 h en nevera.",
+    "embarazo": "Datos insuficientes; por precaución, es preferible evitarlo.",
+    "lactancia": "Pasa a la leche en pequeñas cantidades: usar solo si el beneficio para la madre justifica el riesgo para el lactante.",
+    "pediatria": null,
+    "id": "meropenem"
+  },
+  {
+    "file": "Piperacilina-tazobactam.md",
+    "nombre": "Piperacilina-tazobactam",
+    "altoRiesgo": false,
+    "fuente": "https://cima.aemps.es/cima/dochtml/ft/71601/FT_71601.html",
+    "fuenteNombre": "Ficha técnica Piperacilina/Tazobactam Kabi, CIMA AEMPS",
+    "subtitulo": null,
+    "alerta": null,
+    "presentacion": "Vial de polvo de 4 g de piperacilina / 0,5 g de tazobactam (también de 2 g / 0,25 g) para perfusión. El vial de 4 g / 0,5 g contiene 224 mg (9,7 mmol) de sodio.",
+    "propiedades": "Penicilina antipseudomónica de amplio espectro asociada a un inhibidor de betalactamasas (tazobactam). Bactericida.",
+    "indicaciones": "Adultos y adolescentes: neumonía grave (incluidas la hospitalaria y la asociada a ventilación mecánica), infección urinaria complicada (incluida la pielonefritis), infección intraabdominal complicada e infección complicada de piel y tejidos blandos (incluido el pie diabético). Bacteriemia asociada (o sospechada) a cualquiera de ellas. Neutropenia febril de probable origen bacteriano.\nNo se recomienda en la bacteriemia por E. coli o K. pneumoniae productoras de BLEE (resistentes a ceftriaxona).\nNiños de 2 a 12 años: infección intraabdominal complicada y neutropenia febril.",
+    "dosis": "• Habitual: 4 g / 0,5 g cada 8 h (infección urinaria, intraabdominal y de piel y tejidos blandos complicadas).\n• Cada 6 h: neumonía grave, neutropenia febril y otras infecciones especialmente graves.\n• Administración: perfusión IV en 30 min. Reconstituir el vial de 4 g / 0,5 g con 20 ml de SF 0,9 % o agua para inyección y diluir hasta 50–150 ml de SF 0,9 % o SG 5 %.\n• Insuficiencia renal (ClCr): >40 ml/min, sin ajuste; 20–40 ml/min, máximo 4 g / 0,5 g cada 8 h; <20 ml/min, máximo 4 g / 0,5 g cada 12 h. Hemodiálisis: 2 g / 0,25 g adicionales tras cada sesión (elimina el 30–50 % de la piperacilina en 4 h).\n• Insuficiencia hepática y ancianos con ClCr >40 ml/min: sin ajuste.\n• Duración habitual: 5–14 días según la infección y la respuesta.",
+    "contraindicaciones": "Hipersensibilidad a la piperacilina, al tazobactam, a cualquier otra penicilina o a los excipientes. Antecedente de reacción alérgica aguda grave a cualquier otro betalactámico (cefalosporinas, monobactámicos, carbapenémicos).",
+    "efectosSecundarios": "Muy frecuente: diarrea. Frecuentes: candidiasis, trombocitopenia, anemia, cefalea, insomnio, dolor abdominal, náuseas, vómitos, estreñimiento, dispepsia, erupción, prurito, fiebre, reacción en el punto de inyección, aumento de transaminasas y creatinina, alargamiento del TTPa. Poco frecuentes: leucopenia, hipopotasemia, hipotensión, flebitis, ictericia, urticaria, eritema multiforme, artralgias, mialgias. Raras: colitis pseudomembranosa, agranulocitosis, epistaxis, necrólisis epidérmica tóxica. Graves de frecuencia no conocida: anafilaxia, síndrome de Kounis, síndrome de Stevens-Johnson, DRESS, pancitopenia, anemia hemolítica, nefritis tubulointersticial, insuficiencia renal, rabdomiólisis, convulsiones, encefalopatía, delirio, neumonía eosinofílica, linfohistiocitosis hemofagocítica (sobre todo con tratamientos de más de 10 días).",
+    "observaciones": "• Con vancomicina aumenta la incidencia de lesión renal aguda; también puede retrasar la recuperación de la función renal en el paciente crítico.\n• Inactiva los aminoglucósidos (gentamicina, tobramicina, amikacina) si se mezclan: administrarlos por separado.\n• Incompatible con Ringer lactato y con soluciones con bicarbonato. No mezclar con otros fármacos, hemoderivados ni albúmina.\n• Puede prolongar el bloqueo de los relajantes neuromusculares no despolarizantes.\n• Anticoagulantes: controlar la coagulación con más frecuencia; las hemorragias son más probables con insuficiencia renal.\n• Metotrexato: reduce su eliminación (vigilar niveles). Probenecid: prolonga la semivida.\n• Convulsiones con dosis altas, sobre todo con insuficiencia renal. Vigilar el potasio y el hemograma en tratamientos prolongados.\n• Falsos positivos: glucosuria por métodos no enzimáticos, prueba de Coombs, galactomanano de Aspergillus.\n• Reconstituido o diluido, estable 24 h en nevera.",
+    "embarazo": "Atraviesa la placenta: usar solo si está claramente indicado y el beneficio supera el riesgo.",
+    "lactancia": "La piperacilina pasa a la leche en bajas concentraciones: usar solo si el beneficio supera el riesgo.",
+    "pediatria": null,
+    "id": "piperacilina-tazobactam"
   }
 ];
