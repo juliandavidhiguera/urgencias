@@ -3,64 +3,68 @@
    steps: {type:'action'|'decision'|'info', text, yes, no, branch:'yes'|'no'}
    Referencias: guías ERC/AHA, DAS (vía aérea difícil), SEM Gencat
    ================================================================== */
-/* Patrones ECG de oclusión coronaria (OMI): galería del Codi IAM y desplegable de su flujograma. */
+/* Patrones ECG de oclusión coronaria (OMI): galería del Codi IAM y desplegable de su flujograma.
+   nivel 1: activación inmediata (equivalente de IAMCEST) · nivel 2: alto riesgo, coronariografía urgente tras
+   valoración experta · nivel 3: signo en estudio, nunca activa por sí solo ni retrasa el manejo.
+   esquema: dibujo propio (codigos/patrones iam nuevos/esquemas/), el mismo que usa el temario de urgencias-sim. */
 const PATRONES_OMI = [
-      {file:'Ondas T hiperagudas.jpg', label:'Ondas T hiperagudas',
+      {file:'Patron de Winter.jpg', esquema:'de-winter.svg', nivel:1, label:'Patrón de De Winter',
+        criterios:'Descenso del ST ascendente desde el punto J, generalmente ≥1 mm, en precordiales, con ondas T altas, positivas y simétricas, sin elevación del ST precordial · puede haber elevación discreta del ST en aVR',
+        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
+        significado:'Patrón de alto riesgo compatible con oclusión de la DA: con clínica isquémica compatible, coronariografía urgente. Es criterio de activación del Codi IAM.',
+        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466; Codi IAM'},
+      {file:'OMI inferobasal - posterior.jpg', esquema:'posterior.svg', nivel:1, label:'OMI inferobasal-posterior',
+        criterios:'Descenso del ST máximo en V1–V4, sobre todo horizontal o isquémico, no secundario a bloqueo de rama ni marcapasos · registrar V7–V9: elevación del ST ≥0,5 mm lo apoya',
+        arteria:'CD (más frecuente), Cx, ramas obtusas marginales o descendente posterior',
+        significado:'Uno de los patrones mejor respaldados. El infarto posterior supone en torno al 10 % de los OMI y es especialmente fácil de pasar por alto: buscarlo activamente con V7–V9 si hay descenso del ST en V1–V3.',
+        fuente:'Meyers 2021, JAHA · PMID 34775811'},
+      {file:'criterios Sgarbossa.jpg', esquema:'sgarbossa-smith.svg', nivel:1, label:'Criterios de Sgarbossa modificados (Smith)',
+        criterios:'1) Elevación del ST concordante ≥1 mm en derivación con QRS positivo · 2) Descenso del ST concordante ≥1 mm en V1–V3 · 3) Discordancia excesiva: cociente ST/S ≤ −0,25 (elevación del ST ≥25 % de la profundidad de la S; sustituye el umbral fijo de ≥5 mm del Sgarbossa original) — basta 1 criterio',
+        arteria:'Variable — indica oclusión coronaria aguda en presencia de BRIHH o ritmo de marcapasos',
+        significado:'El mejor validado para BRIHH o ritmo estimulado: en la cohorte de validación, sensibilidad 80 % frente a 49 % del Sgarbossa original, con especificidad cercana al 99 %. Si es positivo, manejo como IAMCEST, integrado con síntomas y situación hemodinámica.',
+        fuente:'Smith 2012 · PMID 22939607; Meyers 2015 · PMID 26678648; Dodd 2021 · PMID 34172301; Kontos 2022 · PMID 36241466'},
+      {file:'Patron Wellens.jpg', esquema:'wellens.svg', nivel:2, label:'Patrón de Wellens',
+        criterios:'Tipo A: T bifásica en V2–V3. Tipo B: T invertida profunda y simétrica en V2–V3. Progresión de la onda R conservada; se registra en fase sin dolor (tras reperfusión espontánea)',
+        arteria:'DA proximal — estenosis crítica, no necesariamente ocluida en el momento del registro',
+        significado:'No es un OMI activo: patrón de reperfusión o isquemia crítica con alto riesgo de oclusión. NO realizar ergometría. Valoración coronaria invasiva precoz; no todos los pacientes sin dolor requieren la misma activación que un IAMCEST con oclusión persistente.',
+        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
+      {file:'Patron Aslanger.jpg', esquema:'aslanger.svg', nivel:2, label:'Patrón de Aslanger',
+        criterios:'Elevación del ST aislada en III, sin elevación en las otras inferiores · descenso del ST en alguna de V4–V6 con onda T positiva o terminalmente positiva, sin afectación de V2 · ST en V1 más alto que en V2',
+        arteria:'Oclusión de CD o Cx en un paciente con enfermedad de varios vasos',
+        significado:'Fenotipo de alto riesgo poco frecuente (1,2 % de una serie prospectiva de 1.223 SCA) con firma angiográfica multivaso. Comentar con hemodinámica; no basta por sí solo para afirmar una oclusión.',
+        fuente:'Aslanger 2020, J Electrocardiol; Yousuf 2026, Indian Heart J'},
+      {file:'Ondas T hiperagudas.jpg', nivel:2, label:'Ondas T hiperagudas',
         criterios:'Ondas T altas, de base ancha, simétricas y desproporcionadas respecto al QRS precedente, en ≥2 derivaciones contiguas. Suelen preceder a la elevación del ST. Excluir hiperpotasemia, HVI y repolarización precoz.',
         arteria:'Según distribución: V1–V4 → DA · II/III/aVF → CD o Cx · I/aVL/V5–V6 → Cx o diagonal',
-        significado:'Sin criterios STEMI, hasta 84% tienen lesión culpable de IAM (especificidad 98%) — angiografía urgente.',
-        fuente:'Meyers 2025, JACC Adv · PMID 40892623'},
-      {file:'Patron de Winter.jpg', label:'Patrón de Winter',
-        criterios:'Depresión del ST ≥1 mm ascendente en el punto J en V1–V6 con ondas T altas y simétricas, sin elevación del ST precordial · ST elevado 1–3 mm en aVR',
-        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
-        significado:'Equivalente OMI formalmente reconocido — indicación de angiografía inmediata.',
+        significado:'Nunca como criterio aislado: interpretar con los síntomas, los cambios seriados y las derivaciones recíprocas. Si se mantienen con clínica compatible, comentar con hemodinámica.',
         fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
-      {file:'Patron Wellens.jpg', label:'Patrón de Wellens',
-        criterios:'Tipo A: T bifásica en V2–V3. Tipo B: T invertida profunda y simétrica (≥2 mm) en V2–V3. Progresión de onda R conservada, registrado en fase asintomática (post-reperfusión).',
-        arteria:'DA proximal — estenosis crítica (sin oclusión total en el momento del registro)',
-        significado:'Patrón de preinfarto: >75% de IAM anterior en días–semanas sin revascularización. NO realizar ergometría — riesgo de oclusión completa.',
-        fuente:'Kontos 2022, ACC Expert Consensus · PMID 36241466'},
-      {file:'Patron Aslanger.jpg', label:'Patrón de Aslanger',
-        criterios:'Elevación del ST aislada en III (≥1 mm) sin cumplir criterios STEMI inferior (no ≥1 mm en ≥2 de II/III/aVF) + depresión del ST en V4–V6 que enmascara la elevación inferior',
-        arteria:'CD, con enfermedad concomitante de la DA (multivaso)',
-        significado:'Muy específico de OMI inferior en enfermedad multivaso; frecuentemente mal clasificado como NSTEMI con manejo diferido — mortalidad hospitalaria elevada.',
-        fuente:'Aslanger 2020, J Electrocardiol; serie de casos 2025 · PMID 41445864'},
-      {file:'Patron de remolino - swirl.jpg', label:'Patrón de remolino (swirl sign)',
-        criterios:'Elevación del ST y/o T hiperagudas en V1–V2 con depresión recíproca del ST y/o inversión de T en V5–V6 (rotación horaria del vector ST en el precordio)',
-        arteria:'DA proximal, habitualmente proximal a la primera perforante septal',
-        significado:'Alta especificidad para OMI por oclusión de DA proximal.',
-        fuente:'Verificado con Perplexity 2025 · PMID 40319770 — Vera Health expresó incertidumbre sobre la definición exacta; se prioriza esta fuente'},
-      {file:'OMI inferobasal - posterior.jpg', label:'OMI inferobasal-posterior',
-        criterios:'Depresión del ST máxima en V1–V4 (STDmaxV1–4) de cualquier magnitud, no explicada por causa no isquémica · confirmar con derivaciones posteriores V7–V9 (STE ≥0,5 mm)',
-        arteria:'CD (más frecuente), Cx, ramas obtusas marginales o descendente posterior',
-        significado:'Más de la mitad de los IAM posteriores son "STEMI-negativos" — se pierden si no se buscan activamente. Solicitar V7–V9 si hay STD en V1–V3.',
-        fuente:'Meyers 2021, JAHA · PMID 34775811'},
-      {file:'Northen OMI.jpg', label:'Patrón «Northern OMI» (North sign)',
-        criterios:'Elevación del ST en aVR y aVL con onda T negativa + depresión del ST en derivaciones inferiores y laterales (II, III, aVF, V4–V6) con onda T positiva o bifásica',
-        arteria:'Oclusión de la bifurcación de la primera diagonal de la DA (también en enfermedad multivaso)',
-        significado:'Patrón OMI anterior alto/proximal — terminología reciente de expertos OMI, aún fuera de guías mayores clásicas.',
-        fuente:'Verificado con Perplexity 2025 — terminología reciente, fuera de guías formales'},
-      {file:'Distorsion terminal QRS.jpg', label:'Distorsión terminal del QRS',
+      {file:'Distorsion terminal QRS.jpg', nivel:2, label:'Distorsión terminal del QRS',
         criterios:'Ausencia simultánea de onda S y de muesca en el punto J, en V5 o V6',
         arteria:'DA proximal o media',
-        significado:'Marcador de isquemia transmural grave y completa; distingue oclusión verdadera de repolarización precoz benigna en STEMI límite.',
-        fuente:'Birnbaum 1993, Circulation; validado por Meyers 2021 · PMID 34775811'},
-      {file:'Signo de la bandera de sudafrica.jpg', label:'Signo de la bandera de Sudáfrica',
-        criterios:'Elevación del ST en I, aVL y V2 con depresión recíproca en III (a menudo también aVF)',
-        arteria:'Oclusión de la primera diagonal (D1) de la DA — IAM lateral alto/anterolateral',
-        significado:'Discrepancia detectada: Vera Health describió inicialmente otra definición (aVR + depresión difusa, propia del patrón de tronco común/triple vaso). Perplexity y la imagen original confirman que el signo real es I/aVL/V2 + III → D1. No confundir ambos patrones.',
-        fuente:'Verificado con Perplexity 2025 · PMC10413884, PMC12040377'},
-      {file:'criterios Sgarbossa.jpg', label:'Criterios de Sgarbossa modificados (Smith)',
-        criterios:'1) Concordancia STE ≥1 mm en derivación con QRS positivo · 2) Concordancia STD ≥1 mm en V1–V3 · 3) Discordancia excesiva: STE ≥1 mm y cociente ST/S ≤ −0,25 (sustituye el umbral fijo ≥5 mm del Sgarbossa original) — basta 1 criterio positivo',
-        arteria:'Variable — indica oclusión coronaria aguda en presencia de BRIHH o ritmo de marcapasos',
-        significado:'Sensibilidad 91% vs. 52% del Sgarbossa original; validado también en ritmo de marcapasos ventricular. Tratar como equivalente STEMI.',
-        fuente:'Smith 2012 · PMID 22939607; Meyers 2015 · PMID 26678648; Dodd 2021 · PMID 34172301'},
-      {file:'nuevo bloqueo bifascicular.jpg', label:'Bloqueo bifascicular de nueva aparición',
-        criterios:'BRIHH + hemibloqueo anterior (o posterior) izquierdo de nueva aparición en el contexto de SCA',
+        significado:'Marcador auxiliar de isquemia anterior grave; ayuda a distinguir la oclusión de la repolarización precoz, pero no sustituye a la clínica, el ECG seriado ni la coronariografía.',
+        fuente:'Birnbaum 1993, Circulation; Meyers 2021, JAHA · PMID 34775811'},
+      {file:'nuevo bloqueo bifascicular.jpg', nivel:2, label:'Bloqueo de rama o bifascicular de nueva aparición',
+        criterios:'Bloqueo bifascicular: habitualmente bloqueo de rama derecha + hemibloqueo anterior (o posterior) izquierdo, de nueva aparición en un SCA',
         arteria:'DA proximal (las perforantes septales irrigan la rama derecha y el fascículo anterior)',
-        significado:'Riesgo de progresión a bloqueo AV completo (~20–40%) — preparar marcapasos transcutáneo. Predictor independiente de mortalidad. Angiografía urgente + monitorización con capacidad de estimulación.',
-        fuente:'2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline · PMID 40013746'}
+        significado:'Un bloqueo de rama izquierda nuevo y aislado ya no equivale automáticamente a IAMCEST: la activación depende de isquemia persistente, criterios de Sgarbossa modificados, inestabilidad, troponina seriada y/o alteraciones segmentarias en el ecocardiograma. Riesgo de bloqueo AV completo: monitorizar con capacidad de estimulación.',
+        fuente:'2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline · PMID 40013746; Kontos 2022 · PMID 36241466'},
+      {file:'Patron de remolino - swirl.jpg', nivel:3, label:'Patrón de remolino (swirl sign)',
+        criterios:'Elevación del ST en V1–V2 con descenso del ST en V5–V6',
+        arteria:'Propuesto para oclusión de la DA',
+        significado:'Signo en estudio: definición no unificada y sin validación diagnóstica sólida ni recomendación de guías. No activa el Codi IAM por sí solo ni debe retrasar el manejo.',
+        fuente:'PMID 40319770 (descripción); sin validación en guías'},
+      {file:'Northen OMI.jpg', nivel:3, label:'Patrón «Northern OMI» (North sign)',
+        criterios:'Elevación del ST en aVR y aVL con onda T negativa + descenso del ST en inferiores y laterales (II, III, aVF, V4–V6) con onda T positiva o bifásica',
+        arteria:'Propuesto para oclusión de la bifurcación de la primera diagonal de la DA',
+        significado:'Terminología reciente, fuera de las guías y sin validación angiográfica suficiente. Solo docente: no activa el Codi IAM por sí solo.',
+        fuente:'Terminología de expertos OMI, sin validación en guías'},
+      {file:'Signo de la bandera de sudafrica.jpg', nivel:3, label:'Signo de la bandera de Sudáfrica',
+        criterios:'Elevación del ST en I, aVL y V2 con descenso recíproco en III (a menudo también aVF). No confundir con el descenso difuso del ST con elevación en aVR (tronco común o multivaso)',
+        arteria:'Compatible con lesión de la primera diagonal (D1) — IAM lateral alto',
+        significado:'Signo educativo, no equivalente formal: la evidencia procede sobre todo de casos y series pequeñas. Si cumple criterios clásicos de elevación del ST, se activa por ellos.',
+        fuente:'PMC10413884, PMC12040377 (series de casos)'}
 ];
+const OMI_NIVEL = window.OMI_NIVEL = { 1: 'Nivel 1 · activación inmediata (equivalente de IAMCEST)', 2: 'Nivel 2 · alto riesgo: coronariografía urgente tras valoración experta', 3: 'Nivel 3 · signo en estudio: no activa por sí solo' };
 
 window.PROTOCOLS = [
 
@@ -1214,7 +1218,7 @@ window.PROTOCOLS = [
   },
   galeria:{
     titulo:'Patrones ECG de oclusión coronaria (OMI)',
-    nota:'Equivalentes de infarto con oclusión coronaria aguda que no cumplen los criterios clásicos de elevación del ST — no descartan activación del Codi IAM.',
+    nota:'Patrones sin criterios clásicos de elevación del ST, en tres niveles: 1) activación inmediata (equivalente de IAMCEST) · 2) alto riesgo: coronariografía urgente tras valoración experta · 3) signos en estudio: nunca activan por sí solos. Ninguno debe retrasar el manejo guiado por la clínica, el ECG seriado, la troponina y la hemodinámica.',
     dir:'codigos/patrones iam nuevos/',
     items: PATRONES_OMI
   },
@@ -1246,9 +1250,10 @@ window.PROTOCOLS = [
       opts: [{ l: '&lt;90 min', go: 'icp', sug: v => E().estr(v) === 'icp' }, { l: '90–120 min (individualizar)', go: 'ventana', sug: v => E().estr(v) === 'ventana' }, { l: '>120 min', go: 'fibci', sug: v => /^fib/.test(E().estr(v) || '') }]
     };
     /* Patrón OMI → nodo: imagen, criterios y conducta según el tipo de patrón. */
-    const OMI_EQUIV = ['OMI inferobasal - posterior.jpg', 'criterios Sgarbossa.jpg'];
     const omiNodo = it => {
       const base = '<img class="fl-omi-img" src="' + encodeURI('codigos/patrones iam nuevos/' + it.file) + '" alt="ECG con ' + it.label + '" loading="lazy">' +
+        (it.esquema ? '<img class="fl-omi-img" src="' + encodeURI('codigos/patrones iam nuevos/esquemas/' + it.esquema) + '" alt="Esquema de ' + it.label + '" loading="lazy">' : '') +
+        '<b>' + OMI_NIVEL[it.nivel] + '</b><br>' +
         '<b>Criterios:</b> ' + it.criterios + '<br><b>Arteria:</b> ' + it.arteria + '<br><b>Significado:</b> ' + it.significado +
         '<br><span class="pe-nota">' + it.fuente + '</span><br>';
       if (it.file === 'Patron Wellens.jpg') return {
@@ -1257,17 +1262,23 @@ window.PROTOCOLS = [
         q: '¿Dolor recurrente o refractario, inestabilidad hemodinámica o eléctrica, u otro criterio de muy alto riesgo?',
         opts: [{ l: 'Sí', go: 'muyalto' }, { l: 'No', go: 'wellens_alto' }]
       };
-      if (OMI_EQUIV.includes(it.file)) return {
+      if (it.nivel === 1) return {
         t: it.label, c: 'high',
         show: base + '<b>Equivalente de IAMCEST:</b> misma estrategia de reperfusión, con fibrinólisis si la ICP se retrasa >120 min (ACC/AHA 2025, ESC 2023).' +
           (it.file === 'OMI inferobasal - posterior.jpg' ? ' Suele acompañar al inferior: aplicar sus precauciones y descartar el VD con V3R–V4R.' : ''),
         ...TQ
       };
+      if (it.nivel === 3) return {
+        t: it.label, c: 'mid',
+        show: base + '<b>Signo en estudio:</b> no justifica por sí solo la activación del Codi IAM ni debe retrasar el manejo. Decidir por la clínica, ECG seriados (cada 15–30 min), troponina seriada y situación hemodinámica; ante la duda, comentar el ECG con hemodinámica.',
+        q: '¿Hay otro criterio de activación o lo confirma hemodinámica?',
+        opts: [{ l: 'Sí: coronariografía o ICP urgente', go: 'icp' }, { l: 'No: valorar como SCASEST', go: 'scasest' }]
+      };
       return {
         t: it.label, c: 'high',
-        show: base + '<b>Posible oclusión sin criterios clásicos:</b> coronariografía o ICP urgente; avisar a hemodinámica. La fibrinólisis no está indicada de rutina: solo si la oclusión es segura y la ICP se retrasa >120 min, decidido con cardiología (ACC/AHA 2025; consenso ACC 2022).',
-        q: 'Estrategia de reperfusión',
-        opts: [{ l: 'Coronariografía o ICP urgente', go: 'icp' }, { l: 'Fibrinólisis consensuada con cardiología (ICP >120 min)', go: 'fibci' }]
+        show: base + '<b>Alto riesgo sin oclusión demostrada:</b> comentar el ECG con hemodinámica, ECG seriados (cada 15–30 min) y troponina seriada. Coronariografía urgente si hemodinámica lo indica. La fibrinólisis no está indicada de rutina: solo si la oclusión es segura y la ICP se retrasa >120 min, decidido con cardiología (ACC/AHA 2025; consenso ACC 2022).',
+        q: 'Decisión tras comentarlo con hemodinámica',
+        opts: [{ l: 'Coronariografía o ICP urgente', go: 'icp' }, { l: 'Fibrinólisis consensuada con cardiología (ICP >120 min)', go: 'fibci' }, { l: 'No se confirma oclusión: valorar como SCASEST', go: 'scasest' }]
       };
     };
     const mlh = (dosis, peso, conc) => f(Math.round(dosis * peso * 60 / conc * 10) / 10);

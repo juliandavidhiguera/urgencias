@@ -581,6 +581,9 @@ body.rt-bar-on .toast { bottom: calc(var(--rt-bar-h, 128px) + 12px); }
 .galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; padding: 6px 0 4px; align-items: start; }
 .galeria-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 0; }
 .galeria-item img { display: block; width: 100%; height: auto; }
+.galeria-esquema { border-top: 1px solid var(--border); background: #fff; }
+.galeria-nivel { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; }
+.galeria-nivel-1 { color: #c0392b; } .galeria-nivel-2 { color: #b9770e; } .galeria-nivel-3 { color: var(--text2, #888); }
 .galeria-item figcaption { padding: 8px 10px; font-size: var(--fs-sm); font-weight: 600; color: var(--text); text-align: center; }
 .galeria-detail { padding: 0 12px 12px; }
 .galeria-detail .ficha-section { padding: 8px 0; }
@@ -5968,7 +5971,8 @@ function openGaleria(protocolId) {
       g.items.map(it =>
         '<figure class="galeria-item">' +
           '<img src="' + encodeURI(g.dir + it.file) + '" alt="' + it.label + '" loading="lazy">' +
-          '<figcaption>' + it.label + '</figcaption>' +
+          (it.esquema ? '<img class="galeria-esquema" src="' + encodeURI(g.dir + 'esquemas/' + it.esquema) + '" alt="Esquema de ' + it.label + '" loading="lazy">' : '') +
+          '<figcaption>' + it.label + (it.nivel ? '<span class="galeria-nivel galeria-nivel-' + it.nivel + '">' + (window.OMI_NIVEL || {})[it.nivel] + '</span>' : '') + '</figcaption>' +
           '<div class="galeria-detail">' +
             (it.criterios ? _fichaSection('Criterios ECG', it.criterios) : '') +
             (it.arteria ? _fichaSection('Arteria / anatomía asociada', it.arteria) : '') +

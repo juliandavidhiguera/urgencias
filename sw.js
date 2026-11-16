@@ -2,7 +2,7 @@
 // (revalidando la cache HTTP) y se actualiza la copia local; la cache solo se usa
 // sin conexion. Ya no hace falta subir CACHE en cada cambio de data/*.js o
 // index.html; subirla solo si cambia la lista ASSETS o este fichero.
-const CACHE = 'urg-v85';
+const CACHE = 'urg-v86';
 const ASSETS = [
   '/',
   '/index.html',
@@ -53,7 +53,12 @@ const ASSETS = [
   '/codigos/patrones iam nuevos/Distorsion terminal QRS.jpg',
   '/codigos/patrones iam nuevos/Signo de la bandera de sudafrica.jpg',
   '/codigos/patrones iam nuevos/criterios Sgarbossa.jpg',
-  '/codigos/patrones iam nuevos/nuevo bloqueo bifascicular.jpg'
+  '/codigos/patrones iam nuevos/nuevo bloqueo bifascicular.jpg',
+  '/codigos/patrones iam nuevos/esquemas/de-winter.svg',
+  '/codigos/patrones iam nuevos/esquemas/posterior.svg',
+  '/codigos/patrones iam nuevos/esquemas/sgarbossa-smith.svg',
+  '/codigos/patrones iam nuevos/esquemas/wellens.svg',
+  '/codigos/patrones iam nuevos/esquemas/aslanger.svg'
 ];
 
 let hadPrevious = false;
