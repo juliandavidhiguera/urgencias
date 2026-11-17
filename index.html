@@ -3249,6 +3249,12 @@ let _infuManual = false;
 function _infuEsPed() { return document.getElementById('inf-pac').value === 'ped'; }
 
 function _infuUsaRegla(d) { return !!(d && d.regla && _infuEsPed()); }
+/* Fármaco con la unidad y el rango del tipo de paciente: si es pediátrico y el fármaco trae «ped»
+   (p. ej. nitroglicerina: µg/min en el adulto, µg/kg/min en el niño), se usan esos. */
+function _infuF(name) {
+  const d = INFUSIONS.find(x => x.name === name);
+  return d && d.ped && _infuEsPed() ? Object.assign({}, d, d.ped) : d;
+}
 
 function _infuReglaTxt(d) {
   const r = String(d.regla).replace('.', ',');
@@ -3261,12 +3267,12 @@ function _infuDilucion(d, peso, ped) {
 }
 
 function _infuVolverRegla() {
-  const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
+  const d = _infuF(document.getElementById('inf-farmaco').value);
   if (_infuUsaRegla(d)) { _infuAplicarRegla(d); calcInfusion(); }
 }
 
 function cambiarPacienteInfusion() {
-  const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
+  const d = _infuF(document.getElementById('inf-farmaco').value);
   if (d && !_infuManual) {
     if (_infuUsaRegla(d)) {
       _infuAplicarRegla(d);
@@ -3275,6 +3281,7 @@ function cambiarPacienteInfusion() {
       document.getElementById('inf-vol').value = d.vol;
     }
   }
+  if (d && d.ped) { document.getElementById('inf-dosis').value = d.doseMin; document.getElementById('inf-unidad').value = d.unit; }
   if (d) _infuPintarRango(d);
   calcInfusion();
   renderInfusionGrid();
@@ -3309,7 +3316,7 @@ function selectInfusionDrug() {
   const rangeEl = document.getElementById('inf-range');
   const alertEl = document.getElementById('inf-alert');
   const fichaBtn = document.getElementById('inf-ficha-btn');
-  const d = INFUSIONS.find(x => x.name === name);
+  const d = _infuF(name);
   if (!d) {
     document.getElementById('inf-mg').value = '';
     document.getElementById('inf-vol').value = '';
@@ -3344,7 +3351,7 @@ function calcInfusion() {
   const unit = document.getElementById('inf-unidad').value;
   const sel = document.getElementById('inf-farmaco').value;
   const nombre = sel === '_otro' ? (document.getElementById('inf-nombre').value || 'Medicamento') : sel;
-  const d = INFUSIONS.find(x => x.name === sel);
+  const d = _infuF(sel);
   const u = (d && d.unitLabel) || 'mg';
 
   const conc = (mg != null && vol != null && vol > 0) ? mg / vol : null;
@@ -3386,7 +3393,7 @@ function openInfusionFicha() {
 }
 
 function updateInfusionPeso() {
-  const d = INFUSIONS.find(x => x.name === document.getElementById('inf-farmaco').value);
+  const d = _infuF(document.getElementById('inf-farmaco').value);
   if (_infuUsaRegla(d) && !_infuManual) _infuAplicarRegla(d);
   calcInfusion();
   renderInfusionGrid();
@@ -3412,7 +3419,8 @@ function renderInfusionGrid() {
   const ped = _infuEsPed();
   const lista = _infuLista();
   if (!lista.length) { grid.innerHTML = '<div class="scale-note">Ningún medicamento coincide con la búsqueda</div>'; return; }
-  grid.innerHTML = lista.map(d => {
+  grid.innerHTML = lista.map(d0 => {
+    const d = ped && d0.ped ? Object.assign({}, d0, d0.ped) : d0;
     const u = d.unitLabel || 'mg';
     const regla = ped && d.regla;
     const mgRef = regla ? d.regla * peso : d.mg;
@@ -3446,7 +3454,7 @@ function copyInfusion() {
   if (document.getElementById('inf-copy-btn').disabled) return;
   const sel = document.getElementById('inf-farmaco').value;
   const nombre = sel === '_otro' ? (document.getElementById('inf-nombre').value || 'Medicamento') : sel;
-  const d = INFUSIONS.find(x => x.name === sel);
+  const d = _infuF(sel);
   const u = (d && d.unitLabel) || 'mg';
   const peso = document.getElementById('inf-peso').value || '_';
   const mg = document.getElementById('inf-mg').value || '_';

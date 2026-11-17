@@ -42,7 +42,7 @@ window.PAUTAS_PROTOCOLO = {
   'Acetilsalicilato de lisina': '• Si no puede tomar VO (IV): 450 mg', // nodo activar: «(450 mg IV de acetilsalicilato de lisina si no puede VO)»
   'Fentanilo': '• Analgesia (IV): 50–75 mcg cada 5–10 min', // nodo activar: «fentanilo 50–75 µg IV cada 5–10 min»
   'Cloruro mórfico': '• Analgesia (IV): 4–8 mg, después 2 mg cada 5–15 min (máx. 15–20 mg)', // nodo activar: «cloruro mórfico 4–8 mg IV (+2 mg cada 5–15 min, máx. 15–20 mg)»
-  'Nitroglicerina': '• Dolor isquémico (SL): 0,4 mg', // nodo activar: «Nitroglicerina (SL 0,4 mg o IV)» — la IV es perfusión (5–10 µg/min; steps: 10–60 mcg/kg/h), omitida
+  'Nitroglicerina': '• Dolor isquémico (SL): 0,4 mg', // nodo activar: «Nitroglicerina (SL 0,4 mg o IV)» — la IV es perfusión (5–10 µg/min, máx. 200 µg/min; unificado en µg/min el 18/11/2026), omitida
   'Heparina sódica': '• Angioplastia primaria, bolo (IV): 70 UI/kg\n• Con fibrinólisis, bolo (IV): 60 UI/kg (máx. 4000 UI), después perfusión según TTPa', // nodo icp: «HEPARINA SÓDICA 70 UI/kg IV en bolo» · nodo fib (hnf): «60 UI/kg IV (máx. 4.000 UI) + 12 UI/kg/h (máx. 1.000 UI/h) según TTPa»
   'Heparina sódica@icp': '• Angioplastia primaria, bolo (IV): 70–100 UI/kg, ajustado a ACT 250–300 s', // nodo icp (ACC/AHA 2025)
   'Heparina sódica@fib': '• Con fibrinólisis, bolo (IV): 60 UI/kg (máx. 4000 UI), después perfusión según TTPa',

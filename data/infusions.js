@@ -12,6 +12,8 @@
    (p.ej. 5 mg en 50 mL); el usuario puede editarlos en la calculadora.
    info: opcional, secciones clínicas [{titulo, alerta?, items: [[etiqueta, texto]]}]
    que se muestran debajo del cálculo al elegir el fármaco.
+   ped: opcional, {unit, doseMin, doseMax} que sustituyen a los de adulto cuando el paciente
+   es pediátrico (fármacos que en el adulto van a dosis fija, p. ej. nitroglicerina en µg/min).
    regla: solo vasoactivos y solo en paciente PEDIÁTRICO: la dilución por defecto
    es regla × peso (kg) mg hasta 50 mL (regla del 3 = 3, regla del 0,3 = 0.3).
    Con 50 mL, 1 mL/h = regla/3 mcg/kg/min. La cantidad sigue al peso hasta que el
@@ -100,8 +102,9 @@ window.INFUSIONS = [
   diluyente: 'SF 0,9%', notas: 'Dosis fija: NO se titula por peso'},
 
 {name: 'Nitroglicerina', group: 'Vasoactivos', badge: 'red',
-  mg: 50, vol: 50, unit: 'mcg/kg/min', doseMin: 0.05, doseMax: 2.2,
-  diluyente: 'SG 5% / SF 0,9%', notas: 'No usar equipo de PVC estándar (adsorción del fármaco, pérdida de hasta 40-80% de la dosis): usar set de polietileno/vidrio. Cefalea, taquifilaxia >24-48h. Evitar si IAM de VD, hipovolemia o uso reciente de inhibidores de la PDE5',
+  mg: 10, vol: 50, unit: 'mcg/min', doseMin: 5, doseMax: 200,
+  ped: {unit: 'mcg/kg/min', doseMin: 0.25, doseMax: 5},
+  diluyente: 'SG 5% / SF 0,9%', notas: 'Adulto: empezar con 5–10 µg/min y subir 5–10 µg/min cada 3–5 min según TA y dolor; máx. 200 µg/min. Con 10 mg en 50 mL (200 µg/mL): 10 µg/min = 3 mL/h, 200 µg/min = 60 mL/h. Si no hay ampollas de 5 mg/5 mL: 2 mL de la de 50 mg/10 mL. Pediatría (Pediamécum): 0,25–0,5 µg/kg/min de inicio, habitual 1–3 µg/kg/min. No usar equipo de PVC estándar (adsorción del fármaco, pérdida de hasta 40-80% de la dosis): usar set de polietileno/vidrio. Cefalea, taquifilaxia >24-48h. Evitar si IAM de VD, hipovolemia o uso reciente de inhibidores de la PDE5',
   ficha: 'Nitroglicerina.md'},
 
 {name: 'Nitroprusiato sódico', group: 'Vasoactivos', badge: 'red',

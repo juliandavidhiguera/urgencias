@@ -40,7 +40,7 @@ window.BIBLIOGRAFIA = [
     {ficha: 'Labetalol', cambio: 'Añadido "asma/broncoespasmo activo" a contraindicaciones'}
   ],
   pendientes: [
-    {ficha: 'Nitroglicerina', nota: 'Dosis en mcg/kg/h (convención del protocolo SEM catalán) vs mcg/min (convención ACC/AHA 2025). No se ha unificado; revisar si aporta confusión clínica real.'},
+    {ficha: 'Nitroglicerina', nota: 'La ficha SEM da la perfusión en mcg/kg/h (10–60, máx. 200 µg/min). La app la unifica en µg/min (5–10 de inicio, máx. 200; ACC/AHA 2025) con la dilución de la ficha (10 mg en 50 mL), por decisión de la usuaria del 18/11/2026; la ficha se conserva tal cual.'},
     {ficha: 'Hidrocloruro de fenilefrina', nota: 'Dosis fija en mcg/min; ACC 2025 sugiere mcg/kg/min en shock cardiogénico. Contextos distintos (prehospitalario vs UCI), sin cambio aplicado.'},
     {ficha: 'Urapidilo', nota: 'Vera no pudo confirmar con fuentes propias — sin guía específica localizada. Pendiente de una fuente citable si se quiere verificar con cita.'}
   ]
