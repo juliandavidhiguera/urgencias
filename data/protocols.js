@@ -1805,6 +1805,7 @@ window.PROTOCOLS = [
 
 {id:'codi-ppt', title:'Codi PPT', sub:'Paciente traumático — criterios fisiológicos, anatómicos y mecanismo lesional', badge:'red', tag:'Crítico', rank:3, codigo:true,
   folleto:"codigos/C03._Codi_PPT_Instruccio_04-2026.pdf",
+  docs:[{l:'🏥 Protocolo de Campdevànol v1 (borrador, PDF)', f:'protocolos/Protocolo_PPT_Campdevanol_v1.pdf'}],
   /* Evaluador: los datos del paciente se introducen una sola vez; el flujograma de abajo usa estas
      mismas claves (v.edad, v.fr, v.tas, v.gcs y los criterios) para sugerir las opciones y para el
      mensaje al hospital. Criterios, prioridades, destino y mensaje: Instrucció 04/2026 del CatSalut
