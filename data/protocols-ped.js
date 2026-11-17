@@ -846,7 +846,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
   steps:[
     {text:'Triángulo de Evaluación Pediátrica y constantes (incluido el dolor). Tríada de Cushing (bradicardia, HTA, respiración irregular) = aumento de la PIC.'},
     {text:'Inestable: ABCDE, control cervical si riesgo, O₂ 100 %, intubar si GCS &lt;9, monitorizar (FC, FR, TA, EtCO₂, SatO₂), dolor, acceso venoso, TAC si riesgo alto e ingreso.'},
-    {text:'Hipertensión intracraneal (BTF 2019): cabecera 30°, salino hipertónico 3 % 2–5 ml/kg en 10–20 min, normocapnia (PaCO₂ 35–40), sin bolos de sedantes en las crisis de PIC; profilaxis anticomicial 7 días en el TCE grave.'},
+    {text:'Hipertensión intracraneal (BTF 2019): cabecera 30°, salino hipertónico 3 % 3–5 ml/kg en 10–20 min (pauta del centro; la BTF 2019 admite 2–5), normocapnia (PaCO₂ 35–40), sin bolos de sedantes en las crisis de PIC; profilaxis anticomicial 7 días en el TCE grave.'},
     {text:'Estable: historia clínica (mecanismo de riesgo, síntomas, sospecha de maltrato) y exploración física (GCS, cabeza, signos de fractura, fontanela).'},
     {text:'Riesgo alto de LIC (focalidad, fractura palpable, signos de fractura basilar, fontanela tensa, convulsiones) → TAC.'},
     {text:'Riesgo intermedio (criterios distintos en &lt;2 y ≥2 años) → observación hospitalaria mínima de 4–6 h frente a TAC.'},
@@ -872,7 +872,7 @@ window.PROTOCOLS.push({ id:'seup-tce', ped:true, title:'Traumatismo craneal pedi
     const rk = (v, a, b, max, d, u) => { const w = P(v); if (!w) return ''; const m = max == null ? Infinity : max; const lo = Math.min(w * a, m), hi = Math.min(w * b, m); return ' <b>= ' + (lo === hi ? fx(lo, d) : fx(lo, d) + '–' + fx(hi, d)) + ' ' + u + '</b>'; };
     const picTxt = v => '<b>Si hay signos de hipertensión intracraneal</b> (tríada de Cushing, anisocoria, deterioro del GCS):<br>' +
       '&nbsp;&nbsp;– Cabecera a <b>30°</b> y cabeza en línea media · normotermia · normoglucemia · evitar hipotensión e hipoxia.<br>' +
-      '&nbsp;&nbsp;– <b>Suero salino hipertónico 3 %</b>: bolo <b>2–5 ml/kg en 10–20 min</b>' + rk(v, 2, 5, null, 0, 'ml') + '. Evitar Na &gt;160 mEq/L mantenido.<br>' +
+      '&nbsp;&nbsp;– <b>Suero salino hipertónico 3 %</b>: bolo <b>3–5 ml/kg en 10–20 min</b>' + rk(v, 3, 5, null, 0, 'ml') + ' (pauta del centro, como en el Codi PPT de Campdevànol; la BTF 2019 admite 2–5 ml/kg). Evitar Na &gt;160 mEq/L mantenido.<br>' +
       '&nbsp;&nbsp;– <b>Manitol</b> 0,25–1 g/kg' + rk(v, 0.25, 1, null, 1, 'g') + ': la guía pediátrica no lo recomienda ni lo rechaza (sin estudios); si se usa, con volemia y TA normales.<br>' +
       '&nbsp;&nbsp;– Ventilación: <b>normocapnia (PaCO₂ 35–40 mmHg)</b>. Hiperventilación solo breve, como puente ante herniación, sin bajar de 30 mmHg.<br>' +
       '&nbsp;&nbsp;– Sedoanalgesia en perfusión; en las crisis de PIC <b>evitar bolos de midazolam o fentanilo</b> (hipotensión).<br>' +

@@ -2160,11 +2160,19 @@ window.PROTOCOLS = [
             }
           },
           {
-            l: 'Hospital no CAT (puente)', t: 'Hospital no CAT o comarcal: puente', c: 'high',
+            l: 'Hospital no CAT (puente) · Campdevànol', t: 'Hospital no CAT o comarcal: puente (Campdevànol)', c: 'high',
             show: 'Recibe P0–1 <b>solo en emergencia</b> no demorable, como puente: <b>estabilizar y trasladar</b> al centro definitivo según el CECOS.<br>' +
               'Destino por isócrona: centros a <b>&lt;10 min</b> del más rápido son equivalentes; decide el CECOS.<br>' +
               'Traslado secundario a mayor complejidad en las <b>primeras 24 h</b> = <b>Codi PPT</b> (traslado prioritario del CECOS).<br>' +
-              '<span class="pe-nota">Instrucció 04/2026, 5.3, 5.4 y annex III.</span>'
+              '<b>En Campdevànol</b> (no es centro Codi PPT): activar siempre con el <b>CECOS</b>, que decide el destino.<br>' +
+              '• <b>P0–P1:</b> activar ya; solo lo que salva la vida y no retrasa la salida; sin TC si está inestable → CAT-3 / CAT-P3 (Vic, CAT-2, solo como escalón intermedio si lo indica el CECOS).<br>' +
+              '• <b>P2:</b> trasladar <b>siempre</b>; TC solo si no retrasa la salida → adulto CAT-2 <b>H. de Vic</b>; niño ≤15 a CAT-P2 (Trueta, Germans Trias).<br>' +
+              '• <b>P3:</b> comunicar al CECOS; <b>valoración aquí con TC</b>; derivar si hay lesión o aparece un criterio P0–P2 (CAT-1 / CAT-P1 o superior; Vic es CAT-P1).<br>' +
+              '• <b>Sin criterios:</b> circuito habitual con reevaluación seriada; <b>cualquier criterio nuevo en las primeras 24 h → activar</b>.<br>' +
+              '• Quemado o lesión medular → Vall d\'Hebron · reimplante → Parc Taulí.<br>' +
+              '• Anciano: los betabloqueantes ocultan la taquicardia; no descartar por una FC normal.<br>' +
+              '• En la historia: hora de llegada, de activación y de llamada al CECOS, prioridad y criterio, hora de salida y destino.<br>' +
+              '<span class="pe-nota">Instrucció 04/2026, 5.3, 5.4 y annex III · protocolo PPT de Campdevànol v1 (borrador, 17/11/2026), botón de arriba.</span>'
           },
           {
             farmacos: ['Ácido tranexámico'], l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
@@ -2214,7 +2222,7 @@ window.PROTOCOLS = [
   {type:'action', text:'Destino: P0-1 → CAT-3/CAT-P3 (alternativa CAT-2/P2; puente CAT-1/P1 u hospital no CAT si no es demorable) · P2 → CAT-2/CAT-P2 · P3 → CAT-1/CAT-P1. El más próximo por isócrona; <10 min de diferencia = equivalentes, decide el CECOS'},
   {type:'action', text:'Activar CECOS con 9 datos: sexo · edad · prioridad (rojo 0-1 / amarillo 2-3) · ALFA · CHARLIE · ROMEO · HOTEL (HOTEL-SIERRA si ABC >2) · GOLF desglosado · hora de llegada'},
   {type:'action', text:'Transferencia IDEAS: Identificación · Diagnóstico de sospecha · Estado ABCDE · Actuaciones · Signos de alarma'},
-  {type:'info', text:'Hospital no CAT: solo puente en emergencia (estabilizar y trasladar). Traslado secundario a mayor complejidad en las primeras 24 h = Codi PPT'},
+  {type:'info', text:'Hospital no CAT: solo puente en emergencia (estabilizar y trasladar). Traslado secundario a mayor complejidad en las primeras 24 h = Codi PPT. Campdevànol: P0–P2 se trasladan siempre (P2 → CAT-2 Vic); P3 se valora aquí con TC y se deriva si hay lesión; destino siempre del CECOS'},
   {type:'action', text:'Inmovilización espinal completa (trauma cerrado) si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse o <3a con mecanismo de riesgo + hipotensión mantenida. Trauma penetrante: inmovilizar solo si sospecha de déficit neurológico'},
   {type:'info', text:'Escalas: Glasgow adulto/pediátrico (leve 14-15, moderado 9-13, grave <8) · RTS adulto e ITP pediátrico solo como herramienta auxiliar (no son criterio del código)'}
 ], src:'Codi PPT — Instrucció 04/2026 del CatSalut (en vigor el 8/10/2026; deroga la 04/2011): criterios, destino, mensaje e IDEAS · inmovilización, transferencia física, Glasgow, RTS e ITP (auxiliares): folleto Codi PPT SEM, revisión diciembre 2017'},
