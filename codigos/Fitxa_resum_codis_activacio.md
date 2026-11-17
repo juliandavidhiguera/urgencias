@@ -47,36 +47,40 @@ Sospecha de hemorragia subaracnoidea **NO** es Codi Ictus (circuito específico)
 ---
 
 ## Codi PPT — Paciente traumático
-*Fuente: C03._Codi_persona_pacient_traumàtica_(PPT) · SEM, revisión diciembre 2017*
+*Fuente: Instrucció 04/2026 del CatSalut (C03._Codi_PPT_Instruccio_04-2026), en vigor el 8/10/2026; deroga la Instrucció 04/2011 y sustituye al folleto SEM de diciembre de 2017*
 
-Algoritmo secuencial: si no cumple criterio fisiológico → valorar anatómico → si no → mecanismo lesional de riesgo → si no → antecedentes relevantes.
+Algoritmo secuencial tras la evaluación primaria: si no cumple criterio fisiológico → valorar anatómico → si no → mecanismo lesional de riesgo → si no → criterio del equipo. Los criterios se interpretan de forma integrada, nunca aislada. Edad pediátrica: ≤15 años.
 
-**Criterios FISIOLÓGICOS (Prioridad 0 — box de críticos):**
-- FR <10 rpm (<20 en <1a) o >29 rpm (todas las edades)
-- TAS <90 mmHg (<70 en <1a)
-- Ausencia de pulsos periféricos (todas las edades)
-- Glasgow ≤13 (o pérdida transitoria de consciencia en <1a)
+**Criterios FISIOLÓGICOS (Prioridad 0 — alto riesgo, rojo):**
+- FR <10 o >29 rpm (todas las edades); SpO₂ <90 %; dificultad respiratoria o soporte respiratorio
+- Adulto: índice de shock FC/TAS ≥1; TAS <90 mmHg (<110 en >65 años)
+- Niño: TAS <60 (<1 mes), <70 (<1 año), <70 + 2 × edad (1–10 años), <90 (>10 años)
+- Exceso de base <−6 mEq/L o lactato >5 mmol/L
+- Glasgow ≤13 (sobre todo motor <6); <3 años sin movimientos espontáneos; <1 año con pérdida transitoria de consciencia
 
-**Criterios ANATÓMICOS (Prioridad 1 — box de críticos):**
-- Herida penetrante en cabeza/cuello/tórax/extremidades (proximal a rodilla/codo)
-- Fractura craneal abierta o hundimiento
-- Tórax inestable (volet), fractura de pelvis
-- ≥2 fracturas de huesos largos proximales (húmero/fémur); en <1a, ≥1
-- Amputación proximal a tobillo/muñeca, extremidad aplastada/degloved/destrozada
-- Parálisis de extremidad, déficit motor/sensitivo (sospecha lesión medular)
-- Quemaduras grado >II con extensión ≥15% (o ≥10% en <10a, >50a o embarazada); grado III >5%; quemadura completa de cara o cuello
+**Criterios ANATÓMICOS (Prioridad 1 — alto riesgo, rojo):**
+- Sangrado activo que requiere compresión o torniquete
+- Herida penetrante en cabeza, cuello, tórax, abdomen (incluye empalamiento) o extremidades proximal a rodilla y codo
+- Sospecha de fractura de cráneo; tórax deformado o inestable (volet); sospecha de fractura de pelvis
+- Sospecha de fractura de ≥2 huesos largos proximales (húmero/fémur); en <1a, ≥1
+- Amputación proximal a tobillo/muñeca; extremidad catastrófica (aplastada, degloved, destrozada o sin pulso distal)
+- Sospecha de lesión medular (déficit motor o sensitivo); E-FAST positivo
+- Quemaduras grado II ≥15 % (≥10 % en <10a, >50a o embarazada); grado III ≥5 %; extensa de cara o cuello
 
-**Mecanismo lesional de riesgo (Prioridad 2):**
-- Caídas: adultos >6m, niños >2-3x su altura (en general >3m)
-- Colisión de vehículo: intrusión >30cm (acompañante) o >45cm; eyección parcial/completa; muerte de un ocupante; telemetría con velocidad >60 km/h
-- Atropello con desplazamiento o impacto significativo (>30 km/h); accidente de moto/bici a velocidad significativa
-- Sospecha de maltrato en <3 años; objeto que cae desde altura; armas blancas/de fuego
+**Mecanismo lesional de riesgo (Prioridad 2 — riesgo moderado, amarillo):**
+- Caída >3 m (todas las edades); impacto, objeto contundente u onda expansiva de explosión
+- Colisión de vehículo: niño 0–9a sin retención o mal colocada; intrusión >30 cm (zona de ocupantes) o >45 cm; atrapamiento con extracción; eyección; muerte de un acompañante; telemetría de riesgo (en general >60 km/h)
+- Atropello de peatón/ciclista con impacto significativo; moto, bici, todoterreno, patinete u otro medio con impacto significativo o separado del dispositivo
 
-**Consideraciones especiales (Prioridad 3):** embarazo avanzado (>20 sem), anticoagulación/coagulopatía, diálisis/multipatología, <3 años o >65 años, criterio del profesional.
+**Criterio del equipo de emergencias (Prioridad 3 — riesgo moderado, amarillo):** caída de baja altura con impacto en la cabeza en <5a o >65a; crónico complejo con necesidades especiales; sospecha de maltrato; embarazo >20 semanas; anticoagulante, antiagregante o coagulopatía; otros motivos.
 
-**Inmovilización espinal completa (trauma cerrado)** si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse, o <3a con mecanismo de riesgo + hipotensión mantenida. **Trauma penetrante:** solo si sospecha de déficit neurológico.
+**Destino (5.4 y annex III):** P0–1 → CAT-3 / CAT-P3 (alternativa CAT-2/P2; CAT-1/P1 u hospital de proximidad como puente si no es demorable, con traslado secundario urgente) · P2 → CAT-2 / CAT-P2 más próximo (CAT-3 si es el de referencia y proximidad) · P3 → CAT-1 / CAT-P1 (o superior si es el más próximo). Proximidad por isócrona; ventana de equivalencia de 10 min (decide el CECOS). Traslado interhospitalario a mayor complejidad en las primeras 24 h = criterios del Codi PPT.
 
-**Escalas:** Glasgow (adulto/pediátrico); RTS adulto (<12 → centro de trauma); ITP pediátrico (<8 → centro de trauma).
+**Mensaje de activación (annex IV):** sexo · edad · prioridad (rojo 0–1 / amarillo 2–3) · Alfa (tipo de accidente) · Charlie (zona) · Romeo (respiración) · Hotel (hemodinámica; Hotel-Sierra si ABC >2) · Golf (Glasgow desglosado) · hora prevista de llegada. **Transferencia IDEAS (annex VI):** Identificación · Diagnóstico de sospecha · Estado (ABCDE) · Actuaciones · Signos de alarma.
+
+**Inmovilización espinal completa (trauma cerrado)** (folleto SEM 2017) si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse, o <3a con mecanismo de riesgo + hipotensión mantenida. **Trauma penetrante:** solo si sospecha de déficit neurológico.
+
+**Escalas:** Glasgow (adulto/pediátrico). RTS adulto e ITP pediátrico: solo herramienta auxiliar (la Instrucció 04/2026 no las recoge).
 
 ---
 

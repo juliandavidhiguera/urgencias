@@ -1804,56 +1804,65 @@ window.PROTOCOLS = [
 ], src:'Codi Ictus — SEM Catalunya, Grup de Treball en Ictus, v.03 abril 2023 · Fase hospitalaria (Campdevànol con teleictus): AHA/ASA 2026 Guideline for the Early Management of Acute Ischemic Stroke · ESO 2021 trombólisis IV (Berge E, Eur Stroke J 2021) y ESO 2023 tenecteplasa (Alamowitch S, Eur Stroke J 2023) · fichas técnicas Actilyse y Metalyse 25 mg (CIMA) · AcT (PMID 35779553), EXTEND (PMID 31067369), WAKE-UP (PMID 29766770), TWIST (Lancet Neurol 2023)'},
 
 {id:'codi-ppt', title:'Codi PPT', sub:'Paciente traumático — criterios fisiológicos, anatómicos y mecanismo lesional', badge:'red', tag:'Crítico', rank:3, codigo:true,
-  folleto:"codigos/C03._Codi_persona_pacient_traumàtica_(PPT).pdf",
+  folleto:"codigos/C03._Codi_PPT_Instruccio_04-2026.pdf",
   /* Evaluador: los datos del paciente se introducen una sola vez; el flujograma de abajo usa estas
      mismas claves (v.edad, v.fr, v.tas, v.gcs y los criterios) para sugerir las opciones y para el
-     mensaje al hospital. Criterios, prioridades, destino, inmovilización, Glasgow, RTS e ITP: folleto
-     Codi PPT (SEM, Grup de Treball de Trauma, revisión diciembre 2017). Sin índice de shock: no está en el folleto. */
+     mensaje al hospital. Criterios, prioridades, destino y mensaje: Instrucció 04/2026 del CatSalut
+     (annex II, III, IV y VI; edad pediátrica ≤15 años, 5.1). Inmovilización, Glasgow, RTS e ITP: folleto
+     Codi PPT (SEM, revisión diciembre 2017), como herramienta auxiliar (la instrucción no los recoge). */
   eval:(() => {
     const num = x => !isNaN(x) && x >= 0;
-    const edadTxt = e => e < 1 ? Math.round(e * 12) + ' meses' : Math.floor(e) + ' años';
-    /* [clave, texto del folleto, forma corta para el resumen] */
+    /* [clave, texto de la instrucción (annex II), forma corta para el resumen] */
     const ANAT = [
-      ['aPen', 'Herida penetrante en cabeza, cuello, tórax o extremidades (proximal a rodilla o codo)', 'herida penetrante'],
-      ['aCra', 'Fractura craneal abierta o con hundimiento', 'fractura craneal abierta o con hundimiento'],
-      ['aVol', 'Tórax inestable (volet)', 'tórax inestable'],
-      ['aPel', 'Fractura de pelvis', 'fractura de pelvis'],
-      ['aHue', '≥2 fracturas de huesos largos proximales (húmero o fémur); en &lt;1 año, ≥1', 'fracturas de huesos largos proximales'],
+      ['aSan', 'Sangrado activo que requiere intervención (compresión o torniquete)', 'sangrado activo que requiere compresión o torniquete'],
+      ['aPen', 'Herida penetrante en cabeza, cuello, tórax, abdomen (incluye empalamiento) o extremidades (proximal a rodilla y codo)', 'herida penetrante'],
+      ['aCra', 'Sospecha de fractura de cráneo', 'sospecha de fractura de cráneo'],
+      ['aVol', 'Tórax deformado o inestable (sospecha de volet)', 'tórax deformado o inestable'],
+      ['aPel', 'Sospecha de fractura de pelvis', 'sospecha de fractura de pelvis'],
+      ['aHue', 'Sospecha de fractura de ≥2 huesos largos proximales (húmero o fémur); en &lt;1 año, ≥1', 'fracturas de huesos largos proximales'],
       ['aAmp', 'Amputación proximal a tobillo o muñeca', 'amputación proximal'],
-      ['aExt', 'Extremidad aplastada, desguantada o destrozada (extremidad catastrófica)', 'extremidad catastrófica'],
-      ['aPar', 'Parálisis de una extremidad, déficit motor o sensitivo (sospecha de lesión medular)', 'déficit motor o sensitivo de una extremidad'],
-      ['aCara', 'Quemadura completa de cara o cuello', 'quemadura completa de cara o cuello']
+      ['aExt', 'Extremidad catastrófica (aplastada, desguantada, destrozada o sin pulso distal)', 'extremidad catastrófica'],
+      ['aPar', 'Sospecha de lesión medular (déficit motor o sensitivo)', 'sospecha de lesión medular'],
+      ['aFast', 'E-FAST positivo', 'E-FAST positivo'],
+      ['aCara', 'Quemadura extensa de cara o cuello', 'quemadura extensa de cara o cuello']
     ];
     const MEC = [
-      ['mCai', 'Caída: adultos >6 m, niños >2–3 veces su altura (en general >3 m)', 'caída'],
-      ['mVeh', 'Colisión de vehículo: intrusión >30 cm en el lugar del acompañante o >45 cm en cualquier otro, eyección parcial o completa, muerte de un ocupante o telemetría de alto riesgo (en general >60 km/h)', 'colisión de vehículo de riesgo'],
-      ['mAtr', 'Atropello de peatón o ciclista con desplazamiento o impacto significativo (>30 km/h)', 'atropello'],
-      ['mMoto', 'Accidente de moto, bicicleta u otro dispositivo móvil (p. ej., esquí) a velocidad significativa', 'moto, bicicleta o esquí a velocidad significativa'],
-      ['mMal', 'Sospecha de maltrato en &lt;3 años', 'sospecha de maltrato en &lt;3 años'],
-      ['mObj', 'Objeto que cae desde altura sobre el afectado (valorar peso y altura)', 'objeto que cae desde altura'],
-      ['mArm', 'Arma blanca o de fuego', 'arma blanca o de fuego']
+      ['mCai', 'Caída de más de 3 m de altura (todas las edades)', 'caída >3 m'],
+      ['mImp', 'Impacto, agresión con objeto contundente u onda expansiva de una explosión', 'impacto, objeto contundente o explosión'],
+      ['mVeh', 'Colisión de vehículo: sin sistema de retención, inadecuado o mal colocado (niños de 0–9 años) · intrusión >30 cm en la zona de ocupantes o >45 cm en cualquier otro lugar · atrapamiento con necesidad de extracción · eyección parcial o completa · muerte de un acompañante · telemetría de alto riesgo (en general >60 km/h)', 'colisión de vehículo de riesgo'],
+      ['mAtr', 'Atropello de peatón o ciclista por un coche, con atropello o desplazamiento e impacto significativo', 'atropello'],
+      ['mMoto', 'Conductor de moto, bicicleta, todoterreno u otro medio (patinete u otro dispositivo de movilidad personal, esquí, caballo…) con impacto significativo o separado del dispositivo', 'moto, bicicleta, patinete u otro medio con impacto significativo']
     ];
     const ESP = [
-      ['eAco', 'Anticoagulación o alteración de la coagulación', 'anticoagulación o coagulopatía'],
-      ['eDia', 'Diálisis o múltiples patologías', 'diálisis o multipatología'],
-      ['ePro', 'Criterio del profesional', 'criterio del profesional']
+      ['eCai', 'Caída de baja altura (incluida a nivel) con impacto significativo en la cabeza en niños &lt;5 años o adultos >65 años', 'caída de baja altura con impacto en la cabeza (&lt;5 o >65 años)'],
+      ['eCro', 'Paciente crónico complejo con necesidades especiales (p. ej., dependencia de ventilador)', 'paciente crónico complejo'],
+      ['eMal', 'Sospecha de maltrato', 'sospecha de maltrato'],
+      ['eAco', 'Tratamiento anticoagulante (incluye antiagregantes) o alteración de la coagulación (sobre todo con impacto craneal)', 'anticoagulante, antiagregante o coagulopatía'],
+      ['ePro', 'Criterio del equipo de emergencias por otros motivos', 'criterio del equipo']
     ];
-    /* Criterios del folleto. Si cumple varias prioridades, prevalece la más grave. */
+    /* TAS mínima en niños (≤15 años) según la edad (annex II) */
+    const tasMinPed = e => e < 1 / 12 ? 60 : e < 1 ? 70 : e <= 10 ? 70 + 2 * Math.floor(e) : 90;
+    /* Criterios del annex II. Si cumple varias prioridades, prevalece la más grave. */
     const crit = v => {
-      const lact = num(v.edad) && v.edad < 1;
+      const ped = num(v.edad) && v.edad <= 15;
       const fisio = [];
-      if (num(v.fr) && (v.fr > 29 || v.fr < (lact ? 20 : 10))) fisio.push('FR ' + v.fr + ' rpm');
-      if (num(v.tas) && v.tas < (lact ? 70 : 90)) fisio.push('TAS ' + v.tas + ' mmHg');
-      if (v.pulsos) fisio.push('sin pulsos periféricos');
+      if (num(v.fr) && (v.fr > 29 || v.fr < 10)) fisio.push('FR ' + v.fr + ' rpm');
+      if (num(v.spo2) && v.spo2 < 90) fisio.push('SpO₂ ' + v.spo2 + ' %');
+      if (v.resp) fisio.push('dificultad respiratoria o soporte respiratorio');
+      const tasMin = ped ? tasMinPed(v.edad) : num(v.edad) && v.edad > 65 ? 110 : 90;
+      if (num(v.tas) && v.tas < tasMin) fisio.push('TAS ' + v.tas + ' mmHg (&lt;' + tasMin + ')');
+      if (!ped && num(v.fc) && num(v.tas) && v.tas > 0 && v.fc / v.tas >= 1) fisio.push('índice de shock ' + (v.fc / v.tas).toFixed(1).replace('.', ',') + ' (≥1)');
+      if (!isNaN(v.eb) && v.eb < -6) fisio.push('EB ' + v.eb + ' mEq/L');
+      if (num(v.lac) && v.lac > 5) fisio.push('lactato ' + v.lac + ' mmol/L');
       if (num(v.gcs) && v.gcs <= 13) fisio.push('Glasgow ' + v.gcs);
+      if (v.mov) fisio.push('sin movimientos espontáneos (&lt;3 años)');
       if (v.ptc) fisio.push('pérdida transitoria de consciencia (&lt;1 año)');
       const anat = ANAT.filter(a => v[a[0]]).map(a => a[2]);
       const qLim = (num(v.edad) && (v.edad < 10 || v.edad > 50)) || v.emb > 0 ? 10 : 15;
-      if (num(v.q2) && v.q2 >= qLim) anat.push('quemadura de grado >II del ' + v.q2 + ' % (≥' + qLim + ' %)');
-      if (num(v.q3) && v.q3 > 5) anat.push('quemadura de grado III del ' + v.q3 + ' % (>5 %)');
+      if (num(v.q2) && v.q2 >= qLim) anat.push('quemadura de grado II del ' + v.q2 + ' % (≥' + qLim + ' %)');
+      if (num(v.q3) && v.q3 >= 5) anat.push('quemadura de grado III del ' + v.q3 + ' % (≥5 %)');
       const mec = MEC.filter(a => v[a[0]]).map(a => a[2]);
-      const esp = [v.emb === 2 ? 'embarazo >20 semanas' : ''].concat(ESP.filter(a => v[a[0]]).map(a => a[2]),
-        num(v.edad) && (v.edad < 3 || v.edad > 65) ? 'edad ' + edadTxt(v.edad) + ' (&lt;3 o >65 años, orientativo)' : '').filter(Boolean);
+      const esp = [v.emb === 2 ? 'embarazo >20 semanas' : ''].concat(ESP.filter(a => v[a[0]] && (a[0] !== 'eCai' || !num(v.edad) || v.edad < 5 || v.edad > 65)).map(a => a[2])).filter(Boolean);
       const prio = fisio.length ? 0 : anat.length ? 1 : mec.length ? 2 : esp.length ? 3 : null;
       /* Inmovilización completa de la columna (trauma cerrado / penetrante) */
       const inmC = [num(v.gcs) && v.gcs < 15 ? 'Glasgow ' + v.gcs + ' (&lt;15)' : '',
@@ -1872,14 +1881,14 @@ window.PROTOCOLS = [
       const gc = v.gcs >= 13 ? 4 : v.gcs >= 9 ? 3 : v.gcs >= 6 ? 2 : v.gcs >= 4 ? 1 : 0;
       return { fr, ta, gc, total: fr + ta + gc };
     };
-    const P = ['fisiológico', 'anatómico', 'mecanismo lesional', 'consideración especial'];
-    const DEST = [
-      'Criterio fisiológico: <b>box de críticos</b>. Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.',
-      'Criterio anatómico: <b>box de críticos</b>. Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.',
-      'Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
-      'Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.'
-    ];
-    const DEST01 = '<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 min: CAT 3 (considerar CAT 3e) · isócrona CAT 3 >30 min: CAT 3 (considerar CAT 3e) / CAT 2b · Pediátrico: CAT P3 (considerar CAT P3e) / CAT P2b.';
+    const P = ['fisiológico', 'anatómico', 'mecanismo lesional', 'criterio del equipo'];
+    /* Destino (5.4 y annex III) */
+    const PROX = '<br><b>Proximidad:</b> entre los centros del nivel requerido, el de menor tiempo de traslado (isócrona); si dos o más difieren &lt;10 min del más rápido, todos son válidos y el CECOS elige (ventana de equivalencia).';
+    const DEST01 = 'Alto riesgo (rojo). <b>Destino: CAT-3 / CAT-P3</b> (pediátrico ≤15 años: CAT-P3). Por criterios clínicos, logísticos u operativos (CECOS): otro CAT-3/CAT-P3 o un CAT-2/CAT-P2; si requiere actuación inmediata no demorable, CAT-1/CAT-P1 u hospital de proximidad con soporte vital como puente, con traslado interhospitalario urgente preferente al centro definitivo.';
+    const DEST = [DEST01, DEST01,
+      'Riesgo moderado (amarillo). <b>Destino: CAT-2 / CAT-P2</b> más próximo; si el hospital de referencia y proximidad es un CAT-3/CAT-P3, a ese centro.',
+      'Riesgo moderado (amarillo). <b>Destino: CAT-1 / CAT-P1</b> más próximo (o CAT/CAT-P 2–3 si es el hospital de referencia y proximidad).'
+    ].map(d => d + PROX);
     const SEL0 = ['emb', 'tipo'];
     return {
       crit,
@@ -1889,16 +1898,21 @@ window.PROTOCOLS = [
         {k:'fr', t:'num', l:'Frecuencia respiratoria', u:'rpm'},
         {k:'tas', t:'num', l:'TAS', u:'mmHg'},
         {k:'gcs', t:'num', l:'Glasgow', u:'3–15'},
-        {t:'h', l:'Criterios FISIOLÓGICOS (Prioridad 0): la FR, la TAS y el Glasgow salen de arriba'},
-        {k:'pulsos', t:'chk', l:'Ausencia de pulsos periféricos'},
+        {k:'fc', t:'num', l:'Frecuencia cardiaca', u:'lpm'},
+        {k:'spo2', t:'num', l:'SpO₂ (aire ambiente u oxígeno)', u:'%'},
+        {t:'h', l:'Criterios FISIOLÓGICOS (Prioridad 0): FR, SpO₂, TAS, índice de shock FC/TAS (adulto) y Glasgow salen de arriba'},
+        {k:'resp', t:'chk', l:'Dificultad respiratoria o soporte respiratorio (balón, intubación o alternativas, ventilación mecánica)'},
+        {k:'eb', t:'num', l:'Exceso de base (criterio &lt;−6)', u:'mEq/L'},
+        {k:'lac', t:'num', l:'Lactato (criterio >5)', u:'mmol/L'},
+        {k:'mov', t:'chk', l:'Niño &lt;3 años: ausencia de movimientos espontáneos'},
         {k:'ptc', t:'chk', l:'Pérdida transitoria de consciencia en &lt;1 año'},
         {t:'h', l:'Criterios ANATÓMICOS (Prioridad 1)'},
         ...ANAT.map(a => ({k:a[0], t:'chk', l:a[1]})),
-        {k:'q2', t:'num', l:'Quemaduras de grado >II (dérmicas o de espesor total): extensión (criterio ≥15 %; ≥10 % en &lt;10 años, >50 años o embarazadas)', u:'% SCQ'},
-        {k:'q3', t:'num', l:'Quemaduras de grado III: extensión (criterio >5 %)', u:'% SCQ'},
+        {k:'q2', t:'num', l:'Quemaduras de grado II (dérmicas): extensión (criterio ≥15 %; ≥10 % en &lt;10 años, >50 años o embarazadas)', u:'% SCQ'},
+        {k:'q3', t:'num', l:'Quemaduras de grado III (espesor total): extensión (criterio ≥5 %)', u:'% SCQ'},
         {t:'h', l:'MECANISMO LESIONAL de riesgo (Prioridad 2)'},
         ...MEC.map(a => ({k:a[0], t:'chk', l:a[1]})),
-        {t:'h', l:'CONSIDERACIONES ESPECIALES (Prioridad 3): la edad &lt;3 o >65 años (orientativo) sale de arriba'},
+        {t:'h', l:'CRITERIO DEL EQUIPO DE EMERGENCIAS (Prioridad 3)'},
         {k:'emb', t:'sel', l:'Embarazo', o:[['No',0],['Sí, ≤20 semanas',1],['Sí, >20 semanas',2]]},
         ...ESP.map(a => ({k:a[0], t:'chk', l:a[1]})),
         {t:'h', l:'Inmovilización de la columna'},
@@ -1924,26 +1938,25 @@ window.PROTOCOLS = [
 
         /* 1. Activación y prioridad */
         const faltan = [num(v.fr) ? '' : 'FR', num(v.tas) ? '' : 'TAS', num(v.gcs) ? '' : 'Glasgow'].filter(Boolean);
-        const lista = [['Fisiológicos (P0)', k.fisio], ['Anatómicos (P1)', k.anat], ['Mecanismo lesional (P2)', k.mec], ['Consideraciones especiales (P3)', k.esp]]
+        const lista = [['Fisiológicos (P0)', k.fisio], ['Anatómicos (P1)', k.anat], ['Mecanismo lesional (P2)', k.mec], ['Criterio del equipo (P3)', k.esp]]
           .filter(x => x[1].length).map(x => '<b>' + x[0] + ':</b> ' + x[1].join(' · '));
         out.push(k.prio === null ?
           {t:'Sin criterios de Codi PPT' + (faltan.length ? ' (faltan ' + faltan.join(', ') + ')' : ''), c:'low',
             h:'No se activa el código. Valoración y traslado habituales; reevaluar si cambian las constantes.' +
               (faltan.length ? '<br><b>Faltan ' + faltan.join(', ') + ':</b> sin ellos no se pueden descartar los criterios fisiológicos.' : '')} :
           {t:'ACTIVAR CODI PPT — PRIORIDAD ' + k.prio + ' (' + P[k.prio] + ')', c:k.prio <= 1 ? 'high' : 'mid',
-            h:lista.join('<br>') + '<br>Si cumple varias prioridades, prevalece la más grave. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», en el flujograma).' +
+            h:lista.join('<br>') + '<br>Si cumple varias prioridades, prevalece la más grave. Los criterios se interpretan de forma integrada tras la valoración primaria, nunca de forma aislada. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», en el flujograma).' +
               (k.prio > 0 && faltan.length ? '<br><b>Faltan ' + faltan.join(', ') + ':</b> podrían cumplir un criterio fisiológico (Prioridad 0).' : '')});
 
-        /* 2. Destino y traslado (folleto); RTS e ITP como criterio de centro de trauma */
+        /* 2. Destino (Instrucció 04/2026, 5.4 y annex III). RTS e ITP solo como herramienta auxiliar (abajo) */
         const r = rts(v);
         const itpV = [v.itpVia, v.itpCons, v.itpHer, v.itpFrac];
         const itpDatos = num(v.peso) || itpV.some(has);
         const itpOk = num(v.peso) && num(v.tas) && itpV.every(has);
         const itp = itpOk ? (v.peso > 20 ? 2 : v.peso >= 10 ? 1 : -1) + (v.tas > 90 ? 2 : v.tas >= 50 ? 1 : -1) + itpV.reduce((a, x) => a + x, 0) : null;
-        const centro = [r && r.total < 12 ? 'RTS ' + r.total + ' (&lt;12)' : '', itp !== null && itp < 8 ? 'ITP ' + itp + ' (&lt;8)' : ''].filter(Boolean);
-        out.push({t:'Destino y traslado', c:k.prio === null ? (centro.length ? 'mid' : 'low') : k.prio <= 1 ? 'high' : 'mid',
-          h:(k.prio === null ? 'Sin activación: hospital según la valoración habitual.' : DEST[k.prio] + (k.prio <= 1 ? DEST01 : '')) +
-            (centro.length ? '<br><b>' + centro.join(' · ') + ' → traslado a un centro de trauma especializado.</b>' : '')});
+        out.push({t:'Destino y traslado', c:k.prio === null ? 'low' : k.prio <= 1 ? 'high' : 'mid',
+          h:(k.prio === null ? 'Sin activación: hospital según la valoración habitual.' : DEST[k.prio] +
+            '<br>Traslado interhospitalario a un centro de mayor complejidad en las primeras 24 h: criterios del Codi PPT.')});
 
         /* 3. Glasgow (folleto: leve 14–15 · moderado 9–13 · grave <8) */
         if (num(v.gcs) && v.gcs >= 3 && v.gcs <= 15) {
@@ -1954,16 +1967,16 @@ window.PROTOCOLS = [
         } else if (num(v.gcs)) out.push({t:'Glasgow fuera de rango', c:'', h:'El Glasgow va de 3 a 15.'});
 
         /* 4. RTS (adulto) */
-        if (r) out.push({t:'RTS (adulto): ' + r.total + '/12' + (r.total < 12 ? ' → centro de trauma especializado' : ''), c:r.total < 12 ? 'high' : 'low',
+        if (r) out.push({t:'RTS (adulto): ' + r.total + '/12 · herramienta auxiliar', c:r.total < 12 ? 'mid' : 'low',
           h:'FR ' + v.fr + ' → ' + r.fr + ' · TAS ' + v.tas + ' → ' + r.ta + ' · Glasgow ' + v.gcs + ' → ' + r.gc + '.<br>' +
-            'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0. <b>RTS &lt;12 requiere traslado a un centro de trauma especializado</b> (folleto).'});
+            'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0. El folleto SEM 2017 usaba RTS &lt;12 para indicar un centro de trauma especializado. <b>Herramienta auxiliar: no es criterio del Codi PPT</b> (la Instrucció 04/2026 no la recoge).'});
 
         /* 5. ITP (pediátrico) */
         if (itpDatos) {
           const falta = [num(v.peso) ? '' : 'peso', num(v.tas) ? '' : 'TAS', has(v.itpVia) ? '' : 'vía aérea', has(v.itpCons) ? '' : 'consciencia', has(v.itpHer) ? '' : 'heridas', has(v.itpFrac) ? '' : 'fracturas'].filter(Boolean);
           out.push(itp === null ? {t:'ITP (pediátrico) incompleto', c:'', h:'Faltan: ' + falta.join(', ') + '.'} :
-            {t:'ITP (pediátrico): ' + itp + (itp < 8 ? ' → centro de trauma especializado' : ''), c:itp < 8 ? 'high' : 'low',
-              h:'Peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples (+2 / +1 / −1). <b>ITP &lt;8 requiere traslado a un centro de trauma especializado</b> (folleto).'});
+            {t:'ITP (pediátrico): ' + itp + ' · herramienta auxiliar', c:itp < 8 ? 'mid' : 'low',
+              h:'Peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples (+2 / +1 / −1). El folleto SEM 2017 usaba ITP &lt;8 para indicar un centro de trauma especializado. <b>Herramienta auxiliar: no es criterio del Codi PPT</b> (la Instrucció 04/2026 no la recoge).'});
         }
 
         /* 6. Inmovilización completa de la columna */
@@ -1996,16 +2009,18 @@ window.PROTOCOLS = [
       const gc = v.gcs >= 13 ? 4 : v.gcs >= 9 ? 3 : v.gcs >= 6 ? 2 : v.gcs >= 4 ? 1 : 0;
       return fr + ta + gc;
     };
-    /* Mensaje de activación del Codi PPT al hospital (CatSalut, Instrucció 04/2011, annex III).
+    /* Mensaje de activación del Codi PPT al hospital (Instrucció 04/2026 del CatSalut, annex IV).
        Lo elegido vive solo en memoria y se borra con «Empezar de nuevo». */
-    const ALFA = ['Desconocido', 'Accidente de tráfico', 'Atropello (peatón o ciclista)', 'Precipitación o caída', 'Agresión por arma blanca o de fuego', 'Agresión por otros mecanismos', 'Quemado', 'Ahogado en agua dulce, salada u otras', 'Accidente en metro o ferroviario', 'Otros'];
+    const ALFA = ['Desconocido', 'Accidente de tráfico', 'Atropello (peatón, ciclista o dispositivo de movilidad personal)', 'Precipitación o caída', 'Agresión por arma blanca o de fuego', 'Agresión por otros mecanismos', 'Quemado', 'Ahogado en agua dulce, salada u otras', 'Accidente en metro o ferroviario', 'Otros'];
     const CHARLIE = ['Sin lesiones aparentes', 'Cabeza', 'Cara', 'Cuello', 'Tórax', 'Abdomen', 'Pelvis ósea', 'Raquis o columna vertebral', 'Extremidades superiores o inferiores', 'Lesiones externas, incluidas quemaduras'];
     const ROMEO = ['Manejo invasivo de la vía aérea: IOT, mascarilla laríngea, cricotirotomía…', 'Dificultad respiratoria', 'Normal'];
-    const HOTEL = { a0: 'Sin pulso o TAS <50 mmHg', a1: 'TAS 50–90 mmHg', a2: 'TAS >90 mmHg', n0: 'Sin pulso central ni periférico', n1: 'Pulso central sí, periférico no', n2: 'Pulsos central y periférico, mala perfusión', n3: 'Pulsos central y periférico, buena perfusión' };
+    const HOTEL = { a0: 'Sin pulso o TAS <50 mmHg', a1: 'TAS 50–90 mmHg', a2: 'TAS >90 mmHg', n0: 'Sin pulso central ni periférico (o TAS bajo el mínimo para la edad)', n1: 'Pulso central sí, periférico no', n2: 'Pulsos central y periférico, mala perfusión', n3: 'Pulsos central y periférico, buena perfusión' };
     const MSG = {};
     let msgV = {};
     const prio = v => { const id = ['p0', 'p1', 'p2', 'p3'].find(x => (v.ruta || []).includes(x)); return id ? +id[1] : null; };
     const hotelDe = v => MSG.hotel || (num(v.tas) ? (v.tas < 50 ? 'a0' : v.tas <= 90 ? 'a1' : 'a2') : '');
+    /* Assessment of Blood Consumption: >2 puntos → HOTEL-SIERRA (annex IV) */
+    const abc = v => [v.aPen || v.tipo === 2, num(v.tas) && v.tas < 90, num(v.fc) && v.fc > 120, v.aFast].filter(Boolean).length;
     const mensaje = v => {
       const edad = num(v.edad) ? (v.edad < 1 ? Math.round(v.edad * 12) + ' meses' : Math.floor(v.edad) + ' años') : '¿edad?';
       const pr = prio(v);
@@ -2016,9 +2031,10 @@ window.PROTOCOLS = [
         const t = new Date(Date.now() + MSG.eta * 60000);
         eta = 'ETA: ' + MSG.eta + ' minutos (llegada hacia las ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ')';
       }
-      return 'Activamos Código PPT. ' + (MSG.sexo || '¿Sexo?') + ' de ' + edad + ', Prioridad ' + (pr === null ? '¿?' : pr) + '. ' +
+      return 'Activamos Código PPT. ' + (MSG.sexo || '¿Sexo?') + ' de ' + edad + ', Prioridad ' + (pr === null ? '¿?' : pr + (pr <= 1 ? ' (rojo)' : ' (amarillo)')) + '. ' +
         cod('ALFA', ALFA, MSG.alfa) + '. ' + cod('CHARLIE', CHARLIE, MSG.charlie) + '. ' + cod('ROMEO', ROMEO, MSG.romeo) + '. ' +
-        (h ? 'HOTEL ' + h[1] + ' (' + HOTEL[h] + ')' : 'HOTEL ¿?') + '. GOLF ' + (num(v.gcs) ? v.gcs : '¿?') + '. ' + eta + '.';
+        (h ? 'HOTEL ' + h[1] + ' (' + HOTEL[h] + ')' : 'HOTEL ¿?') + (abc(v) > 2 ? ', HOTEL-SIERRA (ABC ' + abc(v) + ')' : '') +
+        '. GOLF ' + (num(v.gcs) ? v.gcs : '¿?') + (MSG.golf ? ' (' + MSG.golf + ')' : '') + '. ' + eta + '.';
     };
     window.pptMsg = (k, x) => {
       MSG[k] = x;
@@ -2029,7 +2045,9 @@ window.PROTOCOLS = [
       lista.map(([x, t]) => '<option value="' + x + '"' + (MSG[k] === x ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></label>';
     const codigos = lista => lista.map((t, i) => [String(i), i + ' · ' + t]);
     const hotelOpts = pre => Object.keys(HOTEL).filter(x => x[0] === pre).map(x => '<option value="' + x + '"' + (MSG.hotel === x ? ' selected' : '') + '>' + x[1] + ' · ' + HOTEL[x].replace(/</g, '&lt;') + '</option>').join('');
-    const DEST01 = '<b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 min: CAT 3 (considerar CAT 3e) · isócrona CAT 3 >30 min: CAT 3 (considerar CAT 3e) / CAT 2b · Pediátrico: CAT P3 (considerar CAT P3e) / CAT P2b.';
+    const PROX = '<br>Isócrona: el más próximo; si otros están a <b>&lt;10 min</b> del más rápido, decide el CECOS.';
+    const DEST01 = '<b>Destino: CAT-3</b> (niño ≤15 a: <b>CAT-P3</b>). Si no es posible: CAT-2/P2; si no es demorable: CAT-1/P1 u hospital no CAT como <b>puente</b> → traslado secundario urgente.' + PROX;
+    const FIN = '<br><b>Activar CECOS</b> con los 9 datos («Activación SEM», abajo) · entrega con <b>IDEAS</b> («Transferencia al hospital»).';
     const TIPO = {
       q: '¿Traumatismo cerrado o penetrante?',
       help: 'Para decidir la inmovilización de la columna.',
@@ -2039,47 +2057,52 @@ window.PROTOCOLS = [
       start: 'fisio',
       nodes: {
         fisio: {
-          escalas: ['gcs', 'gcsped', 'tep-ped'], q: '¿Tiene algún criterio FISIOLÓGICO?',
+          escalas: ['gcs', 'gcsped', 'tep-ped'],
+          t: 'Primero: evaluación primaria xABCDE', c: 'high',
+          show: '<b>x</b> hemorragia exanguinante (compresión, torniquete) · <b>A</b> vía aérea + control cervical · <b>B</b> · <b>C</b> · <b>D</b> · <b>E</b>. Los criterios se valoran juntos, nunca aislados.',
+          q: '¿Criterio FISIOLÓGICO? (P0)',
           help: v => {
             const r = fisio(v);
-            return 'FR &lt;10 rpm (&lt;20 en &lt;1 año) o >29 rpm · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en &lt;1 año).' +
-              (r.length ? '<br><b>Con los datos introducidos cumple: ' + r.join(' · ') + '.</b>' : '');
+            return 'FR <b>&lt;10 o >29</b> · SpO₂ <b>&lt;90 %</b> · dificultad o soporte respiratorio · Glasgow <b>≤13</b> (motor &lt;6) · EB <b>&lt;−6</b> o lactato <b>>5</b><br>' +
+              'Adulto: TAS <b>&lt;90</b> (<b>&lt;110</b> si >65 a) o FC/TAS <b>≥1</b><br>' +
+              'Niño ≤15 a: TAS <b>&lt;60</b> (&lt;1 mes) · <b>&lt;70</b> (&lt;1 a) · <b>&lt;70 + 2×edad</b> (1–10 a) · <b>&lt;90</b> (>10 a) · &lt;3 a sin movimientos espontáneos · &lt;1 a con pérdida transitoria de consciencia' +
+              (r.length ? '<br><b>Cumple: ' + r.join(' · ') + '.</b>' : '');
           },
-          opts: [{ l: 'Sí, algún criterio', go: 'p0', sug: v => fisio(v).length > 0 }, { l: 'No', go: 'anat' }]
+          opts: [{ l: 'Sí', go: 'p0', sug: v => fisio(v).length > 0 }, { l: 'No', go: 'anat' }]
         },
         p0: {
-          t: '🔴 ACTIVAR CODI PPT — PRIORIDAD 0', c: 'high',
-          show: 'Criterio fisiológico: <b>box de críticos</b>. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          t: '🔴 CODI PPT — PRIORIDAD 0 (rojo)', c: 'high',
+          show: DEST01 + FIN,
           ...TIPO
         },
         anat: {
-          q: '¿Tiene algún criterio ANATÓMICO?',
-          help: 'Herida penetrante en cabeza, cuello, tórax o extremidades (proximal a rodilla o codo) · fractura craneal abierta o hundimiento · tórax inestable (volet) · fractura de pelvis · ≥2 fracturas de huesos largos proximales (húmero o fémur; en &lt;1 año, ≥1) · amputación proximal a tobillo o muñeca · extremidad aplastada, desguantada o destrozada · parálisis o déficit motor o sensitivo de una extremidad (sospecha de lesión medular) · quemaduras de grado >II con extensión ≥15 % (≥10 % en &lt;10 años, >50 años o embarazadas) · quemaduras de grado III >5 % · quemadura completa de cara o cuello.',
-          opts: [{ l: 'Sí, algún criterio', go: 'p1', sug: v => ppt(v).anat.length > 0 }, { l: 'No', go: 'mec' }]
+          q: '¿Criterio ANATÓMICO? (P1)',
+          help: 'Sangrado que requiere <b>compresión o torniquete</b> · herida penetrante (o empalamiento) en cabeza, cuello, tórax, abdomen o proximal a codo/rodilla · sospecha de fractura de <b>cráneo</b>, <b>pelvis</b> o <b>≥2 huesos largos</b> proximales (≥1 en &lt;1 a) · tórax inestable · amputación proximal a muñeca/tobillo · extremidad catastrófica o sin pulso distal · déficit motor/sensitivo (medular) · <b>E-FAST +</b> · quemadura grado II <b>≥15 %</b> (≥10 % en &lt;10 a, >50 a o embarazo), grado III <b>≥5 %</b> o extensa de cara/cuello',
+          opts: [{ l: 'Sí', go: 'p1', sug: v => ppt(v).anat.length > 0 }, { l: 'No', go: 'mec' }]
         },
         p1: {
-          t: '🟠 ACTIVAR CODI PPT — PRIORIDAD 1', c: 'high',
-          show: 'Criterio anatómico: <b>box de críticos</b>. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Traslado preferentemente con <b>USVA</b>; individualizar el destino si hay inestabilidad hemodinámica.<br>' + DEST01,
+          t: '🔴 CODI PPT — PRIORIDAD 1 (rojo)', c: 'high',
+          show: DEST01 + FIN,
           ...TIPO
         },
         mec: {
-          q: '¿Tiene un MECANISMO LESIONAL de riesgo?',
-          help: 'Caída: adultos >6 m, niños >2–3 veces su altura (en general >3 m) · colisión de vehículo con intrusión >30 cm en el lugar del acompañante o >45 cm en cualquier otro, eyección parcial o completa, muerte de un ocupante o telemetría de alto riesgo (en general >60 km/h) · atropello de peatón o ciclista con desplazamiento o impacto significativo (>30 km/h) · moto, bicicleta u otro dispositivo (p. ej., esquí) a velocidad significativa · sospecha de maltrato en &lt;3 años · objeto que cae desde altura (valorar peso y altura) · arma blanca o de fuego.',
+          q: '¿MECANISMO lesional de riesgo? (P2)',
+          help: 'Caída <b>>3 m</b> · impacto, objeto contundente o explosión · vehículo: niño 0–9 a sin retención, intrusión <b>>30 cm</b> (ocupantes) / <b>>45 cm</b>, atrapamiento con extracción, eyección, acompañante fallecido, telemetría de riesgo (<b>>60 km/h</b>) · atropello con impacto significativo · moto, bici, patinete u otro con impacto significativo o separado del vehículo',
           opts: [{ l: 'Sí', go: 'p2', sug: v => ppt(v).mec.length > 0 }, { l: 'No', go: 'ant' }]
         },
         p2: {
-          t: '🟡 ACTIVAR CODI PPT — PRIORIDAD 2', c: 'mid',
-          show: 'Mecanismo lesional de riesgo. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>; individualizar si hay inestabilidad hemodinámica.<br><b>Destino</b> (tabla del folleto) · Adulto, isócrona CAT 3 &lt;30 o >30 min: CAT 2b / CAT 2a / CAT 1; CAT 3 (considerar CAT 3e) · Pediátrico: CAT P2a (considerar CAT P3e / CAT P2b / CAT P1).',
+          t: '🟡 CODI PPT — PRIORIDAD 2 (amarillo)', c: 'mid',
+          show: '<b>Destino: CAT-2 / CAT-P2</b> más próximo (CAT-3/P3 si es el de referencia y proximidad).' + PROX + FIN,
           ...TIPO
         },
         ant: {
-          q: '¿Tiene algún antecedente o consideración especial?',
-          help: 'Embarazo avanzado (>20 semanas) · anticoagulación o alteración de la coagulación · diálisis o múltiples patologías · niños pequeños o edad avanzada (orientativo &lt;3 y >65 años) · criterio del profesional.',
+          q: '¿CRITERIO DEL EQUIPO? (P3)',
+          help: 'Caída a nivel o baja altura con golpe en la cabeza en <b>&lt;5 a</b> o <b>>65 a</b> · anticoagulante, antiagregante o coagulopatía · embarazo <b>>20 sem</b> · sospecha de maltrato · crónico complejo (p. ej., dependiente de ventilador) · otros motivos',
           opts: [{ l: 'Sí', go: 'p3', sug: v => ppt(v).esp.length > 0 }, { l: 'No', go: 'noact' }]
         },
         p3: {
-          t: '🟢 ACTIVAR CODI PPT — PRIORIDAD 3', c: 'mid',
-          show: 'Antecedente relevante. Notificar a CECOS (mensaje en «Activación SEM: prioridad y mensaje», abajo).<br>Sin criterios fisiológicos ni anatómicos: <b>considerar traslado con USVB</b>.<br><b>Destino:</b> hospital de referencia.',
+          t: '🟡 CODI PPT — PRIORIDAD 3 (amarillo)', c: 'mid',
+          show: '<b>Destino: CAT-1 / CAT-P1</b> más próximo (CAT 2–3 si es el de referencia y proximidad).' + PROX + FIN,
           ...TIPO
         },
         noact: {
@@ -2115,13 +2138,11 @@ window.PROTOCOLS = [
             show: v => {
               msgV = v;
               const pr = prio(v);
-              return '<b>Prioridad</b> (si cumple varias, prevalece la más grave):<br>' +
-                '🔴 <b>P0 · fisiológico</b>: FR &lt;10 o >29 rpm (&lt;20 en &lt;1 año) · TAS &lt;90 mmHg (&lt;70 en &lt;1 año) · sin pulsos periféricos · Glasgow ≤13.<br>' +
-                '🟠 <b>P1 · anatómico</b>: herida penetrante en cabeza, cuello, tórax o extremidad proximal a codo o rodilla · tórax inestable · fractura de pelvis o craneal abierta o con hundimiento · ≥2 fracturas de huesos largos proximales · amputación proximal a muñeca o tobillo · extremidad aplastada o destrozada · déficit motor o sensitivo de una extremidad · quemaduras graves o de cara y cuello.<br>' +
-                '🟡 <b>P2 · mecanismo lesional</b>: caída >6 m (niños >2–3 veces su altura) · tráfico con intrusión, eyección, ocupante fallecido o alta velocidad (>60 km/h) · atropello de peatón o ciclista · moto, bici o esquí a velocidad significativa · arma blanca o de fuego · sospecha de maltrato en &lt;3 años.<br>' +
-                '🟢 <b>P3 · consideraciones especiales</b>: embarazo >20 semanas · anticoagulación o coagulopatía · diálisis o multipatología · &lt;3 o >65 años (orientativo) · criterio del profesional.<br>' +
-                (pr === null ? '<i>Responde las preguntas del flujograma para fijar la prioridad.</i>' : '<b>Este caso: Prioridad ' + pr + '.</b>') +
-                '<br><br><b>Mensaje al hospital</b>, en este orden: sexo · edad · prioridad · ALFA · CHARLIE · ROMEO · HOTEL · GOLF · hora prevista de llegada. La edad, la prioridad, el HOTEL (con la TAS) y el GOLF salen de los datos de arriba.' +
+              return '<b>Prioridad</b> (rojo 0–1 · amarillo 2–3; si cumple varias, la más grave): ' +
+                (pr === null ? '<i>responde las preguntas del flujograma.</i>' : '<b>este caso, Prioridad ' + pr + (pr <= 1 ? ' (rojo, alto riesgo)' : ' (amarillo, riesgo moderado)') + '.</b>') +
+                '<br><br><b>Mensaje al hospital</b>, en este orden: sexo · edad · prioridad · ALFA · CHARLIE · ROMEO · HOTEL (y HOTEL-SIERRA) · GOLF · hora prevista de llegada. La edad, la prioridad, el HOTEL (con la TAS), el HOTEL-SIERRA y el GOLF salen de los datos de arriba. Comunicar la peor cifra.' +
+                '<br>HOTEL-SIERRA (previsión de hemoderivados inmediatos) si ABC >2: penetrante + TAS &lt;90 + FC >120 + E-FAST positivo (1 punto cada uno). ' +
+                (abc(v) ? 'Este caso: ABC ' + abc(v) + '.' : '') +
                 '<div class="fl-form"><div class="fl-form-grid">' +
                 sel('sexo', 'Sexo', [['Mujer', 'Mujer'], ['Hombre', 'Hombre']], 'Elige…') +
                 sel('alfa', 'ALFA · tipo de accidente', codigos(ALFA), 'Elige…') +
@@ -2129,12 +2150,20 @@ window.PROTOCOLS = [
                 sel('romeo', 'ROMEO · respiración', codigos(ROMEO), 'Elige…') +
                 '<label class="fl-form-l">HOTEL · estado hemodinámico<select class="fl-sel" onchange="pptMsg(\'hotel\', this.value)"><option value="">Según la TAS (adulto)</option>' +
                 '<optgroup label="Adulto">' + hotelOpts('a') + '</optgroup><optgroup label="Niño (pulsos central y periférico)">' + hotelOpts('n') + '</optgroup></select></label>' +
+                '<label class="fl-form-l">GOLF desglosado (ocular, verbal, motor)<input type="text" class="num-in" placeholder="p. ej. O3 V4 M5" value="' + (MSG.golf || '').replace(/"/g, '&quot;') + '" oninput="pptMsg(\'golf\', this.value)"></label>' +
                 '<label class="fl-form-l">Llegada prevista (minutos)<input type="number" min="0" step="1" inputmode="numeric" class="num-in" value="' + (MSG.eta || '') + '" oninput="pptMsg(\'eta\', this.value)"></label>' +
                 '</div></div>' +
                 '\n<div class="fl-msg" id="ppt-msg-out" aria-live="polite">' + mensaje(v).replace(/</g, '&lt;') + '</div>' +
                 '<div class="fl-form"><button class="fl-esc" onclick="navigator.clipboard.writeText(document.getElementById(\'ppt-msg-out\').textContent).then(() => showToast()).catch(showCopyError)">📋 Copiar el mensaje</button></div>' +
-                '\n<span class="pe-nota">Códigos de la Instrucció CatSalut 04/2011, annex III. Prioridades del folleto Codi PPT (SEM, 2017).</span>';
+                '\n<span class="pe-nota">Prioridades y códigos: Instrucció 04/2026 del CatSalut, annex II y IV.</span>';
             }
+          },
+          {
+            l: 'Hospital no CAT (puente)', t: 'Hospital no CAT o comarcal: puente', c: 'high',
+            show: 'Recibe P0–1 <b>solo en emergencia</b> no demorable, como puente: <b>estabilizar y trasladar</b> al centro definitivo según el CECOS.<br>' +
+              'Destino por isócrona: centros a <b>&lt;10 min</b> del más rápido son equivalentes; decide el CECOS.<br>' +
+              'Traslado secundario a mayor complejidad en las <b>primeras 24 h</b> = <b>Codi PPT</b> (traslado prioritario del CECOS).<br>' +
+              '<span class="pe-nota">Instrucció 04/2026, 5.3, 5.4 y annex III.</span>'
           },
           {
             farmacos: ['Ácido tranexámico'], l: 'Hemorragia grave', t: 'Hemorragia grave', c: 'high',
@@ -2148,17 +2177,23 @@ window.PROTOCOLS = [
             show: 'Mantener <b>PAM ≥80 mmHg</b>: no aplicar la hipotensión permisiva.<br>Glasgow: leve 14–15 · moderado 9–13 · grave ≤8 (el folleto escribe «grave &lt;8»; el corte habitual, y el de la guía europea, es ≤8).<br><span class="pe-nota">Guía europea de hemorragia en el trauma, 6.ª ed., 2023.</span>'
           },
           {
-            l: 'Escalas RTS e ITP', t: 'Escalas RTS (adulto) e ITP (pediátrico)',
+            l: 'Escalas RTS e ITP (auxiliares)', t: 'Escalas RTS (adulto) e ITP (pediátrico): herramienta auxiliar',
             show: v => {
               const r = rts(v);
-              return '<b>RTS</b> = FR + TAS + Glasgow (0–12)' + (r === null ? '. Introduce la FR, la TAS y el Glasgow para calcularlo.' : ': <b>' + r + '</b>' + (r < 12 ? ' → <b>traslado a un centro de trauma especializado</b>.' : '.')) + '<br>' +
-                'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0. <b>RTS &lt;12 → centro de trauma especializado.</b><br>' +
-                '<b>ITP</b> (sumar +2 / +1 / −1): peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples. <b>ITP &lt;8 → centro de trauma especializado.</b>';
+              return '<b>Herramienta auxiliar, no criterio del Codi PPT</b> (la Instrucció 04/2026 no las recoge; el folleto SEM 2017 indicaba centro de trauma con RTS &lt;12 o ITP &lt;8).<br>' +
+                '<b>RTS</b> = FR + TAS + Glasgow (0–12)' + (r === null ? '. Introduce la FR, la TAS y el Glasgow para calcularlo.' : ': <b>' + r + '</b>.') + '<br>' +
+                'FR 10–29 = 4 · >29 = 3 · 6–9 = 2 · 1–5 = 1 · 0 = 0 · TAS >89 = 4 · 76–89 = 3 · 50–75 = 2 · 1–49 = 1 · 0 = 0 · Glasgow 13–15 = 4 · 9–12 = 3 · 6–8 = 2 · 4–5 = 1 · 3 = 0.<br>' +
+                '<b>ITP</b> (sumar +2 / +1 / −1): peso >20 / 10–20 / &lt;10 kg · vía aérea normal / sostenible / insostenible · TAS >90 / 50–90 / &lt;50 mmHg · consciente / obnubilado / coma · heridas no / menores / mayores o penetrantes · fracturas no / cerrada / abiertas o múltiples.';
             }
           },
           {
-            l: 'Transferencia al hospital', t: 'Transferencia al hospital',
-            show: '<b>Verbal:</b> presentación (profesionales y paciente) · prioridad PPT (crítico P0/P1, no crítico P2/P3) · constantes · paciente: antecedentes (sexo, edad, perfil), accidente (qué ha pasado), patrón lesional (qué tiene), ABCDE y reconocimiento secundario (cómo le afecta), intervenciones y resultado (qué le hemos hecho), alertas (qué nos preocupa) · documentación · acompañantes.<br>' +
+            l: 'Transferencia al hospital (IDEAS)', t: 'Transferencia al hospital: IDEAS',
+            show: '<b>I</b> · identificación: sexo, edad, CIP; nº de afectados y gravedad si hay más de uno<br>' +
+              '<b>D</b> · diagnóstico de sospecha: orientación sindrómica, patrón o mecanismo lesional<br>' +
+              '<b>E</b> · estado: A permeable / permeabilizar o aislar · B adecuada / soporte ventilatorio · C estable / inestable con vasoactivos · D Glasgow inicial y actual · E dolor (EVA), quemaduras (superficie y tipo), otras lesiones<br>' +
+              '<b>A</b> · actuaciones relevantes (pruebas y tratamiento)<br>' +
+              '<b>S</b> · signos de alarma y soporte requerido<br>' +
+              '<span class="pe-nota">Instrucció 04/2026, annex VI. La transferencia física de abajo es del folleto SEM 2017 (la instrucción la da en un algoritmo gráfico).</span><br>' +
               '<b>Física:</b> camilla del hospital con tablero espinal e inmovilizador pélvico si está indicado · camillas juntas y a la misma altura · pasar al paciente con el colchón de vacío hecho · retirarlo con la técnica del puente lateral (líder en la cabecera) · no perder de vista monitorización, tubos y sondas.'
           }
         ]
@@ -2166,20 +2201,22 @@ window.PROTOCOLS = [
     };
   })(),
   steps:[
-  {type:'decision', text:'¿Tiene algún criterio FISIOLÓGICO? (box de críticos)', yes:'Sí → Prioridad 0', no:'No'},
-  {type:'info', branch:'yes', text:'Criterios fisiológicos: FR <10 rpm (<20 en <1a) o >29 rpm (todas las edades) · TAS <90 mmHg (<70 en <1a) · ausencia de pulsos periféricos · Glasgow ≤13 (o pérdida transitoria de consciencia en <1a)'},
-  {type:'decision', branch:'no', text:'¿Tiene algún criterio ANATÓMICO? (box de críticos)', yes:'Sí → Prioridad 1', no:'No'},
-  {type:'info', branch:'no', text:'Criterios anatómicos: herida penetrante en cabeza/cuello/tórax/extremidades (proximal a rodilla/codo) · fractura craneal abierta o con hundimiento · tórax inestable (volet) · fractura de pelvis · ≥2 fracturas de huesos largos proximales (húmero/fémur; en <1a ≥1) · amputación proximal a tobillo/muñeca · extremidad aplastada, degloved o destrozada · parálisis o déficit motor/sensitivo de extremidad (sospecha de lesión medular) · quemaduras grado >II con extensión ≥15% (≥10% en <10a, >50a o embarazada) · quemaduras grado III >5% · quemadura completa de cara o cuello'},
-  {type:'decision', text:'¿Tiene mecanismo lesional de riesgo?', yes:'Sí → Prioridad 2', no:'No'},
-  {type:'info', text:'Mecanismo de riesgo: caídas (adultos >6m, niños >2-3x su altura, en general >3m) · colisión de vehículo con intrusión >30cm (acompañante) o >45cm, eyección parcial/completa, muerte de un ocupante o telemetría con velocidad >60 km/h · atropello con desplazamiento o impacto >30 km/h · accidente de moto/bici a velocidad significativa · sospecha de maltrato en <3 años · objeto que cae desde altura · armas blancas o de fuego'},
-  {type:'decision', text:'¿Tiene antecedentes relevantes?', yes:'Sí → Prioridad 3', no:'No → sin activación'},
-  {type:'info', text:'Consideraciones especiales (Prioridad 3): embarazo avanzado (>20 semanas), anticoagulación o coagulopatía, diálisis o multipatología, <3 años o >65 años, criterio del profesional'},
-  {type:'action', text:'ACTIVAR CODI PPT según la prioridad más alta alcanzada, notificar a CECOS'},
-  {type:'info', text:'Mensaje de activación al hospital (CECOS): sexo · edad · prioridad · ALFA (tipo de accidente) · CHARLIE (zona del cuerpo) · ROMEO (respiración) · HOTEL (estado hemodinámico) · GOLF (Glasgow) · hora prevista de llegada (CatSalut, Instrucció 04/2011)'},
-  {type:'info', text:'Destino: prioridades 0/1 → traslado preferentemente con USVA. Prioridades 2/3 sin criterios fisiológicos ni anatómicos → considerar USVB. Individualizar destino si inestabilidad hemodinámica'},
+  {type:'action', text:'Evaluación primaria xABCDE (hemorragia exanguinante primero). Criterios integrados, nunca aislados. Pediatría: ≤15 años'},
+  {type:'decision', text:'¿Criterio FISIOLÓGICO?', yes:'Sí → P0 (rojo)', no:'No'},
+  {type:'info', branch:'yes', text:'FR <10 o >29 · SpO2 <90% · dificultad o soporte respiratorio · Glasgow ≤13 · EB <−6 o lactato >5 · adulto: TAS <90 (<110 si >65a) o FC/TAS ≥1 · niño: TAS <60 (<1 mes), <70 (<1a), <70+2×edad (1-10a), <90 (>10a); <3a sin movimientos espontáneos; <1a pérdida transitoria de consciencia'},
+  {type:'decision', branch:'no', text:'¿Criterio ANATÓMICO?', yes:'Sí → P1 (rojo)', no:'No'},
+  {type:'info', branch:'no', text:'Sangrado con compresión o torniquete · herida penetrante o empalamiento (cabeza, cuello, tórax, abdomen, proximal a codo/rodilla) · sospecha de fractura de cráneo, pelvis o ≥2 huesos largos proximales (≥1 en <1a) · tórax inestable · amputación proximal a muñeca/tobillo · extremidad catastrófica · lesión medular · E-FAST + · quemadura II ≥15% (≥10% en <10a, >50a o embarazo), III ≥5%, extensa de cara/cuello'},
+  {type:'decision', text:'¿MECANISMO de riesgo?', yes:'Sí → P2 (amarillo)', no:'No'},
+  {type:'info', text:'Caída >3 m · impacto, objeto contundente o explosión · vehículo: niño 0-9a sin retención, intrusión >30/45 cm, atrapamiento, eyección, acompañante fallecido, telemetría >60 km/h · atropello con impacto significativo · moto, bici, patinete u otro con impacto o separado del vehículo'},
+  {type:'decision', text:'¿CRITERIO DEL EQUIPO?', yes:'Sí → P3 (amarillo)', no:'No → sin activación'},
+  {type:'info', text:'Caída de baja altura con golpe en la cabeza (<5a o >65a) · anticoagulante, antiagregante o coagulopatía · embarazo >20 sem · sospecha de maltrato · crónico complejo · otros motivos'},
+  {type:'action', text:'Destino: P0-1 → CAT-3/CAT-P3 (alternativa CAT-2/P2; puente CAT-1/P1 u hospital no CAT si no es demorable) · P2 → CAT-2/CAT-P2 · P3 → CAT-1/CAT-P1. El más próximo por isócrona; <10 min de diferencia = equivalentes, decide el CECOS'},
+  {type:'action', text:'Activar CECOS con 9 datos: sexo · edad · prioridad (rojo 0-1 / amarillo 2-3) · ALFA · CHARLIE · ROMEO · HOTEL (HOTEL-SIERRA si ABC >2) · GOLF desglosado · hora de llegada'},
+  {type:'action', text:'Transferencia IDEAS: Identificación · Diagnóstico de sospecha · Estado ABCDE · Actuaciones · Signos de alarma'},
+  {type:'info', text:'Hospital no CAT: solo puente en emergencia (estabilizar y trasladar). Traslado secundario a mayor complejidad en las primeras 24 h = Codi PPT'},
   {type:'action', text:'Inmovilización espinal completa (trauma cerrado) si: alteración de consciencia (GCS<15), dolor/déficit neurológico/deformidad de raquis, o mecanismo de riesgo con intoxicación, dolor distractor intenso, incapacidad de comunicarse o <3a con mecanismo de riesgo + hipotensión mantenida. Trauma penetrante: inmovilizar solo si sospecha de déficit neurológico'},
-  {type:'info', text:'Escalas: Glasgow adulto/pediátrico (leve 14-15, moderado 9-13, grave <8) · RTS adulto (<12 → centro de trauma especializado) · Índice de Trauma Pediátrico ITP (<8 → centro de trauma especializado)'}
-], src:'Codi PPT — SEM Catalunya, Grup de Treball de Trauma, revisión diciembre 2017'},
+  {type:'info', text:'Escalas: Glasgow adulto/pediátrico (leve 14-15, moderado 9-13, grave <8) · RTS adulto e ITP pediátrico solo como herramienta auxiliar (no son criterio del código)'}
+], src:'Codi PPT — Instrucció 04/2026 del CatSalut (en vigor el 8/10/2026; deroga la 04/2011): criterios, destino, mensaje e IDEAS · inmovilización, transferencia física, Glasgow, RTS e ITP (auxiliares): folleto Codi PPT SEM, revisión diciembre 2017'},
 
 {id:'codi-sepsia', title:'Codi Sèpsia', sub:'NEWS ≥7 + sospecha de infección — activación y objetivos de la 1ª hora', badge:'red', tag:'Crítico', rank:4, codigo:true,
   folleto:'codigos/C04._Codi_sèpsia.pdf',
