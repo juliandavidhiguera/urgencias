@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-12 | **Sesion #:** 28 | **Rama:** main | **HEAD:** `c2edb32` (desplegado en produccion, `urg-v85`) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-17 | **Sesion #:** 29 | **Rama:** main | **HEAD:** `cbe7797` (subido, `urg-v86`) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -60,6 +60,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 29 - 2026-11-17
+- Modificado `data/protocols.js` (PATRONES_OMI): patrones OMI en 3 niveles (`nivel` 1 activación inmediata: De Winter, posterior, Smith · 2 alto riesgo con valoración experta: Wellens, Aslanger, T hiperagudas, distorsión terminal, bloqueo de rama/bifascicular · 3 signos en estudio: remolino, Northern OMI, bandera de Sudáfrica), corregidos según evaluación de evidencia (retirada cifra 84 %/98 %, Wellens no OMI activo, Aslanger sin «muy específico», posterior ≈10 % de OMI, Smith con cifras de validación 80 %/49 %, bifascicular = BRD + hemibloqueo; BRIHH nuevo aislado no equivale a IAMCEST; fuentes sin notas de Perplexity/Vera). `omiNodo` decide por nivel (1 equivalente IAMCEST; 2 comentar con hemodinámica → ICP / fibrinólisis consensuada / SCASEST; 3 no activa → ICP si otro criterio, si no SCASEST). `OMI_NIVEL` global.
+- Añadido `codigos/patrones iam nuevos/esquemas/*.svg` (5 esquemas propios: De Winter, Wellens, Aslanger, posterior, Sgarbossa-Smith), los mismos del temario de urgencias-sim (`estudio/img/generar.py`); se muestran bajo la imagen en galería y flujograma; precacheados en `sw.js` (`urg-v86`).
+- Verificado: carga de datos con Node (11 patrones, destinos por nivel). Revisión visual pendiente en producción.
+- Pendiente: el formulario de evaluación del Codi IAM sigue con la tabla de puntos Sgarbossa 5/3/2 del código catalán (decidir si se pregunta por criterios de Smith).
 
 ### Sesion 28 - 2026-11-12
 - Modificado (peticion del usuario: «la de perfusiones», adaptable y pensada para transporte): `data/drugs.js` `dilution` de Noradrenalina (4 mg/250 → 5 mg/50 mL = 100 µg/mL), Dopamina (200 mg/250 → 200 mg/50 mL), Dobutamina (250 mg/250 → 250 mg/50 mL) y Midazolam (15 mg/50 → 50 mg/50 mL) igualadas a `data/infusions.js`; regla anotada en la cabecera de `drugs.js`. Solo texto: los ml/h ya salian de INFUSIONS. Amiodarona (carga) y Adrenalina (ampolla) no son perfusion y se dejan. Verificado con node: las 4 coinciden con INFUSIONS.
