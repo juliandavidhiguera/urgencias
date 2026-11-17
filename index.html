@@ -810,6 +810,7 @@ label.fl-ask-hint { display: block; }
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
+  overflow: clip; /* recorta las esquinas sin romper la barra fija (sticky) del evaluador */
   margin-bottom: 12px;
 }
 .protocol-card > summary, .scale-card > summary, .databox > summary, .card > summary {
@@ -834,8 +835,41 @@ label.fl-ask-hint { display: block; }
 .fg-calc-in .num-in { width: 80px; }
 .fg-calc-res { color: var(--text2); }
 .pe-title { font-size: var(--fs-base); font-weight: 600; padding: 6px 0; }
-.pe-h { font-size: var(--fs-xs); font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; padding: 12px 0 2px; }
-.pe-out { margin-top: 10px; }
+.pe-h { font-size: var(--fs-sm); font-weight: 600; color: var(--text); padding: 16px 0 6px; line-height: 1.3; }
+/* Números en rejilla, etiqueta encima */
+.pe-nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 10px; padding: 2px 0 6px; }
+.pe-num { display: grid; gap: 3px; font-size: var(--fs-sm); color: var(--text2); line-height: 1.25; align-content: end; }
+.pe-num-in { display: flex; align-items: baseline; gap: 4px; border: 1px solid var(--border); background: var(--bg2); border-radius: 6px; padding: 0 8px; }
+.pe-num-in:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 25%, transparent); }
+.pe-num-in .num-in { flex: 1; min-width: 0; width: 100%; border: 0; background: none; padding: 7px 0; font-size: var(--fs-md); font-variant-numeric: tabular-nums; color: var(--text); outline: none; }
+.pe-num-in small { font-size: var(--fs-xs); color: var(--text2); white-space: nowrap; }
+/* Casillas como etiquetas: se marcan tocándolas */
+.pe-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 0 6px; }
+.pe-chip { position: relative; display: inline-flex; align-items: center; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--bg2); font-size: var(--fs-sm); line-height: 1.3; color: var(--text); cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.pe-chip:hover { border-color: var(--text2); }
+.pe-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.pe-chip:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
+.pe-chip:has(input:checked) { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+/* Resultados: el veredicto primero, después cada apartado con su color */
+.pe-out { margin-top: 12px; display: grid; gap: 8px; }
+.pe-out .pe-sec { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); }
+.pe-out .pe-sec:last-child { border-bottom: 1px solid var(--border); }
+.pe-out .pe-sec.pe-high { border-color: color-mix(in srgb, var(--red) 35%, var(--border)); }
+.pe-out .pe-sec.pe-mid { border-color: color-mix(in srgb, var(--amber) 35%, var(--border)); }
+.pe-out .pe-ver { padding: 12px 14px; }
+.pe-out .pe-ver .ficha-section-title { font-size: var(--fs-md); text-transform: none; letter-spacing: 0; line-height: 1.25; margin-bottom: 6px; }
+.pe-out .pe-ver.pe-high { background: var(--red-bg); }
+.pe-out .pe-ver.pe-mid { background: var(--amber-bg); }
+.pe-out .pe-ver.pe-low { background: var(--green-bg); }
+/* Barra fija abajo con el veredicto mientras se rellenan los datos */
+.pe-dock { position: sticky; bottom: 0; z-index: 2; display: flex; align-items: center; gap: 10px; margin: 10px -14px 0; padding: 10px 14px; background: var(--text); color: var(--bg2); box-shadow: 0 -8px 16px -10px rgba(0,0,0,.35); }
+.pe-dock[hidden], .pe-dock.pe-dock-off { display: none; }
+.pe-dock.pe-high { background: #82071e; color: #fff; }
+.pe-dock.pe-mid { background: #6b4a00; color: #fff; }
+.pe-dock.pe-low { background: #0f5323; color: #fff; }
+.pe-dock-t { flex: 1; min-width: 0; font-weight: 700; font-size: var(--fs-sm); line-height: 1.3; }
+.pe-dock-b { flex: none; border: 1px solid rgba(255,255,255,.55); background: transparent; color: inherit; border-radius: 6px; padding: 7px 10px; font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
+.pe-dock-b:hover { background: rgba(255,255,255,.12); }
 .pe-out .ficha-section-title.risk-low, .fl-card .ficha-section-title.risk-low { color: var(--green); }
 .pe-out .ficha-section-title.risk-mid, .fl-card .ficha-section-title.risk-mid { color: var(--amber); }
 .pe-out .ficha-section-title.risk-high, .fl-card .ficha-section-title.risk-high { color: var(--red-text); }
@@ -920,6 +954,7 @@ label.fl-ask-hint { display: block; }
   z-index: var(--z-toast);
   opacity: 0;
   transition: opacity 0.2s;
+  pointer-events: none; /* solo texto: invisible no debe tapar los botones de debajo */
 }
 .toast.show { opacity: 1; }
 .toast.toast-error { background: var(--red-bg); color: var(--red-text); border-color: var(--red); }
@@ -2562,19 +2597,63 @@ function _protoEvalHtml(p) {
   const on = 'calcProtoEval(\'' + p.id + '\')';
   return '<div class="pe-box" data-pid="' + p.id + '"><div class="pe-title">🧮 Evaluador del paciente</div>' +
     (p.eval.escalas ? _escBarHtml('pe-' + p.id + '-escsel', p.eval.escalas) + _escResHtml(p.id) : '') +
-    p.eval.items.map(it => {
-      if (it.t === 'h') return '<div class="pe-h">' + it.l + '</div>';
-      const id = pid + '-' + it.k;
-      const ctrl = it.t === 'num' ? '<input type="number" step="any" class="num-in" id="' + id + '" oninput="' + on + '" placeholder="' + (it.u || '') + '">' :
-        it.t === 'sel' ? '<select id="' + id + '" onchange="' + on + '">' + it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>' :
-        '<input type="checkbox" id="' + id + '" onchange="' + on + '">';
-      return '<div class="scale-item"><label class="scale-label" for="' + id + '">' + it.l + '</label><div class="scale-input">' + ctrl + '</div></div>' +
-        (it.k === 'fg' || it.k === 'clcr' ? _fgCalcHtml(p, it) : '');
-    }).join('') +
+    _peItemsHtml(p, pid, on) +
     '<div id="' + pid + '-out" class="pe-out" aria-live="polite"></div>' +
+    '<div class="pe-dock" id="' + pid + '-dock" hidden><div class="pe-dock-t" id="' + pid + '-dock-t"></div>' +
+    '<button type="button" class="pe-dock-b" onclick="_peVerDetalle(\'' + p.id + '\')">Ver detalle</button></div>' +
     '<button class="reset-btn" onclick="resetProtoEval(\'' + p.id + '\')">↺ Reset</button>' +
     '<button class="btn btn-copy" onclick="copyProtoEval(\'' + p.id + '\')" style="margin-top:8px;margin-left:6px">📋 Copiar resultado</button>' +
     '</div>';
+}
+
+/* Baja a los resultados del evaluador sin que queden bajo la cabecera y las pestañas fijas */
+function _peVerDetalle(pid) {
+  const o = document.getElementById('pe-' + pid + '-out');
+  const alto = ['.header', '.nav'].reduce((a, q) => { const e = document.querySelector(q); return a + (e ? e.offsetHeight : 0); }, 0);
+  window.scrollTo({ top: o.getBoundingClientRect().top + window.scrollY - alto - 8, behavior: 'smooth' });
+}
+/* La barra del veredicto se oculta mientras los resultados están a la vista (repetiría lo mismo) */
+function _peVigilaOut(pid) {
+  const o = document.getElementById('pe-' + pid + '-out'), d = document.getElementById('pe-' + pid + '-dock');
+  if (!o || !d || o._peObs || !('IntersectionObserver' in window)) return;
+  o._peObs = new IntersectionObserver(es => es.forEach(e => d.classList.toggle('pe-dock-off', e.isIntersecting)));
+  o._peObs.observe(o);
+}
+
+/* Agrupa los campos del evaluador: los números seguidos van en rejilla (etiqueta encima), las casillas
+   seguidas como etiquetas que se marcan al tocarlas y los desplegables en fila. Los ids no cambian:
+   _evalVals, reset y «Copiar» siguen leyendo los mismos controles. */
+function _peItemsHtml(p, pid, on) {
+  const out = [];
+  let grupo = null, buf = [];
+  const cierra = () => {
+    if (!buf.length) return;
+    out.push(grupo === 'num' ? '<div class="pe-nums">' + buf.join('') + '</div>' : '<div class="pe-chips">' + buf.join('') + '</div>');
+    buf = []; grupo = null;
+  };
+  p.eval.items.forEach(it => {
+    const id = pid + '-' + it.k;
+    const fg = it.k === 'fg' || it.k === 'clcr';
+    const tipo = it.t === 'num' && !fg && it.l.replace(/<[^>]+>/g, '').length <= 48 ? 'num' : it.t === 'chk' ? 'chk' : null;
+    if (tipo !== grupo) cierra();
+    if (it.t === 'h') { out.push('<div class="pe-h">' + it.l + '</div>'); return; }
+    if (tipo === 'num') {
+      grupo = 'num';
+      buf.push('<label class="pe-num" for="' + id + '"><span>' + it.l + '</span><span class="pe-num-in"><input type="number" step="any" inputmode="decimal" class="num-in" id="' + id + '" oninput="' + on + '">' + (it.u ? '<small>' + it.u + '</small>' : '') + '</span></label>');
+      return;
+    }
+    if (tipo === 'chk') {
+      grupo = 'chk';
+      buf.push('<label class="pe-chip"><input type="checkbox" id="' + id + '" onchange="' + on + '"><span>' + it.l + '</span></label>');
+      return;
+    }
+    const ctrl = it.t === 'num' ? '<input type="number" step="any" inputmode="decimal" class="num-in" id="' + id + '" oninput="' + on + '" placeholder="' + (it.u || '') + '">' :
+      '<select id="' + id + '" onchange="' + on + '">' + it.o.map(o => '<option value="' + o[1] + '">' + o[0] + '</option>').join('') + '</select>';
+    out.push('<div class="scale-item"><label class="scale-label" for="' + id + '">' + it.l + '</label><div class="scale-input">' + ctrl + '</div></div>' +
+      (fg ? _fgCalcHtml(p, it) : ''));
+  });
+  cierra();
+  return out.join('');
 }
 
 /* Filtrado glomerular a partir de la creatinina, para los campos fg/clcr de los evaluadores (se puede
@@ -2627,9 +2706,19 @@ function _evalVals(p) {
 
 function calcProtoEval(pid) {
   const p = PROTOCOLS.find(x => x.id === pid);
-  document.getElementById('pe-' + pid + '-out').innerHTML = p.eval.calc(_evalVals(p)).map(s =>
-    '<div class="ficha-section"><div class="ficha-section-title' + (s.c ? ' risk-' + s.c : '') + '">' + s.t + '</div>' +
+  const secs = p.eval.calc(_evalVals(p));
+  document.getElementById('pe-' + pid + '-out').innerHTML = secs.map((s, i) =>
+    '<div class="ficha-section pe-sec' + (i === 0 ? ' pe-ver' : '') + (s.c ? ' pe-' + s.c : '') + '"><div class="ficha-section-title' + (s.c ? ' risk-' + s.c : '') + '">' + s.t + '</div>' +
     '<div class="ficha-section-text">' + s.h + '</div></div>').join('');
+  /* Barra fija: el veredicto (primera sección) a la vista mientras se rellenan los datos */
+  const dock = document.getElementById('pe-' + pid + '-dock'), v0 = secs[0];
+  if (dock) {
+    const box = document.querySelector('.pe-box[data-pid="' + pid + '"]');
+    const hayDatos = box && [...box.querySelectorAll('input')].some(i => i.type === 'checkbox' ? i.checked : i.value !== '');
+    const ver = !!(v0 && v0.c && hayDatos);
+    dock.hidden = !ver;
+    if (ver) { dock.className = 'pe-dock pe-' + v0.c + (dock.classList.contains('pe-dock-off') ? ' pe-dock-off' : ''); document.getElementById('pe-' + pid + '-dock-t').innerHTML = v0.t; _peVigilaOut(pid); }
+  }
   if (p.flow) renderFlow(pid); // el flujograma sugiere las opciones con los datos del evaluador
 }
 
