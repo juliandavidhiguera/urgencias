@@ -1067,10 +1067,11 @@ window.PROTOCOLS = [
       {k:'brdhh', t:'chk', l:'BRDHH de nueva aparición'},
       {k:'winter', t:'chk', l:'Patrón de Winter'},
       {k:'mcp', t:'chk', l:'Ritmo de marcapasos con imagen de BRIHH'},
-      {t:'h', l:'Sgarbossa-Smith (con BRIHH o marcapasos)'},
+      {t:'h', l:'Sgarbossa: tabla del Codi IAM y criterios de Smith (con BRIHH o marcapasos)'},
       {k:'sg5', t:'chk', l:'Elevación del ST concordante con el QRS &gt;1 mm en cualquier derivación (5)'},
       {k:'sg3', t:'chk', l:'Descenso del ST concordante con el QRS &gt;1 mm en V1, V2 o V3 (3)'},
       {k:'sg2', t:'chk', l:'Elevación o descenso del ST discordante con el QRS, &gt;25 % (2)'},
+      {k:'smith3', t:'chk', l:'Smith: elevación del ST discordante ≥1 mm y ≥25 % de la profundidad de la S precedente (cociente ST/S ≤ −0,25)'},
       {t:'h', l:'Sin criterios ECG: SCASEST de muy alto riesgo'},
       {k:'inest', t:'chk', l:'Inestabilidad hemodinámica o shock cardiogénico'},
       {k:'refr', t:'chk', l:'Dolor torácico recurrente o refractario pese al tratamiento'},
@@ -1150,9 +1151,14 @@ window.PROTOCOLS = [
         out.push({t:'Criterio ECG dudoso', c:'mid', h:cr.dud.join('<br>')});
         res.push('Criterio ECG dudoso: ' + cr.dud.join(', '));
       }
+      const smith = !!(v.sg5 || v.sg3 || v.smith3);
+      if (v.brihh || v.mcp || sg || v.smith3) {
+        out.push({t:'Criterios de Smith (Sgarbossa modificados): ' + (smith ? 'POSITIVOS' : 'negativos'), c:smith ? 'high' : '', h:(smith ? 'Basta un criterio: probable oclusión coronaria aguda; manejo como IAMCEST, integrado con los síntomas y la situación hemodinámica.' : 'Ningún criterio de Smith. Un BRIHH nuevo y aislado no equivale por sí solo a IAMCEST: valorar isquemia persistente, inestabilidad, troponina seriada y ecocardiograma.') + '<br><span class="pe-nota">Concordante ↑ST ≥1 mm · concordante ↓ST ≥1 mm en V1–V3 · discordante ↑ST ≥25 % de la S. Validación: sensibilidad 80 % frente a 49 % del original, especificidad ≈99 % (Meyers 2015 · PMID 26678648).</span>'});
+        res.push('Smith ' + (smith ? 'positivo' : 'negativo'));
+      }
       if (v.brihh || v.mcp || sg) {
-        out.push({t:'Sgarbossa-Smith ' + sg + (sg >= 3 ? ' (≥3)' : ''), c:sg >= 3 ? 'high' : '', h:(sg >= 3 ? 'Puntuación ≥3: alta sensibilidad para el diagnóstico de IAM.' : 'Puntuación &lt;3.') + (v.mcp ? ' Con estimulación del VD los criterios son aplicables pero menos específicos.' : '') + '<br><span class="pe-nota">Concordante ↑ST &gt;1 mm (5) · concordante ↓ST &gt;1 mm en V1–V3 (3) · discordante &gt;25 % (2).</span>'});
-        res.push('Sgarbossa-Smith ' + sg);
+        out.push({t:'Sgarbossa (tabla del Codi IAM): ' + sg + ' puntos' + (sg >= 3 ? ' (≥3)' : ''), c:sg >= 3 ? 'high' : '', h:(sg >= 3 ? 'Puntuación ≥3: alta sensibilidad para el diagnóstico de IAM.' : 'Puntuación &lt;3.') + (v.mcp ? ' Con estimulación del VD los criterios son aplicables pero menos específicos.' : '') + '<br><span class="pe-nota">Concordante ↑ST &gt;1 mm (5) · concordante ↓ST &gt;1 mm en V1–V3 (3) · discordante &gt;25 % (2).</span>'});
+        res.push('Sgarbossa (Codi IAM) ' + sg);
       }
 
       /* 2. Sin criterios ECG: SCASEST */
