@@ -835,7 +835,17 @@ label.fl-ask-hint { display: block; }
 .fg-calc-in .num-in { width: 80px; }
 .fg-calc-res { color: var(--text2); }
 .pe-title { font-size: var(--fs-base); font-weight: 600; padding: 6px 0; }
-.pe-h { font-size: var(--fs-sm); font-weight: 600; color: var(--text); padding: 16px 0 6px; line-height: 1.3; }
+.pe-h { display: flex; align-items: baseline; gap: 8px; font-size: var(--fs-sm); font-weight: 600; color: var(--text); padding: 16px 0 6px; line-height: 1.3; }
+.pe-h > span:first-child { flex: 1; min-width: 0; }
+.pe-cnt { flex: none; padding: 1px 9px; border-radius: 999px; background: var(--blue); color: var(--bg2); font-size: var(--fs-xs); font-weight: 700; }
+.pe-cnt[hidden] { display: none; }
+/* Criterios largos: filas con casilla */
+.pe-filas { display: grid; margin: 2px 0 8px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.pe-fila { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding: 9px 12px; background: var(--bg2); font-size: var(--fs-sm); line-height: 1.35; color: var(--text); cursor: pointer; }
+.pe-fila + .pe-fila { border-top: 1px solid var(--border); }
+.pe-fila input { width: 18px; height: 18px; margin: 0; accent-color: var(--blue); }
+.pe-fila:has(input:checked) { background: var(--blue-bg); font-weight: 600; }
+.pe-fila:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: -2px; }
 /* Números en rejilla, etiqueta encima */
 .pe-nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 10px; padding: 2px 0 6px; }
 .pe-num { display: grid; gap: 3px; font-size: var(--fs-sm); color: var(--text2); line-height: 1.25; align-content: end; }
@@ -849,7 +859,8 @@ label.fl-ask-hint { display: block; }
 .pe-chip:hover { border-color: var(--text2); }
 .pe-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
 .pe-chip:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
-.pe-chip:has(input:checked) { background: var(--blue); border-color: var(--blue); color: var(--bg2); font-weight: 600; } /* bg2: blanco en claro, oscuro sobre el azul claro del tema oscuro */
+.pe-chip:has(input:checked) { background: var(--blue); border-color: var(--blue); color: var(--bg2); font-weight: 600; }
+.pe-chip:has(input:checked)::before { content: ""; flex: none; width: 11px; height: 6px; margin-right: 7px; border: solid currentColor; border-width: 0 0 2px 2px; transform: rotate(-45deg) translateY(-2px); } /* bg2: blanco en claro, oscuro sobre el azul claro del tema oscuro */
 /* Resultados: el veredicto primero, después cada apartado con su color */
 .pe-out { margin-top: 12px; display: grid; gap: 8px; }
 .pe-out .pe-sec { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); }
@@ -879,9 +890,22 @@ label.fl-ask-hint { display: block; }
 .fl-inputs input { width: 110px; }
 .fl-hint { font-size: var(--fs-xs); color: var(--text2); padding: 2px 0 6px; }
 .fl-card { margin-top: 14px; }
-.fl-ask { margin-top: 18px; padding: 12px 14px 14px; border: 1px solid var(--amber); border-radius: 8px; background: var(--bg2); }
-.fl-ask-n { font-size: var(--fs-xs); font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; }
-.fl-q { margin-top: 4px; font-weight: 700; font-size: var(--fs-md); line-height: 1.35; color: var(--text); }
+.fl-ask { margin-top: 18px; padding: 12px 14px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg2); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.fl-ask-h { display: flex; align-items: flex-start; gap: 10px; }
+.fl-ask-n { flex: none; width: 26px; height: 26px; margin-top: 1px; border-radius: 50%; background: var(--blue); color: var(--bg2); display: grid; place-items: center; font-size: var(--fs-sm); font-weight: 700; }
+.fl-q { font-weight: 700; font-size: var(--fs-md); line-height: 1.35; color: var(--text); }
+.fl-cumple { display: block; margin-top: 6px; padding: 6px 10px; border-radius: 6px; background: var(--red-bg); color: var(--red-text); font-weight: 700; }
+.fl-escs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-size: var(--fs-sm); color: var(--text2); }
+.fl-esc-c { min-height: 32px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg2); color: var(--blue); font: inherit; font-size: var(--fs-sm); cursor: pointer; }
+.fl-esc-c:hover, .fl-esc-c:focus-visible { border-color: var(--blue); background: var(--blue-bg); }
+/* Dos respuestas cortas (Sí / No): control de dos partes, al lado */
+.fl-opts.fl-opts-2 { flex-direction: row; gap: 0; margin-top: 12px; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+.fl-opts-2 .fl-opt { flex: 1 1 0; justify-content: center; flex-wrap: wrap; gap: 2px 8px; min-height: 52px; border: 0; border-radius: 0; background: var(--bg2); font-size: var(--fs-md); font-weight: 700; text-align: center; }
+.fl-opts-2 .fl-opt + .fl-opt { border-left: 1.5px solid var(--border); }
+.fl-opts-2 .fl-radio { display: none; }
+.fl-opts-2 .fl-opt-l { flex: 0 1 auto; }
+.fl-opts-2 .fl-opt.fl-sug { box-shadow: none; background: var(--blue-bg); color: var(--text); }
+.fl-opts-2 .fl-sug-tag { flex-basis: 100%; font-size: var(--fs-xs); }
 .fl-help { margin-top: 6px; padding: 8px 10px; border-radius: 6px; background: var(--bg3); font-size: var(--fs-sm); color: var(--text2); }
 .fl-ask-hint { margin-top: 12px; font-size: var(--fs-sm); color: var(--text2); }
 .fl-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
@@ -2625,10 +2649,17 @@ function _peVigilaOut(pid) {
    _evalVals, reset y «Copiar» siguen leyendo los mismos controles. */
 function _peItemsHtml(p, pid, on) {
   const out = [];
-  let grupo = null, buf = [];
+  let grupo = null, buf = [], g = 0;
+  const largo = it => it.l.replace(/<[^>]+>/g, '').length > 60;
   const cierra = () => {
     if (!buf.length) return;
-    out.push(grupo === 'num' ? '<div class="pe-nums">' + buf.join('') + '</div>' : '<div class="pe-chips">' + buf.join('') + '</div>');
+    if (grupo === 'num') out.push('<div class="pe-nums">' + buf.join('') + '</div>');
+    else {
+      /* Criterios cortos como etiquetas; los largos (más de 60 caracteres) como filas con casilla, debajo */
+      const cortas = buf.filter(x => !x.largo).map(x => x.h), filas = buf.filter(x => x.largo).map(x => x.h);
+      if (cortas.length) out.push('<div class="pe-chips">' + cortas.join('') + '</div>');
+      if (filas.length) out.push('<div class="pe-filas">' + filas.join('') + '</div>');
+    }
     buf = []; grupo = null;
   };
   p.eval.items.forEach(it => {
@@ -2636,7 +2667,7 @@ function _peItemsHtml(p, pid, on) {
     const fg = it.k === 'fg' || it.k === 'clcr';
     const tipo = it.t === 'num' && !fg && it.l.replace(/<[^>]+>/g, '').length <= 48 ? 'num' : it.t === 'chk' ? 'chk' : null;
     if (tipo !== grupo) cierra();
-    if (it.t === 'h') { out.push('<div class="pe-h">' + it.l + '</div>'); return; }
+    if (it.t === 'h') { g++; out.push('<div class="pe-h"><span>' + it.l + '</span><span class="pe-cnt" data-g="' + g + '" hidden></span></div>'); return; }
     if (tipo === 'num') {
       grupo = 'num';
       buf.push('<label class="pe-num" for="' + id + '"><span>' + it.l + '</span><span class="pe-num-in"><input type="number" step="any" inputmode="decimal" class="num-in" id="' + id + '" oninput="' + on + '">' + (it.u ? '<small>' + it.u + '</small>' : '') + '</span></label>');
@@ -2644,7 +2675,8 @@ function _peItemsHtml(p, pid, on) {
     }
     if (tipo === 'chk') {
       grupo = 'chk';
-      buf.push('<label class="pe-chip"><input type="checkbox" id="' + id + '" onchange="' + on + '"><span>' + it.l + '</span></label>');
+      const l = largo(it);
+      buf.push({ largo: l, h: '<label class="' + (l ? 'pe-fila' : 'pe-chip') + '"><input type="checkbox" id="' + id + '" data-g="' + g + '" onchange="' + on + '"><span>' + it.l + '</span></label>' });
       return;
     }
     const ctrl = it.t === 'num' ? '<input type="number" step="any" inputmode="decimal" class="num-in" id="' + id + '" oninput="' + on + '" placeholder="' + (it.u || '') + '">' :
@@ -2710,6 +2742,12 @@ function calcProtoEval(pid) {
   document.getElementById('pe-' + pid + '-out').innerHTML = secs.map((s, i) =>
     '<div class="ficha-section pe-sec' + (i === 0 ? ' pe-ver' : '') + (s.c ? ' pe-' + s.c : '') + '"><div class="ficha-section-title' + (s.c ? ' risk-' + s.c : '') + '">' + s.t + '</div>' +
     '<div class="ficha-section-text">' + s.h + '</div></div>').join('');
+  /* Contador de criterios marcados en cada grupo (junto a su título) */
+  const caja = document.querySelector('.pe-box[data-pid="' + pid + '"]');
+  if (caja) caja.querySelectorAll('.pe-cnt').forEach(c => {
+    const n = caja.querySelectorAll('input[type=checkbox][data-g="' + c.dataset.g + '"]:checked').length;
+    c.hidden = !n; c.textContent = n + (n === 1 ? ' marcado' : ' marcados');
+  });
   /* Barra fija: el veredicto (primera sección) a la vista mientras se rellenan los datos */
   const dock = document.getElementById('pe-' + pid + '-dock'), v0 = secs[0];
   if (dock) {
@@ -2934,10 +2972,10 @@ function _flowShow(n, v, pid, nid) {
 function _flowEscBtns(n, pid) {
   return (n.pcr ? '<button class="fl-esc" onclick="showTab(\'pcr\', document.getElementById(\'navbtn-pcr\'))">🫀 Abrir el protocolo de PCR (SVA)</button>' : '') +
     (n.galeria ? '<button class="fl-esc" onclick="openGaleria(\'' + pid + '\')">🫀 Ver los nuevos patrones de IAM con imagen</button>' : '') +
-    (n.escalas || []).map(id => {
+    ((n.escalas || []).length ? '<div class="fl-escs"><span>Escalas al lado:</span>' + n.escalas.map(id => {
     const sc = SCALES.find(x => x.id === id);
-    return sc ? '<button class="fl-esc" onclick="abrirEscalaLateral(\'' + id + '\', this)">📊 Hacer la escala ' + sc.title + ' al lado</button>' : '';
-  }).join('');
+    return sc ? '<button class="fl-esc-c" onclick="abrirEscalaLateral(\'' + id + '\', this)" aria-label="Hacer la escala ' + sc.title + ' al lado">' + sc.title + '</button>' : '';
+  }).join('') + '</div>' : '');
 }
 
 /* n.farmacos = ['Nombre de la ficha' | {n, inf, mg, vol, dosis, mlh}]: botón por fármaco que abre en el
@@ -3006,17 +3044,19 @@ function renderFlow(pid) {
         '<span class="fl-done-a">✓ ' + n.opts[st.o].l + '</span><span class="fl-done-edit">cambiar</span></button>';
     }
     const qid = 'fl-' + pid + '-q' + i;
+    const ayuda = n.help ? (typeof n.help === 'function' ? n.help(v) : n.help).replace(/(?:<br>)?<b>Cumple:([\s\S]*?)<\/b>/, '<span class="fl-cumple">Cumple:$1</span>') : '';
+    const dos = !n.desplegable && n.opts.length === 2 && n.opts.every(o => o.l.length <= 24);
     return h + '<div class="fl-ask" role="group" aria-labelledby="' + qid + '">' +
-      '<div class="fl-ask-n">Pregunta ' + nq + '</div>' +
-      '<div class="fl-q" id="' + qid + '">' + n.q + '</div>' +
-      (n.help ? '<div class="fl-help">' + (typeof n.help === 'function' ? n.help(v) : n.help) + '</div>' : '') +
+      '<div class="fl-ask-h"><span class="fl-ask-n" aria-label="Pregunta ' + nq + '">' + nq + '</span>' +
+      '<div class="fl-q" id="' + qid + '">' + n.q + '</div></div>' +
+      (ayuda ? '<div class="fl-help">' + ayuda + '</div>' : '') +
       _flowEscBtns(n, pid) + _flowNotaHtml(n, pid, st.n) +
       (n.desplegable
         ? '<label class="fl-ask-hint" for="' + qid + '-sel">Elige una opción:</label>' +
           '<select class="fl-sel" id="' + qid + '-sel" onchange="if (this.value !== \'\') flowGo(\'' + pid + '\',' + i + ',+this.value)">' +
           '<option value="">' + n.desplegable + '</option>' + n.opts.map((o, j) => '<option value="' + j + '">' + o.l + '</option>').join('') + '</select></div>'
-        : '<div class="fl-ask-hint">Elige una opción:</div>' +
-      '<div class="fl-opts">' + n.opts.map((o, j) => {
+        : (dos ? '' : '<div class="fl-ask-hint">Elige una opción:</div>') +
+      '<div class="fl-opts' + (dos ? ' fl-opts-2' : '') + '">' + n.opts.map((o, j) => {
         const sug = o.sug && o.sug(v);
         return '<button class="fl-opt' + (sug ? ' fl-sug' : '') + '" onclick="flowGo(\'' + pid + '\',' + i + ',' + j + ')">' +
           '<span class="fl-radio" aria-hidden="true"></span><span class="fl-opt-l">' + o.l + '</span>' +
@@ -3369,6 +3409,15 @@ function calcInfusion() {
       (_infuUsaRegla(d) && _infuManual ? ' · <span style="color: var(--red-text);font-weight:700">dilución modificada (no es la regla)</span>' : '')
     : '';
   document.getElementById('inf-regla-btn').style.display = _infuUsaRegla(d) && _infuManual ? '' : 'none';
+  /* Pauta por peso de otra fuente (d.alt, en µg/kg/h), traducida a µg/min con el peso del paciente */
+  const alt = d && d.alt && unit === 'mcg/min' && peso > 0 ? d.alt : null;
+  if (alt) {
+    const eq = document.getElementById('inf-equiv');
+    eq.innerHTML += (eq.innerHTML ? '<br>' : '') + '<strong>Por peso (' + alt.fuente + ', ' + peso + ' kg):</strong> ' +
+      (dosis != null ? _fmt(dosis, 2) + ' µg/min = ' + _fmt(dosis * 60 / peso, 1) + ' µg/kg/h · ' : '') +
+      'pauta ' + alt.doseMin + '–' + alt.doseMax + ' µg/kg/h = ' + _fmt(alt.doseMin * peso / 60, 1) + '–' + _fmt(Math.min(alt.doseMax * peso / 60, d.doseMax), 1) + ' µg/min' +
+      (alt.doseMax * peso / 60 > d.doseMax ? ' (tope ' + d.doseMax + ' µg/min)' : '');
+  }
 
   const warnEl = document.getElementById('inf-warning');
   const copyBtn = document.getElementById('inf-copy-btn');
@@ -3442,6 +3491,7 @@ function renderInfusionGrid() {
           : '<div class="scale-item"><span class="scale-label">Dilución de referencia</span><span class="scale-pts">' + d.mg + ' ' + u + ' en ' + d.vol + ' mL (' + _fmt(conc, 3) + ' ' + u + '/mL)</span></div>' +
             (d.regla ? '<div class="scale-item"><span class="scale-label">Pediatría</span><span class="scale-pts">' + _infuReglaTxt(d) + '</span></div>' : '')) +
         '<div class="scale-item"><span class="scale-label">Rango terapéutico</span><span class="scale-pts">' + d.doseMin + (d.doseMax != null && d.doseMax !== d.doseMin ? '–' + d.doseMax : '') + ' ' + d.unit + '</span></div>' +
+        (d.alt && d.unit === 'mcg/min' ? '<div class="scale-item"><span class="scale-label">Por peso (' + d.alt.fuente + ')</span><span class="scale-pts">' + d.alt.doseMin + '–' + d.alt.doseMax + ' µg/kg/h = ' + _fmt(d.alt.doseMin * peso / 60, 1) + '–' + _fmt(Math.min(d.alt.doseMax * peso / 60, d.doseMax), 1) + ' µg/min a ' + peso + ' kg</span></div>' : '') +
         '<div class="scale-item"><span class="scale-label">Infusión a ' + peso + ' kg</span><span class="scale-pts">' + mlhTxt + ' mL/h</span></div>' +
         '<div class="scale-item"><span class="scale-label">Diluyente</span><span class="scale-pts">' + d.diluyente + '</span></div>' +
         (d.notas ? '<div class="scale-item drug-alerts"><span class="scale-label">⚠ Notas</span><span class="scale-pts">' + d.notas + '</span></div>' : '') +
