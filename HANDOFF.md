@@ -62,6 +62,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
 
 ### Sesion 30 - 2026-11-17
+- 18/11: #20 aviso de HBPM empírica del TEP con la escala elegida (Ginebra ≥11 / Wells >6), probado con 4 casos en node; #27 meropenem: reconstitución en la presentación, el analizador lee 50 mg/mL.
 - 18/11: nitroglicerina unificada en µg/min (5–10 de inicio, máx. 200) con 10 mg/50 mL; rango pediátrico propio en la calculadora (`ped`) y pauta SEM por peso mostrada en µg/min (`alt`, informativa). Flujograma (opción B): número en círculo, «Cumple» resaltado, escalas como etiquetas, Sí/No cortos en dos partes. Evaluador (opción A): etiquetas cortas con ✓, criterios >60 caracteres como filas con casilla, contador por grupo. Verificado sirviendo una copia local de la app.
 - Evaluadores (opciones B+C elegidas por la usuaria): `_peItemsHtml` agrupa números en rejilla y casillas como etiquetas (ids sin cambios); resultados con el veredicto primero; barra fija abajo con el veredicto solo si hay datos y oculta cuando los resultados están a la vista; `_peVerDetalle` descuenta `.header`+`.nav`. `.protocol-card` con `overflow: clip` (sticky) y `.toast` con `pointer-events: none` (invisible tapaba los botones de abajo a la derecha). Verificado inyectando el código en la versión publicada (no hay servidor local permitido) (a313caf, 27f5d6a).
 - `codi-ppt`: botón «Protocolo de Campdevànol v1 (borrador, PDF)» (`docs`) → `protocolos/Protocolo_PPT_Campdevanol_v1.pdf`; `sw.js` `urg-v88` con el PDF en ASSETS.
@@ -193,9 +194,9 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | 23 | «Copiar resumen» del flujo sin linea «Datos:» en protocolos con evaluador: decidir si se anade; comentario obsoleto «Killip II–III» en `muyAlto` de codi-iam | `index.html`, `data/protocols.js` | P3 | Usuario | Decision aplicada |
 | ~~25~~ | ~~Ajuste renal de piperacilina-tazobactam~~ — RESUELTO sesion 28: el Codi Sepsia usa la tabla de la monografia (ficha de EE. UU., Zosyn) aportada por el usuario, incluida la fila de neumonia nosocomial; la ficha europea queda como nota | - | - | - | Resuelto |
 | ~~26~~ | ~~Heparina del TEP y la FA abre la perfusion~~ — HECHO sesion 28 (peticion del usuario) | - | - | - | Resuelto |
-| 27 | La calculadora de ficha no lee la presentacion de meropenem («500 mg y de 1 g»): hay que escribirla a mano | `data/fichas.js` (`presentacion`) o `parsePresentacion` | P3 | - | Al abrir la ficha la presentacion queda preseleccionada |
+| ~~27~~ | ~~La calculadora de ficha no lee la presentacion de meropenem («500 mg y de 1 g»): hay que escribirla a mano~~ — HECHO 18/11: reconstitución de la ficha técnica en la presentación (50 mg/mL) | `data/fichas.js` (`presentacion`) o `parsePresentacion` | P3 | - | Al abrir la ficha la presentacion queda preseleccionada |
 | 28 | Nomograma de ajuste de la perfusion de HNF por TTPa (TEP, FA, IAM, SCASEST): hoy el panel solo dice «titular segun la respuesta» | `index.html` (panel lateral) o ficha de heparina | P2 | Usuario (nomograma y rango de TTPa del laboratorio del hospital) | Tabla de ajuste visible en el panel de la heparina |
-| 20 | Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3 | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
+| ~~20~~ | ~~Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3~~ — HECHO 18/11: el aviso usa la escala elegida (Ginebra revisada ≥11 en su vía, Wells >6 en las demás) | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
 | ID | Sintoma | Reproduccion | Hipotesis de causa | Impacto |

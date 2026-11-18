@@ -3793,7 +3793,8 @@ window.PROTOCOLS = [
       if (v.tih) t.push('<b>TIH previa:</b> evitar HNF y HBPM → anticoagulante no heparínico.');
       if (v.sangr && cat !== 'E1' && cat !== 'E2') t.push('<b>Sangrado activo / contraindicación absoluta de anticoagular:</b> suspender la anticoagulación; filtro de VCI recuperable en casos seleccionados y reevaluar a diario.');
       const wells = (v.wTvp ? 3 : 0) + (v.wAlt ? 3 : 0) + (has(fc) && fc > 100 ? 1.5 : 0) + (v.wInm || v.wInmov ? 1.5 : 0) + (v.wPrev ? 1.5 : 0) + (v.wHemop ? 1 : 0) + (v.cancer ? 1 : 0);
-      if (!confirmado && wells > 6) t.push('Probabilidad alta: si hay demora de imagen y el riesgo hemorrágico es aceptable, ' + enoxTxt + ' empírica.');
+      /* Probabilidad alta según la escala elegida: Ginebra revisada ≥11 en su vía, Wells >6 en las demás */
+      if (!confirmado && (v.via === 3 ? g >= 11 : wells > 6)) t.push('Probabilidad alta (' + (v.via === 3 ? 'Ginebra revisada ' + g : 'Wells ' + String(wells).replace('.', ',')) + '): si hay demora de imagen y el riesgo hemorrágico es aceptable, ' + enoxTxt + ' empírica.');
       if (cat === 'E1' || cat === 'E2') {
         t.push(hnf.replace(' + perfusión', ' en cuanto se sospecha; perfusión') + '.');
         if (cat === 'E2') t.push('<b>Si está en PCR — alteplasa (ERC 2025): 50 mg IV en bolo, con o sin otros 50 mg a los 30 min, o 0,6–1 mg/kg' + (pesoOk ? ' (' + Math.min(100, P(0.6)) + '–' + Math.min(100, P(1)) + ' mg)' : '') + ', máx. 100 mg; mientras no haya alteplasa, ' + tnkTxt + ' (misma dosis en PCR).</b> Las contraindicaciones se ponderan frente a la muerte segura; mantener la RCP ≥60–90 min tras la lisis. Ningún régimen ha demostrado superioridad.');
