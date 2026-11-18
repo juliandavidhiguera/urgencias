@@ -3063,9 +3063,9 @@ window.PROTOCOLS = [
         '<b>O₂ controlado</b> con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 % (PaO₂ 60–65). Evitar la hiperoxia. Gasometría a los 30–60 min si hay hipercapnia o se cambia la FiO₂ (BTS 2017, tabla 4).';
       const soporte = v.vital ? (v.iot === 1 ? '<b>SVA e IOT</b> (candidato).' : v.iot === 0 ? '<b>VMNI como techo terapéutico</b> o medidas de confort.' : '<b>Decidir YA la candidatura a IOT/UCI</b>: IOT si es candidato; si no, VMNI como techo.') :
         tipoC ? '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25; pauta local). Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h.' :
-        v.o2 >= 2 ? '<b>OAF</b> (primera modalidad en la hipoxémica, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ para SpO₂ 88–92 %. Gasometría a 1–2 h; si aparece hipercapnia con acidosis → VMNI (tipo C). Descartar neumonía, IC y TEP.' : '';
+        v.o2 >= 2 ? '<b>OAF</b> (si sigue hipoxémica con O₂ convencional, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ para SpO₂ 88–92 %. Gasometría a 1–2 h; si aparece hipercapnia con acidosis → VMNI (tipo C). Descartar neumonía, IC y TEP.' : '';
       const corti = romaC === 'low' && !ir ? '<b>Corticoide:</b> reservarlo para exacerbaciones significativas (incluso los ciclos cortos se asocian a neumonía, sepsis y muerte). Si se indica: prednisona 40 mg/día VO 5 días.' :
-        '<b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral, por equivalencia: pauta local). Vigilar glucemia y delirium.';
+        '<b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO tan eficaz como IV, GOLD 2026; metilprednisolona 40 mg IV si no tolera la vía oral: pauta local, GOLD no da dosis IV). Vigilar glucemia y delirium.';
       out.push({t:'Tratamiento en urgencias', c:'', h:[
         o2txt,
         BRONCO,
@@ -3141,7 +3141,7 @@ window.PROTOCOLS = [
           farmacos: [{ n: 'Salbutamol', inf: false }, { n: 'Bromuro de ipratropio', inf: false }, { n: 'Metilprednisolona', inf: false }, { n: 'Sulfato de magnesio', inf: false }, { n: 'Enoxaparina', inf: false }],
           t: 'Tratamiento inicial', c: 'mid',
           show: '• <b>Broncodilatadores:</b> salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE (no con O₂; si precisa O₂, gafas 1–2 L/min durante la nebulización), 1 dosis cada hora × 2–3 y después cada 2–4 h según respuesta; evitar dosis muy altas de SABA (taquicardia, ↓K⁺). Alternativa: pMDI + cámara. No suspender los LABD. Metilxantinas IV: no.<br>' +
-            '• <b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral, por equivalencia: pauta local). Vigilar glucemia. En la exacerbación leve, reservarlo para las significativas.<br>' +
+            '• <b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO tan eficaz como IV, GOLD 2026; metilprednisolona 40 mg IV si no tolera la vía oral: pauta local, GOLD no da dosis IV). Vigilar glucemia. En la exacerbación leve, reservarlo para las significativas.<br>' +
             '• <b>Antibiótico 5 días</b> si ≥2 de aumento de disnea, fiebre, volumen o purulencia (siendo uno la purulencia), cultivo previo positivo o VMNI/IOT. Procalcitonina: no. El evaluador de arriba da el antibiótico, la dosis y el ajuste al FG según la gravedad y el riesgo de <i>Pseudomonas</i>.<br>' +
             '• <b>HBPM si ingresa:</b> enoxaparina 40 mg/24 h SC (20 mg si FG &lt;30). Balance hídrico; diurético si hay IC.<br>' +
             '• <b>Sin respuesta:</b> sulfato de magnesio 2 g IV en 20 min, dosis única (coadyuvante, evidencia baja; evitar si FG &lt;30).<br>' +
@@ -3166,7 +3166,7 @@ window.PROTOCOLS = [
         },
         tipoB: {
           t: 'Tipo B · hipoxémica', c: 'mid',
-          show: '<b>OAF</b> (primera modalidad en la hipoxémica, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ mínima para SpO₂ 88–92 %.<br>Gasometría a 1–2 h. Si PaCO₂ &gt;45 con pH normal: OAF con control estrecho. <b>Si cae el pH (&lt;7,35) → pasar a C.</b> Descartar neumonía, IC y TEP.',
+          show: '<b>OAF</b> (si sigue hipoxémica con O₂ convencional, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ mínima para SpO₂ 88–92 %.<br>Gasometría a 1–2 h. Si PaCO₂ &gt;45 con pH normal: OAF con control estrecho. <b>Si cae el pH (&lt;7,35) → pasar a C.</b> Descartar neumonía, IC y TEP.',
           q: '¿Cómo está a las 2 h?',
           opts: [
             { l: 'FiO₂ ≤40 %, FR &lt;25 y puede pasar a Venturi', go: 'planta' },
