@@ -1113,7 +1113,7 @@ window.PROTOCOLS = [
       if (v.mcp) c.push('marcapasos con BRIHH');
       return {c:c, dud:dud, no:!c.length && !dud.length ? no : ''};
     },
-    /* SCASEST de muy alto riesgo (ficha SEM, criterio 1). Killip IV = shock; Killip II–III = insuficiencia cardiaca. */
+    /* SCASEST de muy alto riesgo (ficha SEM, criterio 1). Killip IV = shock; Killip III = insuficiencia cardiaca (si es por el SCA). */
     muyAlto:function(v){
       return [v.inest ? 'inestabilidad hemodinámica o shock' : v.killip === 4 ? 'shock cardiogénico (Killip IV)' : '', v.refr ? 'dolor recurrente o refractario' : '', v.arrit ? 'arritmias potencialmente mortales' : '',
         v.mec ? 'complicación mecánica' : '', v.icr ? 'insuficiencia cardiaca relacionada' : v.killip === 3 ? 'insuficiencia cardiaca (Killip III), si es por el SCA' : '',

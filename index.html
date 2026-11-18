@@ -2777,15 +2777,22 @@ function resetProtoEval(pid) {
   escBorrarCaso(pid);
 }
 
-function copyProtoEval(pid) {
-  const p = PROTOCOLS.find(x => x.id === pid);
-  const datos = p.eval.items.filter(it => it.t !== 'h').map(it => {
+/* Datos rellenados en el evaluador, en una línea (los usan «Copiar resultado» y «Copiar resumen»). */
+function _evalDatosTxt(p) {
+  const pid = p.id, tmp = document.createElement('div');
+  return p.eval.items.filter(it => it.t !== 'h').map(it => {
     const el = document.getElementById('pe-' + pid + '-' + it.k);
-    const nombre = it.l.split(' (')[0].split(':')[0];
+    tmp.innerHTML = it.l; // las etiquetas llevan HTML (&lt;, <b>): al portapapeles va el texto
+    const nombre = tmp.textContent.split(' (')[0].split(':')[0];
     if (it.t === 'chk') return el.checked ? nombre : null;
     if (it.t === 'sel') return nombre + ': ' + el.options[el.selectedIndex].text;
     return el.value === '' ? null : nombre + ' ' + el.value;
   }).filter(Boolean).join(' · ');
+}
+
+function copyProtoEval(pid) {
+  const p = PROTOCOLS.find(x => x.id === pid);
+  const datos = _evalDatosTxt(p);
   const res = [...document.querySelectorAll('#pe-' + pid + '-out .ficha-section')].map(s =>
     s.querySelector('.ficha-section-title').textContent + '\n' + s.querySelector('.ficha-section-text').innerText).join('\n\n');
   navigator.clipboard.writeText(p.title + '\nDatos: ' + datos + '\n\n' + res + _farmTxt(pid) + _escTxt(pid)).then(showToast).catch(showCopyError);
@@ -3119,7 +3126,8 @@ function copyFlow(pid) {
   const v = _flowVals(p);
   v.ruta = (_flowPath[pid] || []).map(st => st.n);
   v.resp = _flowResp(_flowPath[pid] || []);
-  const datos = (p.flow.inputs || []).filter(it => !isNaN(v[it.k])).map(it => it.l + ' ' + v[it.k] + (it.u ? ' ' + it.u : '')).join(' · ');
+  const datos = [(p.flow.inputs || []).filter(it => !isNaN(v[it.k])).map(it => it.l + ' ' + v[it.k] + (it.u ? ' ' + it.u : '')).join(' · '),
+    p.eval ? _evalDatosTxt(p) : ''].filter(Boolean).join(' · ');
   const tmp = document.createElement('div');
   const txt = h => { tmp.innerHTML = String(h).replace(/<br\s*\/?>/g, '\n'); tmp.querySelectorAll('.fl-form').forEach(e => e.remove()); return tmp.textContent; };
   const lineas = (_flowPath[pid] || []).map(st => {
