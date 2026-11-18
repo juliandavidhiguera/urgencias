@@ -3060,12 +3060,12 @@ window.PROTOCOLS = [
           ' Quinolonas y macrólidos: QT; quinolonas, además, tendinopatía, delirium e hipoglucemia en el anciano.';
       }
       const o2txt = (v.o2 === 0 && (!has(v.spo2) || v.spo2 >= 88)) ? '<b>O₂:</b> no precisa si SpO₂ ≥88 %. Si lo necesita, objetivo 88–92 %.' :
-        '<b>O₂ controlado</b> con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 % (PaO₂ 60–65). Evitar la hiperoxia. Gasometría a los 30–60 min si hay hipercapnia o se cambia la FiO₂.';
+        '<b>O₂ controlado</b> con Venturi 24–28 % (o gafas 1–2 L/min) → SpO₂ 88–92 % (PaO₂ 60–65). Evitar la hiperoxia. Gasometría a los 30–60 min si hay hipercapnia o se cambia la FiO₂ (BTS 2017, tabla 4).';
       const soporte = v.vital ? (v.iot === 1 ? '<b>SVA e IOT</b> (candidato).' : v.iot === 0 ? '<b>VMNI como techo terapéutico</b> o medidas de confort.' : '<b>Decidir YA la candidatura a IOT/UCI</b>: IOT si es candidato; si no, VMNI como techo.') :
-        tipoC ? '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25). Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h.' :
+        tipoC ? '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25; pauta local). Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h.' :
         v.o2 >= 2 ? '<b>OAF</b> (primera modalidad en la hipoxémica, GOLD 2026): 30–60 L/min, 31–37 °C, FiO₂ para SpO₂ 88–92 %. Gasometría a 1–2 h; si aparece hipercapnia con acidosis → VMNI (tipo C). Descartar neumonía, IC y TEP.' : '';
       const corti = romaC === 'low' && !ir ? '<b>Corticoide:</b> reservarlo para exacerbaciones significativas (incluso los ciclos cortos se asocian a neumonía, sepsis y muerte). Si se indica: prednisona 40 mg/día VO 5 días.' :
-        '<b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral). Vigilar glucemia y delirium.';
+        '<b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral, por equivalencia: pauta local). Vigilar glucemia y delirium.';
       out.push({t:'Tratamiento en urgencias', c:'', h:[
         o2txt,
         BRONCO,
@@ -3141,7 +3141,7 @@ window.PROTOCOLS = [
           farmacos: [{ n: 'Salbutamol', inf: false }, { n: 'Bromuro de ipratropio', inf: false }, { n: 'Metilprednisolona', inf: false }, { n: 'Sulfato de magnesio', inf: false }, { n: 'Enoxaparina', inf: false }],
           t: 'Tratamiento inicial', c: 'mid',
           show: '• <b>Broncodilatadores:</b> salbutamol 2,5–5 mg + ipratropio 0,5 mg nebulizados con AIRE (no con O₂; si precisa O₂, gafas 1–2 L/min durante la nebulización), 1 dosis cada hora × 2–3 y después cada 2–4 h según respuesta; evitar dosis muy altas de SABA (taquicardia, ↓K⁺). Alternativa: pMDI + cámara. No suspender los LABD. Metilxantinas IV: no.<br>' +
-            '• <b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral). Vigilar glucemia. En la exacerbación leve, reservarlo para las significativas.<br>' +
+            '• <b>Prednisona 40 mg/día VO durante 5 días</b>, sin pauta descendente (VO = IV; metilprednisolona 40 mg IV si no tolera la vía oral, por equivalencia: pauta local). Vigilar glucemia. En la exacerbación leve, reservarlo para las significativas.<br>' +
             '• <b>Antibiótico 5 días</b> si ≥2 de aumento de disnea, fiebre, volumen o purulencia (siendo uno la purulencia), cultivo previo positivo o VMNI/IOT. Procalcitonina: no. El evaluador de arriba da el antibiótico, la dosis y el ajuste al FG según la gravedad y el riesgo de <i>Pseudomonas</i>.<br>' +
             '• <b>HBPM si ingresa:</b> enoxaparina 40 mg/24 h SC (20 mg si FG &lt;30). Balance hídrico; diurético si hay IC.<br>' +
             '• <b>Sin respuesta:</b> sulfato de magnesio 2 g IV en 20 min, dosis única (coadyuvante, evidencia baja; evitar si FG &lt;30).<br>' +
@@ -3176,7 +3176,7 @@ window.PROTOCOLS = [
         },
         tipoC: {
           t: 'Tipo C · hipercápnica', c: 'high',
-          show: '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería mientras dure): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25). FR de rescate 12–16. Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h. El antibiótico está indicado.<br>' +
+          show: '<b>VMNI en el box</b> (vigilancia 1:1 de enfermería mientras dure): BiPAP S/T con mascarilla oronasal, EPAP 4–6 e IPAP 10–12 cmH₂O → subir 2 cmH₂O cada 5–10 min hasta 18–20 (máx. 25; pauta local). FR de rescate 12–16. Objetivo FR &lt;25 y Vt 6–8 mL/kg de peso ideal; FiO₂ mínima para SpO₂ 88–92 %. Gasometría a 1 h y 2 h. El antibiótico está indicado.<br>' +
             '<b>Contraindicaciones:</b> IOT inminente, vómitos o secreciones no manejables, neumotórax no drenado, inestabilidad grave, trauma facial.<br>' +
             '<b>Fracaso:</b> pH igual o peor a 1–2 h, ↓ conciencia, intolerancia, agotamiento → IOT si es candidato. La OAF en la hipercápnica solo si no tolera la VMNI y sin retrasar la VMNI ni la IOT.',
           q: '¿Es candidato a IOT/UCI?',
@@ -3255,7 +3255,7 @@ window.PROTOCOLS = [
   {type:'decision', text:'Reevaluar a los 30–60 min con clínica y gasometría: ¿qué tipo de insuficiencia respiratoria?', yes:'B / C', no:'A'},
   {type:'action', branch:'no', text:'A · Sin IR o hipoxemia que corrige con FiO₂ ≤35 %, pH >7,35, PaCO₂ ≤45 o en su basal: continuar y reevaluar a las 2–4 h → ALTA si buena respuesta, estable y con apoyo; si no, INGRESO EN PLANTA'},
   {type:'action', branch:'yes', text:'B · Hipoxémica (SpO₂ <88 % / PaO₂ <60 pese a FiO₂ >35 %, pH >7,35): OAF 30–60 L/min, 31–37 °C. Gasometría a 1–2 h; si cae el pH (<7,35) → C. A las 2 h: FiO₂ ≤40 %, FR <25 y pasa a Venturi → PLANTA; si no → TRASLADO A HUV'},
-  {type:'action', branch:'yes', text:'C · Hipercápnica (pH ≤7,35 y PaCO₂ ≥45, o fatiga muscular): VMNI en el box, EPAP 4–6 / IPAP 10–12 subiendo hasta 18–20. Candidato → avisar a HUV al iniciar la VMNI y trasladar con VMNI. No candidato → VMNI como techo'},
+  {type:'action', branch:'yes', text:'C · Hipercápnica (pH ≤7,35 y PaCO₂ ≥45, o fatiga muscular): VMNI en el box, EPAP 4–6 / IPAP 10–12 subiendo hasta 18–20 (pauta local). Candidato → avisar a HUV al iniciar la VMNI y trasladar con VMNI. No candidato → VMNI como techo'},
   {type:'info', text:'Criterios de traslado a HUV: VMNI u OAF mantenidas, pH ≤7,25, PaCO₂ >60, FiO₂ >40 %, alteración del estado mental, necesidad de IOT, inestabilidad hemodinámica o arritmia grave, TEP de alto riesgo, SCA, neumotórax o sepsis'},
   {type:'info', text:'Al alta: sin tratamiento previo LABA + LAMA (+ CI si eos ≥300); ya con LABA + LAMA, añadir CI si eos ≥100; revisar la técnica inhalatoria, completar prednisona y antibiótico 5 días, plan escrito, tabaco y vacunas (gripe, neumococo, COVID, VRS, dTpa, zóster). AP a las 48–72 h, revisión a las 1–4 semanas y a las 12–16 semanas con FEV₁, rehabilitación en <4 semanas'}],
   src:'Protocolo SAE Hospital de Campdevànol v3.0 clínica (nov 2026) y flujograma v2.4 · GOLD 2026 Report v1.3 (figs. 4.2–4.10) · Criterios de Roma: Celli 2021, AJRCCM, doi:10.1164/rccm.202108-1819PP · GesEPOC 2021 SAE: Soler-Cataluña 2022, Arch Bronconeumol 58:159 · GesEPOC 2025: Miravitlles 2025, doi:10.1016/j.arbres.2025.10.008 · Dosis de antibiótico: ATS/IDSA NAC 2019 · PMID 31573350; MAESTRAL, Wilson 2012 · PMID 22135277; antibiótico 5 días: ACP 2021 · PMID 33819054 · DECAF: Steer 2012, Thorax 67:970 · MgSO₄: Ni 2022, Cochrane CD013506 · EXACOS-CV: Santos 2025, Rev Esp Cardiol 78:138'},
