@@ -111,8 +111,34 @@ window.INFUSIONS = [
   ficha: 'Nitroglicerina.md'},
 
 {name: 'Nitroprusiato sódico', group: 'Vasoactivos', badge: 'red',
-  mg: 50, vol: 50, unit: 'mcg/kg/min', doseMin: 0.3, doseMax: 10,
-  diluyente: 'SG 5%', notas: 'Fotosensible: proteger de la luz (bolsa/línea opaca). Riesgo de toxicidad por cianuro/tiocianato si dosis >2 mcg/kg/min mantenida >24-48h o insuficiencia renal/hepática: monitorizar lactato/acidosis metabólica. Evitar en hemorragia subaracnoidea',
+  mg: 10, vol: 50, unit: 'mcg/kg/min', doseMin: 0.25, doseMax: 10,
+  diluyente: 'SG 5%', notas: 'Las ampollas nuevas NO llevan disolvente: reconstituir el vial de 50 mg con 5 mL de SG 5% (10 mg/mL), coger 1 mL (10 mg) y añadirlo a 49 mL de SG 5% = 200 µg/mL. Cálculo rápido: mL/h = µg/kg/min × peso (kg) × 0,3. Solo en perfusión continua, nunca en bolo. Proteger de la luz (jeringa y línea opacas); desechar si cambia de color (azul, verde o rojo oscuro). PA continua, invasiva si es posible',
+  info: [
+    {titulo: 'Preparación (ampollas nuevas sin disolvente)', alerta: true, items: [
+      ['Reconstituir', 'Vial de 50 mg + 5 mL de SG 5% = 10 mg/mL'],
+      ['Jeringa de 50 mL', '1 mL de la dilución (10 mg) + 49 mL de SG 5% = 200 µg/mL'],
+      ['Luz', 'Jeringa y línea opacas. Si la solución cambia de color (azul, verde o rojo oscuro), desecharla'],
+      ['Vía', 'Solo perfusión continua; nunca en bolo'],
+      ['Resto del vial (40 mg)', 'Pendiente de confirmar con farmacia si se desecha o se conserva']]},
+    {titulo: 'Pauta', items: [
+      ['Inicio', '0,25–0,5 µg/kg/min; subir 0,5 µg/kg/min cada 3–5 min'],
+      ['Habitual', '0,5–3 µg/kg/min'],
+      ['Máximo', '10 µg/kg/min durante ≤10 min'],
+      ['Con 200 µg/mL', '0,5 µg/kg/min: 9 / 10,5 / 12 mL/h (60 / 70 / 80 kg). 1 µg/kg/min: 18 / 21 / 24 mL/h. 3 µg/kg/min: 54 / 63 / 72 mL/h'],
+      ['Monitorización', 'PA continua, invasiva si es posible']]},
+    {titulo: 'Paciente geriátrico', items: [
+      ['Inicio', '0,1–0,25 µg/kg/min: más riesgo de hipotensión brusca por disfunción del barorreflejo'],
+      ['Función renal', 'Calcular el FG antes de empezar: con ERC el tiocianato se acumula antes'],
+      ['Objetivo', 'Bajar la PAM ≤25% en la 1.ª hora (riesgo de hipoperfusión cerebral, renal y coronaria)'],
+      ['Medicación habitual', 'Antihipertensivos, diuréticos e IPDE5 potencian la hipotensión'],
+      ['Confusión o delírium', 'Sospechar toxicidad por tiocianato o cianuro aunque la dosis sea baja']]},
+    {titulo: 'Contraindicaciones y precauciones', items: [
+      ['No administrar', 'HTA compensadora (coartación aórtica, shunt arteriovenoso); atrofia óptica de Leber o ambliopía tabáquica; déficit de B12; hipotiroidismo no tratado; IPDE5 o riociguat concomitantes'],
+      ['Evitar o precaución', 'SCA (robo coronario: mejor NTG); HTIC e ictus (aumenta la PIC); insuficiencia hepática (cianuro) o renal (tiocianato); embarazo; hipovolemia'],
+      ['Disección aórtica', 'Siempre después del betabloqueante']]},
+    {titulo: 'Toxicidad por cianuro o tiocianato', alerta: true, items: [
+      ['Signos de alarma', 'Acidosis láctica, taquifilaxia, ↑ SvO₂. Más riesgo si >2 µg/kg/min mantenido'],
+      ['Antídoto', 'Hidroxocobalamina 5 g IV en 15 min']]}],
   ficha: 'Nitroprussiat.md'},
 
 {name: 'Isoprenalina', group: 'Vasoactivos', badge: 'red',

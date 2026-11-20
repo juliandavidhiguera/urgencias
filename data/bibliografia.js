@@ -36,12 +36,14 @@ window.BIBLIOGRAFIA = [
   cambiosAplicados: [
     {ficha: 'Nitroglicerina', cambio: 'Añadidas contraindicaciones: hipotensión/hipovolemia no corregida, IPDE5 en 24h previas o riociguat'},
     {ficha: 'Nitroprusiato sódico', cambio: 'Añadida contraindicación: IPDE5/riociguat concomitante'},
+    {ficha: 'Nitroprusiato sódico', cambio: '2026-11-20, protocolo del servicio (ampollas nuevas sin disolvente): dilución de la calculadora corregida de 50 mg a 10 mg en 50 mL (200 µg/mL, como la ficha SEM); inicio 0,25 (anciano 0,1–0,25), habitual 0,5–3, máx. 10 µg/kg/min ≤10 min; contraindicaciones, paciente geriátrico y toxicidad. Fuentes citadas: ESC HTA 2024 (doi 10.1093/eurheartj/ehae178), ESC IC 2021 y actualización 2023 (doi 10.1093/eurheartj/ehab368, 10.1093/eurheartj/ehad195), ESC aorta 2024 (doi 10.1093/eurheartj/ehae179), Hottinger 2014 (doi 10.4103/0970-9185.142799)'},
     {ficha: 'Dobutamina', cambio: 'Añadida contraindicación: miocardiopatía hipertrófica obstructiva'},
     {ficha: 'Labetalol', cambio: 'Añadido "asma/broncoespasmo activo" a contraindicaciones'}
   ],
   pendientes: [
     {ficha: 'Nitroglicerina', nota: 'La ficha SEM da la perfusión en mcg/kg/h (10–60, máx. 200 µg/min). La app la unifica en µg/min (5–10 de inicio, máx. 200; ACC/AHA 2025) con la dilución de la ficha (10 mg en 50 mL), por decisión de la usuaria del 18/11/2026; la ficha se conserva tal cual.'},
     {ficha: 'Hidrocloruro de fenilefrina', nota: 'Dosis fija en mcg/min; ACC 2025 sugiere mcg/kg/min en shock cardiogénico. Contextos distintos (prehospitalario vs UCI), sin cambio aplicado.'},
+    {ficha: 'Nitroprusiato sódico', nota: 'Protocolo de noviembre de 2026: falta confirmar con farmacia si el resto del vial (40 mg) se desecha o se conserva, y completar las referencias del protocolo SEM y de la ficha técnica AEMPS de la nueva presentación (título, año, nombre comercial).'},
     {ficha: 'Urapidilo', nota: 'Vera no pudo confirmar con fuentes propias — sin guía específica localizada. Pendiente de una fuente citable si se quiere verificar con cita.'}
   ]
 },
