@@ -1,6 +1,6 @@
 # HANDOFF - urgencias (URG CLÍNICO)
 > Leer integro ANTES de tocar codigo. Actualizar ANTES de cerrar sesion.
-**Ultima actualizacion:** 2026-11-17 | **Sesion #:** 29 | **Rama:** main | **HEAD:** `32964de` (subido, `urg-v86`) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
+**Ultima actualizacion:** 2026-11-20 | **Sesion #:** 31 | **Rama:** main | **HEAD:** `3f9531b` (subido, `urg-v88`) · rama LOCAL `ideas-ia` (`c24be12`, sin subir)
 
 ## 1. OBJETIVO DEL PROYECTO
 PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, protocolos de codigos de activacion (IAM/ictus/trauma/sepsis/riesgo suicidio), farmacos con perfusion IV calculada por peso, checklist de intubacion/SIR, fichas tecnicas y bibliografia. "Terminado" no aplica (herramienta viva de uso clinico); cada sesion anade/corrige contenido o UI.
@@ -60,6 +60,12 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - EPOC agudizado (sesion 12): logica probada con Node (8 casos: vacio, leve, moderada, moderada sin apoyo, grave por PaO2, hipercapnica candidata/no candidata, hipoxemica, riesgo vital) y en Chrome local (render, reset, busqueda "epoc", boton flujograma, PDF 200, sin errores de consola). Produccion verificada con curl tras `70d9068`: `protocols.js` con `epoc-agudizado`, PDF 200 `application/pdf`, `sw.js` `urg-v65`.
 
 ## 5. CAMBIOS POR SESION (log inverso, mas reciente arriba)
+
+### Sesion 31 - 2026-11-20
+- `data/infusions.js` (Nitroprusiato sódico): **error de dilución ×5 corregido**: mg 50 → 10 en 50 mL (200 µg/mL, como la ficha SEM); doseMin 0,3 → 0,25. Protocolo del servicio (ampollas nuevas sin disolvente): reconstituir 50 mg + 5 mL SG 5 %, 1 mL + 49 mL; secciones Preparación, Pauta, Paciente geriátrico, Contraindicaciones, Toxicidad (hidroxocobalamina 5 g). Resto del vial (40 mg) y sobrante de jeringa: desechar (solo farmacia puede fraccionar con técnica aséptica). Verificado en node: 60/70/80 kg dan las mL/h de la tabla del protocolo.
+- `data/fichas.js` (nitroprusiato-sodico): alerta, presentación, dosis y contraindicaciones ampliadas. `data/bibliografia.js`: cambio aplicado con DOIs ESC y Hottinger 2014; pendiente de referencias SEM/AEMPS.
+- Commits: `e1acf95` dilución 10 mg/50 mL y protocolo; `3f9531b` desechar resto del vial. Ambos subidos; despliegue no verificado en el navegador.
+- Sin pasar por `engineering-code-reviewer` (regla del CLAUDE.md): pendiente #29.
 
 ### Sesion 30 - 2026-11-17
 - 18/11: #20 aviso de HBPM empírica del TEP con la escala elegida (Ginebra ≥11 / Wells >6), probado con 4 casos en node; #27 meropenem: reconstitución en la presentación, el analizador lee 50 mg/mL.
@@ -196,6 +202,7 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 | ~~26~~ | ~~Heparina del TEP y la FA abre la perfusion~~ — HECHO sesion 28 (peticion del usuario) | - | - | - | Resuelto |
 | ~~27~~ | ~~La calculadora de ficha no lee la presentacion de meropenem («500 mg y de 1 g»): hay que escribirla a mano~~ — HECHO 18/11: reconstitución de la ficha técnica en la presentación (50 mg/mL) | `data/fichas.js` (`presentacion`) o `parsePresentacion` | P3 | - | Al abrir la ficha la presentacion queda preseleccionada |
 | 28 | Nomograma de ajuste de la perfusion de HNF por TTPa (TEP, FA, IAM, SCASEST): hoy el panel solo dice «titular segun la respuesta» | `index.html` (panel lateral) o ficha de heparina | P2 | Usuario (nomograma y rango de TTPa del laboratorio del hospital) | Tabla de ajuste visible en el panel de la heparina |
+| 29 | Nitroprusiato: completar las referencias del protocolo SEM y de la ficha técnica AEMPS de la nueva presentación (título, año, nombre comercial); pasar `e1acf95`+`3f9531b` por `engineering-code-reviewer` y ver la calculadora en el navegador (70 kg, 1 µg/kg/min = 21 mL/h) | `data/bibliografia.js`, `data/infusions.js` | P2 | Usuario (referencias) | Referencias completas y nota de `pendientes` retirada; 21 mL/h en producción |
 | ~~20~~ | ~~Aviso de HBPM empirica en Tratamiento del TEP: hoy solo salta con Wells >6; anadir Ginebra ≥11 cuando `via`=3~~ — HECHO 18/11: el aviso usa la escala elegida (Ginebra revisada ≥11 en su vía, Wells >6 en las demás) | `data/protocols.js` (`tep-agudo` eval) | P3 | - | Con Ginebra alta y demora de imagen aparece la HBPM empirica |
 
 ## 7. BUGS CONOCIDOS Y DEUDA TECNICA
@@ -284,4 +291,4 @@ PWA de consulta rapida para urgencias: cheatsheets, escalas clinicas, formulas, 
 - **Heparina en INFUSIONS**: todo boton `'Heparina sódica'` como texto en un nodo abre la perfusion a 18 UI/kg/h; donde la pauta sea otra usar `{ n: 'Heparina sódica', inf: false }` (solo bolo) o `min/max/rango` (otro rango, como la FA) y `topeH` (tope absoluto por hora, IAM/SCASEST 1.000 UI/h).
 
 ## 10. SIGUIENTE ACCION INMEDIATA
-Hacer el backlog #27 (que la calculadora de ficha lea la presentacion de meropenem «500 mg y de 1 g»); #28 y meropenem en HD esperan datos del usuario.
+Comprobar en urgencias.doctorhiguera.com que el nitroprusiato da 21 mL/h con 70 kg y 1 µg/kg/min, y pasar `e1acf95`+`3f9531b` por `engineering-code-reviewer` (#29).
