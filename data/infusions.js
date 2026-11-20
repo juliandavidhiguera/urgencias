@@ -119,7 +119,8 @@ window.INFUSIONS = [
       ['Jeringa de 50 mL', '1 mL de la dilución (10 mg) + 49 mL de SG 5% = 200 µg/mL'],
       ['Luz', 'Jeringa y línea opacas. Si la solución cambia de color (azul, verde o rojo oscuro), desecharla'],
       ['Vía', 'Solo perfusión continua; nunca en bolo'],
-      ['Resto del vial (40 mg)', 'Pendiente de confirmar con farmacia si se desecha o se conserva']]},
+      ['Resto del vial (40 mg)', 'Desecharlo: no guardar el vial reconstituido ni reutilizarlo en la unidad. Solo farmacia puede fraccionarlo (hasta 4 jeringas más de 10 mg/50 mL) con técnica aséptica validada y protocolo propio'],
+      ['Sobrante de la jeringa', 'Al terminar o suspender la perfusión, desecharlo; no pasarlo a otra jeringa']]},
     {titulo: 'Pauta', items: [
       ['Inicio', '0,25–0,5 µg/kg/min; subir 0,5 µg/kg/min cada 3–5 min'],
       ['Habitual', '0,5–3 µg/kg/min'],

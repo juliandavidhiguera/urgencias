@@ -43,7 +43,7 @@ window.BIBLIOGRAFIA = [
   pendientes: [
     {ficha: 'Nitroglicerina', nota: 'La ficha SEM da la perfusión en mcg/kg/h (10–60, máx. 200 µg/min). La app la unifica en µg/min (5–10 de inicio, máx. 200; ACC/AHA 2025) con la dilución de la ficha (10 mg en 50 mL), por decisión de la usuaria del 18/11/2026; la ficha se conserva tal cual.'},
     {ficha: 'Hidrocloruro de fenilefrina', nota: 'Dosis fija en mcg/min; ACC 2025 sugiere mcg/kg/min en shock cardiogénico. Contextos distintos (prehospitalario vs UCI), sin cambio aplicado.'},
-    {ficha: 'Nitroprusiato sódico', nota: 'Protocolo de noviembre de 2026: falta confirmar con farmacia si el resto del vial (40 mg) se desecha o se conserva, y completar las referencias del protocolo SEM y de la ficha técnica AEMPS de la nueva presentación (título, año, nombre comercial).'},
+    {ficha: 'Nitroprusiato sódico', nota: 'Protocolo de noviembre de 2026: falta completar las referencias del protocolo SEM y de la ficha técnica AEMPS de la nueva presentación (título, año, nombre comercial).'},
     {ficha: 'Urapidilo', nota: 'Vera no pudo confirmar con fuentes propias — sin guía específica localizada. Pendiente de una fuente citable si se quiere verificar con cita.'}
   ]
 },
